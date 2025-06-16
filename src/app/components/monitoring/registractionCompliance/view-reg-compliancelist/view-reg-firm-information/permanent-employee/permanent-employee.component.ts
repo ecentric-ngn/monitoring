@@ -46,52 +46,34 @@ export class PermanentEmployeeComponent {
   }
 
   tableId: any
-  // saveAndNext() {
-  //   const table= this.service.setData(this.id, 'tableId', 'office-signage');
-  //   this.tableId = this.id
-  //    this.activateTab.emit({ id: this.id, tab: 'equipment' });
-  // }
 
   saveAndNext() {
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
-    // const hr = this.tableData.map((item: any) => ({
-    //   cidNo: item.cdbno,
-    //   fullName: item.fullName,
-    //   mobileNo: item.mobileNo,
-    //   designation: item.designationName,
-    //   email: item.email,
-    //   gender: item.sex,
-    //   nationality: item.countryName,
-    //   qualification: item.qualification,
-    //   joiningDate: '2023-09-01',
-    //   tradeField: item.tradeName, // fixed here
-    //   paySlip: this.formData.paySlipFileName,
-    //   hrFulfilled: this.formData.hrFulfilled,
-    //   resubmitDeadline: this.formData.resubmitDate,
-    //   remarks: this.formData.remarks,
-    //   tdsFetched: this.formData.tdsFetched
-    // }));
+    const hr = this.tableData.map((item: any) => ({
+      cidNo: item.cId,
+      fullName: item.name,
+      mobileNo: item.mobileNo,
+      designation: item.designationName,
+      email: item.email,
+      gender: item.sex,
+      nationality: item.countryName,
+      qualification: item.qualification,
+      // joiningDate:  item.joiningDate, encountered an issue with date format
+      joiningDate: "2024-01-01",
+      tradeField: item.tradeName,
+      paySlip: item.paySlipFileName,
+      hrFulfilled: this.formData.hrFulfilled,
+      resubmitDeadline: this.formData.resubmitDate,
+      deadlineRemarks: this.formData.remarksNo,
+      remarks: this.formData.remarksYes,
+      psremarks: ""
+    }));
     const payload = {
 
       registrationReview: { id: this.tableId }, // fixed here
-      // employeeReviews: hr
-      employeeReviews: [
-        {
-          cidNo: this.data.cId,
-          fullName: this.data.name,
-          gender: this.data.sex,
-          nationality: this.data.countryName,
-          qualification: this.data.qualification,
-          joiningDate: this.data.joiningDate || "2025-06-12", // default date if not provided
-          tradeField: this.data.tradeName, // fixed here
-          paySlip: this.data.paySlipFileName || "paySlipFileName.pdf", // default value if not provided
-          hrFulfilled: this.formData.hrFulfilled,
-          resubmitDeadline: this.formData.resubmitDate,
-          remarks: "All documents are in order.",
-          tdsFetched: true
-        }
-      ]
+      employeeReviews: hr
+
     };
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
       console.log('res', res);

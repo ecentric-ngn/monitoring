@@ -1,108 +1,139 @@
-<div class="row m-4">
-  <!-- Office Signboard -->
-  <div class="col-md-6 mb-3">
-    <label class="form-label">Office signboard:<span class="text-danger font-size-12">*</span></label>
-    <button *ngIf="formData.officeSignboardPath" class="btn btn-sm btn-outline-primary"
-      (click)="viewFile(formData.officeSignboardPath)">
-      View doc
-    </button>
-   
-  </div>
+<div *ngIf="formData">
+  <div class="row m-4">
+    <!-- Office Signboard -->
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Office signboard:<span class="text-danger font-size-12">*</span></label>
+      <button *ngIf="formData.officeSignboardPath" class="btn btn-sm btn-outline-primary"
+        (click)="viewFile(formData.officeSignboardPath)">
+        View doc
+      </button>
+    </div>
 
-  <!-- Location -->
-  <div class="col-md-6 mb-3">
-    <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
-    <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation" name="officeLocation"
-      placeholder="Auto" required #officeLocation="ngModel" readonly />
-    <div *ngIf="officeLocation.invalid && officeLocation.touched" class="text-danger font-size-12">
-      Location is required
+    <!-- Location -->
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
+      <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation"
+        name="officeLocation" placeholder="Auto" required #officeLocation="ngModel" readonly />
+      <div *ngIf="officeLocation.invalid && officeLocation.touched" class="text-danger font-size-12">
+        Location is required
+      </div>
+    </div>
+
+    <!-- Review for Signboard -->
+    <div class="col-md-4 mb-3">
+      <label class="form-label">Review (Office signboard):<span class="text-danger font-size-12">*</span></label>
+      <select class="form-select form-control-sm" [(ngModel)]="formData.signboardReview" name="signboardReview" required
+        #signboardReview="ngModel" (change)="onReviewChange()">
+        <option value="">-- Select --</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <div *ngIf="signboardReview.invalid && signboardReview.touched" class="text-danger font-size-12">
+        Please select Yes or No
+      </div>
+    </div>
+
+    <!-- If Review is No: Show Resubmit Date and Remarks -->
+    <div class="col-md-6 mb-3" *ngIf="formData.signboardReview === 'No'">
+      <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
+      <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.signboardResubmitDate"
+        name="signboardResubmitDate" required #signboardResubmitDate="ngModel" />
+      <div *ngIf="signboardResubmitDate.invalid && signboardResubmitDate.touched" class="text-danger font-size-12">
+        Please provide a date
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-3" *ngIf="formData.signboardReview === 'No'">
+      <label class="form-label">Remarks:</label>
+      <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.signboardRemarks"
+        name="signboardRemarks"></textarea>
     </div>
   </div>
 
-  <!-- Review for Signboard -->
-  <div class="col-md-6 mb-3">
-    <label class="form-label">Review (Office signboard):<span class="text-danger font-size-12">*</span></label>
-    <select class="form-select form-control-sm" [(ngModel)]="formData.signboardReview" name="signboardReview" required
-      #signboardReview="ngModel" (change)="onReviewChange()">
-      <option value="">-- Select --</option>
-      <option value="Yes">Yes</option>
-      <option value="No">No</option>
-    </select>
-    <div *ngIf="signboardReview.invalid && signboardReview.touched" class="text-danger font-size-12">
-      Please select Yes or No
+  <div class="row m-4">
+    <!-- Proper Filing System -->
+    <div class="col-md-6">
+      <label class="form-label">Proper filing system:<span class="text-danger font-size-12">*</span></label>
+      <button *ngIf="formData.properFillingPath" class="btn btn-sm btn-outline-primary"
+        (click)="viewFile(formData.properFillingPath)">
+        View doc
+      </button>
     </div>
-  </div>
 
-  <!-- If Review is No: Show Resubmit Date and Remarks -->
-  <div class="col-md-6 mb-3" *ngIf="formData.signboardReview === 'No'">
+    <!-- Review for Filing System -->
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Review(Proper Filing System):<span class="text-danger font-size-12">*</span></label>
+      <select class="form-select form-control-sm" [(ngModel)]="formData.filingReview" name="filingReview" required
+        #filingReview="ngModel" (change)="onFilingReviewChange()">
+        <option value="">-- Select --</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <!-- If Filing Review is No: Show Resubmit Date and Remarks -->
+    <div class="col-md-6 mb-3" *ngIf="formData.filingReview === 'No'">
+      <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
+      <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.filingResubmitDate"
+        name="filingResubmitDate" required #filingResubmitDate="ngModel" />
+      <div *ngIf="filingResubmitDate.invalid && filingResubmitDate.touched" class="text-danger font-size-12">
+        Please provide a date
+      </div>
+    </div>
+
+    <div class="col-md-12 mb-3" *ngIf="formData.filingReview === 'No'">
+      <label class="form-label">Remarks:</label>
+      <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.filingRemarks"
+        name="filingRemarks"></textarea>
+    </div>
+
+    <div class="col-md-6 mb-3">
+      <label class="form-label">OHS Handbook:<span class="text-danger font-size-12">*</span></label>
+      <button *ngIf="formData.ohsHandBook" class="btn btn-sm btn-outline-primary"
+        (click)="viewFile(formData.ohsHandBook)">
+        View doc
+      </button>
+    </div>
+
+    <!-- Review for OHS -->
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Review (OHS Handbook):<span class="text-danger font-size-12">*</span></label>
+      <select class="form-select form-control-sm" [(ngModel)]="formData.ohsReview" name="ohsReview" required
+        #ohsReview="ngModel">
+        <option value="">-- Select --</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+    </div>
+
+    <!-- If OHS Review is No: Show Resubmit Date and Remarks -->
+    <!-- <div class="col-md-6 mb-3" *ngIf="formData.ohsReview === 'No'">
     <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
-    <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.resubmitDate" name="resubmitDate"
-      required  #resubmitDate="ngModel"/>
-    <div *ngIf="resubmitDate.invalid && resubmitDate.touched" class="text-danger font-size-12">
+    <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.ohsResubmitDate" name="ohsResubmitDate"
+      required #ohsResubmitDate="ngModel"/>
+    <div *ngIf="ohsResubmitDate.invalid && ohsResubmitDate.touched" class="text-danger font-size-12">
       Please provide a date
     </div>
   </div>
 
-  <div class="col-md-12 mb-3" *ngIf="formData.signboardReview === 'No'">
+  <div class="col-md-12 mb-3" *ngIf="formData.ohsReview === 'No'">
     <label class="form-label">Remarks:</label>
-    <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.signboardRemarks" name="signboardRemarks">
+    <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.ohsRemarks" name="ohsRemarks"></textarea>
+  </div> -->
 
-    </textarea>
+    <!-- General Remarks -->
+    <div class="col-md-12 mb-3">
+      <label class="form-label">Remarks:</label>
+      <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.generalRemarks"
+        name="generalRemarks"></textarea>
+    </div>
+
+    <!-- Save & Next Button -->
+    <div class="col-12 text-end mt-3">
+      <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()">
+        Save & Next
+      </button>
+    </div>
   </div>
 </div>
 
-<div class="row m-4">
-  <!-- Proper Filing System -->
-  <div class="col-md-6">
-    <label class="form-label">Proper filing system:<span class="text-danger font-size-12">*</span></label>
-    <button *ngIf="formData.properFillingPath" class="btn btn-sm btn-outline-primary"
-      (click)="viewFile(formData.properFillingPath)">
-      View doc
-    </button>
-  </div>
-
-  <!-- Review for Filing System -->
-  <div class="col-md-6 mb-3">
-    <label class="form-label">Review:<span class="text-danger font-size-12">*</span></label>
-    <select class="form-select form-control-sm" [(ngModel)]="formData.filingReview" name="filingReview" required
-      #filingReview="ngModel">
-      <option value="">-- Select --</option>
-      <option value="Yes">Yes</option>
-      <option value="No">No</option>
-    </select>
-  </div>
-
-
-   <div class="col-md-6 mb-3">
-    <label class="form-label">OHS Handbook:<span class="text-danger font-size-12">*</span></label>
-    <button *ngIf="formData.ohsHandBook" class="btn btn-sm btn-outline-primary"
-      (click)="viewFile(formData.ohsHandBook)">
-      View doc
-    </button>
-   </div>
-
-  <!-- Review for OHS -->
-  <div class="col-md-6 mb-3">
-    <label class="form-label">Review (OHS Handbook):<span class="text-danger font-size-12">*</span></label>
-    <select class="form-select form-control-sm" [(ngModel)]="formData.ohsReview" name="ohsReview" required
-      #ohsReview="ngModel">
-      <option value="">-- Select --</option>
-      <option value="Yes">Yes</option>
-      <option value="No">No</option>
-    </select>
-  </div>
-
-  <!-- General Remarks -->
-  <div class="col-md-12 mb-3">
-    <label class="form-label">Remarks:</label>
-    <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.generalRemarks"
-      name="generalRemarks"></textarea>
-  </div>
-  <!-- Save & Next Button -->
-  <div class="col-12 text-end mt-3">
-    <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()">
-      Save & Next
-    </button>
-  </div>
-
-</div>

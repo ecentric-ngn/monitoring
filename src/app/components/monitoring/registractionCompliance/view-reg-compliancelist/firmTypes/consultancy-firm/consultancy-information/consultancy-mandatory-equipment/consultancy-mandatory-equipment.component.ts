@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonService } from '../../../../../service/common.service';
+import { CommonService } from 'src/app/service/common.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -92,7 +92,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
     const eq = this.tableData.map((item: any) => ({
       "equipmentType": item.vehicleType,
-      "requiredEquipment": "string",
+      "isRegistered": "string",
       "categoryOfService": "string",
       "equipmentDeployed": "string",
       "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement, // fixed here

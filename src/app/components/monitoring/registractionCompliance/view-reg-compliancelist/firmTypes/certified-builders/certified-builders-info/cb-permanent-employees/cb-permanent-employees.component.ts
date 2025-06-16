@@ -31,6 +31,7 @@ formData: any = {};
       console.log('employee', this.formData);
     })
   }
+  
   fetchTdsHcPension() {
   }
 
@@ -41,9 +42,9 @@ formData: any = {};
   //    this.activateTab.emit({ id: this.id, tab: 'equipment' });
   // }
 
-  saveAndNext() {
-    const table = this.service.setData(this.id, 'tableId', 'office-signage');
-    this.tableId = this.id;
+  // saveAndNext() {
+  //   const table = this.service.setData(this.id, 'tableId', 'office-signage');
+  //   this.tableId = this.id;
     // const hr = this.tableData.map((item: any) => ({
     //   cidNo: item.cdbno,
     //   fullName: item.fullName,
@@ -61,33 +62,33 @@ formData: any = {};
     //   remarks: this.formData.remarks,
     //   tdsFetched: this.formData.tdsFetched
     // }));
-    const payload = {
+  //   const payload = {
 
-      cbReviewDto: { id: this.tableId }, // fixed here
-      // employeeReviews: hr
-      cbEmployeeReviewDto: [
-        {
-          cidNo: "1241112222",
-          fullName: "John Doe",
-          gender: "Male",
-          nationality: "Bhutanese",
-          qualification: "Bachelor's Degree",
-          joiningDate: "2025-06-12",
-          tradeField: "Engineering",
-          paySlip: "paySlipFileName.pdf",
-          hrFulfilled: this.formData.hrFulfilled,
-          resubmitDeadline: this.formData.resubmitDate,
-          deadlineRemarks: "All documents are in order.",
-          psremarks: "Requirements met!",
-        }
-      ]
-    };
-    this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
-      console.log('res', res);
-      //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
-      this.activateTab.emit({ id: this.tableId, tab: 'cbEquipment' });
-    });
-  }
+  //     cbReviewDto: { id: this.tableId }, // fixed here
+  //     // employeeReviews: hr
+  //     cbEmployeeReviewDto: [
+  //       {
+  //         cidNo: "1241112222",
+  //         fullName: "John Doe",
+  //         gender: "Male",
+  //         nationality: "Bhutanese",
+  //         qualification: "Bachelor's Degree",
+  //         joiningDate: "2025-06-12",
+  //         tradeField: "Engineering",
+  //         paySlip: "paySlipFileName.pdf",
+  //         hrFulfilled: this.formData.hrFulfilled,
+  //         resubmitDeadline: this.formData.resubmitDate,
+  //         deadlineRemarks: "All documents are in order.",
+  //         psremarks: "Requirements met!",
+  //       }
+  //     ]
+  //   };
+  //   this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
+  //     console.log('res', res);
+  //     //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
+  //     this.activateTab.emit({ id: this.tableId, tab: 'cbEquipment' });
+  //   });
+  // }
 
   saveAndForward() {
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
@@ -112,6 +113,41 @@ formData: any = {};
           psremarks: "Requirements not met!",
         }
       ]
+    };
+    this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
+      console.log('res', res);
+      //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
+      this.activateTab.emit({ id: this.tableId, tab: 'cbEquipment' });
+    });
+  }
+
+  saveAndNext() {
+    const table = this.service.setData(this.id, 'tableId', 'office-signage');
+    this.tableId = this.id;
+    const hr = this.tableData.map((item: any) => ({
+      cidNo: item.cId,
+      fullName: item.name,
+      mobileNo: item.mobileNo,
+      designation: item.designationName,
+      email: item.email,
+      gender: item.sex,
+      nationality: item.countryName,
+      qualification: item.qualification,
+      // joiningDate:  item.joiningDate, encountered an issue with date format
+      joiningDate: "2024-01-01",
+      tradeField: item.tradeName,
+      paySlip: item.paySlipFileName,
+      hrFulfilled: this.formData.hrFulfilled,
+      resubmitDeadline: this.formData.resubmitDate,
+      deadlineRemarks: this.formData.remarksNo,
+      remarks: this.formData.remarksYes,
+      psremarks: ""
+    }));
+    const payload = {
+      cbReviewDto: {
+        id: this.tableId,
+      },
+      cbEmployeeReviewDto: hr
     };
     this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
       console.log('res', res);

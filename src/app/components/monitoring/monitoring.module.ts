@@ -47,6 +47,7 @@ import { SfPermanentEmployeesComponent } from './registractionCompliance/view-re
 import { SpecializedFirmsInfoComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/specialized-firms/specialized-firms-info/specialized-firms-info.component';
 import { SpecializedFirmsComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/specialized-firms/specialized-firms.component';
 
+
 @NgModule({
     imports: [
         CommonModule,

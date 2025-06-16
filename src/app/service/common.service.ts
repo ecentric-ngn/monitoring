@@ -10,72 +10,72 @@ import { Observable } from "rxjs";
 export class CommonService {
   storage: any;
 
-  
-   // Shared service method to get the data using the provided property name
-   getData(propertyName: string): any {
+
+  // Shared service method to get the data using the provided property name
+  getData(propertyName: string): any {
     return history.state[propertyName];
-   
+
   }
-// Shared service method to set the tender ID and navigate to the specified route
-// Shared service method to set the tender ID and navigate to the specified route
-setData(data: any, propertyName: string, route: string) {
-  
-  // Create an object with the dynamic property name and ID
-  const stateObj = { [propertyName]: data };
-  // Create NavigationExtras with the state object
-  const navigationExtras: NavigationExtras = {
-    state: stateObj
+  // Shared service method to set the tender ID and navigate to the specified route
+  // Shared service method to set the tender ID and navigate to the specified route
+  setData(data: any, propertyName: string, route: string) {
+
+    // Create an object with the dynamic property name and ID
+    const stateObj = { [propertyName]: data };
+    // Create NavigationExtras with the state object
+    const navigationExtras: NavigationExtras = {
+      state: stateObj
+    }
+    // Navigate to the specified route, passing the NavigationExtras
+    this.router.navigate([route], navigationExtras);
   }
-  // Navigate to the specified route, passing the NavigationExtras
-  this.router.navigate([route], navigationExtras);
-}
 
-setTableData(value: any, key: string, route: string): void {
-  this.storage.set(key, value);
-  // Optionally store `route` too if needed
-}
+  setTableData(value: any, key: string, route: string): void {
+    this.storage.set(key, value);
+    // Optionally store `route` too if needed
+  }
 
-getTableData(key: string): any {
-  return this.storage.get(key);
-}
-    //This is tenderID to fetch the tender details based on the tender id
-    egpTenderId:any
+  getTableData(key: string): any {
+    return this.storage.get(key);
+  }
+  //This is tenderID to fetch the tender details based on the tender id
+  egpTenderId: any
 
-    setTenderId(id:any){
-      this.egpTenderId = id;
-    }
-    getTenderId(){
-      return this.egpTenderId;
-    }
-  
-  constructor(private http: HttpClient,private router: Router) {}
+  setTenderId(id: any) {
+    this.egpTenderId = id;
+  }
+  getTenderId() {
+    return this.egpTenderId;
+  }
 
-//crps endpoint
-  getModelsByUserId(payload: any, token: any,module:any) {
-    
+  constructor(private http: HttpClient, private router: Router) { }
+
+  //crps endpoint
+  getModelsByUserId(payload: any, token: any, module: any) {
+
     const headers = {
       Authorization: `Bearer ${token}`,
     };
     return this.http.get(
       `${userManagmentAPI}/usermgt/menu/getMenuSubmenuByUserId/${payload}/${module}`,
       { headers }
-      
+
     );
   }
-//save audit memo
-  createAuditMemo(payload){
-    return this.http.post<any>(`${api_url}/createAuditMemo`,payload)
+  //save audit memo
+  createAuditMemo(payload) {
+    return this.http.post<any>(`${api_url}/createAuditMemo`, payload)
   }
-// fetch audit data from view
-  fetchAuditData(payload){
-    return this.http.post<any>(`${api_url}/view`,payload);
+  // fetch audit data from view
+  fetchAuditData(payload) {
+    return this.http.post<any>(`${api_url}/view`, payload);
   }
-  viewData(payload){
-    return this.http.post<any>(`${api_url}/view`,payload);
+  viewData(payload) {
+    return this.http.post<any>(`${api_url}/view`, payload);
   }
- 
 
-  
+
+
   //update audit meno
   updateAuditMemo(payload: any) {
     return this.http.put<string>(`${api_url}/updateAuditMemo`, payload, { responseType: 'text' as 'json' });
@@ -84,21 +84,21 @@ getTableData(key: string): any {
   deleteAuditData(id: any) {
     return this.http.delete<string>(`${api_url}/deleteAuditMemo/${id}`, { responseType: 'text' as 'json' });
   }
-  
+
   saveAsDraft(payload: any) {
-    return this.http.post<string>(`${api_url_Monitoring}/draft`, payload, {responseType: 'text' as 'json'});
+    return this.http.post<string>(`${api_url_Monitoring}/draft`, payload, { responseType: 'text' as 'json' });
   }
 
-  saveOnQualityData(payload: any,tableId: any) {
-    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/oq-tests`, payload, {responseType: 'text' as 'json'});
+  saveOnQualityData(payload: any, tableId: any) {
+    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/oq-tests`, payload, { responseType: 'text' as 'json' });
   }
 
-  saveReinforcementData(payload: any,tableId: any) {
-    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/reinforcement`, payload, {responseType: 'text' as 'json'});
+  saveReinforcementData(payload: any, tableId: any) {
+    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/reinforcement`, payload, { responseType: 'text' as 'json' });
   }
 
-  saveCertifiedSkillWorkerData(payload: any,tableId: any) {
-    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/csw`, payload, {responseType: 'text' as 'json'});
+  saveCertifiedSkillWorkerData(payload: any, tableId: any) {
+    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/csw`, payload, { responseType: 'text' as 'json' });
   }
   saveWorkInformation(payload: any): Observable<string> {
     return this.http.post(`${otp_api_url}/work-information`, payload, {
@@ -106,7 +106,7 @@ getTableData(key: string): any {
     });
   }
 
-    saveNewContractorInformationData(payload: any): Observable<string> {
+  saveNewContractorInformationData(payload: any): Observable<string> {
     return this.http.post(`${api_url_Monitoring}/new-contractor`, payload, {
       responseType: 'text' as 'text'
     });
@@ -114,17 +114,17 @@ getTableData(key: string): any {
 
 
 
-updateWorkInformationData(payload: any, id: any): Observable<string> {
-  return this.http.put(`${otp_api_url}/work-information/${id}`, payload, {
-    responseType: 'text' as 'text'
-  });
-}
+  updateWorkInformationData(payload: any, id: any): Observable<string> {
+    return this.http.put(`${otp_api_url}/work-information/${id}`, payload, {
+      responseType: 'text' as 'text'
+    });
+  }
 
 
 
 
   saveWorkDetails(payload: any) {
-    return this.http.post<string>(`${otp_api_url}/inspection-details`, payload, {responseType: 'text' as 'json'});
+    return this.http.post<string>(`${otp_api_url}/inspection-details`, payload, { responseType: 'text' as 'json' });
   }
   generateApplicationNo(id: any) {
     return this.http.post<string>(`${api_url_Monitoring}/${id}/submit`, null);
@@ -135,33 +135,33 @@ updateWorkInformationData(payload: any, id: any): Observable<string> {
   getApplicationDetails(id: any) {
     return this.http.get<any>(`${api_url_Monitoring}/${id}`);
   }
-  uploadFile(file:File){
+  uploadFile(file: File) {
     const formData: FormData = new FormData();
     formData.append("file", file);
-    return this.http.post(`${fileUpload_api_url_Monitoring}/file/upload`, formData ,{ responseType: 'text' });
+    return this.http.post(`${fileUpload_api_url_Monitoring}/file/upload`, formData, { responseType: 'text' });
   }
-  uploadFiles(file:File,remarks: string, formType: string, userName: string){
+  uploadFiles(file: File, remarks: string, formType: string, userName: string) {
     const formData: FormData = new FormData();
     formData.append("file", file);
     formData.append("remarks", remarks);
     formData.append("formType", formType);
     formData.append("createdBy", userName);
     formData.append('documentType', 'pdf'); // ✅ Add this
-    return this.http.post(`${fileUpload_api_url_Monitoring}/file/upload`, formData ,{ responseType: 'text' });
+    return this.http.post(`${fileUpload_api_url_Monitoring}/file/upload`, formData, { responseType: 'text' });
   }
   saveCheckListId(checklistId: any, payload: any) {
-    return this.http.post<any>(`${api_url_Monitoring}/${checklistId}/assign-files`, payload, {responseType: 'text' as 'json'});
+    return this.http.post<any>(`${api_url_Monitoring}/${checklistId}/assign-files`, payload, { responseType: 'text' as 'json' });
   }
-  
-    saveActionTakenByData(payload: any,checklistId: any) {
-    return this.http.post<any>(`${api_url_Monitoring}/monitoring-actions/${checklistId}`, payload, {responseType: 'text' as 'json'});
+
+  saveActionTakenByData(payload: any, checklistId: any) {
+    return this.http.post<any>(`${api_url_Monitoring}/monitoring-actions/${checklistId}`, payload, { responseType: 'text' as 'json' });
   }
 
   forwardApplicationToReviewer(payload: any) {
-    return this.http.post<any>(`${api_url_Monitoring}/forward`, payload, {responseType: 'text' as 'json'});
+    return this.http.post<any>(`${api_url_Monitoring}/forward`, payload, { responseType: 'text' as 'json' });
   }
 
- sendMassEmail(payload: any) {
+  sendMassEmail(payload: any) {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/contractor/compliance/notification`, payload, { responseType: 'text' as 'json' });
   }
 
@@ -173,7 +173,7 @@ updateWorkInformationData(payload: any, id: any): Observable<string> {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/notification`, payload, { responseType: 'text' as 'json' });
   }
 
-   sendMassMailToSpecializedFirm(payload: any) {
+  sendMassMailToSpecializedFirm(payload: any) {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/notification`, payload, { responseType: 'text' as 'json' });
   }
 
@@ -189,7 +189,7 @@ updateWorkInformationData(payload: any, id: any): Observable<string> {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/certified-builder/compliance/save`, payload, { responseType: 'text' as 'json' });
   }
 
-   saveOfficeSignageAndDocSF(payload: any) {
+  saveOfficeSignageAndDocSF(payload: any) {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/save`, payload, { responseType: 'text' as 'json' });
   }
 
@@ -200,6 +200,13 @@ updateWorkInformationData(payload: any, id: any): Observable<string> {
   forwardToReviewCommiteeConsultancy(id: any) {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
   }
+  forwardToReviewCommiteeCB(id: any) {
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/certified-builder/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
+  }
+
+  forwardToReviewCommiteeSF(id: any) {
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
+  }
   generateOtp(mobileNo: any) {
     console.log('mobileNo', mobileNo);
     const params = new HttpParams().set('mobileNumber', mobileNo);
@@ -208,15 +215,15 @@ updateWorkInformationData(payload: any, id: any): Observable<string> {
       responseType: 'text' as 'json'  // casting to satisfy TypeScript
     });
   }
-  saveSiteEngineerData(payload: any,tableId) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/client-site-engineers/${tableId}`,payload,{responseType: 'text' as 'json'});
+  saveSiteEngineerData(payload: any, tableId) {
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/client-site-engineers/${tableId}`, payload, { responseType: 'text' as 'json' });
   }
 
-  saveMonitoringTeamData(payload: any,tableId) {
-  return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/monitoring-team-member/${tableId}`,payload,{responseType: 'text' as 'json'});
+  saveMonitoringTeamData(payload: any, tableId) {
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/monitoring-team-member/${tableId}`, payload, { responseType: 'text' as 'json' });
   }
   getUserDetails(payload: any) {
-    return this.http.post<any>(`${userManagmentAPI}/usermgt/view`,payload);
+    return this.http.post<any>(`${userManagmentAPI}/usermgt/view`, payload);
   }
   validateOtp(mobileNo: any, otp: any) {
     const params = new HttpParams()
@@ -229,102 +236,102 @@ updateWorkInformationData(payload: any, id: any): Observable<string> {
   }
 
 
-saveEndorseRejectApplication(payload:any) {
-  return this.http.post<any>(
-    `${otp_api_url}/review/checklists/decision`,payload,{responseType: 'text' as 'json'}
+  saveEndorseRejectApplication(payload: any) {
+    return this.http.post<any>(
+      `${otp_api_url}/review/checklists/decision`, payload, { responseType: 'text' as 'json' }
 
-  );
-}
-// saveRejectApplicationData(payload:any) {
-//   return this.http.post<any>(
-//     `${otp_api_url}/review/checklists/decision`,payload,{responseType: 'text' as 'json'}
+    );
+  }
+  // saveRejectApplicationData(payload:any) {
+  //   return this.http.post<any>(
+  //     `${otp_api_url}/review/checklists/decision`,payload,{responseType: 'text' as 'json'}
 
-//   );
-// }
+  //   );
+  // }
 
-// saveRejectApplicationData(payload: any, id: any, reviewerId: any, rejectReason: any) {
-//   const params = {
-//     decision: payload,
-//     reviewerId: reviewerId
-//   };
-//   const body = {
-//     remarks: rejectReason.remarks
-//   };return this.http.post<any>(
-//     `${otp_api_url}/review/checklists/${id}/decision`,body,{params: params,responseType: 'text' as 'json'
-//     }
-//   );
-// }
+  // saveRejectApplicationData(payload: any, id: any, reviewerId: any, rejectReason: any) {
+  //   const params = {
+  //     decision: payload,
+  //     reviewerId: reviewerId
+  //   };
+  //   const body = {
+  //     remarks: rejectReason.remarks
+  //   };return this.http.post<any>(
+  //     `${otp_api_url}/review/checklists/${id}/decision`,body,{params: params,responseType: 'text' as 'json'
+  //     }
+  //   );
+  // }
 
-getEmailedContractors() {
-  return this.http.get<any[]>(`${api_url_Monitoring_siteEngineer}/contractor/compliance/emailed-contractors
+  getEmailedContractors() {
+    return this.http.get<any[]>(`${api_url_Monitoring_siteEngineer}/contractor/compliance/emailed-contractors
 
 `);
-}
-getConsultancyFirm(){
-   return this.http.get<any[]>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/emailed-consultants
+  }
+  getConsultancyFirm() {
+    return this.http.get<any[]>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/emailed-consultants
 `);
-}
-getSpecilizedFirm(){
+  }
+  getSpecilizedFirm() {
     return this.http.get<any[]>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/emailed-specialized-firms
 
 `  );
-}
-getCertifiedFirm(){
+  }
+  getCertifiedFirm() {
     return this.http.get<any[]>(`${api_url_Monitoring_siteEngineer}/certified-builder/compliance/emailed-certified-builders
 
 `  );
-}
-notifyMonitoringCommittee(ids: number[]) {
-  return this.http.post<any>(
-    `${api_url_Monitoring_siteEngineer}/contractor/compliance/notify-monitoring-committee`, 
-    ids, // Send the array directly
-    { responseType: 'text' as 'json' }
-  );
-}
+  }
+  notifyMonitoringCommittee(ids: number[]) {
+    return this.http.post<any>(
+      `${api_url_Monitoring_siteEngineer}/contractor/compliance/notify-monitoring-committee`,
+      ids, // Send the array directly
+      { responseType: 'text' as 'json' }
+    );
+  }
 
-consultantFirmNotifyingMonitoringCommittee(ids: number[]) {
-  return this.http.post<any>(
-    `${api_url_Monitoring_siteEngineer}/consultant/compliance/notify-monitoring-committee
+  consultantFirmNotifyingMonitoringCommittee(ids: number[]) {
+    return this.http.post<any>(
+      `${api_url_Monitoring_siteEngineer}/consultant/compliance/notify-monitoring-committee
 `,
-    ids,
-    { responseType: 'text' as 'json' }
-  );
-}
+      ids,
+      { responseType: 'text' as 'json' }
+    );
+  }
 
-specilizedFirmNotifyingMonitoringCommittee(ids: number[]) {
-  return this.http.post<any>(
-    `${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/notify-monitoring-committee`,
-    ids,
-    { responseType: 'text' as 'json' }
-  );
-}
+  specilizedFirmNotifyingMonitoringCommittee(ids: number[]) {
+    return this.http.post<any>(
+      `${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/notify-monitoring-committee`,
+      ids,
+      { responseType: 'text' as 'json' }
+    );
+  }
 
-certifiedBuilderFirmNotifyingMonitoringCommittee(ids: number[]) {
-  return this.http.post<any>(
-    `${api_url_Monitoring_siteEngineer}/certified-builder/compliance/notify-monitoring-committee`,
-    ids,
-    { responseType: 'text' as 'json' }
-  );
-}
+  certifiedBuilderFirmNotifyingMonitoringCommittee(ids: number[]) {
+    return this.http.post<any>(
+      `${api_url_Monitoring_siteEngineer}/certified-builder/compliance/notify-monitoring-committee`,
+      ids,
+      { responseType: 'text' as 'json' }
+    );
+  }
 
-fetchCertifiedBuilderDetails (payload: any, pageNo: any, pageSize: any, viewName: any) {
-  return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`,payload);
-}
+  fetchCertifiedBuilderDetails(payload: any, pageNo: any, pageSize: any, viewName: any) {
+    return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`, payload);
+  }
 
-fetchconsultantDetails (payload: any, pageNo: any, pageSize: any, viewName: any) {
-      return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`,payload);
-    }
+  fetchconsultantDetails(payload: any, pageNo: any, pageSize: any, viewName: any) {
+    return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`, payload);
+  }
 
-    fetchSpecializedDetails (payload: any, pageNo: any, pageSize: any, viewName: any) {
-      return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`,payload);
-    }
+  fetchSpecializedDetails(payload: any, pageNo: any, pageSize: any, viewName: any) {
+    return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`, payload);
+  }
 
-   fetchDetails(payload: any, pageNo: any, pageSize: any, viewName: any) {
-      return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`,payload);
-    }
- deleteFile(fileId: string) {
-  return this.http.delete(`${fileUpload_api_url_Monitoring}/file/files/${fileId}` , { responseType: 'text' });
- }
+  fetchDetails(payload: any, pageNo: any, pageSize: any, viewName: any) {
+    return this.http.post<any>(`${api_url_Monitoring}/view?pageNo=${pageNo}&pageSize=${pageSize}&viewName=${viewName}`, payload);
+  }
+  deleteFile(fileId: string) {
+    return this.http.delete(`${fileUpload_api_url_Monitoring}/file/files/${fileId}`, { responseType: 'text' });
+  }
   /**
    * Saves compliance and non-compliance data for a specific contractor.
    * Makes an HTTP POST request to process the data based on the provided table ID.
@@ -333,34 +340,34 @@ fetchconsultantDetails (payload: any, pageNo: any, pageSize: any, viewName: any)
    * @returns An observable that emits the server response.
    */
   savecomplianceAndNonCompliance(payload: any, tableId: any): Observable<any> {
-    return this.http.post<any>(`${otp_api_url}/contractor/process/${tableId}`, payload, {responseType: 'text' as 'json'});
+    return this.http.post<any>(`${otp_api_url}/contractor/process/${tableId}`, payload, { responseType: 'text' as 'json' });
   }
-    downloadFile(filePath:any) {
-      return this.http.get(`${api_url_Monitoring_siteEngineer}/file/download?filePath=${filePath}`, { 
-        observe: 'response', 
-        responseType: 'blob' 
-      });
-      }
+  downloadFile(filePath: any) {
+    return this.http.get(`${api_url_Monitoring_siteEngineer}/file/download?filePath=${filePath}`, {
+      observe: 'response',
+      responseType: 'blob'
+    });
+  }
 
-      saveReviewedData(payload: any): Observable<any> {
-         return this.http.post<any>(`${otp_api_url}/review/review-status`, payload, {responseType: 'text' as 'json'});
-      }
-    /**
-     * This function makes an HTTP GET request to the DCRC API to fetch citizen details
-     * based on the provided CID.
-     * @param cid The CID of the citizen whose details are to be fetched.
-     * @returns An observable that emits the response from the API.
-     */
-    getCitizenDetails(cid: any): Observable<any> {
-      return this.http.get(`${web_service_url}/getCitizenDetails/${cid}`);
-    }
+  saveReviewedData(payload: any): Observable<any> {
+    return this.http.post<any>(`${otp_api_url}/review/review-status`, payload, { responseType: 'text' as 'json' });
+  }
+  /**
+   * This function makes an HTTP GET request to the DCRC API to fetch citizen details
+   * based on the provided CID.
+   * @param cid The CID of the citizen whose details are to be fetched.
+   * @returns An observable that emits the response from the API.
+   */
+  getCitizenDetails(cid: any): Observable<any> {
+    return this.http.get(`${web_service_url}/getCitizenDetails/${cid}`);
+  }
 
-    getBaseOnEid(eidnumber: number): Observable<any> {
-      return this.http.get(`${web_service_url}/getEmployeeDetails/${eidnumber}`)
-    }
+  getBaseOnEid(eidnumber: number): Observable<any> {
+    return this.http.get(`${web_service_url}/getEmployeeDetails/${eidnumber}`)
+  }
 
-  
-fetchComplianceData() {
+
+  fetchComplianceData() {
     return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/contractor/compliance/emailed-contractors`);
   }
 
@@ -376,9 +383,9 @@ fetchComplianceData() {
     return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/emailed-specialized-firms`);
   }
 
- getDatabasedOnBctaNo(bctaNo: any) {
-  return this.http.get(`${g2c_url}/compliance/full/${bctaNo}`);
-}
+  getDatabasedOnBctaNo(bctaNo: any) {
+    return this.http.get(`${g2c_url}/compliance/full/${bctaNo}`);
+  }
 
 
 
@@ -395,7 +402,7 @@ fetchComplianceData() {
       { headers }
     );
   }
-  getPrivileges(submenuId: any,uuid:any ,token: any) {
+  getPrivileges(submenuId: any, uuid: any, token: any) {
     const headers = {
       Authorization: `Bearer ${token}`,
     };
@@ -405,20 +412,17 @@ fetchComplianceData() {
     );
   }
   //getting the list of consultant function
-  getList(consultant:any){
-    return this.http.post<any>(`${api_url}/view`,consultant)
-    }
-    getAllAgency(){
-      return this.http.get<any>(`${Agency_api_url}/agency/getAllAgency`);
-    }
-    
-    getVehicleDetails(vehicleNo:any, vehicleType:string){
-      return this.http.get(`${web_service_url}/getVehicleDetails/${vehicleNo}/${vehicleType}`);
-    }
+  getList(consultant: any) {
+    return this.http.post<any>(`${api_url}/view`, consultant)
+  }
+  getAllAgency() {
+    return this.http.get<any>(`${Agency_api_url}/agency/getAllAgency`);
   }
 
-  
-  
+  getVehicleDetails(vehicleNo: any, vehicleType: string) {
+    return this.http.get(`${web_service_url}/getVehicleDetails/${vehicleNo}/${vehicleType}`);
+  }
+}
 
 function specilizedFirmNotifyingMonitoringCommittee(ids: number[], arg1: any) {
   throw new Error("Function not implemented.");

@@ -17,13 +17,15 @@
       <tr *ngFor="let data of tableData">
         <!-- Registered -->
         <ng-container *ngIf="data.owner !== 'Unregistered'; else notRegistered">
-          <td>Yes</td>
-          <td>{{ data.vehicleType }}</td>
-          <td>{{ data.vehicleNumber }}</td>
+          <td>{{data.equipmentType}}</td>
+          <td>{{ data.equipmentName }}</td>
+          <td>{{ data.registrationNo }}</td>
           <td>{{ data.owner }}</td>
-          <td>{{ data.cdbno || 'N/A' }}</td>
+          <td>{{ data.cid}}</td>
+          <td> 'N/A' </td>
           <td>{{ data.chassisNumber }}</td>
-          <td>-</td>
+          
+         
           <!-- <td>-</td> -->
         </ng-container>
 

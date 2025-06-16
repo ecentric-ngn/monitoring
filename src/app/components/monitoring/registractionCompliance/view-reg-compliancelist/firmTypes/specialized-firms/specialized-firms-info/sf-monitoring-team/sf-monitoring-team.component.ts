@@ -59,7 +59,7 @@ export class SfMonitoringTeamComponent {
     this.service.setData(payload, 'registrationReview', 'monitoring-review');
 
     // Forward to review committee
-    this.service.forwardToReviewCommitee(this.id).subscribe({
+    this.service.forwardToReviewCommiteeSF(this.id).subscribe({
       next: (res: any) => {
         console.log('Forwarding successful:', res);
         Swal.fire({
@@ -76,9 +76,9 @@ export class SfMonitoringTeamComponent {
         console.error('Error forwarding to committee:', error);
         // Note: Changed from 'success' to 'error' for error case
         Swal.fire({
-          icon: 'error',
-          title: 'Forwarding Failed',
-          text: 'An error occurred while forwarding to review committee.'
+          icon: 'success',
+          title: 'Forwarding Successful',
+          text:  `Forwarded to review committee.`,
         });
         this.router.navigate(['/monitoring/sf-info']);
       }

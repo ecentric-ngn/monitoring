@@ -36,7 +36,8 @@
                           }
                         ],
                         "styles": [
-                          "node_modules/primeng/resources/primeng.min.css"
+                          "node_modules/primeng/resources/primeng.min.css",
+                          "node_modules/ng-zorro-antd/ng-zorro-antd.min.css"
                           
                         ],
                         "scripts": [
@@ -111,7 +112,8 @@
                         "inlineStyleLanguage": "scss",
                         "styles": [
                             "src/styles.scss",
-                            "node_modules/primeng/resources/primeng.min.css"
+                            "node_modules/primeng/resources/primeng.min.css",
+                            "node_modules/ng-zorro-antd/ng-zorro-antd.min.css"
                         ],
                         "scripts": [],
                         "assets": [

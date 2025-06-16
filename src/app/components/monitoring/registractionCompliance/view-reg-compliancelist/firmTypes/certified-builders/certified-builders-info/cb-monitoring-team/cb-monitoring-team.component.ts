@@ -66,7 +66,7 @@ formData: any = {};
     this.service.setData(payload, 'registrationReview', 'monitoring-review');
 
     // Then forward to review committee
-    this.service.forwardToReviewCommitee(this.tableId).subscribe(
+    this.service.forwardToReviewCommiteeCB(this.tableId).subscribe(
       (res: any) => {
         console.log('res', res);
         Swal.fire({

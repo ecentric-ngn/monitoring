@@ -15,6 +15,9 @@ export class OfficeSignageComponent {
     constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
   
     ngOnInit() {
+
+      this.initializeFormData();
+
       const WorkDetail = this.service.getData('BctaNo');
       console.log('Retrieved WorkDetail:', WorkDetail);
   
@@ -37,19 +40,42 @@ export class OfficeSignageComponent {
       }
     }
   
-    fetchDataBasedOnBctaNo() {
-      this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
-        this.formData = res.complianceEntities[0]
-        console.log('Consultancy officesignagedoc', this.formData);
-      })
+     initializeFormData() {
+    this.formData = {
+      // Office Signboard Section
+      officeSignboardPath: null,       // File path (null if not uploaded)
+      officeLocation: '',              // Location text
+      signboardReview: '',             // 'Yes' or 'No'
+      resubmitDate: null,              // Date object for resubmission
+      signboardRemarks: '',            // Remarks text
+
+      // Proper Filing System Section
+      properFillingPath: null,         // File path
+      filingReview: '',                // 'Yes' or 'No'
+      
+      // Initialize other fields that might be used in saveAndNext()
+      ohsHandBook: null                // File path (commented in template)
+    };
+  }
+
+   onReviewChange() {
+    if (this.formData.signboardReview === 'No') {
+      // Initialize resubmit fields when 'No' is selected
+      this.formData.resubmitDate = null;
+      this.formData.signboardRemarks = '';
     }
-  
-    onReviewChange() {
-      if (this.formData.signboardReview === 'No') {
-        this.formData.resubmitDate = '';
-        this.formData.remarks = '';
-      }
-    }
+  }
+
+   fetchDataBasedOnBctaNo() {
+  this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+    // Merge API response with initialized formData
+    this.formData = { 
+      ...this.formData, // Keep initialized values
+      ...res.complianceEntities[0] // Add API data
+    };
+    console.log('Updated formData:', this.formData);
+  });
+}
   
     id: any;
     saveAndNext() {

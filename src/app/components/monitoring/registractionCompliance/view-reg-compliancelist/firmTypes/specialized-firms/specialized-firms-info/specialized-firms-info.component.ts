@@ -64,7 +64,6 @@ formData: any = {};
     this.id = this.id
     this.activeTabId = 'sfemployee';
   }
-  
 
   monitoringTeam() {
     this.id = this.id

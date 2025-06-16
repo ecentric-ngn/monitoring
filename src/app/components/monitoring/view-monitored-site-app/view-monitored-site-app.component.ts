@@ -94,10 +94,10 @@ export class ViewMonitoredSiteAppComponent {
 
     private closeModal() {
         // Use native Bootstrap JS to close the modal
-        const modal = bootstrap.Modal.getInstance(this.modalContent.nativeElement);
-        if (modal) {
-            modal.hide();
-        }
+        // const modal = bootstrap.Modal.getInstance(this.modalContent.nativeElement);
+        // if (modal) {
+        //     modal.hide();
+        // }
         // // Alternative if using ng-bootstrap:
         // this.modalService.dismissAll();
     }

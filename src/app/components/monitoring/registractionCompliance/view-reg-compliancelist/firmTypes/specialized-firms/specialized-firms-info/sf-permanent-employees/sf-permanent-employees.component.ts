@@ -44,7 +44,7 @@ export class SfPermanentEmployeesComponent {
 saveAndNext() {
   // Get the first employee or create a default object
   const firstEmployee = this.tableData?.[0] || {};
-  
+
   // Create single object payload
   const payload = {
     firmName: firstEmployee?.name || 'string', 
@@ -62,8 +62,22 @@ saveAndNext() {
   this.service.saveOfficeSignageAndDocSF(payload).subscribe({
     next: (res: any) => {
       console.log('API response:', res);
+      // Debug: log typeof res and its keys
+      console.log('typeof res:', typeof res, 'res keys:', res && Object.keys(res));
+      // Defensive: handle stringified JSON
+      let emittedId = '';
+      if (typeof res === 'string') {
+        try {
+          const parsed = JSON.parse(res);
+          emittedId = parsed && parsed.id ? parsed.id : '';
+        } catch (e) {
+          emittedId = '';
+        }
+      } else if (res && res.id) {
+        emittedId = res.id;
+      }
       this.activateTab.emit({ 
-        id: this.tableId, 
+        id: emittedId, 
         tab: 'sfmonitoring' 
       });
     },
@@ -71,7 +85,7 @@ saveAndNext() {
       console.error('API error:', err);
       // Handle error (show message, etc.)
     }
-  });
+  }); 
 }
 
 private formatDate(date: any): string {

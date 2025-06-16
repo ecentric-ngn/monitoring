@@ -82,32 +82,20 @@ export class MandatoryEquipmentComponent {
   saveAndNext() {
     const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
     this.tableId = this.id;
-    // const eq = this.tableData.map((item: any) => ({
-    //   isRegistered: 'true',
-    //   vehicleType: item.vehicleType,
-    //   registrationNo: item.vehicleNumber,
-    //   ownerName: item.owner,
-    //   ownerCid: item.vehicleType,
-    //   equipmentType: item.vehicleType,
-    //   mandatoryEquipmentFulfilled: 'true',
-    //   resubmitDeadline: '2023-09-01',
-    //   remarks: this.formData.remarks, // fixed here
-    // }));
+     const eq = this.tableData.map((item: any) => ({
+      "equipmentType": item.equipmentName,
+      "isRegistered": item.equipmentType,
+      "registrationNo": item.registrationNo,
+      "equipmentDeployed": "string",
+      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement, // fixed here
+      "resubmitDeadline": this.formData.ResubmitDate, // fixed here
+      "deadlineRemarks": this.formData.resubmitRemarks, // fixed here
+      "remarks": "string",
+      "edremarks": "string" }));
+
     const payload = {
       registrationReview: { id: this.tableId },
-      equipmentReviews: [
-        {
-          isRegistered: true,
-          vehicleType: this.data.vehicleType,
-          registrationNo: this.data.vehicleNumber,
-          ownerName: this.data.owner,
-          ownerCid: "119218392",
-          equipmentType: "Type-R",
-          mandatoryEquipmentFulfilled: "yes",
-          resubmitDeadline: "2025-06-12",
-          remarks: "All required equipment is available and in good condition."
-        }
-      ]
+      equipmentReviews: eq
     };
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
       console.log('res', res);
@@ -119,21 +107,21 @@ export class MandatoryEquipmentComponent {
   notifyContractor() {
   const table = this.service.setData(this.id, 'tableId', 'office-signage');
   this.tableId = this.id;
+
+   const eq = this.tableData.map((item: any) => ({
+      "equipmentType": item.vehicleType,
+      "requiredEquipment": "string",
+      "categoryOfService": "string",
+      "equipmentDeployed": "string",
+      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement, // fixed here
+      "resubmitDeadline": this.formData.ResubmitDate, // fixed here
+      "deadlineRemarks": this.formData.resubmitRemarks, // fixed here
+      "remarks": "string",
+      "edremarks": "string" }));
+
   const payload = {
      registrationReview: { id: this.tableId },
-        equipmentReviews: [
-          {
-            isRegistered: true,
-            vehicleType: this.data.vehicleType,
-            registrationNo: this.data.vehicleNumber,
-            ownerName: this.data.owner,
-            ownerCid: "119218392",
-            equipmentType: "Type-R",
-            mandatoryEquipmentFulfilled: "no",
-            resubmitDeadline: "2025-06-12",
-            remarks: this.formData.resubmitRemarks
-          }
-        ]
+      equipmentReviews: eq
   };
   
   this.service.saveOfficeSignageAndDoc(payload).subscribe({
