@@ -1,0 +1,708 @@
+<hr class="m-3">
+<div class="p-3">
+  <span class=" font-bold font-size-12">Onsite Facilities and management</span>
+  <hr>
+  <form>
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Project Sign Installed:</label>
+        <span class="font-size-12"> {{ formData.project_sign_installed  }}</span>
+
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Site Office Available:</label>
+        <span class="font-size-12"> {{ formData.site_office_available }}</span>
+
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Site Store Available:</label>
+        <span class="font-size-12"> {{ formData.site_store_available }}</span>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Workers Accommodation:</label>
+        <span class="font-size-12"> {{ formData.workers_accommodation_available }}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Sanitation Facilities:</label>
+        <span class="font-size-12"> {{ formData.proper_sanitation_facilities}}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Potable Water Access:</label>
+        <span class="font-size-12"> {{ formData.potable_water_access }}</span>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">APS Maintained:</label>
+        <span class="font-size-12"> {{ formData.aps_maintained_by_agency }}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Meetings Documented:</label>
+        <span class="font-size-12"> {{ formData.meetings_conducted_and_documented  }}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <div class="">
+          <span class="font-size-12"> {{ formData.onsiteremarks }}</span>
+        </div>
+      </div>
+      <div class="row col-md-12">
+        <div *ngIf="onsiteFiles.length > 0" class="mb-3 p-3 d-flex align-items-center">
+          <label class="form-label me-3 mb-0">Onsite Files:</label>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <div *ngFor="let filePath of onsiteFiles">
+              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                <i class="">view doc</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </form>
+  <span class=" font-bold font-size-12">Contract document at site</span>
+  <hr>
+  <form>
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Construction Permit:</label>
+          <span class="font-size-12">{{ formData.construction_permit_available}}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Conditions of Contract:</label>
+          <span class="font-size-12">{{ formData.construction_conditions_complied }}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Work Insurance:</label>
+          <span class="font-size-12">{{ formData.work_insurance_status }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Third Party Insurance:</label>
+          <span class="font-size-12">{{ formData.third_party_insurance_status }}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Approved Drawings:</label>
+          <span class="font-size-12">{{ formData.approved_drawings_available }}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Materials quality certification:</label>
+          <span class="font-size-12">{{ formData.materials_quality_certified  }}</span>
+        </div>
+      </div>
+
+    </div>
+    <div class="row">
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Test conducted as per QAP, Specifications and Industry
+            standards:</label>
+          <span class="font-size-12">{{ formData.tests_conducted_as_per_standards }}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Hindrance Register Select maintained:</label>
+          <span class="font-size-12">{{ formData.hindrance_register_maintained }}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Day work Journal Maintained:</label>
+          <span class="font-size-12">{{ formData.day_work_journal_maintained  }}</span>
+        </div>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Environment Management Plan:</label>
+          <span class="font-size-12">{{ formData.environment_management_plan}}</span>
+        </div>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <div class="d-flex justify-content-between">
+          <label class="form-label me-2 font-size-12">Work plan:</label>
+          <span class="font-size-12">{{ formData.work_plan  }}</span>
+        </div>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <div>
+          <div class="">
+            <span class="font-size-12"> {{ formData.contractDocRemarks }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="row col-md-12">
+        <div *ngIf="contractDocFiles.length > 0" class="mb-3 d-flex align-items-center p-3">
+          <label class="form-label me-3 mb-0">Onsite Files:</label>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <div *ngFor="let filePath of contractDocFiles">
+              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                <i class="">view doc</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <span class=" font-bold font-size-12">Work Progress</span>
+  <hr>
+  <form>
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Physical progress:</label>
+        <span class="font-size-12">
+          {{ formData.physical_progress }}
+        </span>
+
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Financial progress:</label>
+        <span class="font-size-12">
+          {{ formData.financial_progress }}
+        </span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <div *ngIf="workProgressFiles.length > 0" class="mb-3">
+          <label class="form-label ">Work Progress Files:</label>
+          <div *ngFor="let filePath of workProgressFiles" class="mb-1">
+            <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+              <i class="bi bi-eye me-1"></i> view doc
+            </button>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">Remarks:</label>
+          <span class="font-size-12">{{formData.workProgressRemarks}}</span>
+        </div>
+      </div>
+
+    </div>
+  </form>
+
+  <span class=" font-bold font-size-12">Qualification of Subcontractors</span>
+  <hr>
+  <form>
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Sub-contractor/Specialized Firm:</label>
+        <span class="font-size-12">{{ formData.sub_contractor_exists }}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">
+          BCTA Registration No:
+        </label>
+        <span class="font-size-12">{{ formData.bcta_registration_no || 'N/A' }}</span>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Full Name:</label>
+        <span class="font-size-12">{{ formData.sub_contractor_full_name || 'N/A' }}</span>
+      </div>
+    </div>
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Date Validity:</label>
+        <span class="font-size-12">{{ formData.registration_valid_until || 'N/A' }}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Licensing requirements of subcontractor/Specialized Firm:</label>
+        <span class="font-size-12">{{ formData.sub_contractor_licensing_compliance }}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <span class="font-size-12">{{ formData.qualificationRemarks || 'N/A' }}</span>
+      </div>
+      <div class="row">
+        <div class="row col-md-12">
+          <div *ngIf="qualificationFiles.length > 0" class="mb-3 d-flex align-items-center p-3">
+            <label class="form-label me-3 mb-0">Qualification File:</label>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div *ngFor="let filePath of qualificationFiles">
+                <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                  <i class="">view doc</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <span class=" font-bold font-size-12">Work Task quality</span>
+  <hr>
+  <form>
+    <div class="row">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Site Order book available at Site:</label>
+        <span class="font-size-12">{{ formData.site_order_book_available}}</span>
+      </div>
+      <div class="col-md-8 mb-3">
+        <label class="form-label me-2 font-size-12">
+          All quality inspections
+          and quality control
+          activities were
+          performed and
+          documented:
+
+        </label>
+        <span class="font-size-12">{{ formData.quality_control_activities_documented || 'N/A' }}</span>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label me-2 font-size-12">All materials were
+          inspected and approved
+          before use:</label>
+        <span class="font-size-12">{{ formData.materials_inspected_before_use || 'N/A' }}</span>
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <span class="font-size-12">{{ formData.worktaskRemarks || 'N/A' }}</span>
+      </div>
+      <div class="row">
+        <div class="row col-md-12">
+          <div *ngIf="workTaskFiles.length > 0" class="mb-3 d-flex align-items-center p-3">
+            <label class="form-label me-3 mb-0">Work Task Files:</label>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div *ngFor="let filePath of workTaskFiles">
+                <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                  <i class="">view doc</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <span class=" font-bold font-size-12">Onsite Quality Check per design specs</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th>Sl No.</th>
+          <th>Building Components</th>
+          <th>Concrete grade as per the contract</th>
+          <th>Age of the concrete</th>
+          <th>Test result of Schmidt Text Hammer test</th>
+          <th>Remarks</th>
+          <th>Uploaded Doc</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="OnsiteQuantityList?.length === 0">
+          <td colspan="6" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let item of OnsiteQuantityList; let i = index">
+          <td class="text-center bg-white">{{ i+1 }}</td>
+          <td class="text-center bg-white">{{ item.building_components }}</td>
+          <td class="text-center bg-white">{{ item.concrete_age }}</td>
+          <td class="text-center bg-white">{{ item.concrete_grade_contract }}</td>
+          <td class="text-center bg-white">{{ item.schmidt_hammer_test_result }}</td>
+          <td class="text-center bg-white">{{ item.remarks }}</td>
+          <td class="text-center bg-white">
+            <a [href]="item.file_path" *ngIf="item.file_path">
+              <i class="pi pi-download"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
+  <span class=" font-bold font-size-12">Reinforcement(using Profometer)</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th>Numbers of the rebar as per designed</th>
+          <th>Spacing of the longitudinal (main) rebar as per designed</th>
+          <th>Spacing of the stirrup as per design</th>
+          <th>Remarks</th>
+          <th>Document</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="reinforcementList?.length === 0">
+          <td colspan="10" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let item of reinforcementList; let i = index">
+          <td class="text-center bg-white">{{ item.rebar_quantity_design }}</td>
+          <td class="text-center bg-white">{{ item.longitudinal_rebar_spacing_design }}</td>
+          <td class="text-center bg-white">{{ item.stirrup_spacing_design }}</td>
+          <td class="text-center bg-white">{{ item.remarks }}</td>
+          <td class="text-center bg-white">
+            <a [href]="item.file_path" *ngIf="item.file_path">
+              <i class="pi pi-download"></i>
+            </a>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+  <span class=" font-bold font-size-12">Occupational Health and Safety</span>
+  <hr>
+  <form>
+    <div class="">
+      <div class="row">
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">Certified OHS In-Charge:</label>
+          <span class="font-size-12">{{ formData.certified_ohs_in_charge }}</span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">
+            CID No:
+          </label>
+          <span class="font-size-12">{{ formData.ohs_cid_number || 'N/A' }}</span>
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Full Name:</label>
+          <span class="font-size-12">{{ formData.ohs_in_charge_full_name || 'N/A' }}</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Mobile No:</label>
+          <span class="font-size-12">{{ formData.ohs_in_charge_mobile || 'N/A' }}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Safety Signages:</label>
+          <span class="font-size-12">{{ formData.safety_signages_available}}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Fire Extinguisher:</label>
+          <span class="font-size-12">{{ formData.fire_extinguisher_available  }}</span>
+        </div>
+
+
+      </div>
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">First Aid Box:</label>
+          <span class="font-size-12">{{ formData.first_aid_box_available === 'Y' ? 'Yes' :
+            formData.first_aid_box_available}}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Electrical safety</label>
+          <span class="font-size-12">{{ formData.electrical_safety_complied  }}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Fire Extinguisher:</label>
+          <span class="font-size-12">{{ formData.fire_extinguisher_available  }}</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Safety Helmet:</label>
+          <span class="font-size-12">{{ formData.safety_helmet_used }}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Reflective vest/jackets:</label>
+          <span class="font-size-12">{{ formData.reflective_vest_used}}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Goggles:</label>
+          <span class="font-size-12">{{ formData.goggles_used }}</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Welding mask/goggles:</label>
+          <span class="font-size-12">{{ formData.welding_mask_used }}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Dust mask:</label>
+          <span class="font-size-12">{{ formData.dust_mask_used }}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Safety Harness/belts:</label>
+          <span class="font-size-12">{{ formData.safety_harness_used  }}</span>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Safety Gloves:</label>
+          <span class="font-size-12">{{ formData.safety_gloves_used }}</span>
+        </div>
+        <div class="col-md-4 mb-3">
+          <label class="form-label me-2 font-size-12">Ear plug:</label>
+          <span class="font-size-12">{{ formData.ear_plugs_used }}</span>
+        </div>
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">Remarks:</label>
+          <span class="font-size-12">{{ formData.ohsremarks || 'N/A' }}</span>
+        </div>
+      </div>
+      <div class="row">
+        <div class="row col-md-12">
+          <div *ngIf="ohsFiles.length > 0" class="mb-3 d-flex align-items-center p-3">
+            <label class="form-label me-3 mb-0">Work Task Files:</label>
+            <div class="d-flex flex-wrap align-items-center gap-2">
+              <div *ngFor="let filePath of ohsFiles">
+                <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                  <i class="">view doc</i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+  <span class=" font-bold font-size-12">Human Resources in Contract</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th class="text-center p-1">#</th>
+          <th class="text-center p-1">Full Name</th>
+          <th class="text-center p-1">Cid No</th>
+          <th class="text-center p-1">Designation</th>
+          <th class="text-center p-1">Qualification</th>
+          <th class="text-center p-1">Status</th>
+          <th class="text-center p-1">uploaded Doc</th>
+          <!-- <th class="text-center p-1">Action</th> -->
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="humanResources?.length === 0">
+          <td colspan="10" class="text-center">No data found</td>
+        </tr>
+        <ng-container *ngFor="let item of humanResources; let i = index">
+          <tr>
+            <td class="text-center bg-white">{{ i + 1 }}</td>
+            <td class="text-center bg-white">{{ item.full_name }}</td>
+            <td class="text-center bg-white">{{ item.cid_no }}</td>
+            <td class="text-center">{{ item.designation }}</td>
+            <td class="text-center">{{ item.qualification }}</td>
+            <td class="text-center">{{ item.status }}</td>
+            <td class="text-center"><span></span></td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+    <div class="row">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Upload:</label>
+        <div *ngFor="let item of fileAndRemark">
+          <div *ngIf="item.form_type === '10'" class="">
+            <button class="btn btn-outline-primary btn-sm" (click)="viewFile(item.file_path)">
+              <i class="bi bi-eye me-1"></i> view doc Doc
+            </button>
+          </div>
+        </div>
+
+      </div>
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <div *ngFor="let item of fileAndRemark">
+          <div *ngIf="item.form_type === '10'" class="">
+            <span class="font-size-12"> {{ item.remarks }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <span class=" font-bold font-size-12">Certified Skilled worker deployed at Site</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th>Skilled Worker Type</th>
+          <th>Certificate</th>
+          <th>Number of Workers</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let group of groupedData">
+          <tr *ngFor="let worker of group.workers; let i = index">
+            <td *ngIf="i === 0" [attr.rowspan]="group.workers.length">{{ group.skilled_worker_type }}</td>
+            <td>{{ worker.certificates }}</td>
+            <td>{{ worker.number_of_workers }}</td>
+            <td>{{ worker.remarks }}</td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+  </form>
+  <span class=" font-bold font-size-12">List of committed equipments</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th class="text-center p-1">#</th>
+          <th class="text-center p-1">Equipment</th>
+          <th class="text-center p-1">Equipment Type</th>
+          <th class="text-center p-1">Equipment No.</th>
+          <th class="text-center p-1">Registration No.</th>
+          <th class="text-center p-1">Vehicle Type</th>
+          <th class="text-center p-1">Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="committedEquipmentList?.length === 0">
+          <td colspan="10" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let item of committedEquipmentList; let i = index">
+          <td class="text-center">{{ i + 1 }}</td>
+          <td class="text-center">{{ item.equipment_name }}</td>
+          <td class="text-center">{{ item.equipment_type }}</td>
+            <td class="text-center">{{ item.equipment_number }}</td>
+          <td class="text-center">{{ item.registration_number }}</td>
+          <td class="text-center">{{ item.vehicle_type }}</td>
+          <td class="text-center">{{ item.status }}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="row">
+      <div class="col-md-6 -flex">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <div>
+          <div>
+            <!-- <span class="font-size-12"> {{ committedEquipmentList.eqremarks }}</span> -->
+          </div>
+        </div>
+      </div>
+      <div class="col-md-6">
+        <div *ngIf="equipmentFiles.length > 0" class="mb-3 d-flex align-items-center p-3">
+          <label class="form-label me-3 mb-0">UploadedFiles:</label>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <div *ngFor="let filePath of equipmentFiles">
+              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                <i class="">view doc</i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <span class=" font-bold font-size-12">Human Resources strength at site</span>
+  <hr>
+  <form>
+    <div class="row">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Total nos of Bhutanese labors:</label>
+        <span class="font-size-12">{{formData.total_bhutanese_labors || 'N/A'}}</span>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label me-2 font-size-12">
+          Total nos of Numeric Non-Bhutanese labors:
+        </label>
+        <span class="font-size-12">{{formData.total_non_bhutanese_labors || 'N/A'}}</span>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <span class="font-size-12">{{formData.remarks || 'N/A'}}</span>
+      </div>
+    </div>
+  </form>
+
+  <span class=" font-bold font-size-12">view doc name of client site engineers present during the site monitoring</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th>SL No.</th>
+          <th>CID No</th>
+          <th>Full Name</th>
+          <th>Designation</th>
+          <th>Mobile No</th>
+          <th>Email</th>
+
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="SiteMonitoringTeamList?.length === 0">
+          <td colspan="10" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let item of SiteMonitoringTeamList; let i = index">
+          <td class="text-center bg-white">{{ i+1}}</td>
+          <td class="text-center bg-white">{{ item.cid_no }}</td>
+          <td class="text-center bg-white">{{ item.full_name }}</td>
+          <td class="text-center bg-white">{{ item.designation }}</td>
+          <td class="text-center bg-white">{{ item.mobile_no }}</td>
+          <td class="text-center bg-white">{{ item.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+
+  <span class=" font-bold font-size-12">Monitoring team names, BCTA officials</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th>CID No</th>
+          <th>Full Name</th>
+          <th>Mobile No</th>
+          <th>Email</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="monitoringTeamList?.length === 0">
+          <td colspan="10" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let item of monitoringTeamList; let i = index">
+          <td class="text-center bg-white">{{ item.cid_no }}</td>
+          <td class="text-center bg-white">{{ item.full_name }}</td>
+          <td class="text-center bg-white">{{ item.mobile_no }}</td>
+          <td class="text-center bg-white">{{ item.email }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
+</div>
+<div class="justify-content-end d-flex">
+  <button class="btn mr-1 text-white prev-btn" type="submit" (click)="onPreviousClick()">Prev</button>
+  <button class="btn text-white save-next-btn" (click)="submitAllData()" type="submit">Submit</button>
+</div>

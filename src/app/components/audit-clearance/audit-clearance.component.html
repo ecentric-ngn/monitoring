@@ -1,0 +1,158 @@
+
+  <div class="d-flex justify-content-center align-items-center" style="height: 100vh;" *ngIf="loading">
+    <div>
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading...</p>
+    </div>
+  </div>
+  <div class="container-fluid" *ngIf="!loading">
+    <div class="row">
+      <div class="col-sm-12">
+        <div class="card ml--4 mr--4 mt--3">
+          <div class="alert alert-warning" *ngIf="errorMessage">System error, check your internet and reload the page.</div>
+          <!-- card header starts -->
+          <div class="card-header d-flex justify-content-between p-0 m-0 pl-2">
+            <div class="header-title">
+              <h4 class="card-title font-medium text-gray-700">Contractor/Consultant Audit clearance </h4>
+            </div>
+             <button (click)="navigateToAddClearance()"
+              type="button"
+              class="btn btn-sm btn-primary">
+              Add Audit Clearance
+            </button>
+
+          </div>
+          <div class="row mb--4">
+            <div class="col d-flex pl-4">
+              <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+              <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+                style="border-color: #ced4da;">
+                <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+              </select>
+            </div>
+            <div class="col d-flex justify-content-end pr-2">
+              <p class="mr-1 p-1 text-gray-600">Search By : </p>
+              <input type="text" placeholder="CDB No & Name of Firm"
+                class="form-control  form-control-sm w-6 mr-2" id="search " [(ngModel)]="searchQuery"
+                (input)="Searchfilter()" />
+            </div>
+          </div>
+          <div>
+            <div class="table-responsive p-0 m-0">
+              <table id="datatable-1" class="table table-striped table-bordered mt-4">
+                <thead>
+                  <tr class="text-center">
+                    <th>#</th>
+                    <th>CDB #</th>
+                    <th>Type</th>
+                    <th>Name of Firm</th>
+                    <th>Agency</th>
+                    <th>Audited Period</th>
+                    <th>AIN</th>
+                    <th>Para #</th>
+                    <th>Audit Observation</th>
+                    <th>Date</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngIf="tableData?.length === 0">
+                    <td colspan="11" class="text-center">No data found</td>
+                  </tr>
+                  <tr *ngFor="let data of tableData; let i = index">
+                    <td>{{i+1}}</td>
+                    <td>{{data.cdbNo}}</td>
+                    <td>{{data.type}}</td>
+                    <td>{{data.nameOfFirm}}</td>
+                    <td>{{data.agency}}</td>
+                    <td>{{data.auditedPeriod}}</td>
+                    <td>{{data.AIN}}</td>
+                    <td>{{data.paraNo}}</td>
+                    <td>  <div *ngFor="let auditObservation of splitTextIntoChunks(data.auditObservation, 10)">
+                      {{ auditObservation }}
+                    </div></td>
+                    <td>{{data.date | date: 'dd-MM-yyyy'}}</td>
+                    <td class="text-center">
+                      <button (click)="navigateToEditAuditClearance(data.id)" type="button" class="btn btn-sm btn-primary ml-2">Edit</button>
+                      <button (click)="storeId(data.id)" type="button" class="btn btn-sm btn-danger ml-2">Delete</button>
+                      <button (click)="getAuditById(data.id)" type="button" class="btn btn-sm btn-purple ml-2" data-bs-toggle="modal" data-bs-target="#exampleModal">Drop</button>
+                    </td>
+                  </tr> 
+                </tbody>
+              </table>
+            </div>
+                  <div *ngIf="Tabledata" class="justify-content-start mb--3">
+                      <div class="justify-content-start font-size-12 font-bold mt-5">
+                          <p>{{ calculateOffset() }}</p>
+                          <div class="d-flex justify-content-end m-3 mr-0 m-lg--5">
+                            <div *ngIf="Tabledata" class="Page navigation">
+                              <ul class="pagination pagination-sm mr-2 m--5 ml--1">
+                                <li class="page-item" (click)="previousPage()">
+                                  <a class="page-link pointer">Previous</a>
+                                </li>
+                                <ng-container *ngFor="let page of generatePageArray()">
+                                    <li class="page-item" [class.active]="page === pageNo" (click)="goToPage(page)">
+                                      <a class="page-link" *ngIf="page !== -1">{{ page }}</a>
+                                      <span class="page-link ellipsis" *ngIf="page === -1">...</span>
+                                  </ng-container>
+                                <li class="page-item" (click)="nextPage()">
+                                  <a class="page-link pointer">Next</a>
+                                </li>
+                              </ul>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <p-toast></p-toast>
+                      <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog">
+                          <div class="modal-content">
+                            <div class="modal-header">
+                              <h5 class="modal-title" id="exampleModalLabel">Resolved Audit</h5>
+                              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                              <form #actionForm="ngForm">
+                              <!-- Name of Firm -->
+                              <div class="mb-3">
+                                <label for="nameOfFirm" class="form-label font-bold">Name of Firm:</label>
+                                <div class="font-size-14">{{ nameOfFirm }} ({{ cdbNo}})</div>
+                              </div>
+                      
+                              <!-- Audit Details -->
+                              <div class="mb-3">
+                                <label for="auditObservation" class="form-label font-bold">Audit Details:</label>
+                                <div class="font-size-14">{{ auditObservation }}</div>
+                              </div>
+                      
+                              <!-- Action Date -->
+                               <div class="mb-3"[class.was-validated]="dateInput.touched && dateInput.invalid">
+                                <label for="Date" class="form-label">Action Date <span class="mandatory">*</span></label>
+                                <input #dateInput="ngModel" type="date" [(ngModel)]="formData.Date" class="form-control form-control-sm" id="Date" name="Date" required>
+                                <div *ngIf="dateInput.touched && dateInput.invalid" class="text-danger mt-1 font-size-12">
+                                  Date is required.
+                                </div>
+                              </div>
+                            
+                              <!-- Remarks -->
+                              <div class="mb-3" [class.was-validated]="remarksInput.touched && remarksInput.invalid">
+                                <label for="Details" class="form-label">Remarks <span class="mandatory">*</span></label>
+                                <textarea #remarksInput="ngModel" [(ngModel)]="formData.remarks" class="form-control form-control-sm" id="Details" name="Details" required></textarea>
+                                <div *ngIf="remarksInput.touched && remarksInput.invalid" class="text-danger mt-1 font-size-12">
+                                  Remarks is required.
+                                </div>
+                              </div>
+                          </form>
+                            <div class="modal-footer">
+                            
+                              <button type="button" #closeButton (click)="cancelDropDetails(actionForm)"  class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                              <button type="button" (click)="dropDetails(actionForm)" class="btn btn-primary">Update</button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                    
+      

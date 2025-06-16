@@ -1,0 +1,51 @@
+.form-control {
+  height: 34px;
+    line-height: 31x;
+    background: #fff;
+    font-size: 14px;
+    color: #324253;
+    border-radius: 5px;
+    box-shadow: none;
+}
+
+.card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+   
+}
+/* styles.css or your-component.component.css */
+
+.disabled-field {
+    background-color: #e9ecef; /* Light grey background */
+    cursor: not-allowed; /* Change cursor to indicate it's not clickable */
+  }
+  .modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 1143px;
+    pointer-events: auto;
+    background-color: #FFF;
+    background-clip: padding-box;
+    border: 1px solid rgba(235, 235, 235, 0.2);
+    border-radius: 5px;
+    box-shadow: 0 0.25rem 0.5rem rgsba(0, 0, 0, 0.5);
+    outline: 0;
+    margin-left: -225px;
+}
+.form-controls {
+  height: 28px;
+  line-height: 45px;
+  background: #fff;
+  font-size: 14px;
+  border-radius: 5px;
+ 
+}
+svg {
+    display: inline-block;
+    vertical-align: middle;
+    height: 20px;
+}

@@ -1,0 +1,45 @@
+<form #form="ngForm">
+    <div class="p-5">
+        <div class="row mb-3 ">
+            <div class="col-md-6 ">
+                <label class="form-label">Total nos of Bhutanese labors:<span
+                        class="text-danger font-size-12">*</span></label>
+                <input type="number" class="form-control h-3rem" placeholder="Enter total nos of Bhutanese labors"
+                    [(ngModel)]="formData.totalNoOfBhutaneseLabors" name="totalNoOfBhutaneseLabors"
+                    id="totalNoOfBhutaneseLabors" required #totalNoOfBhutaneseLabors="ngModel" />
+                <div *ngIf="totalNoOfBhutaneseLabors.invalid && totalNoOfBhutaneseLabors.touched"
+                    class="text-danger font-size-12">
+                    Please enter total nos of Bhutanese labors.
+                </div>
+            </div>
+            <div class="col-md-6 ">
+                <label class="form-label">Total nos of Non-Bhutanese labors:<span
+                        class="text-danger font-size-12">*</span></label>
+                <input type="number" class="form-control h-3rem"
+                    placeholder="Enter total nos of Numeric Non-Bhutanese labors"
+                    [(ngModel)]="formData.totalNoOfNumericNonBhutaneseLabors" name="totalNoOfNumericNonBhutaneseLabors"
+                    id="totalNoOfNumericNonBhutaneseLabors" required #totalNoOfNumericNonBhutaneseLabors="ngModel" />
+                <div *ngIf="totalNoOfNumericNonBhutaneseLabors.invalid && totalNoOfNumericNonBhutaneseLabors.touched"
+                    class="text-danger font-size-12">
+                    Please enter total nos of Numeric Non-Bhutanese labors.
+                </div>
+            </div>
+
+        </div>
+      
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Remarks:</label>
+                    <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.remarks"
+                        name="remarks" required #remarks="ngModel"></textarea>
+                    <div *ngIf="remarks.invalid && remarks.touched" class="text-danger font-size-12">
+                        Please enter remarks.
+                    </div>
+                </div>
+            </div>
+            <div class="justify-content-end d-flex">
+                <button class="btn mr-1 text-white prev-btn" *ngIf="appNoStatus !== 'REJECTED'" type="submit" (click)="onPreviousClick()" type="submit">Prev</button>
+                <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
+              </div>
+        </div>
+</form>

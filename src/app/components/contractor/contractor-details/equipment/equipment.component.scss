@@ -1,0 +1,32 @@
+*{
+   
+    font-family: DM Sans, sans-serif;
+}
+// .table{
+//     font-size: 14px;
+// }
+td{
+    color: rgb(10, 0, 0);
+    font-weight:500;
+}
+label{
+    color: #212529;
+    font-weight: 600;
+    // font-size: 0.8125rem;
+    font-size: 13px;
+}
+.p-button {
+    margin: 0;
+    display: inline-flex;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    vertical-align: bottom;
+    text-align: center;
+    /* overflow: hidden; */
+    position: relative;
+    height: 27px;
+    padding-left: inherit;
+    padding-right: inherit;
+}

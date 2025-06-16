@@ -1,0 +1,917 @@
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;" *ngIf="loading">
+  <div>
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading...</p>
+  </div>
+</div>
+<div class="m-4" *ngIf="!loading">
+  <!-- <div class="d-flex justify-content-between align-items-center p-2 flex-wrap">
+      <div class="font-weight-bold h5 mb-0">
+        Monitored Site Application
+      </div>
+      <div class="d-flex align-items-center">
+        <input type="text" placeholder="BCTA No or Firm Name" class="form-control form-control-sm"/>
+      </div>
+    </div> -->
+  <div class="font-weight-bold h5 mb-0">
+    Monitored Site Application
+  </div>
+  <div class="row">
+    <div class="col d-flex pl-4">
+      <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+      <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+        style="border-color: #ced4da;">
+        <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+      </select>
+    </div>
+    <div class="col d-flex justify-content-end pr-2">
+      <p class="mr-1 p-1 text-gray-600">Search By : </p>
+      <input type="text" placeholder="BCTA No or Firm Name" class="form-control form-control-sm col-md-4" id="search "
+        [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+    </div>
+  </div>
+
+  <div class="d-flex justify-content-end align-items-center p-2 flex-wrap">
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#firmSelectionModal">
+      Send Mass Notification
+    </button>
+  </div>
+
+  <!-- <app-firm-selection-modal></app-firm-selection-modal> -->
+
+  <div class="table-responsive ">
+    <table id="datatable-1" class="table table-bordered table-sm rounded-2">
+      <thead>
+        <tr>
+          <th class="text-center p-1">#</th>
+          <th class="text-center">Application No</th>
+          <th class="text-center">BCTA No</th>
+          <th class="text-center">Firm Name</th>
+          <th class="text-center">Name of Work</th>
+          <th class="text-center">Location</th>
+          <th class="text-center">Contract Amount</th>
+          <th class="text-center">Start Date</th>
+          <th class="text-center">Proposed Completion Date</th>
+          <th class="text-center">Procuring Agency</th>
+          <th class="text-center">Work Type</th>
+          <th class="text-center">Status</th>
+          <th class="text-center">Action</th>
+          <th class="text-center">Select</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="tableData?.length === 0">
+          <td colspan="16" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let data of tableData; let i = index">
+          <td class="p-1 text-center">{{ i + 1 }}</td>
+          <td class="text-bold text-center text-nowrap ">{{ data.application_number }}</td>
+          <td class="text-center"><a>{{ data.awardedBctaNo || data.other_bcta_no }}</a></td>
+          <td class="text-center">{{ data.nameOfFirm }}</td>
+          <td class="text-center  ">{{ data.workName }}</td>
+          <td class="text-center">{{ data.dzongkhag || data.place }}</td>
+          <td class="text-center">{{ data.awardedAmount }}</td>
+          <td class="text-center text-nowrap ">{{ data.officialStartDate | date: 'dd-MM-yyyy' }}</td>
+          <td class="text-center text-nowrap  ">{{ data.officialEndDate | date: 'dd-MM-yyyy' }}</td>
+          <td class="text-center">{{ data.agency }}</td>
+          <td class="text-center">{{ data.inspection_type }}</td>
+          <td class="text-center" [ngClass]="{
+              'text-success': data.applicationStatus === 'APPROVED',
+              'text-danger': data.applicationStatus === 'REJECTED'
+            }">
+            {{ data.applicationStatus }}
+          </td>
+
+          <td class="text-center text-nowrap pointer-event ">
+            <button *ngIf="data.applicationStatus === 'APPROVED'" (click)="getCheckListId(data.checklist_id)"
+              class="btn btn-primary btn-sm h-100 me-2 pointer-event" data-bs-toggle="modal"
+              data-bs-target="#exampleModal">
+              <span class="text-white">Perform Action</span>
+            </button>
+
+            <button *ngIf="data.applicationStatus === 'REJECTED'" (click)="reviewAgain(data)"
+              class="btn btn-danger btn-sm h-100 me-2 pointer-event">
+              <span class="text-white">Resubmit</span>
+            </button>
+
+            <button *ngIf="data.applicationStatus === 'ACTION TAKEN'" (click)="getCheckListId(data.checklist_id)"
+              class="btn btn-primary btn-sm h-100 me-2 pointer-event" data-bs-toggle="modal"
+              data-bs-target="#checklistModal">
+              <span class="text-white">Generate</span>
+            </button>
+
+            <button *ngIf="data.inspection_type === 'OTHERS' && data.applicationStatus === 'SUBMITTED'"
+              (click)="getworkId(data)" class="btn btn-warning btn-sm h-100">
+              <span class="text-white" data-bs-toggle="modal" data-bs-target="#editWorkInformation">Edit</span>
+            </button>
+          </td>
+          <td class="text-center">
+            <input type="checkbox"
+              [disabled]="data.applicationStatus === 'REJECTED' || data.applicationStatus === 'ACTION TAKEN' || data.applicationStatus === 'APPROVED'"
+              [(ngModel)]="data.rightSelected" (change)="onCheckboxChange(data)" />
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <div class="justify-content-end d-flex" *ngIf="tableData && tableData?.length > 0">
+      <button (click)="forwardApplication()" class="btn btn-success  pointer-event">
+        <span class="text-white">Forward to Review</span>
+        <i class="pi pi-forward text-white ms-2"></i>
+      </button>
+    </div>
+  </div>
+</div>
+<div *ngIf="tableData && tableData?.length > 0" class="justify-content-start mb--3">
+  <div class="justify-content-start font-size-12 font-bold ml-2">
+    <p>{{ calculateOffset() }}</p>
+    <div class="d-flex justify-content-end m-3 mr-0 m-lg--5">
+      <div *ngIf="tableData" class="Page navigation">
+        <ul class="pagination pagination-sm mr-2 m--5 ml--1">
+          <li class="page-item" (click)="previousPage()">
+            <a class="page-link pointer-event">Previous</a>
+          </li>
+          <ng-container *ngFor="let page of generatePageArray()">
+            <li class="page-item" [class.active]="page === pageNo" (click)="goToPage(page)">
+              <a class="page-link" *ngIf="page !== -1">{{ page }}</a>
+              <span class="page-link ellipsis" *ngIf="page === -1">...</span>
+            </li>
+          </ng-container>
+          <li class="page-item" (click)="nextPage()">
+            <a class="page-link pointer-event">Next</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #495f8a">
+        <h5 class="modal-title text-white" id="exampleModalLabel">Record of Monitoring observations actions taken by the
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #form="ngForm">
+          <div class="p-3">
+            <div class="row align-items-end">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">BCTA Registration Number:<span
+                    class="text-danger font-size-12">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.contractorNo"
+                  placeholder="Text" name="contractorNo" required #contractorNo="ngModel">
+                <div *ngIf="contractorNo.invalid && contractorNo.touched" class="text-danger font-size-12">
+                  Please enter BCTA Registration Number
+                </div>
+              </div>
+
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Action Taken:<span class="text-danger font-size-12">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.actionTaken"
+                  placeholder="Text" name="actionTaken" required #actionTaken="ngModel">
+                <div *ngIf="actionTaken.invalid && actionTaken.touched" class="text-danger font-size-12">
+                  Please enter Action Taken
+                </div>
+              </div>
+            </div>
+            <div class="row align-items-end">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Reference No:<span class="text-danger font-size-12">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.referenceNo"
+                  placeholder="Text" name="referenceNo" required #referenceNo="ngModel">
+                <div *ngIf="referenceNo.invalid && referenceNo.touched" class="text-danger font-size-12">
+                  Please enter Reference No
+                </div>
+              </div>
+              <div class="col-md-6 mb-auto">
+                <label class="form-label">Date:<span class="text-danger font-size-12">*</span></label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.date" placeholder="Auto"
+                  name="date" required #date="ngModel">
+                <div *ngIf="date.invalid && date.touched" class="text-danger font-size-12">
+                  Please enter Date
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="justify-content-end d-flex">
+            <button #closeactionTakenModal class="btn btn-danger mr-1 " type="submit"
+              data-bs-dismiss="modal">Cancel</button>
+            <button class="btn text-white save-next-btn" (click)="saveObservationReport(form)"
+              type="submit">Save</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="checklistModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content modal-dialog-scrollable">
+      <div class="modal-header" style="background-color: #495f8a">
+        <h5 class="modal-title text-white" id="exampleModalLabel">
+          Generate list of compliance/non compliance checklist
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" #closeModal aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <ul class="nav nav-tabs m-0 justify-content-center custom-tab" id="checklistTabs" role="tablist">
+          <li class="nav-item col-6 p-0" role="presentation">
+            <button [class.active]="activeTab === 'Contractor'" (click)="setActiveTab('Contractor')"
+              class="nav-link active w-100 rounded-pill rounded-start custom-tab-btn" id="contractor-tab"
+              data-bs-toggle="tab" data-bs-target="#contractor" type="button" role="tab" aria-controls="contractor"
+              aria-selected="true">
+              Contractor
+            </button>
+          </li>
+          <li class="nav-item col-6 p-0" role="presentation">
+            <button [class.active]="activeTab === 'Client'" (click)="setActiveTab('Client')"
+              class="nav-link w-100  rounded-pill rounded-end custom-tab-btn" id="client-tab" data-bs-toggle="tab"
+              data-bs-target="#client" type="button" role="tab" aria-controls="client" aria-selected="false">
+              Client
+            </button>
+          </li>
+        </ul>
+        <div class="tab-content pt-3" id="checklistTabsContent">
+          <!-- Contractor Tab -->
+          <div class="tab-pane fade show active" id="contractor" role="tabpanel" aria-labelledby="contractor-tab">
+            <form #form="ngForm" *ngIf="showContractorInf">
+              <div class="p-3">
+                <div class="row align-items-end">
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">
+                      BCTA Registration Number:
+                      <span class="text-danger font-size-12">*</span>
+                    </label>
+                    <div class="d-flex">
+                      <input type="text" class="form-control form-control-sm me-2" [(ngModel)]="formData.contractorNo"
+                        placeholder="Text" name="contractorNo" id="contractorNo" required #contractorNo="ngModel">
+                      <button type="button" class="btn btn-primary btn-sm"
+                        (click)="searchBasedOnBCTANo()">Search</button>
+                    </div>
+                    <div *ngIf="contractorNo.invalid && contractorNo.touched" class="text-danger font-size-12">
+                      Please enter BCTA Registration Number
+                    </div>
+                    <div *ngIf="errorMessage" class="text-danger font-size-12">
+                      {{errorMessage}}
+                    </div>
+                  </div>
+
+                  <div class="col-md-6 mb-3">
+                    <label class="form-label">Contractor Firm Name:<span
+                        class="text-danger font-size-12">*</span></label>
+                    <input type="text" (input)="clearErrorMessage()" class="form-control form-control-sm"
+                      [(ngModel)]="formData.nameOfFirm" placeholder="Auto" name="nameOfFirm" required
+                      #nameOfFirm="ngModel" [disabled]="isFormDataLoaded">
+                    <div *ngIf="nameOfFirm.invalid && nameOfFirm.touched" class="text-danger font-size-12">
+                      Please enter Name Of Firm
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row align-items-end">
+                  <div class="col-md-6 mb-auto">
+                    <label class="form-label">Email address:<span
+                        class="text-danger h-11rem font-size-12">*</span></label>
+                    <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.email"
+                      placeholder="Auto" name="email" required #email="ngModel" [disabled]="isFormDataLoaded">
+                    <div *ngIf="email.invalid && email.touched" class="text-danger font-size-12">
+                      Please enter Email Address
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label">
+                      List of items/Checklist:
+                      <span class="text-danger font-size-12">*</span>
+                    </label>
+                    <select class="form-select form-control-sm h-11rem font-size-12" id="listOfItems" name="listOfItems"
+                      [(ngModel)]="formData.listOfItemsType" required multiple #listOfItemsRef="ngModel">
+                      <option value="onsite_facilities_and_management">Onsite Facilities and Management</option>
+                      <option value="contract_document_at_site">Contract Document at Site</option>
+                      <option value="work_progress">Work Progress</option>
+                      <option value="work_task_quality">Work Task Quality</option>
+                      <option value="qualification_of_subcontractors">Qualification of Subcontractors</option>
+                      <option value="onsite_quality_confirmation_test">Onsite Quality Confirmation Test against the
+                        Designed Specification</option>
+                      <option value="ohs_view">Occupational Health and Safety</option>
+                      <option value="committed_equipment_view">List of Committed Human Resources in Contract</option>
+                      <option value="human_resources_strength">Human Resources Strength at Site</option>
+                      <option value="human_resources_view">Human Resources In Contract</option>
+                    </select>
+                    <div *ngIf="listOfItemsRef.invalid && listOfItemsRef.touched" class="text-danger font-size-12">
+                      Please select at least one option for List Of Items
+                    </div>
+                  </div>
+                </div>
+
+                <div class="row align-items-end">
+                  <div class="col-md-12 mb-3">
+                    <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
+                    <textarea class="form-control form-control-sm" placeholder="Enter remarks"
+                      [(ngModel)]="formData.remarks" name="remarks" required #remarks="ngModel"></textarea>
+                    <div *ngIf="remarks.invalid && remarks.touched" class="text-danger font-size-12">
+                      Please enter remarks.
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="justify-content-end d-flex">
+                <button class="btn text-white save-next-btn" type="button" (click)="goToClientTab()">Next</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- Client Tab -->
+          <div [class.show]="activeTab === 'Client'" [class.active]="activeTab === 'Client'" class="tab-pane fade"
+            id="client" role="tabpanel" aria-labelledby="client-tab">
+            <div class="p-3 text-muted">
+              <!-- You can replace this with any client-specific form or message -->
+              <div class="justify-content-end d-flex">
+                <table class="table table-bordered align-middle text-sm">
+                  <thead class="table-light text-center">
+                    <tr>
+                      <th scope="col">CID No</th>
+                      <th scope="col">Full Name</th>
+                      <th scope="col">Mobile No</th>
+                      <th scope="col">Designation</th>
+                      <th scope="col">Email</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let formData of dataList; let i = index">
+                      <td class="text-center bg-white">{{ formData.cid_no }}</td>
+                      <td class="text-center bg-white">{{ formData.full_name }}</td>
+                      <td class="text-center bg-white">{{ formData.mobile_no }}</td>
+                      <td class="text-center bg-white">{{ formData.designation }}</td>
+                      <td class="text-center bg-white">{{ formData.email }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div class="justify-content-end d-flex">
+              <button class="btn mr-1 text-white btn-warning" type="button" (click)="goToPreviousTab()">Prev</button>
+              <button class="btn text-white save-next-btn" (click)="generateChecklistDetails(form)"
+                type="submit">Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="editWorkInformation" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header " style="background-color: #495f8a">
+        <h5 class="modal-title text-white" id="staticBackdropLabel">Edit Work Information
+        </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #form="ngForm">
+          <div class="p-3">
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">
+                  Project Name:<span class="text-danger font-size-12">*</span>
+                  <span class="text-danger font-size-12">*</span>
+                </label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.projectName"
+                  placeholder="Text" name="projectName" required #projectName="ngModel">
+                <div *ngIf="projectName.invalid && projectName.touched" class="text-danger font-size-12">
+                  Please enter Project Name
+                </div>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label for="dzongkhag" class="form-label">Dzongkhag<span class="text-danger">*</span></label>
+                <select class="form-select font-size-16" id="dzongkhagId" name="dzongkhagId"
+                  [(ngModel)]="formData.dzongkhagId">
+                  <option>--select--</option>
+                  <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.id">
+                    {{ dzongkhag.name }}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label for="dzongkhag" class="form-label">Place Name<span class="text-danger">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.placeName"
+                  placeholder="Text" name="placeName" required #placeName="ngModel" />
+                <div *ngIf="placeName.invalid && placeName.touched" class="text-danger font-size-12">
+                  Please enter Place Name
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Contract Amount:<span class="text-danger font-size-12">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.contractAmount"
+                  placeholder="Auto" name="contractAmount" required #contractAmount="ngModel">
+                <div *ngIf="contractAmount.invalid && contractAmount.touched" class="text-danger font-size-12">
+                  Please enter Contract Amount
+                </div>
+              </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Start Date:<span class="text-danger font-size-12">*</span></label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.startDate"
+                  placeholder="Auto" name="startDate" required #startDate="ngModel">
+                <div *ngIf="startDate.invalid && startDate.touched" class="text-danger font-size-12">
+                  Please enter Start Date
+                </div>
+              </div>
+
+              <div class="col-md-4 mb-3">
+                <label class="form-label">Proposed Completion Date:<span
+                    class="text-danger font-size-12">*</span></label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.proposedCompletionDate"
+                  placeholder="Auto" name="proposedCompletionDate" id="proposedCompletionDate" required
+                  #proposedCompletionDate="ngModel">
+                <div *ngIf="proposedCompletionDate.invalid && proposedCompletionDate.touched"
+                  class="text-danger font-size-12">
+                  Please enter Proposed Completion Date
+                </div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <label class="form-label">Client:<span class="text-danger font-size-12">*</span></label>
+                <select id="client" name="client" class="form-select font-size-16" [(ngModel)]="formData.client">
+                  <option>--select--</option>
+                  <option *ngFor="let agency of PocuringAgencyList" [ngValue]="agency.id">
+                    {{ agency.agency_name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+          </div>
+          <div class="justify-content-end d-flex">
+            <button #closeupdateOwner class="btn mr-1 text-white btn-danger" type="submit"
+              data-bs-dismiss="modal">Cancel</button>
+            <button class="btn text-white save-next-btn" (click)="updateOwnerInformation(form)"
+              type="submit">Update</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Mass Notification Modal -->
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content ">
+      <div class="modal-header" style="background-color: #495f8a">
+        <h5 class="modal-title text-white" id="staticBackdropLabel">Send Notification to submit registration compliance
+        </h5>
+        <button type="button" #closeModalForm class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #notificationForm="ngForm">
+          <div class="row g-3 m-2">
+            <!-- <div class="col-md-6">
+              <label class="form-label">BCTA Header <span class="text-danger">*</span></label>
+              <input type="file" class="form-control form-control-sm" required name="bctaHeader" ngModel
+                #bctaHeader="ngModel">
+              <div *ngIf="bctaHeader.invalid && bctaHeader.touched" class="text-danger small">
+                BCTA Header is required.
+              </div>
+            </div> -->
+
+            <!-- BCTA Footer -->
+            <!-- <div class="col-md-6">
+              <label class="form-label">BCTA Footer <span class="text-danger">*</span></label>
+              <input type="file" class="form-control form-control-sm" required name="bctaFooter" ngModel
+                #bctaFooter="ngModel">
+              <div *ngIf="bctaFooter.invalid && bctaFooter.touched" class="text-danger small">
+                BCTA Footer is required.
+              </div>
+            </div> -->
+
+            <!-- Date -->
+            <div class="col-md-6">
+              <label class="form-label">Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control form-control-sm" placeholder="Auto" required name="date"
+                [(ngModel)]="dateData.date" #date="ngModel">
+              <div *ngIf="date.invalid && date.touched" class="text-danger small">
+                Date is required.
+              </div>
+            </div>
+
+            <!-- Drafted -->
+            <!-- <div class="col-md-6">
+              <label class="form-label">Drafted By:<span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" placeholder="Auto" name="draftedBy"
+                [(ngModel)]="formData.draftedBy">
+            </div> -->
+
+            <!-- Subject -->
+            <div class="col-md-6">
+              <label class="form-label">Subject <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" placeholder="Auto" required name="subject"
+                [(ngModel)]="formData.subject" #subject="ngModel">
+              <div *ngIf="subject.invalid && subject.touched" class="text-danger small">
+                Subject is required.
+              </div>
+            </div>
+
+            <!-- Signature -->
+            <!-- <div class="col-md-6">
+              <label class="form-label">Signature<span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" name="signature" placeholder="Auto"
+                [(ngModel)]="formData.signature">
+            </div> -->
+
+            <!-- Firm Name -->
+            <!-- <div class="col-md-6">
+              <label class="form-label">Firm Name (Name and Email Address)</label>
+              <input type="text" class="form-control form-control-sm" name="firmName" [(ngModel)]="formData.firmName"
+                placeholder="Auto">
+            </div> -->
+
+            <!-- Deadline -->
+            <div class="col-md-6">
+              <label class="form-label">Deadline (Auto-calculated)<span class="text-danger">*</span></label>
+              <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
+                [(ngModel)]="formData.deadline" readonly>
+            </div>
+
+            <!-- Contractor Class -->
+            <div class="col-md-6">
+              <label class="form-label">Contractor Class</label>
+              <select class="form-select form-control-sm" name="contractorClass"
+                [(ngModel)]="formData.workClassification">
+                <option value="" selected>-- Select --</option>
+                <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
+              </select>
+            </div>
+
+            <div class="col-md-6">
+              <label class="form-label">Dzongkhag</label>
+              <select class="form-select form-control-sm" name="dzongkhag" [(ngModel)]="formData.dzongkhagName">
+                <option [value]="">-- Select --</option>
+                <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">
+                  {{ dzongkhag }}
+                </option>
+              </select>
+            </div>
+
+            <!-- HR Requirements -->
+            <div class="col-md-6">
+              <label class="form-label">HR Requirements</label>
+              <select class="form-select form-control-sm" name="hrRequirement" [(ngModel)]="formData.hrRequirements">
+                <option value="">-- Select --</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
+            <!-- Registered Equipment -->
+            <div class="col-md-6">
+              <label class="form-label">Registered Equipment</label>
+              <select class="form-select form-control-sm" name="registeredEquipment"
+                [(ngModel)]="formData.registeredEquipment">
+                <option value="">-- Select --</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
+            <!-- Unregistered Equipment -->
+            <div class="col-md-6">
+              <label class="form-label">Unregistered Equipment</label>
+              <select class="form-select form-control-sm" name="unregisteredEquipment"
+                [(ngModel)]="formData.unregisteredEquipment">
+                <option value="">-- Select --</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
+            </div>
+
+            <!-- Send Button -->
+            <div class="col-md-12 d-flex justify-content-end mt-3 gap-2">
+              <button #closeModalForm type="submit" data-bs-dismiss="modal" class="btn btn-danger">
+                Cancel
+              </button>
+              <button type="submit" class="btn btn-primary" (click)="sendMassEmail()">
+                Send
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+<!-- firm-selection-modal-->
+<div class="modal fade" id="firmSelectionModal" #modalContent tabindex="-1" aria-labelledby="firmSelectionModalLabel"
+  aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="firmSelectionModalLabel">Send Notification to submit registration compliance</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <!-- Firm Type Selection -->
+        <div class="mb-4">
+          <label class="form-label">Select a type of firm</label>
+          <select class="form-select" [(ngModel)]="selectedFirmType" (change)="onFirmTypeChange()">
+            <option value="">-- Select Firm Type --</option>
+            <option value="construction">Construction Firm</option>
+            <option value="consultancy">Consultancy Firm</option>
+            <option value="certified">Certified Builders</option>
+            <option value="specialized">Specialized Firms</option>
+          </select>
+        </div>
+
+        <!-- Dynamic Form Container -->
+        <div *ngIf="selectedFirmType">
+          <div *ngIf="selectedFirmType === 'construction'">
+            <h4>Construction Firm Form</h4>
+            <form>
+              <!-- Construction firm fields -->
+              <!-- Row 1: Date & Subject -->
+    <div class="row g-3 m-2">
+      <div class="col-md-6">
+        <label class="form-label">Date <span class="text-danger">*</span></label>
+        <input type="date" class="form-control form-control-sm" required name="date"
+               [(ngModel)]="dateData.date" #date="ngModel">
+        <div *ngIf="date.invalid && date.touched" class="text-danger small">
+          Date is required.
+        </div>
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Subject <span class="text-danger">*</span></label>
+        <input type="text" class="form-control form-control-sm" required name="subject"
+               [(ngModel)]="formData.subject" #subject="ngModel">
+        <div *ngIf="subject.invalid && subject.touched" class="text-danger small">
+          Subject is required.
+        </div>
+      </div>
+    </div>
+
+    <!-- Row 2: Deadline & Contractor Class -->
+    <div class="row g-3 m-2">
+      <div class="col-md-6">
+        <label class="form-label">Deadline (Auto-calculated)<span class="text-danger">*</span></label>
+        <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
+               [(ngModel)]="formData.deadline" readonly name="deadline">
+      </div>
+
+      <div class="col-md-6">
+        <label class="form-label">Contractor Class</label>
+        <select class="form-select form-control-sm" name="contractorClass"
+                [(ngModel)]="formData.workClassification">
+          <option value="" selected>-- Select --</option>
+          <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Continue same for other fields -->
+    
+    <!-- Row 3: Dzongkhag & HR Requirements -->
+    <div class="row g-3 m-2">
+      <div class="col-md-6">
+        <label class="form-label">Dzongkhag</label>
+        <select class="form-select form-control-sm" name="dzongkhag" [(ngModel)]="formData.dzongkhagName">
+          <option [value]="">-- Select --</option>
+          <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">{{ dzongkhag }}</option>
+        </select>
+      </div>
+
+    </div>
+
+    <!-- Row 4: Equipment -->
+ 
+            </form>
+          </div>
+
+          <div *ngIf="selectedFirmType === 'consultancy'">
+            <h4>Consultancy Firm Form</h4>
+            <form>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Date <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" placeholder="Auto" required name="date"
+                    [(ngModel)]="dateData.date" #date="ngModel">
+                  <div *ngIf="date.invalid && date.touched" class="text-danger small">
+                    Date is required.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Deadline (Auto-calculated)<span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
+                    [(ngModel)]="formData.deadline" readonly>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Subject <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="formData.subject" name="subject" required>
+                </div>
+
+              </div>
+
+              <!-- Second Row -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Contractor Class</label>
+                  <select class="form-select" [(ngModel)]="formData.contractorClass" name="contractorClass">
+                    <option value="">-- Select Class --</option>
+                    <option value="S-Small">S-Small</option>
+                    <option value="M-Medium">M-Medium</option>
+                    <option value="L-Large">L-Large</option>
+                  </select>
+                </div>
+              </div>
+
+
+              <!-- Fourth Row -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Dzongkhag</label>
+                  <select class="form-select" [(ngModel)]="formData.dzongkhagName" name="dzongkhagName">
+                    <option value="">-- Select Dzongkhag --</option>
+                    <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">
+                      {{ dzongkhag }}
+                    </option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" [(ngModel)]="formData.status" name="status">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+
+            </form>
+          </div>
+
+          <!--Certified Builder -->
+          <div *ngIf="selectedFirmType === 'certified'">
+            <h4>Certified Builders Form</h4>
+            <form>
+              <!-- First Row -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Date <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" placeholder="Auto" required name="date"
+                    [(ngModel)]="dateData.date" #date="ngModel">
+                  <div *ngIf="date.invalid && date.touched" class="text-danger small">
+                    Date is required.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Deadline (Auto-calculated)<span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
+                    [(ngModel)]="formData.deadline" readonly>
+                </div>
+              </div>
+
+              <!-- Second Row -->
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Subject</label>
+                  <input type="text" class="form-control" [(ngModel)]="formData.subject" name="subject" value="">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" [(ngModel)]="formData.status" name="status">
+                    <option value="Active" selected>Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Third Row -->
+              <div class="row mb-3">
+                <!-- <div class="col-md-6">
+                  <label class="form-label">HR Requirements</label>
+                  <select class="form-select form-control-sm" name="hrRequirement"
+                    [(ngModel)]="formData.hrRequirements">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div> -->
+                <div class="col-md-6">
+                  <label class="form-label">Dzongkhag</label>
+                  <select class="form-select form-control-sm" name="dzongkhag" [(ngModel)]="formData.dzongkhagName">
+                    <option [value]="">-- Select --</option>
+                    <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">
+                      {{ dzongkhag }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Fourth Row -->
+              <!-- <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Registered Equipment</label>
+                  <select class="form-select form-control-sm" name="registeredEquipment"
+                    [(ngModel)]="formData.registeredEquipment">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Unregistered Equipment</label>
+                  <select class="form-select form-control-sm" name="unregisteredEquipment"
+                    [(ngModel)]="formData.unregisteredEquipment">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+              </div> -->
+            </form>
+          </div>
+
+          <div *ngIf="selectedFirmType === 'specialized'">
+            <h4>Specialized Firms Form</h4>
+            <form>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Date <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" placeholder="Auto" required name="date"
+                    [(ngModel)]="dateData.date" #date="ngModel">
+                  <div *ngIf="date.invalid && date.touched" class="text-danger small">
+                    Date is required.
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Deadline (Auto-calculated)<span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
+                    [(ngModel)]="formData.deadline" readonly>
+                </div>
+              </div>
+
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Subject <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control" [(ngModel)]="formData.subject" name="subject" required>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Dzongkhag</label>
+                  <select class="form-select" [(ngModel)]="formData.dzongkhagName" name="dzongkhagName">
+                    <option value="">-- Select Dzongkhag --</option>
+                    <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">
+                      {{ dzongkhag }}
+                    </option>
+                  </select>
+                </div>
+              </div>
+
+              <!-- Second Row -->
+              <div class="row mb-3">
+                 <div class="col-md-6">
+                  <label class="form-label">Status</label>
+                  <select class="form-select" [(ngModel)]="formData.status" name="status">
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Pending">Pending</option>
+                  </select>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" [disabled]="!selectedFirmType" (click)="sendMassEmail()">
+          Send Mail
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,338 @@
+<form #form="ngForm">
+    <div class="p-3">
+        <div class="row mb-3 ">
+            <div class="col-md-4 ">
+                <label class="form-label">Certified OHS In-Charge:<span
+                        class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm"  [(ngModel)]="formData.ohsInCharge" id="ohsInCharge"
+                    name="ohsInCharge" required #ohsInCharge="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="ohsInCharge.invalid && ohsInCharge.touched" class="text-danger font-size-12">
+                    Please select an option for OHS In-Charge
+                </div>
+            </div>
+
+        </div>
+        <div class="row mb-3">
+
+            <div class="col-md-4" *ngIf="formData.ohsInCharge === 'Yes'">
+                <label class="form-label">
+                    CID No/Work Permit No:
+                    <span class="text-danger font-size-12">*</span>
+                </label>
+
+                <div class="d-flex align-items-start gap-2">
+                    <input type="number" class="form-control h-3rem" placeholder="Enter CID No"
+                        [(ngModel)]="formData.cidNo" name="cidNo" id="cidNo" required #cidNo="ngModel" />
+
+                    <button type="button" class="btn btn-primary" (click)="onCidChange()" [disabled]="isLoading">
+                        Fetch
+                    </button>
+                </div>
+
+                <div *ngIf="isLoading" class="mt-1">
+                    <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <div *ngIf="cidNo.invalid && cidNo.touched" class="text-danger font-size-12">
+                    Please enter CID No.
+                </div>
+                <div *ngIf="errorMessages.notFound" class="text-danger font-size-12">
+                    {{ errorMessages.notFound }}
+                </div>
+                <div *ngIf="errorMessages.server" class="text-danger font-size-12">
+                    {{ errorMessages.server }}
+                </div>
+            </div>
+            <div class="col-md-4 " *ngIf="formData.ohsInCharge === 'Yes'">
+                <label class="form-label">Full Name:<span class="text-danger font-size-12">*</span></label>
+                <input type="text" class="form-control form-control-sm " placeholder="Enter Full Name"
+                    [(ngModel)]="formData.fullName" name="fullName"  readonly />
+               
+            </div>
+            <div class="col-md-4 " *ngIf="formData.ohsInCharge === 'Yes'">
+                <label class="form-label">Mobile No:<span class="text-danger font-size-12">*</span></label>
+                <input type="number" class="form-control form-control-sm " placeholder="Enter Mobile No"
+                    [(ngModel)]="formData.mobileNo" name="mobileNo" required #mobileNo="ngModel"
+                    (ngModelChange)="validateMobileNumber()" />
+                <div *ngIf="mobileNo.invalid && mobileNo.touched" class="text-danger font-size-12">
+                    Please enter Mobile No.
+                </div>
+                <div *ngIf="errorMessages.mobile" class="text-danger font-size-12">{{errorMessages.mobile}}
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4 ">
+                <label class="form-label">Safety Signages:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.safetySignages" name="safetySignages"
+                    required #safetySignages="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="safetySignages.invalid && safetySignages.touched" class="text-danger font-size-12">
+                    Please select an option for Safety Signages
+                </div>
+
+            </div>
+            <div class="col-md-4 ">
+                <label class="form-label">Fire Extinguisher:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.fireExtinguisher"
+                    name="fireExtinguisher" required #fireExtinguisher="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="fireExtinguisher.invalid && fireExtinguisher.touched" class="text-danger font-size-12">
+                    Please select an option for Fire Extinguisher
+                </div>
+            </div>
+            <div class="col-md-4 ">
+                <label class="form-label">First Aid Box:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.firstAidBox" name="firstAidBox"
+                    required #firstAidBox="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="firstAidBox.invalid && firstAidBox.touched" class="text-danger font-size-12">
+                    Please select an option for First Aid Box
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3 ">
+            <div class="col-md-4 ">
+                <label class="form-label">Peripheral Boundary fencing /condoning of hazardous site:<span
+                        class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.peripheralBoundaryFencing"
+                    name="peripheralBoundaryFencing" required #peripheralBoundaryFencing="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="peripheralBoundaryFencing.invalid && peripheralBoundaryFencing.touched"
+                    class="text-danger font-size-12">
+                    Please select an option for Peripheral Boundary fencing /condoning of hazardous site
+                </div>
+            </div>
+            <div class="col-md-4 ">
+                <label class="form-label">Electrical safety:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.electricalSafety"
+                    name="electricalSafety" required #electricalSafety="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="electricalSafety.invalid && electricalSafety.touched" class="text-danger font-size-12">
+                    Please select an option for Electrical safety
+                </div>
+            </div>
+        </div>
+        <span class="font-bold">Personal Protective Equipment used at site</span>
+        <hr>
+        <div class="row mb-3 ">
+            <div class="col-md-4 ">
+                <label class="form-label">Safety Helmet:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.safetyHelmet" name="safetyHelmet"
+                    required #safetyHelmet="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="safetyHelmet.invalid && safetyHelmet.touched" class="text-danger font-size-12">
+                    Please select an option for Safety Helmet
+                </div>
+            </div>
+
+            <div class="col-md-4 ">
+                <label class="form-label">Safety Boots:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.safetyBoots" name="safetyBoots"
+                    required #safetyBoots="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="safetyBoots.invalid && safetyBoots.touched" class="text-danger font-size-12">
+                    Please select an option for Safety Boots
+                </div>
+            </div>
+
+            <div class="col-md-4 ">
+                <label class="form-label">Reflective vest/jackets:<span
+                        class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.reflectiveVest" name="reflectiveVest"
+                    required #reflectiveVest="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="reflectiveVest.invalid && reflectiveVest.touched" class="text-danger font-size-12">
+                    Please select an option for Reflective vest/jackets
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3 ">
+            <div class="col-md-4 ">
+                <label class="form-label">Goggles:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.goggles" name="goggles" required
+                    #goggles="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="goggles.invalid && goggles.touched" class="text-danger font-size-12">
+                    Please select an option for Goggles
+                </div>
+            </div>
+
+            <div class="col-md-4 ">
+                <label class="form-label">Welding mask/goggles:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.weldingMask" name="weldingMask"
+                    required #weldingMask="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="weldingMask.invalid && weldingMask.touched" class="text-danger font-size-12">
+                    Please select an option for Welding mask/goggles
+                </div>
+            </div>
+
+            <div class="col-md-4 ">
+                <label class="form-label">Dust mask:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.dustMask" name="dustMask" required
+                    #dustMask="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="dustMask.invalid && dustMask.touched" class="text-danger font-size-12">
+                    Please select an option for Dust mask
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-3 ">
+            <div class="col-md-4 ">
+                <label class="form-label">Safety Harness/belts:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.safetyHarness" name="safetyHarness"
+                    required #safetyHarness="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="safetyHarness.invalid && safetyHarness.touched" class="text-danger font-size-12">
+                    Please select an option for Safety Harness/belts
+                </div>
+            </div>
+
+            <div class="col-md-4 ">
+                <label class="form-label">Safety Gloves:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.safetyGloves" name="safetyGloves"
+                    required #safetyGloves="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="safetyGloves.invalid && safetyGloves.touched" class="text-danger font-size-12">
+                    Please select an option for Safety Gloves
+                </div>
+            </div>
+
+
+            <div class="col-md-4 ">
+                <label class="form-label">Ear plug:<span class="text-danger font-size-12">*</span></label>
+                <select class="form-select form-control-sm" [(ngModel)]="formData.earPlug" name="earPlug" required
+                    #earPlug="ngModel"  [disabled]="appNoStatus === 'REJECTED'">
+                    <option value="">-- Select --</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
+                    <option value="Not Available">NA</option>
+                </select>
+                <div *ngIf="earPlug.invalid && earPlug.touched" class="text-danger font-size-12">
+                    Please select an option for Ear plug
+                </div>
+            </div>
+        </div>
+        <div class="row mb-3">
+            <div class="col-md-4 mb-3">
+                <label class="form-label mb-2">Upload Files</label>
+                <div *ngFor="let fileInput of fileInputs; let i = index"
+                    class="row g-2 align-items-end mb-2 border rounded">
+                    <!-- File input -->
+                    <div class="col-9">
+                        <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
+                            [class.is-invalid]="fileErrors[i]" />
+                        <div *ngIf="fileErrors[i]" class="text-danger small mt-1">
+                            {{ fileErrors[i] }}
+                        </div>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="col-3 d-flex flex-column gap-2">
+                        <!-- "Add More" for the first row only -->
+                        <button *ngIf="i === 0" type="button" class="btn btn-outline-primary btn-sm"
+                            (click)="addFileInput()">
+                            <i class="pi pi-plus me-1"></i> More
+                        </button>
+
+                        <!-- "Remove" for all other rows -->
+                        <button *ngIf="fileInputs.length > 1 && i !== 0" type="button"
+                            class="btn btn-outline-danger btn-sm" (click)="removeFileInput(i)">
+                            <i class="pi pi-trash me-1"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4" *ngIf="formData.filePathList && formData.filePathList.length > 0">
+                <label class="form-label me-2 font-size-12">Upload Documents:</label>
+                <div class="flex-wrap align-items-center gap-2 flex-column">
+                    <ng-container *ngIf="formData.filePathList && formData.filePathList.length > 0">
+                        <div *ngFor="let filePath of formData.filePathList; let i = index"
+                            class="d-flex align-items-center gap-2 mb-1">
+                            <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                                <i class="bi bi-eye me-1"></i> View Doc
+                            </button>
+                            <button class="btn btn-outline-danger btn-sm" (click)="deleteFile(i)">
+                                <i class="bi bi-trash me-1"></i> Delete
+                            </button>
+                        </div>
+                    </ng-container>
+                    <span *ngIf="!formData.filePathList || formData.filePathList.length === 0" class="text-muted">
+                        No file uploaded
+                    </span>
+                </div>
+            </div>
+            <div class="col-md-4 ">
+                <label class="form-label">Remarks:</label>
+                <textarea class="form-control form-control-sm" placeholder="Enter remarks"
+                    [(ngModel)]="formData.remarks" id="remarks" name="remarks" required [disabled]="appNoStatus === 'REJECTED'"></textarea>
+               
+            </div>
+        </div>
+    </div>
+    <div class="justify-content-end d-flex">
+        <button class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()" type="submit">Prev</button>
+        <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
+    </div>
+</form>

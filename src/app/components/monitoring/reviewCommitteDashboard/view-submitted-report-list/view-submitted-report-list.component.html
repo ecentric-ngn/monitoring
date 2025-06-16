@@ -1,0 +1,185 @@
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;" *ngIf="loading">
+    <div>
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="mt-2">Loading...</p>
+    </div>
+</div>
+<div class="card container-fluid" *ngIf="!loading">
+    <p class="font-bold font-size-18"><strong>List of New sites</strong></p>
+
+    <form>
+        <div class=" border p-3">
+            <div class="row align-items-end">
+                <!-- Dzongkhag -->
+                <div class="col-md-3">
+                    <label for="dzongkhag" class="form-label">Dzongkhag<span class="text-danger">*</span></label>
+                    <select class="form-select font-size-16" id="dzongkhag"
+                        (change)="onDzongkhagChange($event.target.value)">
+                        <option>--select--</option>
+                        <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.id">
+                            {{ dzongkhag.name }}
+                        </option>
+                    </select>
+                </div>
+                <!-- Procuring Agency -->
+                <div class="col-md-3">
+                    <label for="agency_name" class="form-label">Procuring Agency<span
+                            class="text-danger">*</span></label>
+                    <select id="agency_name" class="form-select font-size-16"
+                        (change)="FetchWorkBaseOnAgencyId($event.target.value)">
+                        <option>--select--</option>
+                        <option *ngFor="let agency of PocuringAgencyList" [value]="agency.id">
+                            {{ agency.agency_name }}
+                        </option>
+                    </select>
+                </div>
+                <!-- BCTA Registration No -->
+                <div class="col-md-3">
+                    <label for="bctaNo" class="form-label">BCTA Registration No<span
+                            class="text-danger">*</span></label>
+                    <input type="text" id="BCTANo" class="form-control h-100" name="BCTANo"
+                        [(ngModel)]="formData.BCTANo" placeholder="Enter BCTA No">
+                </div>
+                <div class="col-md-2">
+                    <button type="button" class="btn btn-primary" (click)="searchBasedOnBCTANo()">Search</button>
+                </div>
+            </div>
+        </div>
+    </form>
+    <div class="row" *ngIf="showTable">
+        <div class="col d-flex pl-4">
+            <p class="text-gray-600">Items Per Page</p>
+            <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+                style="border-color: #ced4da;">
+                <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+            </select>
+        </div>
+        <div class="col d-flex justify-content-end">
+            <p class="text-gray-600 m-2">Search By : </p>
+            <input type="text" placeholder="Application No" class="form-control form-control-sm col-md-4" id="search "
+                [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-bordered" *ngIf="showTable">
+            <thead>
+                <tr>
+                    <th class="text-center p-1">#</th>
+                    <th class="text-center">Application No</th>
+                    <th class="text-center">BCTA No</th>
+                    <th class="text-center">Firm Name</th>
+                    <th class="text-center">Name of Work</th>
+                    <th class="text-center">Location</th>
+                    <th class="text-center">Contract Amount</th>
+                    <th class="text-center">Start Date</th>
+                    <th class="text-center">Proposed Completion Date</th>
+                    <th class="text-center">Procuring Agency</th>
+                    <th class="text-center">Work Type</th>
+                    <th class="text-center">Status</th>
+                    <th class="text-center">Action</th>
+                    <th class="text-center">select</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                <tr *ngFor="let tender of tenderList; let i = index">
+                    <td class="p-1 text-center">{{ i + 1 }}</td>
+                    <td class="text-bold text-center text-nowrap ">{{ tender.application_number }}</td>
+                    <td class="text-center"><a>{{ tender.awardedBctaNo }}</a></td>
+                    <td class="text-center pointer">{{ tender.nameOfFirm }} </td>
+                    <td class="text-center">{{ tender.workName }}</td>
+                    <td class="text-center">{{ tender.dzongkhag || tender.dzongkhagName}}</td>
+                    <td class="text-center">{{ tender.awardedAmount }}</td>
+                    <td class="text-center">{{ tender.officialStartDate | date: 'dd-MM-yyyy' }}</td>
+                    <td class="text-center">{{ tender.officialEndDate | date: 'dd-MM-yyyy' }}</td>
+                    <td class="text-center">{{ tender.agency }}</td>
+                    <td class="text-center">{{ tender.inspection_type }}</td>
+                    <td class="text-center">{{ tender.applicationStatus }}</td>
+                    <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button *ngIf="tender.applicationStatus ==='FORWARDED'" class="btn btn-primary btn-sm h-100"
+                                (click)="navigate(tender)">View</button>
+
+                        </div>
+                    </td>
+                    <td class="text-center">
+                        <input type="checkbox"
+                            [disabled]="tender.applicationStatus === 'FORWARDED' || tender.applicationStatus === 'REJECTED' || tender.applicationStatus === 'APPROVED' || tender.applicationStatus === 'ACTION TAKEN' || tender.applicationStatus === 'SUBMITTED'"
+                            [(ngModel)]="tender.selected" [(ngModel)]="tender.rightSelected" (change)="onCheckboxChange(tender)" />
+                    </td>
+                       <!-- <td class="text-center">
+                        <input type="checkbox"
+                            [disabled]="tender.applicationStatus === 'FRWARDED' || tender.applicationStatus === 'REJECTED' || tender.applicationStatus === 'APPROVED'"
+                            [(ngModel)]="tender.selected" [(ngModel)]="tender.rightSelected" (change)="onCheckboxChange(tender)" />
+                    </td> -->
+                </tr>
+            </tbody>
+        </table>
+        <div class="d-flex justify-content-end align-items-center mb-4 gap-2" *ngIf="showTable && tenderList.length > 0">
+            <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to endorse the application?'"
+                (nzOnConfirm)="EndorseApplicationNo('ENDORSE')">
+                <button class="btn btn-primary btn-sm h-100">
+                    Endorse
+                </button>
+            </a>
+            <button class="btn btn-danger btn-sm h-100" (click)="getId('nbbb')" data-bs-toggle="modal"
+                data-bs-target="#rejectedReason">Reject</button>
+        </div>
+        <div *ngIf="tenderList && showTable" class="d-flex justify-content-between  align-items-center">
+            <p class="mb-0 fw-bold font-size-12">{{ calculateOffset() }}</p>
+            <div *ngIf="tenderList" class="Page navigation mb-0">
+                <ul class="pagination pagination-sm mb-0">
+                    <li class="page-item" (click)="previousPage()">
+                        <a class="page-link pointer">Previous</a>
+                    </li>
+                    <ng-container *ngFor="let page of generatePageArray()">
+                        <li class="page-item" [class.active]="page === pageNo" (click)="goToPage(page)">
+                            <a class="page-link" *ngIf="page !== -1">{{ page }}</a>
+                            <span class="page-link ellipsis" *ngIf="page === -1">...</span>
+                        </li>
+                    </ng-container>
+                    <li class="page-item" (click)="nextPage()">
+                        <a class="page-link pointer">Next</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+
+    </div>
+
+
+    <div class="modal fade" id="rejectedReason" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+        aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="staticBackdropLabel">Rejected Reason</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row align-items-end">
+                        <div class="col-md-12 mb-3">
+                            <label class="form-label">Rejected Reason:<span
+                                    class="text-danger font-size-12">*</span></label>
+                            <textarea type="text" class="form-control form-control-sm"
+                                [(ngModel)]="formData.rejectedReason" placeholder="Text" name="rejectedReason"
+                                id="rejectedReason" required #rejectedReason="ngModel" maxlength="500"></textarea>
+                            <div *ngIf="rejectedReason.invalid && rejectedReason.touched"
+                                class="text-danger font-size-12">
+                                Please enter Rejected Reason
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" #closeRejectButton class="btn btn-danger"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary"
+                        (click)="rejectApplication('reject',checklist_id)">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>

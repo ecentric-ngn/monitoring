@@ -1,0 +1,32 @@
+<p-toast></p-toast>
+<div class="container-fluid">
+    <div class="card rounded p-3">
+      <h4 class="font-semibold">Import Contractors/Consultants Audit Details</h4>
+      <div class="card mt-3 p-3" style="background-color: #f0f8ff;">
+        <h6 class="mb-3 ">Download template below:</h6>
+        <button class="btn btn-success btn-sm col-lg-2" (click)="downloadExcel()">
+          <i class="pi pi-download "></i> Template
+        </button>
+      </div>
+      <form class="mt-4">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <label for="fileInput" class="form-label">Upload file (xlsx or xls format)</label>
+            <div class="d-flex">
+              <input
+                id="fileInput"
+                class="form-control form-control-sm me-2"
+                type="file"
+                (change)="onFileChanged($event)"/>
+              <button  (click)="saveAuditDetails()"   class="btn btn-primary btn-sm" type="submit">
+                Upload
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="d-flex mt-3">
+        </div>
+      </form>
+    </div>
+  </div>
+  

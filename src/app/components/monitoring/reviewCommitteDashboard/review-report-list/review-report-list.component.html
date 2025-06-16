@@ -1,0 +1,96 @@
+<div class="d-flex justify-content-center align-items-center" style="height: 100vh;" *ngIf="loading">
+  <div>
+    <div class="spinner-border" role="status">
+      <span class="visually-hidden">Loading...</span>
+    </div>
+    <p class="mt-2">Loading...</p>
+  </div>
+</div>
+<div class="m-4" *ngIf="!loading">
+    <div class="font-weight-bold h5 mb-0">
+      List of Review Report
+    </div>
+    <div class="row">
+      <div class="col d-flex pl-4">
+        <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+        <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+          style="border-color: #ced4da;">
+          <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+        </select>
+      </div>
+      <div class="col d-flex justify-content-end pr-2">
+        <p class="mr-1 p-1 text-gray-600">Search By : </p>
+        <input type="text" placeholder="Application No or BCTANo" class="form-control form-control-sm col-md-4" id="search "
+          [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+      </div>
+    </div>
+
+    <div class="table-responsive p-0 m-0 ml-2">
+      <table id="datatable-1" class="table  table-bordered">
+        <thead>
+          <tr>
+            <th class="text-center p-1">#</th>
+            <th class="text-center">Application No</th>
+            <th class="text-center">BCTA No</th>
+            <th class="text-center">Firm Name</th>
+            <th class="text-center">Name of Work</th>
+            <th class="text-center">Location</th>
+            <th class="text-center">Contract Amount</th>
+            <th class="text-center">Start Date</th>
+            <th class="text-center">Proposed Completion Date</th>
+            <th class="text-center">Procuring Agency</th>
+            <th class="text-center">Work Type</th>
+            <th class="text-center">Status</th>
+            <th class="text-center">Action</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngIf="tableData?.length === 0">
+            <td colspan="16" class="text-center">No data found</td>
+          </tr>
+          <tr *ngFor="let data of tableData; let i = index">
+            <td class="p-1 text-center">{{ i + 1 }}</td>
+            <td class="text-bold text-center text-nowrap">{{ data.application_number }}</td>
+            <td class="text-center"><a>{{ data.awardedBctaNo }}</a></td>
+            <td class="text-center pointer">{{ data.nameOfFirm }} </td>
+            <td class="text-center">{{ data.workName }}</td>
+            <td class="text-center">{{ data.dzongkhag || data.place}}</td>
+            <td class="text-center">{{ data.awardedAmount }}</td>
+            <td class="text-center text-nowrap">{{ data.officialStartDate | date: 'dd-MM-yyyy' }}</td>
+            <td class="text-center text-nowrap">{{ data.officialEndDate | date: 'dd-MM-yyyy' }}</td>
+            <td class="text-center">{{ data.agency }}</td>
+            <td class="text-center">{{ data.inspection_type }}</td>
+            <td class="text-center">{{ data.applicationStatus }}</td>
+          
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div *ngIf="tableData" class="justify-content-start mb--3">
+    <div class="justify-content-start font-size-12 font-bold ml-2">
+      <p>{{ calculateOffset() }}</p>
+      <div class="d-flex justify-content-end m-3 mr-0 m-lg--5">
+        <div *ngIf="tableData" class="Page navigation">
+          <ul class="pagination pagination-sm mr-2 m--5 ml--1">
+            <li class="page-item" (click)="previousPage()">
+              <a class="page-link pointer">Previous</a>
+            </li>
+            <ng-container *ngFor="let page of generatePageArray()">
+              <li class="page-item" [class.active]="page === pageNo" (click)="goToPage(page)">
+                <a class="page-link" *ngIf="page !== -1">{{ page }}</a>
+                <span class="page-link ellipsis" *ngIf="page === -1">...</span>
+              </li>
+            </ng-container>
+            <li class="page-item" (click)="nextPage()">
+              <a class="page-link pointer">Next</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+

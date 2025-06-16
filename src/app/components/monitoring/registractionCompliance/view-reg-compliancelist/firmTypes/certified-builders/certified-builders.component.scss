@@ -1,0 +1,55 @@
+
+thead th {
+  background-color: #495f8a !important;
+  color: white;
+  text-align: center;
+  padding: 0.5rem;
+}
+
+.pointer-event {
+  cursor: pointer;
+}
+
+.text-primary {
+  color: #007bff;
+}
+
+.table-row:hover td {
+  background-color: #f8f9fa;
+}
+
+/* Only apply hover effect to clickable rows */
+tr[ng-reflect-ng-if="true"]:hover td {
+  background-color: #e9f5ff;
+}
+
+.badge {
+  padding: 0.25em 0.4em;
+  font-size: 75%;
+  font-weight: 700;
+  line-height: 1;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: baseline;
+  border-radius: 0.25rem;
+}
+
+.badge-primary {
+  background-color: #007bff;
+  color: white;
+}
+
+.badge-success {
+  background-color: #28a745;
+  color: white;
+}
+
+.badge-warning {
+  background-color: #ffc107;
+  color: #212529;
+}
+
+.badge-secondary {
+  background-color: #6c757d;
+  color: white;
+}

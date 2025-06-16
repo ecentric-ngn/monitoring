@@ -1,0 +1,27 @@
+<!-- Display General Information component outside of tabs -->
+<div class="card mr--4 ml--4 mt--3">
+    <div class="card-body pt-0"> 
+
+        <app-registration-information [data]="registrationInformation"[title]="title"></app-registration-information>
+        
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs bg-body mt-5 d-flex flex-wrap justify-content-between p-0" id="myTab-1" role="tablist">
+            <li class="nav-item flex-fill text-center">
+                <a (click)="selectTab('employment-history')" class="nav-link active border rounded-0"  id="employment-history-tab" data-toggle="pill" href="#employment-history" role="tab" aria-controls="employment-history" aria-selected="false">Employment History</a>
+            </li>
+            <li class="nav-item flex-fill text-center">
+                <a (click)="selectTab('work-history')"  class="nav-link border rounded-0"  id="engineer-record-tab" data-toggle="pill" href="#work-history" role="tab" aria-controls="work-history" aria-selected="false">Work History</a>
+            </li>
+            <li class="nav-item flex-fill text-center">
+                <a (click)="selectTab('architect-record')"  class="nav-link border rounded-0"  id="architect-record-tab" data-toggle="pill" href="#architect-record" role="tab" aria-controls="architect-record" aria-selected="false">Architect Record</a>
+            </li>
+        </ul>
+        <!-- Tab content -->
+        <div class="tab-content mb--3">
+        <!-- Owner information -->
+        <app-employment-history *ngIf="selectedTab === 'employment-history' || selectedTab === 'registration-information'"[data]=employmentHistory></app-employment-history>
+        <app-architect-record *ngIf="selectedTab === 'architect-record'" [data]=architectRecord></app-architect-record>
+        <app-work-history *ngIf="selectedTab === 'work-history'" [data]=workRecord></app-work-history>
+        </div>
+    </div>
+</div>

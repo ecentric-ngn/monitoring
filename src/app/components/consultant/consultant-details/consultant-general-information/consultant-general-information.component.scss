@@ -1,0 +1,89 @@
+
+*{
+   
+    font-family: DM Sans, sans-serif;
+}
+label{
+    color: rgb(7, 0, 0);
+    font-weight: 500;
+    // font-size: 0.8125rem;
+    font-size: 14px;
+}
+.mt--2{
+    font-size: 13px;
+}
+.size-6 {
+    width: 50px; /* Adjust size as necessary */
+    height: 50px;
+}
+
+.ml-2 {
+    margin-left: 0.5rem; /* Adjust the margin as necessary */
+}
+
+.row {
+    display: flex;
+    align-items: center;
+}
+
+hr{
+    color: gray;
+    border-bottom: 1px solid;
+}
+*{
+   
+    font-family: DM Sans, sans-serif;
+}
+td{
+    color: rgb(14, 1, 1);
+    font-weight:500;
+}
+label{
+    font-size: 12;
+}
+.show {
+    max-height: 655px;
+}
+.horizontal-labels {
+    display: flex;
+  }
+  .label-item {
+    flex: 1; /* Equal width for both items */
+    margin-right: 20px; /* Adjust spacing between items */
+  }
+  
+  .label-item:last-child {
+    margin-right: 0; /* Remove margin for the last item */
+  }
+  .red-text {
+    color: red;
+  }
+  .details{
+    color: red;
+}
+.Deregister{
+    color: red;
+}
+.generalInformation{
+    font-size: 12px;
+}
+.margin {
+    margin-left: 184px;
+}
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 154%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 5px;
+    box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .5);
+    outline: 0;
+}
+
+ .height {
+    height: 36px;
+}

@@ -1,0 +1,248 @@
+
+<div class="row" style="background-color: white;">
+    <div class="col">
+      <nav aria-label="breadcrumb" class="m--3">
+        <ol class="breadcrumb mb-0 m-1">
+          <li class="breadcrumb-item"><a class="text-blue pointer" (click)="back()">{{title}}</a></li>
+          <li class="breadcrumb-item active" aria-current="page" style="color: black;">Consultant Details</li>
+        </ol>
+      </nav>
+    </div>
+  </div>
+  <div class="d-flex justify-content-center align-items-center" style="height: 100vh;" *ngIf="loading">
+    <div>
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading...</p>
+    </div>
+  </div>
+  <form class="" *ngIf="!loading"> 
+    <div class="mb-2 mt--3 row">
+      <div class="col">
+          <h6><b>Consultant Details :</b></h6>
+        </div>
+      </div>
+  <div class="row mt--3">
+    <div class="details red mt--3" *ngIf="formData">
+        <div *ngIf="data.status === 'Suspended'" class="horizontal-labels">
+            <div class="col col-4 red ml--2">
+                <label for="DeregisteredDate red" class="red-text">Suspended Date</label>
+                <div class="font-size details mt--1">{{formData?.suspendDate}}</div>
+            </div>
+            <div class="col col-4">
+                <label for="Suspended red" class="red-text">Suspended Details</label>
+                <div class="font-size details text-container mt--1 "> {{formData.suspendDate | date: 'dd-MM-yyyy'}}</div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="details red mt--1" *ngIf="formData">
+        <div *ngIf="data.status === 'Deregistered'" class="horizontal-labels">
+        <div class="col col-4 red ml--2">
+            <label for="Cancelled red"class="red-text" >Deregistered Date:</label>
+            <div class="font-size details mt--1"> {{formData?.deregisteredDate | date: 'dd-MM-yyyy'}}</div>
+        </div>
+            <div class="col col-4">
+                <label for="Cancelled red" class="red-text">Deregistered Details:</label>
+                <div class="font-size details text-container mt--1">{{ formData.deregisteredDetails }}</div>
+            </div>
+           
+        </div>
+    </div>
+</div>
+    <div class="row ">
+        <div class="details red mt--1" *ngIf="formData">
+            <div *ngIf="data.status === 'Cancelled'" class="horizontal-labels">
+            <div class="col col-4 red ml--2">
+                <label for="Cancelled red"class="red-text" >Cancelled Date:</label>
+                <div class="font-size details mt--1">{{formData?.cancelledDate | date: 'dd-MM-yyyy'}}</div>
+            </div>
+                <div class="col col-4">
+                    <label for="Cancelled red" class="red-text">Cancelled Details:</label>
+                    <div class="font-size details text-container mt--1">{{ formData.cancelledDetails }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row mt--1">
+        <div class="col col-4">
+            <label for="BCTA">BCTA No:</label>
+            <div class="font-size">{{ formData?.consultantNo}}</div>
+        </div>
+        <div class="col col-4">
+            <label for="Ownership">Ownership Type:</label>
+            <div class="font-size">{{ formData?.ownershipType}}</div>
+        </div>
+        <div class="col col-4">
+            <label for="Contractor">Name of Firm:</label>
+            <div class="mt--2">{{ formData?.nameOfFirm}}</div>
+        </div>
+      </div>
+      <div class="row mb--3 mt--3">
+        <div class="col col-4">
+            <label for="Contractor">Business License No:</label>
+            <div class="font-size">{{ formData?.businessLicenseNo}}</div>
+        </div>
+        <div class="col col-4">
+            <label for="Contractor">TPN:</label>
+            <div class="font-size">{{ formData?.tpn }}</div>
+        </div>
+        <div class="col col-4">
+            <label for="issueDate">Issue Date:</label>
+            <div class="font-size">{{formData?.issueDate | date: 'dd-MM-yyyy'}}</div>
+        </div>
+        </div>
+        <div class="row mb--3">   
+        <div class="col col-4">
+            <label for="ExpiryDate">Expiry Date:</label>
+            <div class="font-size"> {{formData?.expiryDate | date: 'dd-MM-yyyy' }}</div>
+        </div>
+        <div class="col col-4"></div>
+        </div>
+        <h6 class="mt-3 pb--3"><b>Permanent Address :</b></h6>
+        <hr class="mb--1" />
+        <div class="row mb--3">
+          <div class="col col-4">
+            <label for="EstablishedAddressAddress">Dzongkhag:</label>
+            <div class="font-size">{{ formData?.permanentDzongkhag}}</div>
+          </div>
+          <div class="col col-4">
+            <label for="EstablishedAddressEmail">Gewog:</label>
+            <div class="font-size">{{ formData?.permanentGewog }}</div>
+          </div>
+          <div class="col col-4">
+            <label for="EstablishedAddressTelephoneNo">Village No:</label>
+            <div class="font-size">{{ formData?.permanentVillage }}</div>
+          </div>
+        </div>
+           <h6 class="pb--3"><b>Established Address:</b></h6>
+        <hr class="mb--1">
+         <div class="row">
+            <div class="col col-4">
+                <label for="EstablishedAddressAddress">Address:</label>
+                <div class="font-size">{{ formData?.establishmentAddress}}</div>
+            </div>
+            <div class="col col-4">
+                <label for="EstablishedAddressAddress">Establishment Dzongkhag:</label>
+                <div class="font-size">{{ formData?.dzongkhagName}}</div>
+            </div>
+            <div class="col col-4">
+                <label for="EstablishedAddressEmail">Email:</label>
+                <div class="font-size">{{ formData?.email }}</div>
+            </div>
+            <div class="col col-4">
+                <label for="EstablishedAddressTelephoneNo">Telephone No:</label>
+                <div class="font-size">{{ formData?.telephoneNo }}</div>
+            </div>
+            <div class="col col-4">
+                <label for="EstablishedAddressMobileNo">Mobile No:</label>
+                <div class="font-size">{{ formData?.mobileNo}}</div>
+            </div>
+            <div class="col col-4">
+                <label for="EstablishedAddressFaxNo">Fax No:</label>
+                <div class="font-size">{{ formData?.faxNo }}</div>
+            </div>
+            </div>
+            <a (click)="openModal()"  data-bs-toggle="modal" data-bs-target="#exampleModal" class="btn btn-block btn-primary text-white w-16rem"> 
+              <i class=" pi pi-pencil"></i>
+                Edit General Information
+            </a>
+      </form>
+      <div class="Note mt-3">
+          <i>Note: Scroll down and click on the tab to view the Consultant information.</i>
+        </div>
+        <p-toast></p-toast>
+        <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true"data-bs-backdrop="static" data-bs-keyboard="false">
+          <div class="modal-dialog">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Edit General Information</h5>
+              </div>
+              <div class="modal-body">
+                <div class="row mb--3">
+                  <div class="col col-4">
+                    <label for="BusinessLicenseNo">Business License No:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.businessLicenseNo" id="BusinessLicenseNo" />
+                  </div>
+                  <div class="col col-4">
+                    <label for="TPN">TPN:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.tpn" id="TPN" />
+                  </div>
+                </div>
+                <div class="row">
+                </div>
+                <h6 class="pb--3"><b>Permanent Address :</b></h6>
+                <hr class="mb--1" />
+                <div class="row mb--3">
+                  <div class="col col-4">
+                    <label for="Dzongkhag">Dzongkhag:</label>
+                    <select
+                      class="form-select font-size height rounded-0"
+                      [(ngModel)]="formData.permanentDzongkhag"  
+                      id="Dzongkhag">
+                      <option *ngFor="let dzongkhag of dzongkhagList" [ngValue]="dzongkhag.name">
+                        {{ dzongkhag.name }}
+                      </option>
+                    </select>
+                  </div>
+                  
+                  <div class="col col-4">
+                    <label for="Gewog">Gewog:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.permanentGewog" id="EstablishmentAddress" />
+                  </div>
+                  <div class="col col-4">
+                    <label for="Village">Village No:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.permanentVillage" id="EstablishmentAddress" />
+                  </div>
+                </div>
+                
+                <h6 class="mt-3 pb--3"><b>Established Address :</b></h6>
+                <span class="text-danger font-size-12">(This address will display the dzongkhag in certificate)</span>
+                <hr class="mb--1" />
+                <div class="row mb--3">
+                  <div class="col col-4">
+                    <label for="EstablishmentAddress">Address:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.establishmentAddress" id="EstablishmentAddress" />
+                  </div>
+                  <div class="col col-4">
+                    <label for="EstablishmentDzongkhag">Establishment Dzongkhag:</label>
+                    <select
+                    class="form-select font-size height rounded-0"
+                    [(ngModel)]="formData.dzongkhagName"
+                    (ngModelChange)="onDzongkhagChange($event)">
+                    id="Ownership" >
+                    <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.name">
+                      {{ dzongkhag.name }}
+                    </option>
+                  </select>
+                  </div>
+                  <div class="col col-4">
+                    <label for="Email">Email:</label>
+                    <input type="email" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.email" id="Email" />
+                  </div>
+                </div>
+                <div class="row">
+                  <div class="col col-4">
+                    <label for="Telephone">Telephone No:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.telephoneNo" id="Telephone" />
+                  </div>
+                  <div class="col col-4">
+                    <label for="Mobile">Mobile No:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.mobileNo" id="Mobile" />
+                  </div>
+                  <div class="col col-4">
+                    <label for="Fax">Fax No:</label>
+                    <input type="text" class="form-control font-size h-100 rounded-0" [(ngModel)]="formData.faxNo" id="Fax" />
+                  </div>
+                </div>
+                
+              </div>
+              <div class="modal-footer">
+                <button type="button" (click)="updateGeneralInformation()" class="btn btn-primary">Update</button>
+                <button type="button" (click)="onCancel()"  #closeButton class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>

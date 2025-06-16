@@ -1,0 +1,153 @@
+<div class="m-5">
+    <div class="font-weight-bold h5 mb-4">
+        Verify Registration Compliance Applications For Certified Builders
+    </div>
+    <div class="row">
+        <div class="col-md-4">
+            <label class="form-label">Firm Type<span class="text-danger">*</span></label>
+            <select class="form-select" name="firmType" [(ngModel)]="formData.firmType" (ngModelChange)="onChangeFirmType($event)" required #firmType="ngModel">
+                <option value="" class="text-muted">Select Firm Type</option>
+                <option value="constructionFirm">CONSTRUCTIONS FIRMS</option>
+                <option value="consultancyFirm">CONSULTANCY FIRMS</option>
+                <option value="specializedFirm">SPECIALIZED FIRMS</option>
+                <!-- <option value="certifiedBuilders">CERTIFIED BUILDERS</option> -->
+            </select>
+            <div *ngIf="firmType.invalid && firmType.touched" class="text-danger font-size-12">
+                Please select a firm type
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col d-flex pl-4">
+            <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+            <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+                style="border-color: #ced4da;">
+                <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+            </select>
+        </div>
+        <div class="col d-flex justify-content-end ">
+            <p class="mr-1 p-1 text-gray-600">Search By : </p>
+            <input type="text" placeholder="BCTA No or Firm Name" class="form-control form-control-sm col-md-4"
+                id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+        </div>
+    </div>
+
+    <div class="table-responsive text-center ">
+        <table id="datatable-1" class="table table-bordered table-sm rounded-2">
+            <thead>
+                <tr>
+                    <th>BCTA No.</th>
+                    <th>Firm Name</th>
+                    <th>Submitted On</th>
+                    <th>Application Status</th>
+                    <th>Category</th>
+                    <th>License Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of tableData" class="table-row">
+                    <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
+                        [class.text-primary]="data.applicationStatus== 'Submitted'" (click)="navigate(data)">
+                        {{ data.certifiedBuilderNo }}
+                    </td>
+                    <td>{{ data.nameOfFirm }}</td>
+                    <td>{{ data.sentDate }}</td>
+                    <td>
+                        <span class="badge" [ngClass]="{
+                            'badge-secondary': data.applicationStatus== 'Not Submitted',
+                            'badge-warning': data.applicationStatus== 'In Process',
+                            'badge-success': data.applicationStatus== 'Verified',
+                            'badge-primary': data.applicationStatus== 'Submitted'
+                            }">
+                            {{ data.applicationStatus }}
+                        </span>
+                    </td>
+                    <td>{{ data.category }}</td>
+                    <td>{{ data.licenseStatus }}</td>
+                    <!-- <td>
+                        <div *ngIf="data.status === 'Not Submitted'">
+                            <div *ngIf="data.isEditing; else viewMode">
+                                <textarea [(ngModel)]="data.notification" rows="2" class="notification-textarea"
+                                    placeholder="Enter message..."></textarea>
+                                <button (click)="saveNotification(data.id)">💾</button>
+                                <button (click)="cancelEdit(data.id)">❌</button>
+                            </div>
+                            <ng-template #viewMode>
+                                <div class="view-mode">
+                                    <div *ngIf="data.notification; else noNote">
+                                        <span>{{ data.notification }}</span>
+                                    </div>
+                                    <ng-template #noNote>
+                                        <span class="no-notification">Click to add message</span>
+                                    </ng-template>
+                                    <button (click)="toggleEditNotification(data.id)">✏️</button>
+                                </div>
+                            </ng-template>
+                        </div>
+                    </td> -->
+
+                    <!-- <td class="text-bold pointer-event" [ngClass]="{ 'text-primary': app.status === 'Not Submitted' }"
+                        (click)="navigate(app)">
+                        {{ app.bctaNo }}
+                    </td>
+                    <td>{{ app.firmName }}</td>
+                    <td>{{ app.submittedOn || '-' }}</td>
+                    <td>
+                        <span class="status-badge" [ngClass]="getStatusClass(app.status)">
+                            <ng-container [ngSwitch]="app.status">
+                                <span *ngSwitchCase="'Verified'">Verified</span>
+                                <span *ngSwitchCase="'In Process'">In Process</span>
+                                <span *ngSwitchCase="'Not Submitted'">Not Submitted</span>
+                            </ng-container>
+                        </span>
+                    </td>
+                    <td>
+                        <span class="license-badge" [ngClass]="getLicenseStatusClass(app.licenseStatus)">
+                            {{ app.licenseStatus }}
+                        </span>
+                    </td>
+                    <td>
+                        <span *ngIf="app.verifiedBy; else noVerifier"> {{ app.verifiedBy }}</span>
+                        <ng-template #noVerifier><span>-</span></ng-template>
+                    </td>
+                    <td> -->
+                    <!-- Editable Notification -->
+                    <!-- <div *ngIf="app.status === 'Not Submitted'">
+                            <div *ngIf="app.isEditing; else viewMode">
+                                <textarea [(ngModel)]="app.notification" rows="2" class="notification-textarea"
+                                    placeholder="Enter message..."></textarea>
+                                <button (click)="saveNotification(app.id)">💾</button>
+                                <button (click)="cancelEdit(app.id)">❌</button>
+                            </div>
+                            <ng-template #viewMode>
+                                <div class="view-mode">
+                                    <div *ngIf="app.notification; else noNote">
+                                        <span>{{ app.notification }}</span>
+                                    </div>
+                                    <ng-template #noNote>
+                                        <span class="no-notification">Click to add message</span>
+                                    </ng-template>
+                                    <button (click)="toggleEditNotification(app.id)">✏️</button>
+                                </div>
+                            </ng-template>
+                        </div> -->
+
+                    <!-- Readonly Notification -->
+                    <!-- <div *ngIf="app.status !== 'Not Submitted'">
+                            <span *ngIf="app.notification; else noNoteReadonly">{{ app.notification }}</span>
+                            <ng-template #noNoteReadonly><span>-</span></ng-template>
+                        </div>
+                    </td> -->
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Empty State -->
+        <!-- <div *ngIf="filteredApplications.length === 0" class="empty-state">
+            <div class="empty-icon">🔍</div>
+            <h3>No applications found</h3>
+            <p>Try adjusting your search or filters.</p>
+        </div> -->
+    </div>
+</div>

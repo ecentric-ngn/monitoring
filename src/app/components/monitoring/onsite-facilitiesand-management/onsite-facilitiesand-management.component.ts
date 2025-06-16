@@ -1,0 +1,364 @@
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { NgForm } from '@angular/forms';
+import { CommonService } from '../../../service/common.service';
+import { Router } from '@angular/router';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+import { NzIconModule, NzIconService } from 'ng-zorro-antd/icon';
+import { forkJoin } from 'rxjs';
+
+@Component({
+    selector: 'app-onsite-facilitiesand-management',
+    templateUrl: './onsite-facilitiesand-management.component.html',
+    styleUrls: ['./onsite-facilitiesand-management.component.scss'],
+})
+export class OnsiteFacilitiesandManagementComponent {
+    formData: any = {};
+    fileError: string | null = null;
+    fileId: any = [];
+    Id: any;
+    @Output() dataSaved = new EventEmitter<{
+        tableId: any;
+        data: any;
+        inspectionType: any;
+    }>();
+  @Output() previousClicked = new EventEmitter<{ ownerId: any }>();
+    data:any={};
+    userId: any;
+    userName: any;
+    @Input() tableId: any;
+    @Input() workInformationdata: any;
+    @Input() prevTableId: any;
+    @Input() inspectionType: any;
+    @Input() datas: any;
+    @Input() workType: any;
+    @Input() ownerId: any;
+    @Input() Previousdata: any;
+    showErrorMessage: any;
+    checkListId: any;
+    fileInputs: number[] = [0]; // Tracks each file input field
+    fileErrors: string[] = [];
+    selectedFiles: File[] = [];
+    appNoStatus: any;
+    formType = '4';
+    constructor(
+        private iconService: NzIconService,
+        private service: CommonService,
+        private router: Router,
+        private notification: NzNotificationService
+    ) {}
+
+    ngOnInit() {
+    // Get user details from session storage safely
+    const userDetailsString = sessionStorage.getItem('userDetails');
+    if (userDetailsString) {
+        try {
+        const userDetails = JSON.parse(userDetailsString);
+        this.userId = userDetails.userId;
+        this.userName = userDetails.username;
+        } catch (e) {
+        console.error('Error parsing userDetails from sessionStorage', e);
+        }
+    }
+    if (this.workType === 'OTHERS') {
+        this.appNoStatus = this.workInformationdata?.applicationStatus || null;
+        this.prevTableId = this.prevTableId || this.workInformationdata?.checklist_id || null;
+        this.data = this.datas || this.workInformationdata;
+        this.getDatabasedOnChecklistId();
+    } else {
+        const WorkDetail = this.service.getData('BctaNo') || {};
+        this.appNoStatus = WorkDetail.data?.applicationStatus || null;
+        this.prevTableId = this.prevTableId || WorkDetail.data?.checklist_id || null;
+        this.tableId = WorkDetail?.workId || WorkDetail?.checklist_id || null;
+        this.data = WorkDetail?.data || this.datas || null;
+          this.getDatabasedOnChecklistId();
+    }
+    }
+
+
+    pageNo: number = 1;
+    pageSize: number = 10;
+    viewName: string = 'onsite_facilities_and_management';
+    getDatabasedOnChecklistId() {
+    const payload: any = [
+        {
+        field: 'checklist_id',
+        value: this.prevTableId,
+        operator: 'AND',
+        condition: '=',
+        },
+    ];
+
+    this.service.fetchDetails(payload, this.pageNo, this.pageSize, this.viewName).subscribe(
+        (response: any) => {
+        const data = response.data[0];
+        this.formData.projectSignBoard = data.project_sign_installed;
+        this.formData.siteOffice = data.site_office_available;
+        this.formData.siteStore = data.site_store_available;
+        this.formData.workerAccommodation = data.workers_accommodation_available;
+        this.formData.potableWater = data.potable_water_access;
+        this.formData.sanitationFacilities = data.proper_sanitation_facilities;
+        this.formData.apsMaintained = data.aps_maintained_by_agency;
+        this.formData.siteMeetingDocumented = data.meetings_conducted_and_documented;
+        this.formData.meetingRemarks = data.remarks;
+        if (data.file_path) {
+            this.formData.filePathList = data.file_path
+            .split(',')
+            .map(path => path.trim());
+
+            this.formData.fileIdList = data.file_id
+            .split(',')
+            .map(id => id.trim());
+
+            // 🔽 Add this line: Check if all paths are 'NO_PATH'
+            this.formData.allPathsNoFile = this.formData.filePathList.every(path => path === 'NO_PATH');
+
+            console.log('filePathList', this.formData.filePathList);
+            console.log('fileIdList', this.formData.fileIdList);
+            console.log('allPathsNoFile', this.formData.allPathsNoFile);
+        }
+        },
+        (error) => {
+        console.error('Error fetching contractor details:', error);
+        }
+    );
+    }
+
+    deleteFile(fileId: string, index: number) {
+        this.service.deleteFile(fileId).subscribe(
+            (response) => {
+                console.log('File deleted successfully:', response);
+                this.getDatabasedOnChecklistId()
+            },
+            (error) => {
+                console.error('Error deleting file:', error);
+            }
+        );
+    }
+    /**
+     * Downloads a file from the server based on the provided filePath.
+     * @param filePath The file path on the server to download the file from.
+     */
+
+    viewFile(attachment: string): void {
+        this.service.downloadFile(attachment).subscribe(
+            (response: HttpResponse<Blob>) => {
+                const binaryData = [response.body];
+                // Create a Blob from the response
+                const blob = new Blob(binaryData, { type: response.body.type });
+                // Generate a URL for the Blob
+                const blobUrl = window.URL.createObjectURL(blob);
+                // Open a new window
+                const newWindow = window.open(
+                    '',
+                    '_blank',
+                    'width=800,height=600'
+                );
+                if (newWindow) {
+                    // Write HTML content to the new window
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                            </head>
+                            <body>
+                            <h1>File</h1>
+                            <iframe src="${blobUrl}" width="100%" height="100%" style="border: none;"></iframe>
+                            </body>
+                        </html>
+                        `);
+
+                    // Optionally revoke the object URL after a timeout to free up resources
+                    setTimeout(() => {
+                        window.URL.revokeObjectURL(blobUrl);
+                    }, 100);
+                } else {
+                    console.error('Failed to open the new window');
+                }
+            },
+            (error: HttpErrorResponse) => {
+                // Check for specific error status
+                if (error.status === 404) {
+                    console.error('File not found', error);
+                    this.showErrorMessage();
+                }
+            }
+        );
+    }
+    extractFileName(filePath: string): string {
+        return (
+            filePath.split('/').pop() ||
+            filePath.split('\\').pop() ||
+            'downloaded-file'
+        );
+    }
+    onPreviousClick() {
+     this.previousClicked.emit(this.ownerId);
+        this.router.navigate(['/monitoring/addworkinformation']);
+    }
+
+    /**
+     * Handles the file selection event and validates the selected file.
+     * If a file is selected, it checks if the file size exceeds 2MB. If the file size
+     * is valid, it sets the file for upload; otherwise, it sets an error message.
+     * If no file is selected, it sets an error message indicating that a file must be uploaded.
+     *
+     * @param event - The file input change event containing the selected file.
+     */
+
+
+    addFileInput() {
+        this.fileInputs.push(this.fileInputs.length);
+        console.log('fileInputs', this.fileInputs);
+        this.fileErrors.push('');
+    }
+    /**
+     * Handles the file selection event and validates the selected file.
+     * If a file is selected, it checks if the file size exceeds 2MB. If the file size
+     * is valid, it sets the file for upload; otherwise, it sets an error message.
+     * If no file is selected, it sets an error message indicating that a file must be uploaded.
+     *
+     * @param event - The file input change event containing the selected file.
+     * @param index - The index of the file input field.
+        */
+    onFileSelected(event: Event, index: number): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+        const file = input.files[0];
+
+        // Check file size (2MB = 2 * 1024 * 1024 bytes)
+        if (file.size > 2 * 1024 * 1024) {
+        this.fileErrors[index] = 'File size must be less than or equal to 2MB.';
+        this.selectedFiles[index] = null;
+        input.value = ''; // Clear the input
+        return;
+        }
+
+        this.selectedFiles[index] = file;
+        this.fileErrors[index] = ''; // Clear error on valid file
+        console.log('selectedFiles', this.selectedFiles);
+    } else {
+        this.fileErrors[index] = 'Please select a valid file.';
+    }
+    }
+
+    removeFileInput(index: number) {
+        this.fileInputs.splice(index, 1);
+        this.fileErrors.splice(index, 1);
+        this.selectedFiles.splice(index, 1);
+    }
+   
+    /**
+     * Uploads the selected file to the server and updates the file ID upon success.
+     */
+
+  saveAndNext(form: NgForm) {
+    if (form.invalid) {
+        Object.keys(form.controls).forEach((field) => {
+            const control = form.controls[field];
+            control.markAsTouched({ onlySelf: true });
+        });
+        return; // Stop execution if form is invalid
+    }
+    // Always call uploadFiles, even if no files are selected
+    const uploadObservables = [];
+    if (this.selectedFiles && this.selectedFiles.length > 0) {
+        for (const file of this.selectedFiles) {
+            const upload$ = this.service.uploadFiles(file, this.formData.meetingRemarks, this.formType, this.userName);
+            uploadObservables.push(upload$);
+        }
+    } else {
+        // Push a dummy observable for empty file upload (e.g., null file)
+        const upload$ = this.service.uploadFiles(null, this.formData.meetingRemarks, this.formType, this.userName);
+        uploadObservables.push(upload$);
+    }
+    forkJoin(uploadObservables).subscribe({
+        next: (fileIds: any[]) => {
+            for (const id of fileIds) {
+                const match = id?.match?.(/[0-9a-fA-F\-]{36}/);
+                if (match) {
+                    this.fileId.push(match[0]);
+                }
+            }
+            this.saveDraftPayload();
+        },
+        error: (err) => {
+            console.error('Error uploading files:', err);
+            this.fileError = 'File upload failed.';
+        },
+    });
+}
+
+    private saveDraftPayload() {
+    const payload: any = {
+    inspectionId: this.userId,
+    id: parseInt(this.checkListId, 10) || this.data.checklist_id,
+    inspectionType: this.workType,
+    projectSignInstalled: this.formData.projectSignBoard,
+    siteOfficeAvailable: this.formData.siteOffice,
+    siteStoreAvailable: this.formData.siteStore,
+    workersAccommodationAvailable: this.formData.workerAccommodation,
+    properSanitationFacilities: this.formData.sanitationFacilities,
+    potableWaterAccess: this.formData.potableWater,
+    apsMaintainedByAgency: this.formData.apsMaintained,
+    meetingsConductedAndDocumented: this.formData.siteMeetingDocumented,
+  };
+
+  // Conditionally include egpTenderId only if workType is not 'OTHERSSSSSSSSS' and data exists
+  if (this.workType !== 'OTHERS' && this.data) {
+    payload.egpTenderId = parseInt(this.data.egpTenderId, 10) || this.data.BCTANo;
+  }
+
+  // Conditionally include workId only if workType is 'OTHERSSSSSSSSS'
+  if (this.workType === 'OTHERS') {
+    payload.workInformationId = this.ownerId;
+  }
+        this.service.saveAsDraft(payload).subscribe({
+            next: (response: any) => {
+                const parsedResponse = typeof response === 'string' ? JSON.parse(response): response;
+                this.tableId = parsedResponse.checklistsInfo.id;
+                if (this.tableId) {
+                    this.assignCheckListId();
+                    this.dataSaved.emit({
+                        tableId: this.tableId,
+                        data: this.data,
+                        inspectionType: this.workType,
+                    });
+                    this.router.navigate(['monitoring/contract-document']);
+                }
+            },
+            error: (error) => {
+                console.error('Error saving draft:', error);
+            },
+        });
+    }
+
+    /**
+     * Assigns the uploaded file to the given checklist ID.
+     * The method sends a request to save the checklist ID and
+     * logs the result upon success or error.
+     */
+    assignCheckListId() {
+        const payload = this.fileId; // this is a valid array of fileIds
+        console.log('fileId..............', payload);
+        // Save the checklist ID with the uploaded file
+        this.service.saveCheckListId(this.tableId, payload).subscribe(
+            (response) => {
+                // Log the result upon success
+                console.log('File ID assigned successfully:', response);
+                this.createNotification();
+            },
+            (error) => {
+                // Log the error upon failure
+                console.error('Error assigning File ID:', error);
+            }
+        );
+    }
+
+    createNotification(): void {
+        this.notification
+            .success('Success', 'The data has been saved successfully')
+            .onClick.subscribe(() => {
+                console.log('notification clicked!');
+            });
+    }
+}

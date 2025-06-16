@@ -1,0 +1,28 @@
+.size-6 {
+    width: 50px; /* Adjust size as necessary */
+    height: 50px;
+}
+
+.ml-2 {
+    margin-left: 0.5rem; /* Adjust the margin as necessary */
+}
+
+.row {
+    display: flex;
+    align-items: center;
+}
+.card {
+    background: var(--surface-card);
+    border: 1px solid var(--surface-border);
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: var(--card-shadow);
+    border-radius: 1px;
+}
+.margin {
+    margin-left: 184px;
+}
+.nav-tabs .nav-link.active {
+    border-bottom: 3px solid #007bff !important; /* Change color as needed */
+  }
+  

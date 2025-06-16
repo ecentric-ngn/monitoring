@@ -1,0 +1,41 @@
+.size-6 {
+    width: 50px; /* Adjust size as necessary */
+    height: 50px;
+}
+
+.ml-2 {
+    margin-left: 0.5rem; /* Adjust the margin as necessary */
+}
+
+.row {
+    display: flex;
+    align-items: center;
+}
+.margin {
+    margin-left: 184px;
+}
+.col-10 {
+    flex: 0 0 auto;
+    padding: 1rem;
+    width: 83.3333%;
+    margin-left: 271px;
+}
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 154%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 5px;
+    box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .5);
+    outline: 0;
+    margin-left: -75px;
+
+}
+
+ .height {
+    height: 36px;
+}

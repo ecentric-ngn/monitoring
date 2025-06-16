@@ -1,0 +1,120 @@
+<form #form="ngForm">
+    <div>
+        <label class="form-label"><strong>Please select other work type<span class="text-danger">*</span></strong></label><br>
+        <label>
+            <input type="radio" name="workType" id="privateOtherWork" [(ngModel)]="formData.workType"
+                value="privateOtherWork" (click)="onclick('privateOtherWork')"   [disabled]="appNoStatus === 'REJECTED'"  required />
+            Private Other Work
+        </label>
+        &nbsp;&nbsp;
+        <label>
+            <input type="radio" name="workType" id="publicOtherWork" [(ngModel)]="formData.workType"
+                value="publicOtherWork" (click)="onclick('publicOtherWork')"   [disabled]="appNoStatus === 'REJECTED'" required />
+            Public Other Work
+        </label>
+        &nbsp;&nbsp;
+    </div>
+
+
+    <div class="p-3" *ngIf="showFormDetails">
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">
+                    Project Name:<span class="text-danger font-size-12">*</span>
+                    <span class="text-danger font-size-12">*</span>
+                </label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.projectName"
+                    placeholder="Text" name="projectName" required #projectName="ngModel"   [disabled]="appNoStatus === 'REJECTED'"
+                   >
+                <div *ngIf="projectName.invalid && projectName.touched" class="text-danger font-size-12">
+                    Please enter Project Name
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label for="dzongkhag" class="form-label">Dzongkhag<span class="text-danger">*</span></label>
+                <select class="form-select font-size-16" name="dzongkhagId" id="dzongkhagId"
+                    [(ngModel)]="formData.dzongkhagId" [disabled]="appNoStatus === 'REJECTED'" required
+                    #location="ngModel">
+                    <option>--select--</option>
+                    <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.id">
+                        {{ dzongkhag.name }}
+                    </option>
+                </select>
+                <div *ngIf="location.invalid && location.touched" class="text-danger font-size-12">
+                    Please enter location
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Place:<span class="text-danger font-size-12">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.placeName"
+                    placeholder="enter place" name="placeName" required #placeName="ngModel"
+                    [disabled]="appNoStatus === 'REJECTED'">
+                <div *ngIf="placeName.invalid && placeName.touched" class="text-danger font-size-12">
+                    Please enter placeName
+                </div>
+            </div>
+
+        </div>
+
+        <div class="row">
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Contract Amount:<span class="text-danger font-size-12">*</span></label>
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="formData.contractAmount"
+                    placeholder="enter contractAmount" name="contractAmount" required #contractAmount="ngModel"
+                    [disabled]="appNoStatus === 'REJECTED'">
+                <div *ngIf="contractAmount.invalid && contractAmount.touched" class="text-danger font-size-12">
+                    Please enter Contract Amount
+                </div>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Start Date:<span class="text-danger font-size-12">*</span></label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.startDate"
+                    placeholder="enter date" name="startDate" required #startDate="ngModel"
+                    [disabled]="appNoStatus === 'REJECTED'">
+                <div *ngIf="startDate.invalid && startDate.touched" class="text-danger font-size-12">
+                    Please enter Start Date
+                </div>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Proposed Completion Date:<span
+                        class="text-danger font-size-12">*</span></label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.proposedCompletionDate"
+                    placeholder="enter date" name="proposedCompletionDate" required #proposedCompletionDate="ngModel"
+                    [disabled]="appNoStatus === 'REJECTED'">
+                <div *ngIf="proposedCompletionDate.invalid && proposedCompletionDate.touched"
+                    class="text-danger font-size-12">
+                    Please enter Proposed Completion Date
+                </div>
+                <div *ngIf="formData.startDate && formData.proposedCompletionDate && formData.proposedCompletionDate < formData.startDate"
+                    class="text-danger font-size-12">
+                    Proposed Completion Date cannot be before Start Date
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <!-- <div class="col-md-4 mb-3">
+                <label class="form-label">Client:<span class="text-danger font-size-12">*</span></label>
+                <select id="client" class="form-select font-size-16" name="client" id="client" [(ngModel)]="formData.client" [disabled]="appNoStatus === 'REJECTED'">
+                    <option>--select--</option>
+                    <option *ngFor="let agency of PocuringAgencyList" [ngValue]="agency.id">
+                        {{ agency.agency_name }}
+                    </option>
+                </select>
+            </div> -->
+            <div class="col-md-4 mb-3">
+                <label class="form-label">Client:<span class="text-danger font-size-12">*</span></label>
+                <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.client"
+                    placeholder="enter client" name="client" required #client="ngModel"
+                    [disabled]="appNoStatus === 'REJECTED'">
+                <div *ngIf="client.invalid && client.touched" class="text-danger font-size-12">
+                    Please enter Client
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div class="justify-content-end d-flex" *ngIf="showFormDetails">
+    <button class="btn text-white save-next-btn" (click)="saveOwnerInformation(form)" type="submit">Save & Next</button>
+</div>

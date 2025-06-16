@@ -1,0 +1,54 @@
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    width: 94%;
+    margin-left: 44;
+}
+.p-button {
+    margin: 0;
+    display: inline-flex;
+    cursor: pointer;
+    -webkit-user-select: none;
+    user-select: none;
+    align-items: center;
+    vertical-align: bottom;
+    text-align: center;
+    /* overflow: hidden; */
+    position: relative;
+    height: 27px;
+    padding-left: inherit;
+    padding-right: inherit;
+}
+.text-container {
+    overflow-wrap: break-word; /* Breaks long words to prevent overflow */
+    word-wrap: break-word;     /* Legacy property for breaking long words */
+    word-break: break-all;     /* Forces breaking of words at any point */
+    white-space: normal;       /* Ensures text wraps normally */
+    max-width: 100%;           /* Ensures container width does not exceed its parent */
+    font-size: 14px;           /* Adjust font size as needed */
+}
+.view-button {
+    background-color: #007bff;
+    border: none;
+    color: white;
+    padding: 5px 10px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    margin: 2px 1px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition-duration: 0.4s;
+  }
+  
+  .view-button:hover {
+ 
+    border: 2px solid #007bff;
+  }
+svg {
+    display: inline-block;
+    vertical-align: middle;
+    height: 20px;
+}
+  

@@ -1,0 +1,110 @@
+<div class="container p-4 border rounded bg-white shadow-sm">
+  <div class="table-responsive">
+
+    <!-- Info / Validation Message -->
+    <div *ngIf="showMessage" class="alert alert-info d-flex justify-content-between align-items-center">
+      {{ showMessage }}
+    </div>
+    <div *ngIf="showValidateMessage" class="alert alert-warning d-flex justify-content-between align-items-center">
+      {{ showValidateMessage }}
+    </div>
+    <form #form="ngForm">
+      <!-- Data Table -->
+      <table class="table table-bordered align-middle text-sm">
+        <thead class="table-light text-center">
+          <tr>
+            <th scope="col">CID No</th>
+            <th scope="col">Full Name</th>
+            <th scope="col">Mobile No</th>
+            <th scope="col">Designation</th>
+            <th scope="col">Email</th>
+            <th scope="col w-16rem">OTP</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let formData of dataList; let i = index">
+            <td>
+              <div class="input-group">
+                <input type="number" class="form-control form-control-sm" [(ngModel)]="formData.cidNo" id="cidNo{{ i }}"
+                  name="cidNo{{ i }}" placeholder="CID No" (ngModelChange)="onCidChange(formData)"
+                (input)="clearErrorMessage(formData)" />
+
+                <span *ngIf="isLoading" class="input-group-text bg-white border-0">
+                  <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                    <span class="visually-hidden">Loading...</span>
+                  </div>
+                </span>
+              </div>
+              <small *ngIf="formData.errorMessages?.notFound" class="text-danger mt-1 d-block">
+                {{ formData.errorMessages.notFound }}
+              </small>
+              <small *ngIf="formData.errorMessages?.server" class="text-danger mt-1 d-block">
+                {{ formData.errorMessages.server }}
+              </small>
+
+            </td>
+
+            <td>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.fullName"
+                id="fullName{{ i }}" name="fullName{{ i }}" placeholder="Full Name" (input)="clearErrorMessage(formData)" />
+            </td>
+
+            <td>
+              <input type="number" class="form-control form-control-sm" [(ngModel)]="formData.mobileNo"
+                id="mobileNo{{ i }}" name="mobileNo{{ i }}" placeholder="Mobile No"
+                (ngModelChange)="validateMobileNumber(formData)" />
+            </td>
+
+            <td>
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.designation"
+                id="designation{{ i }}" name="designation{{ i }}" placeholder="Designation" />
+            </td>
+
+            <td>
+              <input type="email" class="form-control form-control-sm" [(ngModel)]="formData.email" id="email{{ i }}"
+                name="email{{ i }}" placeholder="Email" />
+            </td>
+
+            <td>
+              <div class="d-flex gap-2 align-items-center" [disabled]="appNoStatus === 'REJECTED'">
+                <button type="button" class="btn btn-outline-primary btn-sm" (click)="generateOtp(formData)">Generate
+                  OTP</button>
+                <input *ngIf="formData.showOtpInput" type="number"
+                  class="col-4 form-control form-control-sm h-1rem form-control-sm" [(ngModel)]="formData.otp"
+                  id="otp{{ i }}" name="otp{{ i }}" placeholder="Enter OTP" [disabled]="isOtpDisabled"
+                  (ngModelChange)="onOtpChange(formData)" />
+
+                <div *ngIf="otpvalidated" class="text-success small mt-1 pi pi-verified">
+                  <i class="bi bi-check-circle-fill"></i>
+                </div>
+              </div>
+            </td>
+            <td class="text-center" *ngIf="dataList.length > 1">
+              <button class="btn btn-outline-danger btn-sm" (click)="removeRow(i)">Delete</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
+  </div>
+
+  <!-- Add More Button -->
+  <div class="d-flex justify-content-end mt-3">
+    <button class="btn btn-outline-primary btn-sm" (click)="addRow()" [disabled]="appNoStatus === 'REJECTED'">+ Add
+      More</button>
+  </div>
+  <!-- [disabled]="!isOtpValid -->
+  <!-- Save / Next Buttons -->
+  <div class="justify-content-end d-flex mt-6">
+    <button *ngIf="appNoStatus !== 'REJECTED'" class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()"
+      type="submit">Prev</button>
+    <button class="btn text-white save-next-btn" [disabled]="!(appNoStatus === 'REJECTED' || isOtpValid)"
+      (click)="saveAndNext(form)" type="submit">
+      Save & Next
+    </button>
+
+
+
+  </div>
+</div>

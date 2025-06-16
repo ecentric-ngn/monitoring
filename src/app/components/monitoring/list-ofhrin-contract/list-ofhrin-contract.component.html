@@ -1,0 +1,261 @@
+<form #form="ngForm">
+  <div class="p-3">
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th class="text-center p-1">#</th>
+          <th class="text-center p-1">Cid No</th>
+          <th class="text-center p-1">Full Name</th>
+          <th class="text-center p-1">Designation</th>
+          <th class="text-center p-1">Qualification</th>
+          <th class="text-center p-1">Status</th>
+          <th class="text-center p-1">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="TableData?.length === 0">
+          <td colspan="7" class="text-center">No data found</td>
+        </tr>
+
+        <ng-container *ngFor="let item of TableData; let i = index">
+          <tr>
+            <td class="text-center bg-white">{{ i + 1 }}</td>
+            <td class="text-center bg-white">{{ item.cidNo || item.cidWorkPermitNo }}</td>
+            <td class="text-center bg-white">{{ item.name }}</td>
+            <td class="text-center">{{ item.designation }}</td>
+            <td class="text-center">{{ item.qualification }}</td>
+            <td class="text-center">
+              {{ item.status }}
+              <button *ngIf="item.status === 'REPLACED'" class="btn btn-link btn-sm p-0 ms-2"
+                (click)="toggleReplacement(i)">
+                {{ showReplacementIndex === i ? 'Hide' : 'View' }}
+              </button>
+            </td>
+            <td class="text-center" [disabled]="appNoStatus === 'REJECTED'">
+              <button type="button" class="btn btn-primary btn-sm" (click)="getId(item.id || item.hrId)"
+                data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                Verify
+              </button>
+            </td>
+          </tr>
+
+          <!-- Collapsible Row for Replacement Info -->
+          <tr *ngIf="showReplacementIndex === i && item.status === 'REPLACED'">
+            <td colspan="7" class="text-start px-4">
+              <strong>Replaced By:</strong><br>
+              Name: {{ item.replacementInfo?.name }}<br>
+              CID No: {{ item.replacementInfo?.cidNo }}<br>
+              Designation: {{ item.replacementInfo?.designation }}<br>
+              Qualification: {{ item.replacementInfo?.qualification }}
+            </td>
+          </tr>
+        </ng-container>
+
+        <ng-container *ngIf="inspectionType === 'OTHERS'">
+          <tr *ngFor="let newEntry of entryList; let i = index">
+            <td class="text-center bg-white">{{ i + 1 }}</td>
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <input type="number" class="form-control form-control-sm" placeholder="Enter CID No"
+                  [(ngModel)]="newEntry.cidNo" name="cidNo{{i}}" required />
+                <button type="button" class="btn btn-primary btn-sm" (click)="getCidDetails(newEntry.cidNo, i)">
+                  Fetch
+                </button>
+              </div>
+            </td>
+            <td>
+              <input class="form-control form-control-sm" id="fullName" [(ngModel)]="newEntry.fullName"
+                name="fullName{{i}}" placeholder="Full Name" />
+            </td>
+            <td>
+              <select class="form-select form-control-sm" [(ngModel)]="newEntry.designation" name="designation{{i}}"
+                required>
+                <option value="">---SELECT---</option>
+                <option *ngFor="let desig of designationList" [value]="desig.name">{{ desig.name }}</option>
+              </select>
+            </td>
+            <td>
+              <select class="form-select form-control-sm" [(ngModel)]="newEntry.qualification" name="qualification{{i}}"
+                required>
+                <option value="">---SELECT---</option>
+                <option *ngFor="let q of qualificationList" [value]="q.name">{{ q.name }}</option>
+              </select>
+            </td>
+            <td>
+              <select class="form-select form-control-sm" [(ngModel)]="newEntry.status" name="status{{i}}" required>
+                <option value="">---SELECT---</option>
+                <option value="DEPLOYED">Deployed</option>
+                <option value="NOT_DEPLOYED">Not Deployed</option>
+                <option value="REPLACED">Replaced</option>
+              </select>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
+    </table>
+
+    <!-- Add More Button -->
+    <div class="text-end d-flex justify-content-end mt-2" *ngIf="inspectionType === 'OTHERS'">
+      <button class="btn btn-outline-primary btn-sm" (click)="addNewEntry()">Add More</button>
+    </div>
+    <div class="row mb-4">
+      <!-- File Upload Section -->
+      <div class="col-md-6">
+        <label class="form-label fw-semibold mb-2">Upload Files</label>
+        <div *ngFor="let fileInput of fileInputs; let i = index" class="border rounded p-2 mb-2">
+          <div class="row align-items-end">
+            <!-- File Input -->
+            <div class="col-9">
+              <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
+                [class.is-invalid]="fileErrors[i]" />
+              <div *ngIf="fileErrors[i]" class="invalid-feedback d-block small">
+                {{ fileErrors[i] }}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-2 mb-lg-3 text-end">
+              <button *ngIf="i === 0" type="button" class="btn btn-sm btn-outline-primary"
+                (click)="addFileInput()">
+                <i class="me-1"></i> + More
+              </button>
+              <button *ngIf="fileInputs.length > 1 && i !== 0" type="button" class="btn btn-sm btn-outline-danger w-100"
+                (click)="removeFileInput(i)">
+                <i class="me-1"></i> -Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Remarks Section -->
+      <div class="col-md-6">
+        <label for="remarks" class="form-label fw-semibold">Remarks</label>
+        <textarea class="form-control" id="remarks" name="remarks" placeholder="Enter remarks"
+          [(ngModel)]="formData.remarks" required #remarks="ngModel">
+    </textarea>
+        <div *ngIf="remarks.invalid && remarks.touched" class="text-danger small mt-1">
+          Please enter remarks.
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div class="justify-content-end d-flex">
+    <button class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()" type="submit">Prev</button>
+    <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
+  </div>
+</form>
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #495f8a">
+        <h5 class="modal-title text-white" id="staticBackdropLabel">Verify Human Resource</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <form #form="ngForm">
+          <div class="row ml--1">
+            <div class="col-md-6">
+              <label class="form-label">Status<span class="text-danger">*</span></label>
+              <select class="form-select form-control-sm" [(ngModel)]="formData.status" id="status" name="status"
+                required #status="ngModel">
+                <option value="">Select</option>
+                <option value="DEPLOYED">Deployed</option>
+                <option value="NOT_DEPLOYED">Not Deployed</option>
+                <option value="REPLACED">Replaced</option>
+              </select>
+              <div *ngIf="statusError" class="text-danger font-size-12 mt-1">{{ statusError }}</div>
+            </div>
+          </div>
+          <div class="row p-3" *ngIf="formData.status === 'REPLACED'">
+            <div class="col-md-6">
+              <label class="form-label">CID No/Work Permit No.: <span class="text-danger">*</span></label>
+              <div class="d-flex align-items-start">
+                <input type="number" class="form-control form-control-sm me-2" name="cidNo" [(ngModel)]="formData.cidNo"
+                  required #cidNo="ngModel" />
+                <button type="button" class="btn btn-sm btn-primary" (click)="getCidDetails(formData.cidNo)">
+                  Fetch
+                </button>
+              </div>
+
+              <div *ngIf="cidNo.invalid && cidNo.touched" class="text-danger mt-1">
+                CID is required.
+              </div>
+
+              <div *ngIf="isLoading" class="mt-1">
+                <div class="spinner-border spinner-border-sm text-secondary" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </div>
+              </div>
+
+              <div *ngIf="formData.errorMessage" class="text-danger mt-1">
+                {{ formData.errorMessage }}
+              </div>
+            </div>
+
+
+            <div class="col-md-6">
+              <label class="form-label">Full Name: <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm " name="replacementName"
+                [(ngModel)]="formData.replacementName" required readonly #replacementName="ngModel" />
+              <div *ngIf="replacementName.invalid && replacementName.touched" class="text-danger">
+                Full Name is required.
+              </div>
+            </div>
+          </div>
+          <div class="row p-3" *ngIf="formData.status === 'REPLACED'">
+            <!-- Designation -->
+            <div class="col-md-6">
+              <label class="form-label">Designation <span class="text-danger">*</span></label>
+              <select class="form-select form-control-sm" id="replacementDesignation" name="replacementDesignation"
+                [(ngModel)]="formData.replacementDesignation" (ngModelChange)="onDesignationChange($event)" required
+                #replacementDesignation="ngModel">
+                <option value="">---SELECT---</option>
+                <option *ngFor="let desig of designationList" [value]="desig.id">{{ desig.name }}</option>
+              </select>
+              <div *ngIf="replacementDesignation.invalid && replacementDesignation.touched" class="text-danger">
+                Designation required.
+              </div>
+            </div>
+
+            <!-- Qualification -->
+            <div class="col-md-6">
+              <label class="form-label">Qualification <span class="text-danger">*</span></label>
+              <select class="form-select form-control-sm" id="qualification" name="qualification"
+                [(ngModel)]="formData.qualification" (ngModelChange)="onQualificationChange($event)" required
+                #qualification="ngModel">
+                <option value="">--select--</option>
+                <option *ngFor="let q of qualificationList" [value]="q.id">{{ q.name }}</option>
+              </select>
+              <div *ngIf="qualification.invalid && qualification.touched" class="text-danger">
+                Qualification required.
+              </div>
+            </div>
+          </div>
+
+          <div class="row p-3" *ngIf="formData.status === 'REPLACED'">
+            <div class="col-md-6">
+              <label class="form-label">Meets Qualification <span class="text-danger">*</span></label>
+              <select class="form-select form-control-sm " name="meetsQualification" id="meetsQualification"
+                [(ngModel)]="formData.meetsQualification" required #meetsQualification="ngModel">
+                <option value="">Select</option>
+                <option value="true">Yes</option>
+                <option value="false">No</option>
+              </select>
+              <div *ngIf="meetsQualification.invalid && meetsQualification.touched" class="text-danger">
+                Please choose an option.
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" *ngIf="appNoStatus !== 'REJECTED'" (click)="resetForm()" #closeModal
+          class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="saveHRItem(form)">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

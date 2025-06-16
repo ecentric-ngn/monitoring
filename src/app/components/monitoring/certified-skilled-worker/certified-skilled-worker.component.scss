@@ -1,0 +1,47 @@
+:root {
+  --primary-color: #2c3e50;
+  --secondary-color: #3498db;
+}
+
+.form-control, .form-select {
+  border-radius: 0.5rem;
+  border: 1px solid #ced4da;
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+}
+
+.form-control:focus, .form-select:focus {
+  border-color: var(--secondary-color);
+  box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25);
+}
+
+.card {
+  border-radius: 0.75rem;
+  border: none;
+}
+
+.card-header {
+  border-radius: 0.75rem 0.75rem 0 0 !important;
+}
+
+.btn-primary {
+  background-color: var(--primary-color);
+  border-color: var(--primary-color);
+  padding: 0.5rem 1.5rem;
+  border-radius: 0.5rem;
+}
+
+.btn-primary:hover {
+  background-color: #1a252f;
+  border-color: #1a252f;
+}
+
+.btn-secondary {
+  background-color: #95a5a6;
+  border-color: #95a5a6;
+}
+
+.invalid-feedback {
+  font-size: 0.875em;
+  color: #dc3545;
+  margin-top: 0.25rem;
+}

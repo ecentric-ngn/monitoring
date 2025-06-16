@@ -1,0 +1,297 @@
+<form #form="ngForm">
+  <table class="table table-bordered border-1 overflow-hidden">
+    <thead>
+      <tr>
+        <th class="text-center p-1">#</th>
+        <th class="text-center p-1 w-23rem">Equipment</th>
+        <th class="text-center p-1">Registration No</th>
+        <th class="text-center p-1">Status</th>
+        <th class="text-center p-1">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- No Data Row -->
+      <tr *ngIf="TableData?.length === 0 && (!additionalItems || additionalItems.length === 0)">
+        <td colspan="6" class="text-center">No data found</td>
+      </tr>
+
+      <!-- Loop through TableData -->
+      <ng-container *ngFor="let item of TableData; let i = index">
+        <tr>
+          <td class="text-center bg-white">{{ i + 1 }}</td>
+          <td class="text-center bg-white">{{ item.name || item.equipmentName }}</td>
+          <td class="text-center">{{ item.registrationNo }}</td>
+          <td class="text-center">
+            {{ item.status }}
+            <button *ngIf="item.status === 'REPLACED'" class="btn btn-link btn-sm p-0 ms-2"
+              (click)="toggleReplacement(i)">
+              {{ showReplacementIndex === i ? 'Hide' : 'View' }}
+            </button>
+          </td>
+          <td class="text-center">
+            <button (click)="getStoreId(item)" type="button" class="btn btn-primary btn-sm" data-bs-toggle="modal"
+              data-bs-target="#staticBackdrop"[disabled]="appStatus === 'REJECTED'">
+              Verify
+            </button>
+          </td>
+        </tr>
+
+        <tr *ngIf="showReplacementIndex === i && item.status === 'REPLACED' && item.replacedWithInfo">
+          <td colspan="6" class="text-start px-4">
+            <strong>Replaced With:</strong><br>
+            RegistrationNo: {{ item.replacedWithInfo?.registrationNo }}<br>
+            VehicleType: {{ item.replacedWithInfo?.vehicleType }}<br>
+            Remarks: {{ item.replacedWithInfo?.remarks }}<br>
+          </td>
+        </tr>
+      </ng-container>
+      <!-- Extra Rows for 'OTHERS' -->
+      <ng-container *ngIf="inspectionType === 'OTHERS'">
+        <ng-container *ngFor="let item of additionalItems; let j = index">
+          <tr>
+            <td class="text-center">{{ j + 1 }}</td>
+
+            <!-- Equipment Name Input -->
+            <td class="text-center">
+              <select class="form-select form-control-sm" id="name{{j}}" name="name{{j}}" [(ngModel)]="item.name"
+                (change)="onEquipmentChange(item)" required #equipment="ngModel">
+                <option value="">-- Select --</option>
+                <option *ngFor="let equipment of equipmentLists" [value]="equipment.name">
+                  {{ equipment.name }}
+                </option>
+              </select>
+            </td>
+
+            <!-- Registration No Input -->
+            <td class="text-center">
+              <input type="text" class="form-control form-control-sm" [(ngModel)]="item.registrationNo"
+                [disabled]="!item.vehicleType" name="registrationNo{{j}}" placeholder="Enter registration no" />
+            </td>
+
+            <!-- Status Input -->
+            <td class="text-center">
+              <select class="form-select form-control-sm" [(ngModel)]="item.status" name="status{{j}}" required>
+                <option value="">---SELECT---</option>
+                <option value="DEPLOYED">Deployed</option>
+                <option value="NOT_DEPLOYED">Not Deployed</option>
+                <option value="REPLACED">Replaced</option>
+              </select>
+            </td>
+
+            <!-- Remove Button -->
+            <td class="text-center" *ngIf="additionalItems.length > 1">
+              <button class="btn btn-danger btn-sm" (click)="removeAdditionalItem(j)">Remove</button>
+            </td>
+          </tr>
+        </ng-container>
+      </ng-container>
+    </tbody>
+  </table>
+  <div class="justify-content-end d-flex mt-3"*ngIf="inspectionType === 'OTHERS'">
+    <button class="btn btn-outline-primary btn-sm" (click)="addAdditionalItem()">Add More</button>
+  </div>
+ <div class="row mb-4">
+      <!-- File Upload Section -->
+      <div class="col-md-6">
+        <label class="form-label fw-semibold mb-2">Upload Files</label>
+        <div *ngFor="let fileInput of fileInputs; let i = index" class="border rounded p-2 mb-2">
+          <div class="row align-items-end">
+            <!-- File Input -->
+            <div class="col-9">
+              <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
+                [class.is-invalid]="fileErrors[i]" />
+              <div *ngIf="fileErrors[i]" class="invalid-feedback d-block small">
+                {{ fileErrors[i] }}
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="col-md-2 mb-lg-3 text-end">
+              <button *ngIf="i === 0" type="button" class="btn btn-sm btn-outline-primary"
+                (click)="addFileInput()">
+                <i class="me-1"></i> + More
+              </button>
+              <button *ngIf="fileInputs.length > 1 && i !== 0" type="button" class="btn btn-sm btn-outline-danger w-100"
+                (click)="removeFileInput(i)">
+                <i class="me-1"></i> -Remove
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Remarks Section -->
+      <div class="col-md-6">
+        <label for="remarks" class="form-label fw-semibold">Remarks</label>
+        <textarea class="form-control" id="remarks" name="remarks"  placeholder="Enter remarks"
+          [(ngModel)]="formData.remarks" required #remarks="ngModel">
+    </textarea>
+        <div *ngIf="remarks.invalid && remarks.touched" class="text-danger small mt-1">
+          Please enter remarks.
+        </div>
+      </div>
+    </div>
+  <div class="justify-content-end d-flex">
+    <button class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()" type="submit">Prev</button>
+    <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
+  </div>
+</form>
+
+<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #495f8a">
+        <h5 class="modal-title text-white" id="staticBackdropLabel">Verify Equipment</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+
+      <div class="modal-body">
+        <!-- Status Selection -->
+        <div class="row mb-3">
+          <div class="col-md-6">
+            <label class="form-label">Status</label>
+            <select class="form-select form-control-sm" name="status" id="status" required #status="ngModel"
+              [(ngModel)]="formData.status">
+              <option value="">Select</option>
+              <option value="DEPLOYED">Deployed</option>
+              <option value="NOT_DEPLOYED">Not Deployed</option>
+              <option value="REPLACED">Replaced</option>
+            </select>
+            <div *ngIf="statusError" class="text-danger font-size-12 mt-1">{{ statusError }}</div>
+          </div>
+        </div>
+
+        <!-- Replaced and Registered Section -->
+        <div class="p-3" *ngIf="formData.status === 'REPLACED'">
+          <div class="font-bold font-size-16">Is it Registered?</div>
+          <div class="p-2">
+            <label class="inline-flex items-center me-3">
+              <input type="radio" [(ngModel)]="formData.isRegistered" (click)="onClickYes()" id="True"
+                name="isRegistered" value="True" class="form-radio">
+              <span class="pointer">YES</span>
+            </label>
+
+            <label class="inline-flex items-center">
+              <input type="radio" [(ngModel)]="formData.isRegistered" (click)="onClickNo()" id="isRegistered"
+                name="isRegistered" value="False" class="form-radio">
+              <span class="pointer">NO</span>
+            </label>
+          </div>
+
+          <!-- Registered Equipment -->
+          <div class="row" *ngIf="formData.isRegistered === 'True'">
+            <span *ngIf="showErrorMessage" class="font-bold text-danger p-3">{{showErrorMessage}}</span>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Registration Number: <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" placeholder="Enter registration number"
+                [(ngModel)]="formData.registrationNo" name="registrationNo" required #registrationNo="ngModel" readonly>
+              <div *ngIf="registrationNo.invalid && registrationNo.touched" class="text-danger font-size-12">
+                Please enter registration number.
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Vehicle Type: <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" placeholder="Enter vehicle type"
+                [(ngModel)]="formData.vehicleType" name="vehicleType" required #vehicleType="ngModel" readonly>
+              <div *ngIf="vehicleType.invalid && vehicleType.touched" class="text-danger font-size-12">
+                Please enter vehicle type.
+              </div>
+            </div>
+          </div>
+
+          <!-- Replaced Registration Fields -->
+          <div class="row" *ngIf="formData.isRegistered === 'True'">
+            <span *ngIf="showSuccessMessage" class="font-bold font-size-14 text-blue-400 mb-2">
+              {{showSuccessMessage}}
+            </span>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">New Registration Number: <span class="text-danger">*</span></label>
+              <input type="text" class="form-control form-control-sm" placeholder="Enter registration number"
+                [(ngModel)]="formData.REPLACEDRegistrationNo" name="REPLACEDRegistrationNo"
+                (ngModelChange)="onRegistrationNoChange($event)" required #registrationNo="ngModel">
+              <div *ngIf="registrationNo.invalid && registrationNo.touched" class="text-danger font-size-12">
+                Please enter registration number.
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">New Vehicle Type: <span class="text-danger">*</span></label>
+              <select class="form-select form-control-sm" name="REPLACEDVehicleType"
+                [(ngModel)]="formData.REPLACEDVehicleType" (ngModelChange)="onVehicleTypeChange($event,'Replaced')"
+                required #status="ngModel" readonly>
+                <option value="">Select</option>
+                <option value="Heavy_Vehicle">Heavy Vehicle</option>
+                <option value="Light_Vehicle">Light Vehicle</option>
+                <option value="Earth_Moving_Equipment">Earth Moving Equipment</option>
+                <option value="Medium_Vehicle">Medium Vehicle</option>
+                <option value="Heavy_Bus">Heavy Bus</option>
+              </select>
+            </div>
+
+            <div class="col-md-12">
+              <label class="form-label">Remarks: <span class="text-danger">*</span></label>
+              <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.replacedRemarks"
+                name="replacedRemarks" required #remarks="ngModel"></textarea>
+              <div *ngIf="remarks.invalid && remarks.touched" class="text-danger font-size-12">
+                Please enter remarks.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Unregistered Equipment -->
+        <div class="bg-white border m-2 p-3 rounded" *ngIf="formData.isRegistered === 'False'">
+          <div *ngFor="let formData of equipmentForms; let i = index"
+            class="row align-items-end mb-4 border-bottom pb-3">
+            <div class="col-md-5">
+              <label for="equipment{{i}}" class="form-label">Equipment Type <span class="text-danger">*</span></label>
+              <select class="form-select form-control-sm" id="equipment{{i}}" name="equipment{{i}}"
+                [(ngModel)]="formData.equipmentType" required #equipment="ngModel"
+                [ngModelOptions]="{ standalone: true }">
+                <option value="">-- Select --</option>
+                <option *ngFor="let equipment of equipmentLists" [value]="equipment.id">
+                  {{ equipment.name }}
+                </option>
+              </select>
+              <div *ngIf="equipment.invalid && equipment.touched" class="text-danger small mt-1">
+                Please select equipment.
+              </div>
+            </div>
+
+            <div class="col-md-5">
+              <label for="number{{i}}" class="form-label">Number <span class="text-danger">*</span></label>
+              <input type="number" class="form-control form-control-sm" id="number{{i}}" name="number{{i}}"
+                placeholder="Enter number" [(ngModel)]="formData.number" required #number="ngModel"
+                [ngModelOptions]="{ standalone: true }" />
+              <div *ngIf="number.invalid && number.touched" class="text-danger small mt-1">
+                Please enter number.
+              </div>
+            </div>
+
+            <div class="col-md-2 text-end">
+              <button *ngIf="equipmentForms.length > 1" type="button" class="btn btn-outline-danger btn-sm mt-4"
+                (click)="removeForm(i)">
+                Delete
+              </button>
+            </div>
+          </div>
+
+          <div class="text-end">
+            <button type="button" class="btn btn-success btn-sm" (click)="addForm()">Add More</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button type="button" class="btn btn-danger" (click)="resetForm()" #closeModal data-bs-dismiss="modal">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-primary" (click)="VerifiedData()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

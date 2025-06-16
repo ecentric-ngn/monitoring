@@ -1,0 +1,92 @@
+<div class="m-4">
+
+<table class="table table-bordered table-striped">
+  <thead>
+    <tr>
+      <th>Is Equipment Registered</th>
+      <th>Vehicle Type*</th>
+      <th>Registration No*</th>
+      <th>Owner Name</th>
+      <th>Owner CID</th>
+      <th>Remarks</th>
+      <th>Equipment Type*</th>
+      <th>Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let data of tableData">
+      <!-- Registered -->
+      <ng-container *ngIf="data.owner !== 'Unregistered'; else notRegistered">
+        <td>Yes</td>
+        <td>{{ data.vehicleType }}</td>
+        <td>{{ data.vehicleNumber }}</td>
+        <td>{{ data.owner }}</td>
+        <td>{{ data.cdbno || 'N/A' }}</td>
+        <td>{{ data.chassisNumber }}</td>
+        <td>-</td>
+        <td>-</td>
+      </ng-container>
+
+      <!-- Not Registered -->
+      <ng-template #notRegistered>
+        <td>No</td>
+        <td>-</td>
+        <td>{{ data.vehicleNumber }}</td>
+        <td>{{ data.owner }}</td>
+        <td>{{ data.cdbno || 'N/A' }}</td>
+        <td>{{ data.chassisNumber }}</td>
+        <td>{{ data.vehicleType }}</td>
+        <td>{{ data.engineNumber }}</td>
+      </ng-template>
+    </tr>
+  </tbody>
+</table>
+<form>
+     <div class="col-md-4">
+        <label class="form-label">Does the firm fulfill the required mandatory equipment:<span
+            class="text-danger font-size-12">*</span></label>
+        <select class="form-select h-50" name="fulfillsRequirement" [(ngModel)]="formData.fulfillsRequirement" required
+          #fulfillsRequirement="ngModel">
+          <option value="">Select</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+        <div *ngIf="fulfillsRequirement.invalid && fulfillsRequirement.touched" class="text-danger font-size-12">
+          Please select if the requirement is fulfilled
+        </div>
+      </div>
+     <div class="row m-0 mt-5" *ngIf="formData.fulfillsRequirement === 'No'">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">
+          Last Date to Resubmit:<span class="text-danger font-size-12">*</span>
+        </label>
+        <input type="date" class="form-control form-control-sm" name="resubmitDate" [(ngModel)]="formData.resubmitDate"
+          #resubmitDate="ngModel" required [min]="minResubmitDate" />
+        <div *ngIf="resubmitDate.invalid && resubmitDate.touched" class="text-danger font-size-12">
+          Please provide a date
+        </div>
+      </div>
+
+      <div class="col-md-8 mb-3">
+        <label class="form-label">Remarks</label>
+        <textarea class="form-control form-control-sm" rows="2" name="resubmitRemarks"
+          [(ngModel)]="formData.resubmitRemarks"></textarea>
+      </div>
+      <div class="col-md-12 mb-3">
+        <label class="form-label">Remarks</label>
+        <textarea class="form-control form-control-sm" rows="2" name="finalRemarks"
+          [(ngModel)]="formData.finalRemarks"></textarea>
+      </div>
+    </div>
+    <!-- Buttons -->
+    <div class="d-flex justify-content-end mt-4" >
+      <button type="submit" class="btn btn-success me-2" (click)="notifyContractor()"*ngIf="formData.fulfillsRequirement === 'No'">
+        Save & Forward
+      </button>
+      <button (click)="saveAndNext()" type="submit" class="btn btn-primary" *ngIf="formData.fulfillsRequirement === 'Yes'"
+       >
+        Save & Next
+      </button>
+    </div>
+</form>
+</div>

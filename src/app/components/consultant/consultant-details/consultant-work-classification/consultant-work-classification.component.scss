@@ -1,0 +1,20 @@
+
+td{
+    color: rgb(7, 1, 1);
+    font-weight:500;
+}
+label{
+    color: #212529;
+    font-weight: 600;
+    // font-size: 0.8125rem;
+    font-size: 13px;
+}
+
+hr{
+    color: gray;
+    border-bottom: 1px solid;
+}
+td {
+    padding: 10px; /* Adjust this value to increase or decrease spacing */
+    margin: 0; /* Reset margin to remove any additional space */
+}

@@ -1,0 +1,62 @@
+
+<p-toast></p-toast>
+<div class="container-fluid">
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-12">
+          <div class="card ml--4 mr--4 mt--3">
+            <!-- card header starts -->
+            <div class="card-header d-flex justify-content-between p-0 m-0 pl-2">
+              <div class="header-title">
+                <h4 class="card-title font-medium text-gray-700">Edit Audit Memo</h4>
+              </div>
+            </div>
+            <div>
+              <div class="table-responsive p-0 m-0">
+                <table id="datatable-1" class="table  table-bordered mt-4">
+                  <thead>
+                    <tr class="text-center">
+                      <th>Firm</th>
+                      <th>Agency</th>
+                      <th>Audited Period</th>
+                      <th>AIN</th>
+                      <th>Para No.</th>
+                      <th>Audit Observation</th>   
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let data of tableData; let i = index">
+                      <td>{{ data.nameOfFirm }}</td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm h-100 rounded-0" [(ngModel)]="data.agency">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm h-100 rounded-0" [(ngModel)]="data.auditedPeriod">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm h-100 rounded-0" [(ngModel)]="data.AIN">
+                      </td>
+                      <td>
+                        <input type="text" class="form-control form-control-sm h-100 rounded-0" [(ngModel)]="data.paraNo">
+                      </td>
+                      <td>
+                        <textarea class="form-control form-control-sm h-100 rounded-0" [(ngModel)]="data.auditObservation"></textarea>
+                      </td>
+                    </tr> 
+                  </tbody>
+                </table>
+                <div class="d-flex justify-content-start mt-3">
+                  <button (click)="editAuditClearance(tableData)" type="button" class="btn btn-primary">
+                    <i class="pi pi-save me-2"></i>
+                    <a>Save</a>
+                  </button>
+                  <button (click)="back()" type="button" class="btn btn-purple ml-2">
+                    <i class="bi-save me-2 pi pi-arrow-circle-left"></i>
+                    <a>Back</a>
+                  </button>
+                </div>
+              </div>
+              
+            
+        
+        

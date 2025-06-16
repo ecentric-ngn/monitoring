@@ -1,0 +1,67 @@
+.step-tab {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border: none;
+  background: transparent;
+  color: #6c757d;
+  font-weight: 500;
+  position: relative;
+  padding: 8px 12px;
+  border-bottom: 3px solid transparent; /* default no underline */
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.step-tab:hover {
+  color: #0d6efd;
+}
+.disabled-tab {
+  pointer-events: none;
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.non-clickable {
+  pointer-events: none !important;
+}
+
+
+.step-tab.active {
+  color: #0d6efd !important;
+  font-weight: 600;
+  background-color: aliceblue;
+  border: none;
+  border-bottom: 3px solid #0c2556 !important; /* Force underline */
+}
+
+.tick-class {
+  background-color:#0c2556 !important;
+  color: #ffffff;
+
+  font-weight: bold;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.step-badge {
+  background-color: #dee2e6;
+  color:white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: background-color 0.3s;
+}
+
+.step-tab.active .step-badge,
+.step-tab.completed .step-badge {
+  background-color: #0c2556;
+  color: #fff;
+}

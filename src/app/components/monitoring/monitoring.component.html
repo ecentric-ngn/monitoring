@@ -1,0 +1,250 @@
+<div class="card container-fluid">
+  <p class="font-size-18"><strong>List of New sites</strong></p>
+
+    <label class="form-label"><strong>Please select work type<span class="text-danger">*</span></strong></label>
+    <div>
+      <label>
+        <input type="radio" name="workType" id="private" (click)="onClick('PRIVATE')"
+          [(ngModel)]="formData.workType" value="private" required />
+        Private Work
+      </label>
+      &nbsp;&nbsp;
+      <label>
+        <input type="radio" name="workType" id="public" (click)="onClick('PUBLIC')"
+          [(ngModel)]="formData.workType" value="public" required />
+        Public Work
+      </label>
+      &nbsp;&nbsp;
+      <label>
+        <input type="radio" name="other" id="other" (click)="onClick('OTHERS')" [(ngModel)]="formData.workType"
+          value="other" required />
+        Other Construction Work
+      </label>
+    </div>
+
+
+
+
+
+  <form *ngIf="showPrivateWork">
+    <!-- <form> -->
+    <div class=" border p-3">
+      <div class="row align-items-end">
+        <div class="col-md-3" *ngIf="showPrivateWork">
+          <label for="dzongkhag" class="form-label">Dzongkhag<span class="text-danger">*</span></label>
+          <select class="form-select font-size-16" id="dzongkhag"
+            (change)="OnChangenDzoId($event.target.value,'Private')">
+            <option>--select--</option>
+            <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.id">
+              {{ dzongkhag.name }}
+            </option>
+          </select>
+        </div>
+        <!-- Procuring Agency -->
+        <div class="col-md-3">
+          <label for="agency_name" class="form-label">Client<span class="text-danger">*</span></label>
+          <select id="agency_name" class="form-select font-size-16"
+            (change)="onChangeProcuringAgency($event.target.value,'Private')">
+            <option>--select--</option>
+            <option *ngFor="let agency of PocuringAgencyList" [value]="agency.id">
+              {{ agency.agency_name }}
+            </option>
+          </select>
+        </div>
+        <!-- BCTA Registration No -->
+        <div class="col-md-3">
+          <label for="bctaNo" class="form-label">BCTA Registration No<span class="text-danger">*</span></label>
+          <input type="text" id="BCTANo" class="form-control h-100" name="BCTANo" [(ngModel)]="formData.BCTANo"
+            placeholder="Enter BCTA No">
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-primary" (click)="onChangeBctaNo('Private')">Search</button>
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <form *ngIf="showPublicWork">
+    <!-- <form> -->
+    <div class=" border p-3">
+      <div class="row align-items-end">
+        <!-- Dzongkhag -->
+        <div class="col-md-3">
+          <label for="dzongkhag" class="form-label">Dzongkhag<span class="text-danger">*</span></label>
+          <select class="form-select font-size-16" id="dzongkhag"
+            (change)="OnChangenDzoId($event.target.value,'Public')">
+            <option>--select--</option>
+            <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.id">
+              {{ dzongkhag.name }}
+            </option>
+          </select>
+        </div>
+        <!-- Procuring Agency -->
+        <div class="col-md-3">
+          <label for="agency_name" class="form-label">Procuring Agency<span class="text-danger">*</span></label>
+          <select id="agency_name" class="form-select font-size-16"
+            (change)="onChangeProcuringAgency($event.target.value,'Public')">
+            <option>--select--</option>
+            <option *ngFor="let agency of PocuringAgencyList" [value]="agency.id">
+              {{ agency.agency_name }}
+            </option>
+          </select>
+        </div>
+        <!-- BCTA Registration No -->
+        <div class="col-md-3">
+          <label for="bctaNo" class="form-label">BCTA Registration No<span class="text-danger">*</span></label>
+          <input type="text" id="BCTANo" class="form-control h-100" name="BCTANo" [(ngModel)]="formData.BCTANo"
+            placeholder="Enter BCTA No">
+        </div>
+        <div class="col-md-2">
+          <button type="button" class="btn btn-primary" (click)="onChangeBctaNo('Public')">Search</button>
+        </div>
+      </div>
+    </div>
+  </form>
+  <form *ngIf="showOtherWork">
+    <app-other-construction-monitoring [workType]="workType"></app-other-construction-monitoring>
+  </form>
+
+  <div class="d-flex justify-content-center align-items-center" style="height: 50vh;" *ngIf="loading">
+    <div>
+      <div class="spinner-border" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+      <p class="mt-2">Loading...</p>
+    </div>
+  </div>
+  <div class="row mb--4" *ngIf="showTable">
+    <div class="col d-flex pl-4">
+      <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+      <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+        style="border-color: #ced4da;">
+        <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+      </select>
+    </div>
+    <div class="col d-flex justify-content-end pr-2">
+      <p class="mr-1 p-1 text-gray-600">Search By : </p>
+      <input type="text" placeholder="BCTA No" class="form-control form-control-sm col-md-4" id="search "
+        [(ngModel)]="searchQuery" (input)="SearchPrivatefilter()" />
+    </div>
+  </div>
+
+  <div class="table-responsive p-0 m-0 ml-2" *ngIf="showPrivateWork">
+    <table id="datatable-1" class="table  table-bordered mt-4" *ngIf="showTable">
+      <thead>
+        <tr>
+          <th class="text-center p-1">#</th>
+          <th class="text-center">BCTA No</th>
+          <th class="text-center">Ref No.</th>
+          <th class="text-center">Contractor Firm Name</th>
+          <th class="text-center">Project Name</th>
+          <th class="text-center">Location</th>
+          <th class="text-center">Award Amount</th>
+          <th class="text-center">Final Contract Amount</th>
+          <th class="text-center">Start Date</th>
+          <th class="text-center">End Date</th>
+          <th class="text-center">Proposed Completion Date</th>
+          <th class="text-center">Client</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="privateTenderList?.length === 0">
+          <td colspan="12" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let tender of privateTenderList; let i = index">
+          <td class="p-1 text-center">{{i + 1}}</td>
+          <td class="text-center">
+            <a *ngIf="tender.awardedAmount >= 5000000" class="font-bold text-primary sl_no" (click)="navigate(tender)">
+              {{ tender.BCTANo }}
+            </a>
+            <span *ngIf="tender.awardedAmount < 5000000" class="font-bold">
+              {{ tender.BCTANo }}
+            </span>
+          </td>
+
+          <td class="text-center pointer">{{ tender.referenceNo}} </td>
+          <td class="text-center pointer">{{ tender.nameOfFirm}} </td>
+          <td class="text-center">{{ tender.workName}}</td>
+          <td class="text-center">{{ tender.dzongkhag}}</td>
+          <td class="text-center">{{ tender.awardedAmount}}</td>
+          <td class="text-center">{{ tender.awardedAmount}}</td>
+          <td class="text-center">{{ tender.officialStartDate | date: 'dd-MM-yyyy'}}</td>
+          <td class="text-center">{{ tender.officialEndDate | date: 'dd-MM-yyyy'}}</td>
+          <td class="text-center">{{ tender.officialEndDate | date: 'dd-MM-yyyy'}}</td>
+          <td class="text-center">{{ tender.agency_name}}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+
+  <div class="table-responsive p-0 m-0 ml-2" *ngIf="showPublicWork">
+    <table id="datatable-1" class="table  table-bordered mt-4" *ngIf="showTable">
+      <thead>
+        <tr>
+          <th class="text-center p-1">#</th>
+          <th class="text-center p-1">Egp TenderId</th>
+          <th class="text-center">BCTA No</th>
+          <th class="text-center">Firm Name</th>
+          <th class="text-center">Name of Work</th>
+          <th class="text-center">Location</th>
+          <th class="text-center">Contract Amount</th>
+          <th class="text-center">Start Date</th>
+          <th class="text-center">End Date</th>
+          <th class="text-center">Proposed Completion Date</th>
+          <th class="text-center">Procuring Agency</th>
+          <th class="text-center">system</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="tenderList?.length === 0">
+          <td colspan="11" class="text-center">No data found</td>
+        </tr>
+        <tr *ngFor="let tender of tenderList; let i = index">
+          <td class="p-1 text-center">{{i + 1}}</td>
+          <td class="text-center pointer">{{ tender.egpTenderId}} </td>
+          <td class="text-center"><a class=" font-bold text-primary sl_no"
+              (click)="saveAndNavigate(tender)">{{tender.awardedBctaNo }} </a></td>
+          <!-- <td class="text-center"><a class=" font-bold text-primary sl_no"
+              (click)="navigate(tender)">{{tender.bctaNo }} </a></td>  -->
+          <td class="text-center pointer">{{tender.nameOfFirm }} </td>
+          <td class="text-center">{{tender.workName }}</td>
+          <td class="text-center">{{tender.dzongkhag}}</td>
+          <td class="text-center">{{tender.awardedAmount }}</td>
+          <td class="text-center">{{tender.officialStartDate | date: 'dd-MM-yyyy' }}</td>
+          <td class="text-center">{{tender.officialEndDate | date: 'dd-MM-yyyy'}}</td>
+          <td class="text-center">{{tender.officialEndDate | date: 'dd-MM-yyyy'}}</td>
+          <td class="text-center">{{tender.agency }}</td>
+          <td class="text-center">{{tender.workType }}</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+  <div *ngIf="showTable">
+    <div *ngIf="tenderList" class="justify-content-start mb--3">
+      <div class="justify-content-start font-size-12 font-bold ml-2">
+        <p>{{ calculateOffset() }}</p>
+        <div class="d-flex justify-content-end m-3 mr-0 m-lg--5">
+          <div *ngIf="tenderList" class="Page navigation">
+            <ul class="pagination pagination-sm mr-2 m--5 ml--1">
+              <li class="page-item" (click)="previousPage()">
+                <a class="page-link pointer">Previous</a>
+              </li>
+              <ng-container *ngFor="let page of generatePageArray()">
+                <li class="page-item" [class.active]="page === pageNo" (click)="goToPage(page)">
+                  <a class="page-link" *ngIf="page !== -1">{{ page }}</a>
+                  <span class="page-link ellipsis" *ngIf="page === -1">...</span>
+                </li>
+              </ng-container>
+              <li class="page-item" (click)="nextPage()">
+                <a class="page-link pointer">Next</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>

@@ -1,0 +1,48 @@
+<!-- Display General Information component outside of tabs -->
+<div class="card mr--4 ml--4 mt--3">
+    <div class="card-body pt-0"> 
+        <app-general-information  [data]="generalInformationData"[title]="title"></app-general-information>
+
+        <!-- Tab navigation -->
+        <ul class="nav nav-tabs bg-body mt-5 d-flex flex-wrap justify-content-between p-0" id="myTab-1" role="tablist">
+            <li class="nav-item flex-fill text-center">
+                <a (click)="selectTab('owner-information')" class="nav-link active border rounded-0" id="pills-profile-tab-fill" data-toggle="pill" href="#pills-profile-fill" role="tab" aria-controls="pills-profile" aria-selected="false">Owner Information</a>
+            </li>
+            <li *ngIf="status !=='Cancelled'"class="nav-item flex-fill text-center">
+                <a (click)="selectTab('human-resource')" class="nav-link border rounded-0" id="pills-profile-tab-fill" data-toggle="pill" href="#pills-profile-fill" role="tab" aria-controls="pills-profile" aria-selected="false">Human Resource</a>
+            </li>
+            <li *ngIf="status !=='Cancelled'" class="nav-item flex-fill text-center">
+                <a (click)="selectTab('equipment')" class="nav-link border rounded-0" id="pills-contact-tab-fill" data-toggle="pill" href="#pills-contact-fill" role="tab" aria-controls="pills-contact" aria-selected="false">Equipment</a>
+            </li>
+            <li class="nav-item flex-fill text-center">
+                <a (click)="selectTab('work-classification')" class="nav-link border rounded-0" id="pills-contact-tab-fill" data-toggle="pill" href="#pills-contact-fill" role="tab" aria-controls="pills-contact" aria-selected="false">Work Classification</a>
+            </li>
+            <li class="nav-item flex-fill text-center">
+                <a (click)="selectTab('track-record')" class="nav-link border rounded-0" id="pills-contact-tab-fill" data-toggle="pill" href="#pills-contact-fill" role="tab" aria-controls="pills-contact" aria-selected="false">Track Record</a>
+            </li>
+            <li class="nav-item flex-fill text-center">
+                <a (click)="selectTab('comments-adverse-records')" class="nav-link border rounded-0"  id="pills-contact-tab-fill" data-toggle="pill" href="#pills-contact-fill" role="tab" aria-controls="pills-contact" aria-selected="false">Records</a>
+            </li>
+        </ul>
+        <!-- Tab content -->
+        <div class="tab-content mb--3">
+            <!-- Owner information -->
+            <app-owner-information *ngIf="selectedTab === 'owner-information' || selectedTab === 'general-information'" [data]="ownerInformationData"></app-owner-information>
+            
+            <!-- health resource  -->
+            <app-human-resource *ngIf="selectedTab === 'human-resource'" [data]="humanResourceData"></app-human-resource>
+
+            <!-- Equipment -->
+            <app-equipment *ngIf="selectedTab === 'equipment'" [data]="equipmentData"></app-equipment>
+
+            <!-- work Classification -->
+            <app-work-classification *ngIf="selectedTab === 'work-classification'" [data]="workClassificationData"></app-work-classification>
+
+            <!-- tack records  -->
+            <app-track-record *ngIf="selectedTab === 'track-record'" [data]="trackRecordData"></app-track-record>
+
+            <!-- comments/ adverse records  -->
+            <app-comments-adverse-record *ngIf="selectedTab === 'comments-adverse-records'" [data]="commentsAdverseRecordsData"></app-comments-adverse-record>
+        </div>
+    </div>
+</div>

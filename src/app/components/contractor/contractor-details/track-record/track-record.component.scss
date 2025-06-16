@@ -1,0 +1,20 @@
+.p-icon {
+    width: 32px;
+    height: 17px;
+    border-radius: 5px;
+    background: rgba(255, 255, 255, 0);
+    line-height: 45px;
+    color: rgb(242, 39, 3);
+    text-align: center;
+    font-size: 26px;
+    /* margin-left: 48px; */
+}
+.view-link {
+    color: blue; /* Or any color of your choice */
+    text-decoration: none; /* Remove underline if you prefer */
+  }
+  
+  .view-link:hover {
+    text-decoration: underline; /* Optional: add underline on hover */
+  }
+  

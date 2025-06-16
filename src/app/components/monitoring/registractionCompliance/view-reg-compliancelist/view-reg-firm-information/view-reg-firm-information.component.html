@@ -1,0 +1,92 @@
+<div class="card container-fluid">
+    <p class="m-3 font-bold font-size-18"><strong>Registered firm
+            Information</strong></p>
+
+    <form>
+        <div class="row m-3">
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">Firm Name:</label>
+                <span class="font-size-12">{{formData.firmName || 'N/A'}}</span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">BCTA No:</label>
+                <span class="font-size-12">{{formData.cdbNo || 'N/A'}}</span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">Contact No:</label>
+                <span class="font-size-12">{{formData.mobileNo || 'N/A'}}</span>
+            </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">Email Address:</label>
+                <span class="font-size-12">{{formData.emailAddress || 'N/A'}}</span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">Classification:</label>
+                <span class="font-size-12" [ngSwitch]="formData.classification">
+                    <span *ngSwitchCase="'S'">S - Small</span>
+                    <span *ngSwitchCase="'M'">M - Medium</span>
+                    <span *ngSwitchCase="'L'">L - Large</span>
+                    <span *ngSwitchDefault>N/A</span>
+                </span>
+            </div>
+            </div>
+
+            <div class="container-fluid">
+                <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation" *ngIf="formData.firmType !== 'specializedFirm'">
+                        <button class="nav-link border" [class.active]="activeTabId === 'office'" id="office-tab"
+                            (click)="setActiveTab('office')" type="button" role="tab">
+                            Office Signage & Documents
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button  (click)="specializedFirmForm()"  class="nav-link border" [class.active]="activeTabId === 'employee'" id="employee-tab"
+                            (click)="setActiveTab('employee')" type="button" role="tab">
+                            {{ formData.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent
+                            Employees' }}
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation" *ngIf="formData.firmType !== 'specializedFirm'">
+                        <button (click)="equipmentForm()"  class="nav-link border" [class.active]="activeTabId === 'equipment'" id="equipment-tab"
+                            (click)="setActiveTab('equipment')" type="button" role="tab">
+                            Mandatory Equipment
+                        </button>
+                    </li>
+
+                    <li class="nav-item" role="presentation">
+                        <button (click)="monitoringTeam()" class="nav-link border" [class.active]="activeTabId === 'monitoring'" class="nav-link border" [class.active]="activeTabId === 'monitoring'"
+                            id="monitoring-tab" (click)="setActiveTab('monitoring')" type="button" role="tab">
+                            Monitoring Team Users
+                        </button>
+                    </li>
+                </ul>
+
+            </div>
+    </form>
+
+</div>
+
+<div class="tab-content">
+    <div class="tab-pane fade" [class.show]="activeTabId === 'office'" [class.active]="activeTabId === 'office'"
+        id="office" role="tabpanel" aria-labelledby="office-tab" *ngIf="formData.firmType !== 'specializedFirm'">
+        <p><app-office-signage-and-doc (activateTab)="onActivateTab($event)"></app-office-signage-and-doc></p>
+    </div>
+
+    <div class="tab-pane fade" [class.show]="activeTabId === 'employee'" [class.active]="activeTabId === 'employee'"
+        id="employee" role="tabpanel" aria-labelledby="employee-tab">
+        <p><app-permanent-employee (activateTab)="onActivateTab($event)" [id]="id"></app-permanent-employee></p>
+    </div>
+
+    <div class="tab-pane fade" [class.show]="activeTabId === 'equipment'" [class.active]="activeTabId === 'equipment'"
+        id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+        <p><app-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-mandatory-equipment></p>
+    </div>
+
+    <div  class="tab-pane fade" [class.show]="activeTabId === 'monitoring'" [class.active]="activeTabId === 'monitoring'"
+        id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
+        <p><app-monitoring-team-users [id]="id"></app-monitoring-team-users></p>
+    </div>
+</div>

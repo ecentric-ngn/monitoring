@@ -1,0 +1,115 @@
+<form #form="ngForm">
+  <!-- Add More Button -->
+  <div class="d-flex justify-content-end m-3 mt-6">
+    <button class="btn btn-outline-primary" type="button" (click)="addMore()">+ Add More</button>
+  </div>
+
+  <!-- Dynamic Form Entries -->
+  <div class="p-3 border rounded mb-4" *ngFor="let entry of formEntries; let i = index">
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Numbers of the rebar as per designed:<span class="text-danger font-size-12"> *</span></label>
+        <input type="text" class="form-control form-control-sm" name="rebarNumber{{i}}" [(ngModel)]="entry.rebarNumber"
+          required #rebarNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'" placeholder="Enter Rebar Number" />
+        <div *ngIf="rebarNumber.invalid && rebarNumber.touched" class="text-danger font-size-12">Please enter Rebar
+          Number</div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Spacing of the longitudinal rebar as per designed:<span
+            class="text-danger font-size-12"> *</span></label>
+        <input type="text" class="form-control form-control-sm" name="rebarSpacing{{i}}"
+          [(ngModel)]="entry.rebarSpacing" required #rebarSpacing="ngModel" [disabled]="appNoStatus === 'REJECTED'" placeholder="Enter Rebar Spacing" />
+        <div *ngIf="rebarSpacing.invalid && rebarSpacing.touched" class="text-danger font-size-12">Please enter Rebar
+          Spacing</div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Spacing of the stirrup as per design:<span class="text-danger font-size-12"> *</span></label>
+        <input type="text" class="form-control form-control-sm" name="stirrupSpacing{{i}}"
+          [(ngModel)]="entry.stirrupSpacing" required #stirrupSpacing="ngModel" [disabled]="appNoStatus === 'REJECTED'" placeholder="Enter Stirrup Spacing"/>
+        <div *ngIf="stirrupSpacing.invalid && stirrupSpacing.touched" class="text-danger font-size-12">Please enter
+          Stirrup Spacing</div>
+      </div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Concrete cover as per design:<span class="text-danger font-size-12"> *</span></label>
+        <input type="text" class="form-control form-control-sm" name="concreteCover{{i}}"
+          [(ngModel)]="entry.concreteCover" required #concreteCover="ngModel" [disabled]="appNoStatus === 'REJECTED'"placeholder="Enter Concrete Cover" />
+        <div *ngIf="concreteCover.invalid && concreteCover.touched" class="text-danger font-size-12">Please enter
+          Concrete Cover</div>
+      </div>
+
+        <div class="col-md-4 mb-3">
+        <label class="form-label mb-2">Upload Files</label>
+        <div *ngFor="let fileInput of fileInputs; let i = index" class="row g-2 align-items-end mb-2 border rounded">
+          <!-- File input -->
+          <div class="col-9">
+            <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
+              [class.is-invalid]="fileErrors[i]" />
+            <div *ngIf="fileErrors[i]" class="text-danger small mt-1">
+              {{ fileErrors[i] }}
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="col-3 d-flex flex-column gap-2">
+            <!-- "Add More" for the first row only -->
+            <button *ngIf="i === 0" type="button" class="btn btn-outline-primary btn-sm" (click)="addFileInput()">
+              <i class="pi pi-plus me-1"></i> More
+            </button>
+
+            <!-- "Remove" for all other rows -->
+            <button *ngIf="fileInputs.length > 1 && i !== 0" type="button" class="btn btn-outline-danger btn-sm"
+              (click)="removeFileInput(i)">
+              <i class="pi pi-trash me-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+          <div class="col-md-4" *ngIf="formEntries[0]?.filePaths?.length > 0">
+          <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
+          <div class="flex-wrap align-items-center gap-2 flex-column">
+            <div *ngFor="let filePath of formEntries[0].filePaths; let i = index"
+              class="d-flex align-items-center gap-2 mb-1">
+              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                <i class="bi bi-eye me-1"></i> View Doc
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteFile(0, i)">
+                <i class="bi bi-trash me-1"></i> Delete
+              </button>
+            </div>
+          </div>
+        </div>
+
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
+        <textarea class="form-control form-control-sm" name="remarks{{i}}" [(ngModel)]="entry.remarks" required
+          #remarks placeholder="Enter remarks"></textarea>
+        <div *ngIf="remarks.invalid && remarks.touched" class="text-danger font-size-12">Please enter remarks.</div>
+      </div>
+    </div>
+
+    <!-- Remove Button -->
+    <div class="row">
+      <div *ngIf="appNoStatus !== 'REJECTED'" class="col-12 d-flex justify-content-end">
+        <button *ngIf="formEntries.length > 1" class="btn btn-outline-danger" type="button" (click)="removeForm(i)">
+          - Delete
+        </button>
+      </div>
+    </div>
+
+    <!-- Horizontal Line Separator (if not last entry) -->
+    <hr *ngIf="i < formEntries.length - 1">
+  </div>
+
+  <!-- Submit Buttons -->
+  <div class="d-flex justify-content-end">
+    <button *ngIf="appNoStatus !== 'REJECTED'" class="btn text-white prev-btn mr-2" type="button" (click)="onPreviousClick()">Prev</button>
+    <button class="btn text-white save-next-btn" type="submit" (click)="saveAndNext(form)">Save & Next</button>
+  </div>
+</form>

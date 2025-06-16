@@ -1,0 +1,292 @@
+<form #form="ngForm">
+  <div class="p-3">
+    <div class="row align-items-end">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Construction Permit:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.ConstructionPermit" name="ConstructionPermit"
+          required #ConstructionPermit="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="ConstructionPermit.invalid && ConstructionPermit.touched" class="text-danger font-size-12">
+          Please select an ConstructionPermit
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Conditions of Contract:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.contractConditions" name="contractConditions"
+          required #contractConditions="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="contractConditions.invalid && contractConditions.touched" class="text-danger font-size-12">
+          Please select an option for Site Office
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Work Insurance:<span class="text-danger font-size-12">*</span></label>
+        <input type="text" class="form-control  form-control-sm" [(ngModel)]="formData.workInsurance" placeholder="Auto"
+          name="workInsurance" required #workInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+        <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
+          Please enter Work Insurance
+        </div>
+      </div>
+    </div>
+    <div class="row align-items-end">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Workers Insurance:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select h-3rem form-control-sm" [(ngModel)]="formData.workInsuranceStatus"
+          name="workInsuranceStatus" required #workInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
+          Please select an work Insurance
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Third Party Insurance:<span class="text-danger font-size-12">*</span></label>
+        <input type="text" class="form-control " [(ngModel)]="formData.thirdPartyInsurance" placeholder="Auto"
+          name="thirdPartyInsurance" required #thirdPartyInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+        <div *ngIf="thirdPartyInsurance.invalid && thirdPartyInsurance.touched" class="text-danger font-size-12">
+          Please select an option for Third Party Insurance
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Approved Drawings:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.approvedDrawings" name="approvedDrawings"
+          required #approvedDrawings="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="approvedDrawings.invalid && approvedDrawings.touched" class="text-danger font-size-12">
+          Please select an option for Approved Drawings
+        </div>
+      </div>
+    </div>
+    <div class="row align-items-end">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Bill of Quantities:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.billofQuantities" name="billofQuantities"
+          required #billofQuantities="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="billofQuantities.invalid && billofQuantities.touched" class="text-danger font-size-12">
+          Please select an option for Bill of Quantities
+        </div>
+      </div>
+
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Materials quality certification:<span
+            class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.materialsQualityCertification"
+          name="materialsQualityCertification" required #materialsQualityCertification="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="materialsQualityCertification.invalid && materialsQualityCertification.touched"
+          class="text-danger font-size-12">
+          Please select an option for materials Quality Certification
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Quality Assurance Plan(QAP):<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.qualityAssurancePlan"
+          name="qualityAssurancePlan" required #qualityAssurancePlan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="qualityAssurancePlan.invalid && qualityAssurancePlan.touched" class="text-danger font-size-12">
+          Please select an option for Quality Assurance Plan(QAP)
+        </div>
+      </div>
+    </div>
+    <div class="row align-items-end">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Quality Control Plan:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.qualityControlPlan" name="qualityControlPlan"
+          required #qualityControlPlan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="qualityControlPlan.invalid && qualityControlPlan.touched" class="text-danger font-size-12">
+          Please select an option for Quality Assurance Plan(QAP)
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Test conducted as per QAP, Specifications and Industry standards:<span
+            class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.TestconductedasperQAP"
+          name="TestconductedasperQAP" required #TestconductedasperQAP="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="TestconductedasperQAP.invalid && TestconductedasperQAP.touched" class="text-danger font-size-12">
+          Please select an option for Test conducted as per QAP, Specifications and Industry standards
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Test reports documented:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.testReportsDocumented"
+          name="testReportsDocumented" required #testReportsDocumented="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="testReportsDocumented.invalid && testReportsDocumented.touched" class="text-danger font-size-12">
+          Please select an option for Test Reports Documented
+        </div>
+      </div>
+    </div>
+    <div class="row align-items-end">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Hindrance Register Select maintained:<span
+            class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.HindranceRegisterSelectmaintained"
+          name="HindranceRegisterSelectmaintained" required #HindranceRegisterSelectmaintained="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="HindranceRegisterSelectmaintained.invalid && HindranceRegisterSelectmaintained.touched"
+          class="text-danger font-size-12">
+          Please select an option for Test Reports Documented
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Day work Journal Maintained:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.journalMaintained" name="journalMaintained"
+          required #journalMaintained="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="journalMaintained.invalid && journalMaintained.touched" class="text-danger font-size-12">
+          Please select an option for Day work Journal Maintained
+        </div>
+      </div>
+      <div class="col-md-4 mb-3">
+        <label class="form-label">Environment Management Plan:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.envManagementPlan" name="envManagementPlan"
+          required #envManagementPlan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="envManagementPlan.invalid && envManagementPlan.touched" class="text-danger font-size-12">
+          Please select an option for Environment Management Plan
+        </div>
+      </div>
+    </div>
+
+    <div class="row align-items-end">
+      <div class="col-md-4 mb-auto">
+        <label class="form-label">Work plan:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm " [(ngModel)]="formData.workplan" name="workplan" required
+          #workplan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option value="">-- Select --</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+          <option value="Not Available">NA</option>
+        </select>
+        <div *ngIf="workplan.invalid && workplan.touched" class="text-danger font-size-12">
+          Please select an option for workplan
+        </div>
+      </div>
+      <div class="col-md-4 mb-lg-5">
+        <label class="form-label mb-2">Upload Files</label>
+        <div *ngFor="let fileInput of fileInputs; let i = index" class="row g-2 align-items-end mb-2 border rounded">
+          <!-- File input -->
+          <div class="col-9">
+            <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
+              [class.is-invalid]="fileErrors[i]"/>
+            <div *ngIf="fileErrors[i]" class="text-danger small mt-1">
+              {{ fileErrors[i] }}
+            </div>
+          </div>
+
+          <!-- Action buttons -->
+          <div class="col-3 d-flex flex-column gap-2 " >
+            <!-- "Add More" for the first row only -->
+            <button *ngIf="i === 0" type="button" class="btn btn-outline-primary btn-sm" (click)="addFileInput()">
+              <i class="pi pi-plus me-1"></i> More
+            </button>
+
+            <!-- "Remove" for all other rows -->
+            <button *ngIf="fileInputs.length > 1 && i !== 0" type="button" class="btn btn-outline-danger btn-sm"
+              (click)="removeFileInput(i)">
+              <i class="pi pi-trash me-1"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-4" *ngIf="formData.filePathList && formData.filePathList.length > 0">
+        <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
+        <div class="flex-wrap align-items-center gap-2 flex-column">
+          <!-- Show if at least one file is valid -->
+          <ng-container *ngIf="!formData.allPathsNoFile; else noFileTemplate">
+            <ng-container *ngFor="let filePath of formData.filePathList; let i = index">
+              <div *ngIf="filePath !== 'NO_PATH'" class="d-flex align-items-center gap-2 mb-1">
+                <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                  <i class="bi bi-eye me-1"></i> View Doc
+                </button>
+                <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to delete this file?'"
+                  [nzPopconfirmPlacement]="'topRight'" (nzOnConfirm)="deleteFile(formData.fileIdList[i], i)">
+                  <button class="btn btn-outline-danger btn-sm">
+                    <i class="bi bi-trash me-1"></i> Delete
+                  </button>
+                </a>
+              </div>
+            </ng-container>
+          </ng-container>
+          <!-- Show when all paths are NO_PATH -->
+          <ng-template #noFileTemplate>
+            <span class="text-muted">No file uploaded</span>
+          </ng-template>
+        </div>
+      </div>
+    </div>
+
+    <div class="row align-items-end">
+      <div class="col-md-12 mt--5">
+        <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
+        <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.remarks" id="remarks"
+          name="remarks" required #remarks="ngModel"></textarea>
+        <div *ngIf="remarks.invalid && remarks.touched" class="text-danger font-size-12">
+          Please enter remarks.
+        </div>
+      </div>
+  </div>
+  </div>
+  <div class="justify-content-end d-flex">
+    <button class="btn mr-1 text-white prev-btn" *ngIf="appNoStatus !== 'REJECTED'" type="submit" (click)="onPreviousClick()" type="submit">Prev</button>
+    <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
+  </div>
+</form>

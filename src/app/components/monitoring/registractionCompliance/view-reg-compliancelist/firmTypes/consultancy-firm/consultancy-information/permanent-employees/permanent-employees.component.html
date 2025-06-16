@@ -1,0 +1,89 @@
+<form #hrForm="ngForm">
+    <div class="row g-3 m-4">
+        <!-- Auto fields -->
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>CID No</th>
+                    <th>Full Name</th>
+                    <th>Gender</th>
+                    <th>Nationality</th>
+                    <th>Qualification</th>
+                    <th>Joining Date</th>
+                    <th>Trade Fields</th>
+                    <th>Pay Slip</th>
+                    <th>TDS/HC/Pension</th>
+                    <th>Remarks</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let data of tableData">
+                    <td>{{ data.cId }}</td>
+                    <td>{{data.name }}</td>
+                    <td>{{data.sex }}</td>
+                    <td>{{data.countryName }}</td>
+                    <td>{{data.qualification }}</td>
+                    <td>{{data.joiningDate }}</td>
+                    <td>{{data.tradeName }}</td>
+                    <td class="text-center bg-white">
+                        <a *ngIf="data.paySlipFilePath">
+                            <i class="pi pi-download"></i>
+                        </a>
+                    </td>
+                    <td class="text-center bg-white">
+                        <button type="button" class="btn btn-outline-info btn-sm" (click)="fetchTdsHcPension()">
+                            Fetch TDS/HC/Pension
+                        </button>
+                    </td>
+                    <td>{{data.remarks }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Does the firm fulfill HR requirement -->
+        <div class="col-md-4">
+            <label class="form-label">Does the firm fulfill the required Human Resources?<span
+                    class="text-danger">*</span></label>
+            <select class="form-select form-control-sm" [(ngModel)]="formData.hrFulfilled" name="hrFulfilled" required>
+                <option value="">-- Select --</option>
+                <option value="True">Yes</option>
+                <option value="False">No</option>
+            </select>
+        </div>
+
+        <!-- Conditional fields when HR not fulfilled -->
+        <ng-container *ngIf="formData.hrFulfilled === 'False'">
+            <div class="col-md-4">
+                <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
+                <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.resubmitDate"
+                    name="resubmitDate" required />
+            </div>
+            <div class="col-md-8">
+                <label class="form-label">Remarks<span class="text-danger">*</span></label>
+                <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="formData.remarksNo"
+                    name="remarksNo" required></textarea>
+            </div>
+        </ng-container>
+
+        <!-- Remarks when HR is fulfilled -->
+        <ng-container *ngIf="formData.hrFulfilled === 'True'">
+            <div class="col-md-12">
+                <label class="form-label">Remarks</label>
+                <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="formData.remarksYes"
+                    name="remarksYes"></textarea>
+            </div>
+        </ng-container>
+
+        <!-- Buttons -->
+        <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
+            <button *ngIf="formData.hrFulfilled === 'False'" type="button" class="btn btn-success"
+                (click)="saveAndForward()">
+                Save & Forward
+            </button>
+            <button *ngIf="formData.hrFulfilled === 'True'" type="button" class="btn btn-success"
+                (click)="saveAndNext()">
+                Save & Next
+            </button>
+        </div>
+    </div>
+</form>

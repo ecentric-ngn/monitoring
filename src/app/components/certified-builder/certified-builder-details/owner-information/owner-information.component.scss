@@ -1,0 +1,35 @@
+.modal-lg {
+    max-width: 80%;
+  }
+  
+  .text-danger {
+    font-size: 0.875rem;
+  }
+  .modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 88%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 5px;
+    box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .5);
+    outline: 0;
+    margin-left: inherit;
+}
+svg {
+  display: inline-block;
+  vertical-align: middle;
+  height: 20px;
+}
+.form-control {
+    height: 36px;
+    line-height: 1.5;
+    background: #fff;
+    font-size: 14px;
+    color: #324253;
+    border-radius: 0.375rem;
+    box-shadow: none;
+  }

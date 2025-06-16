@@ -1,0 +1,378 @@
+<form #form="ngForm">
+    <div class="p-3 mt-5">
+        <div class="row g-4">
+            <!-- Left Column -->
+            <div class="col-md-6">
+                <!-- Carpenter -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Carpenters</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addCarpenter() "  [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of carpenters; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Carpenter</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.carpenterCertification" [name]="'carpenterLevel' + i"
+                                required #carpenterLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="carpenterLevel.invalid && carpenterLevel.touched" class="text-danger font-size-12">
+                                Please select Carpenter level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Carpenter</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.carpenterNumber"
+                                [name]="'carpenterNumber' + i" required min="0" #carpenterNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="carpenterNumber.invalid && carpenterNumber.touched" class="text-danger font-size-12">
+                                Please enter number of Carpenters
+                            </div>
+                        </div>
+                        <div *ngIf="appNoStatus !== 'REJECTED'" class="col-md-2 col-md-2 ml--2 mt-6 col-md-2 col-md-2 ml--2 mt-6 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removeCarpenter(i)"
+                                *ngIf="carpenters.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                     <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.carpentersRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Mason -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Masons</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addMason()" [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of masons; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Mason</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.masonCertification" [name]="'masonLevel' + i"
+                                required #masonLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="masonLevel.invalid && masonLevel.touched" class="text-danger font-size-12">
+                                Please select Mason level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Mason</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.masonNumber"
+                                [name]="'masonNumber' + i" required min="0" #masonNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="masonNumber.invalid && masonNumber.touched" class="text-danger font-size-12">
+                                Please enter number of Masons
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-2 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removeMason(i)"
+                                *ngIf="masons.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                        <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.masonsRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+                <!-- Rod Bender -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Rod Benders</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addRodBender()"  [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of rodBenders; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Rod Bender</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.rodBenderCertification" [name]="'rodBenderLevel' + i"
+                                required #rodBenderLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="rodBenderLevel.invalid && rodBenderLevel.touched" class="text-danger font-size-12">
+                                Please select Rod Bender level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Rod Bender</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.rodBenderNumber"
+                                [name]="'rodBenderNumber' + i" required min="0" #rodBenderNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="rodBenderNumber.invalid && rodBenderNumber.touched" class="text-danger font-size-12">
+                                Please enter number of Rod Benders
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-2 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removeRodBender(i)"
+                                *ngIf="rodBenders.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                        <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.rodBendersRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Steel Fabricator -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Steel Fabricators</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addSteelFabricator()"  [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of steelFabricators; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Steel Fabricator</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.steelFabricatorCertification"
+                                [name]="'steelFabricatorLevel' + i" required #steelFabricatorLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="steelFabricatorLevel.invalid && steelFabricatorLevel.touched"
+                                class="text-danger font-size-12">
+                                Please select Steel Fabricator level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Steel Fabricator</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.steelFabricatorNumber"
+                                [name]="'steelFabricatorNumber' + i" required min="0" #steelFabricatorNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="steelFabricatorNumber.invalid && steelFabricatorNumber.touched"
+                                class="text-danger font-size-12">
+                                Please enter number of Steel Fabricators
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-2 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removeSteelFabricator(i)"
+                                *ngIf="steelFabricators.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                        <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.steelFabricatorsRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div class="col-md-6">
+                <!-- Plumber -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Plumbers</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addPlumber()"  [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of plumbers; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Plumber</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.plumberLevel" [name]="'plumberLevel' + i"
+                                required #plumberLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="plumberLevel.invalid && plumberLevel.touched" class="text-danger font-size-12">
+                                Please select Plumber level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Plumber</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.plumberNumber"
+                                [name]="'plumberNumber' + i" required min="0" #plumberNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="plumberNumber.invalid && plumberNumber.touched" class="text-danger font-size-12">
+                                Please enter number of Plumbers
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-2 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removePlumber(i)"
+                                *ngIf="plumbers.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                        <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.plumbersRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Electrician -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Electricians</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addElectrician()"  [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of electricians; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Electrician</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.electricianLevel" [name]="'electricianLevel' + i"
+                                required #electricianLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="electricianLevel.invalid && electricianLevel.touched" class="text-danger font-size-12">
+                                Please select Electrician level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Electrician</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.electricianNumber"
+                                [name]="'electricianNumber' + i" required min="0" #electricianNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="electricianNumber.invalid && electricianNumber.touched"
+                                class="text-danger font-size-12">
+                                Please enter number of Electricians
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-2 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removeElectrician(i)"
+                                *ngIf="electricians.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                        <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.electriciansRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Painter -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Painters</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addPainter()" [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of painters; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Painter</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.painterLevel" [name]="'painterLevel' + i"
+                                required #painterLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="painterLevel.invalid && painterLevel.touched" class="text-danger font-size-12">
+                                Please select Painter level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Painter</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.painterNumber"
+                                [name]="'painterNumber' + i" required min="0" #painterNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="painterNumber.invalid && painterNumber.touched" class="text-danger font-size-12">
+                                Please enter number of Painters
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-2 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removePainter(i)"
+                                *ngIf="painters.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                        <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.paintersRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+
+                <!-- Blaster -->
+                <div class="border p-3 mb-4 rounded-3 shadow-sm">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h6 class="mb-0 text-primary">Blasters</h6>
+                        <button type="button" class="btn btn-outline-primary btn-sm" (click)="addBlast()"  [disabled]="appNoStatus === 'REJECTED'">Add More</button>
+                    </div>
+                    <div *ngFor="let item of blasters; let i = index" class="row g-3 align-items-center mb-3">
+                        <div class="col-md-5">
+                            <label class="form-label">Blaster</label>
+                            <select class="form-select form-control-sm" [(ngModel)]="item.blasterLevel" [name]="'blasterLevel' + i"
+                                required #blasterLevel="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                                <option value="">-- Select --</option>
+                                <option value="NC1">NC1</option>
+                                <option value="NC2">NC2</option>
+                                <option value="NC3">NC3</option>
+                                <option value="None">None</option>
+                            </select>
+                            <div *ngIf="blasterLevel.invalid && blasterLevel.touched" class="text-danger font-size-12">
+                                Please select Blaster level
+                            </div>
+                        </div>
+                        <div class="col-md-5">
+                            <label class="form-label">Number of Blaster</label>
+                            <input type="number" class="form-control form-control-sm" [(ngModel)]="item.blasterNumber"
+                                [name]="'blasterNumber' + i" required min="0" #blasterNumber="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+                            <div *ngIf="blasterNumber.invalid && blasterNumber.touched" class="text-danger font-size-12">
+                                Please enter number of Blasters
+                            </div>
+                        </div>
+                        <div class="col-md-2 col-md-2 ml--2 mt-6">
+                            <button type="button" class="btn btn-danger btn-sm" (click)="removeBlaster(i)"
+                                *ngIf="blasters.length > 1">
+                                Remove
+                            </button>
+                        </div>
+                    </div>
+                        <div class="">
+                            <div class="mb-4">
+                                <label for="remarks" class="form-label ">Remarks</label>
+                                <textarea id="remarks" class="form-control h-4rem"  [(ngModel)]="formData.blastersRemarks"
+                                    name="remarks"></textarea>
+                            </div>
+                        </div>
+                </div>
+            </div>
+        </div>
+        <!-- Buttons -->
+       <div class="justify-content-end d-flex">
+    <button class="btn mr-1 text-white prev-btn" *ngIf="appNoStatus !== 'REJECTED'" (click)="onPreviousClick()" type="submit">Prev</button>
+    <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
+  </div>
+    </div>
+</form>

@@ -1,0 +1,206 @@
+<div class="m-4">
+
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Is Equipment Registered</th>
+        <th>Vehicle Type*</th>
+        <th>Registration No*</th>
+        <th>Owner Name</th>
+        <th>Owner CID</th>
+        <!-- <th>Remarks</th> -->
+        <th>Equipment Type*</th>
+        <th>Remarks</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of tableData">
+        <!-- Registered -->
+        <ng-container *ngIf="data.owner !== 'Unregistered'; else notRegistered">
+          <td>Yes</td>
+          <td>{{ data.vehicleType }}</td>
+          <td>{{ data.vehicleNumber }}</td>
+          <td>{{ data.owner }}</td>
+          <td>{{ data.cdbno || 'N/A' }}</td>
+          <td>{{ data.chassisNumber }}</td>
+          <td>-</td>
+          <!-- <td>-</td> -->
+        </ng-container>
+
+        <!-- Not Registered -->
+        <ng-template #notRegistered>
+          <td>No</td>
+          <td>-</td>
+          <td>{{ data.vehicleNumber }}</td>
+          <td>{{ data.owner }}</td>
+          <td>{{ data.cdbno || 'N/A' }}</td>
+          <td>{{ data.chassisNumber }}</td>
+          <td>{{ data.vehicleType }}</td>
+          <td>{{ data.engineNumber }}</td>
+        </ng-template>
+      </tr>
+    </tbody>
+  </table>
+  
+  <form>
+    <div class="col-md-4">
+      <label class="form-label">Does the firm fulfill the required mandatory equipment:<span
+          class="text-danger font-size-12">*</span></label>
+      <select class="form-select h-50" name="fulfillsRequirement" [(ngModel)]="formData.fulfillsRequirement" required
+        #fulfillsRequirement="ngModel">
+        <option value="">Select</option>
+        <option value="Yes">Yes</option>
+        <option value="No">No</option>
+      </select>
+      <div *ngIf="fulfillsRequirement.invalid && fulfillsRequirement.touched" class="text-danger font-size-12">
+        Please select if the requirement is fulfilled
+      </div>
+    </div>
+    <div class="row m-0 mt-5" *ngIf="formData.fulfillsRequirement === 'No'">
+      <div class="col-md-4 mb-3">
+        <label class="form-label">
+          Last Date to Resubmit:<span class="text-danger font-size-12">*</span>
+        </label>
+        <input type="date" class="form-control form-control-sm" name="resubmitDate" [(ngModel)]="formData.resubmitDate"
+          #resubmitDate="ngModel" required [min]="minResubmitDate" />
+        <div *ngIf="resubmitDate.invalid && resubmitDate.touched" class="text-danger font-size-12">
+          Please provide a date
+        </div>
+      </div>
+
+      <div class="col-md-8 mb-3">
+        <label class="form-label">Remarks</label>
+        <textarea class="form-control form-control-sm" rows="2" name="resubmitRemarks"
+          [(ngModel)]="formData.resubmitRemarks"></textarea>
+      </div>
+      <!-- <div class="col-md-12 mb-3">
+        <label class="form-label">Remarks</label>
+        <textarea class="form-control form-control-sm" rows="2" name="finalRemarks"
+          [(ngModel)]="formData.finalRemarks"></textarea>
+      </div> -->
+    </div>
+    <!-- Buttons -->
+    <div class="d-flex justify-content-end mt-4">
+      <button type="submit" class="btn btn-success me-2" (click)="notifyContractor()"
+        *ngIf="formData.fulfillsRequirement === 'No'">
+        Save & Forward
+      </button>
+      <button (click)="saveAndNext()" type="submit" class="btn btn-primary"
+        *ngIf="formData.fulfillsRequirement === 'Yes'">
+        Save & Next
+      </button>
+    </div>
+  </form>
+</div>
+
+<!-- <form #equipmentForm="ngForm" (ngSubmit)="onSubmit()" *ngIf="firmType === 'consultancyFirm'">
+  <div class=" m-4">
+    <div class="row">
+      <!-- Equipment Type -->
+<!-- <div class="col-md-4">
+        <label class="form-label">Equipment Type :<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select h-50" name="equipmentType" [(ngModel)]="formData.equipmentType" required
+          #equipmentType="ngModel">
+          <option value="">Select Equipment Type</option>
+          <option *ngFor="let item of equipmentMasterList" [value]="item.id">
+            {{ item.name }}
+          </option>
+        </select>
+        <div *ngIf="equipmentType.invalid && equipmentType.touched" class="text-danger font-size-12">
+          Please select an Equipment Type
+        </div>
+      </div> -->
+
+<!-- Required Equipment -->
+<!-- <div class="col-md-4">
+        <label class="form-label">Required Equipment :<span class="text-danger font-size-12">*</span></label>
+        <input type="number" class="form-control form-control-sm" name="requiredEquipment"
+          [(ngModel)]="formData.requiredEquipment" required #requiredEquipment="ngModel" />
+        <div *ngIf="requiredEquipment.invalid && requiredEquipment.touched" class="text-danger font-size-12">
+          Required Equipment is mandatory
+        </div>
+      </div> -->
+
+<!-- Category of Service -->
+<!-- <div class="col-md-4">
+        <label class="form-label">Category of Service :<span class="text-danger font-size-12">*</span></label>
+        <input type="text" class="form-control form-control-sm" name="categoryOfService"
+          [(ngModel)]="formData.categoryOfService" required readonly #categoryOfService="ngModel" />
+        <div *ngIf="categoryOfService.invalid && categoryOfService.touched" class="text-danger font-size-12">
+          Category of Service is required
+        </div>
+      </div>
+    </div> -->
+
+<!-- <div class="row mb-3">
+      <!-- Equipment Deployed -->
+<!-- <div class="col-md-4">
+        <label class="form-label">Equipment Deployed :<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select h-50" name="equipmentDeployed" [(ngModel)]="formData.equipmentDeployed" required
+          #equipmentDeployed="ngModel">
+          <option value="">Select</option>
+          <option [value]="true">Yes</option>
+          <option [value]="false">No</option>
+        </select>
+        <div *ngIf="equipmentDeployed.invalid && equipmentDeployed.touched" class="text-danger font-size-12">
+          Please select an option for Equipment Deployed
+        </div>
+      </div> -->
+
+<!-- Remarks -->
+<!-- <div class="col-md-8">
+        <label class="form-label">Remarks</label>
+        <input type="text" class="form-control" name="remarks" [(ngModel)]="formData.remarks" #remarks="ngModel" />
+      </div>
+    </div> -->
+
+<!-- <div class="row mb-3"> -->
+<!-- Fulfillment Check -->
+<!-- <div class="col-md-4">
+        <label class="form-label">Does the firm fulfill the required mandatory equipment:<span
+            class="text-danger font-size-12">*</span></label>
+        <select class="form-select h-50" name="fulfillsRequirement" [(ngModel)]="formData.fulfillsRequirement" required
+          #fulfillsRequirement="ngModel">
+          <option value="">Select</option>
+          <option value="Yes">Yes</option>
+          <option value="No">No</option>
+        </select>
+        <div *ngIf="fulfillsRequirement.invalid && fulfillsRequirement.touched" class="text-danger font-size-12">
+          Please select if the requirement is fulfilled
+        </div>
+      </div> -->
+
+<!-- Show only if No -->
+<!-- <ng-container *ngIf="formData.fulfillsRequirement === 'No'">
+        <div class="col-md-4">
+          <label class="form-label">Last Date to Resubmit :<span class="text-danger font-size-12">*</span></label>
+          <input type="date" class="form-control form-control-sm" name="lastDateToResubmit"
+            [(ngModel)]="formData.lastDateToResubmit" required #lastDateToResubmit="ngModel" />
+          <div *ngIf="lastDateToResubmit.invalid && lastDateToResubmit.touched" class="text-danger font-size-12">
+            Please select a valid resubmission date
+          </div>
+        </div>
+
+        <div class="col-md-4">
+          <label class="form-label">Remarks</label>
+          <input type="text" class="form-control" name="remarksIfNo" [(ngModel)]="formData.remarksIfNo"
+            #remarksIfNo="ngModel" />
+        </div>
+      </ng-container>
+    </div> -->
+
+<!-- Submit Buttons -->
+<!-- <div class="row mt-4">
+      <div class="col-md-12 text-end">
+        <button *ngIf="formData.fulfillsRequirement === 'No'" class="btn btn-warning me-2" type="submit"
+       >
+          Save & Forward
+        </button>
+        <button *ngIf="formData.fulfillsRequirement === 'Yes'" class="btn save-next-btn" type="submit"
+         >
+          Save & Next
+        </button>
+      </div>
+    </div>
+  </div>
+</form> -->

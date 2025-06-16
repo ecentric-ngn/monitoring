@@ -1,0 +1,87 @@
+.details{
+    color: red;
+}
+.Deregister{
+    color: red;
+
+}
+.flex-container {
+    display: flex;
+}
+
+.flex-item {
+    margin-right: 20px; /* Adjust margin as needed */
+}
+label {
+    color: #0d0e10;
+    font-weight: 500;
+    font-size: 14px;
+}
+
+.horizontal-labels {
+    display: flex;
+}
+
+.label-item {
+    margin-right: 20px; /* Adjust margin as needed */
+}
+// .details{
+//     margin-left: -100px;
+// }
+// .suspended{
+//     margin-left: 183px;
+// }
+.mt-xl-n-4{
+    margin-left: 182px;
+}
+.red-text {
+    color: red;
+  }
+
+  .size-6 {
+    width: 50px; /* Adjust size as necessary */
+    height: 50px;
+}
+
+.ml-2 {
+    margin-left: 0.5rem; /* Adjust the margin as necessary */
+}
+
+.row {
+    display: flex;
+    align-items: center;
+}
+
+.margin {
+    margin-left: 184px;
+}
+
+.col-10{
+    flex: 0 0 auto;
+    padding: 1rem;
+    width: 83.3333%;
+    margin-left: 209px;
+}
+.Deregister {
+    flex: 0 0 auto;
+    padding: 1rem;
+    width: 83.3333%;
+    margin-left: 209px;
+}
+.modal-content {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 154%;
+    pointer-events: auto;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid rgba(0, 0, 0, .2);
+    border-radius: 5px;
+    box-shadow: 0 .25rem .5rem rgba(0, 0, 0, .5);
+    outline: 0;
+}
+
+ .height {
+    height: 36px;
+}

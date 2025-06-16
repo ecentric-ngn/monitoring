@@ -1,0 +1,166 @@
+<div class="m-4 bg-white">
+  <!-- Builder Details Section -->
+  <span class="font-size-16 font-weight-bold m-3">Builder Details</span>
+  <hr />
+  <div class="m-3">
+    <table class="table table-bordered table-sm font-size-12">
+      <tbody>
+        <tr>
+          <th>Firm Name</th>
+          <td>{{ builderDetails.firm_name || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>BCTA Number</th>
+          <td>{{ builderDetails.bcta_no || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Contact Number</th>
+          <td>{{ builderDetails.contact_no || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Email</th>
+          <td>{{ builderDetails.email || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Location</th>
+          <td>{{ builderDetails.location || 'N/A' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Office Signage and Documents Details Section -->
+  <span class="font-size-14 font-weight-bold m-3">Office Signage and Documents Details</span>
+  <hr />
+  <div class="m-3">
+    <table class="table table-bordered table-sm font-size-12">
+      <tbody>
+        <tr>
+          <th>Office Signboard</th>
+          <td>{{ builderDetails.office_signboard || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Review for Signboard</th>
+          <td>{{ builderDetails.location_review || 'N/A' }}</td>
+        </tr>
+        <tr *ngIf="builderDetails.location_review === 'No'">
+          <th>Last Date to Resubmit</th>
+          <td>{{ builderDetails.last_date_resubmit | date:'mediumDate' || 'N/A' }}</td>
+        </tr>
+        <tr *ngIf="builderDetails.location_review === 'No'">
+          <th>Remarks (Signboard)</th>
+          <td>{{ builderDetails.resubmit_remarks || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Proper Filing System</th>
+          <td>{{ builderDetails.filing_system || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Review (Filing System)</th>
+          <td>{{ builderDetails.fsreview || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>OHS Handbook</th>
+          <td>{{ builderDetails.ohs_handbook || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>Review (OHS Handbook)</th>
+          <td>{{ builderDetails.ohs_review || 'N/A' }}</td>
+        </tr>
+        <tr>
+          <th>General Remarks</th>
+          <td>{{ builderDetails.ohs_remarks || 'N/A' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Employee Details Section -->
+  <span class="font-size-14 font-weight-bold m-3">Employee Details</span>
+  <hr />
+  <div class="m-3" *ngIf="employeesData.length > 0">
+    <table class="table table-bordered table-sm font-size-12">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Full Name</th>
+          <th>CID No</th>
+          <th>Gender</th>
+          <th>Nationality</th>
+          <th>Qualification</th>
+          <th>Joining Date</th>
+          <th>Pay Slip</th>
+          <th>Payslip Remarks</th>
+          <th>HR Fulfilled</th>
+          <th>Resubmit Deadline</th>
+          <th>Deadline Remarks</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let employee of employeesData; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ employee.full_name || 'N/A' }}</td>
+          <td>{{ employee.cid_no || 'N/A' }}</td>
+          <td>{{ employee.gender || 'N/A' }}</td>
+          <td>{{ employee.nationality || 'N/A' }}</td>
+          <td>{{ employee.qualification || 'N/A' }}</td>
+          <td>{{ employee.joining_date | date:'mediumDate' || 'N/A' }}</td>
+          <td>{{ employee.pay_slip || 'N/A' }}</td>
+          <td>{{ employee.psremarks || 'N/A' }}</td>
+          <td>{{ employee.hr_fulfilled || 'N/A' }}</td>
+          <td>{{ employee.resubmit_deadline | date:'mediumDate' || 'N/A' }}</td>
+          <td>{{ employee.deadline_remarks || 'N/A' }}</td>
+          <td>{{ employee.remarks || 'N/A' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="m-3" *ngIf="employeesData.length === 0 && !isLoading">
+    <p>No employee details found</p>
+  </div>
+
+  <!-- Equipment Details Section -->
+  <span class="font-size-14 font-weight-bold m-3">Equipment Details</span>
+  <hr />
+  <div class="m-3" *ngIf="equipmentDetails.length > 0">
+    <table class="table table-bordered table-sm font-size-12">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Equipment Description</th>
+          <th>Required Equipment</th>
+          <th>Fulfilled</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of equipmentDetails; let i = index">
+          <td>{{ i + 1 }}</td>
+          <td>{{ item.equipment_description || 'N/A' }}</td>
+          <td>{{ item.required_equipment || 'N/A' }}</td>
+          <td>{{ item.required_equipment_fulfilled || 'N/A' }}</td>
+          <td>{{ item.remarks || 'N/A' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="m-3" *ngIf="equipmentDetails.length === 0 && !isLoading">
+    <p>No equipment details found</p>
+  </div>
+
+  <!-- Loading and Error States -->
+  <div *ngIf="isLoading" class="m-3">
+    <p>Loading data...</p>
+  </div>
+
+  <div *ngIf="errorMessage && !isLoading" class="m-3">
+    <p class="text-danger">{{ errorMessage }}</p>
+  </div>
+
+  <div *ngIf="!builderDetails && !isLoading && !errorMessage" class="m-3">
+    <p>No builder details available</p>
+  </div>
+</div>

@@ -1,0 +1,64 @@
+
+<div class="wrapper">
+  <div class="iq-sidebar sidebar-default">
+    <div class="iq-sidebar-logo d-flex justify-content-center">
+      <img src="../../assets/bctalogo.png" alt="Logo" class="h-4rem" />
+    </div>
+    <div class="data-scrollbar" data-scroll="1">
+      <nav class="iq-sidebar-menu mt-5">
+        <ul id="iq-sidebar-toggle" class="side-menu">
+          <li class="sidebar-layout pointer mt--5" *ngIf="ciNet !== 'CiNET'">
+            <a   (click)="navigateToDashboard('dashboard')" class="svg-icon ml--4">
+              <i>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="18"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  />
+                </svg>
+              </i>
+              <span class="ml-2">Dashboard</span>
+            </a>
+          </li>
+          <ul>
+            <ng-container *ngFor="let menu of allMenuData">
+              <li class="sidebar-layout pointer ml--4" [ngClass]="{'active': isActiveMenu(menu.menu_name)}">
+                <a href="#{{menu.menu_name}}" class="collapsed svg-icon ml--4" data-toggle="collapse" aria-expanded="false">
+                  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                    <path [attr.d]="menu.menu_icon_name" stroke="white" fill="#ffffff"></path>
+                  </svg>
+                  <span class="ml-2">{{menu.menu_name}}</span>
+                  <svg xmlns="http://www.w3.org/2000/svg" class="svg-icon iq-arrow-right arrow-active w-1" width="10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </a>
+                <ul id="{{menu.menu_name}}" class="submenu collapse" data-parent="#iq-sidebar-toggle">
+                  <li class="sidebar-layout pointer">
+                    <ul>
+                      <ng-container *ngFor="let subMenu of menu.submenu">
+                        <li [ngClass]="{'active': isActiveSubMenu(subMenu.submenu_id)}">
+                          <a (click)="navigate(subMenu.submenu_url, subMenu.submenu_id, menu.menu_name)" class="svg-icon">
+                            <span class="bullet-point">&#8226;</span>
+                            <span>{{ subMenu.submenu_name }}</span>
+                          </a>
+                        </li>
+                      </ng-container>
+                    </ul>
+                  </li>
+                </ul>
+              </li>
+            </ng-container>
+        </ul>
+        </ul>
+      </nav>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,69 @@
+<div class="container p-4 border rounded bg-white">
+  <form #form="ngForm">
+    <div class="table-responsive">
+      <table class="table table-bordered align-middle">
+        <thead class="table-light text-center">
+          <tr>
+            <th>CID No</th>
+            <th>Full Name</th>
+            <th>Mobile No</th>
+            <th>Email</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+            <tr *ngFor="let team of teamList; let i = index">
+                <td class="text-center">{{team.cid_emp_id}}</td>
+                <td class="text-center">{{team.name}}</td>
+                <td class="text-center">{{team.contact_no}}</td>
+                <td class="text-center">{{team.email}}</td>
+            </tr>
+   </tbody>
+   <tbody *ngIf="showAddMore">
+          <tr *ngFor="let formData of dataList; let i = index" >
+            <td>
+              <input type="number" [(ngModel)]="formData.cidNo"
+                     (ngModelChange)="onCidChange(formData)"
+                     id="cidNo{{i}}" name="cidNo{{i}}"
+                     class="form-control h-100" placeholder="CID No" />
+              <div *ngIf="errorMessages.notFound" class="text-danger small mt-1">
+                {{ errorMessages.notFound }}
+              </div>
+              <div *ngIf="errorMessages.server" class="text-danger small mt-1">
+                {{ errorMessages.server }}
+              </div>
+            </td>
+            <td><input type="text" [(ngModel)]="formData.fullName" class="form-control h-100" placeholder="Full Name" /></td>
+            <td><input type="number" [(ngModel)]="formData.mobileNo"
+            (ngModelChange)="validateMobileNumber(formData)"
+            class="form-control h-100" placeholder="Mobile No" /></td>
+              <td><input type="text" [(ngModel)]="formData.email" class="form-control h-100" placeholder=" enter email" /></td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-danger" (click)="removeRow(i)">
+                Delete
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    </form>
+    <div class="d-flex justify-content-end mt-3" >
+      <button class="btn btn-outline-primary btn-sm" (click)="addRow()"[disabled]="appNoStatus === 'REJECTED'">+ Add More</button>
+    </div>
+  
+    <!-- OTP Input Section -->
+    <div class="row mt-4">
+      <div class="col-md-4">
+        <label class="form-label">Monitoring Date</label>
+        <input type="date" [(ngModel)]="formData.monitoringDate" id="monitoringDate" name="monitoringDate" class="form-control form-control-sm" placeholder="Monitoring Date" />
+      </div>
+    </div>
+  
+    <!-- Final Action -->
+    <div class="d-flex justify-content-end mt-4">
+       <button class="btn mr-1 text-white prev-btn"  *ngIf="appNoStatus !== 'REJECTED'" type="submit" (click)="onPreviousClick()" type="submit">Prev</button>
+      <button class="btn text-white save-next-btn" (click)="saveMonitorTeamList(form)" type="submit">Save&Next</button>
+    </div>
+  </div>
+  
