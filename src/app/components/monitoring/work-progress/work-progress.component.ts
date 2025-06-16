@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output } from '@angular/core';
-import { NgForm } from '@angular/forms';
+import { NgForm, ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { CommonService } from '../../../service/common.service';
 import { Router } from '@angular/router';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
@@ -8,6 +8,8 @@ import { forkJoin } from 'rxjs';
 @Component({
     selector: 'app-work-progress',
     templateUrl: './work-progress.component.html',
+    standalone: true,
+    imports: [ReactiveFormsModule, FormsModule],
     styleUrls: ['./work-progress.component.scss'],
 })
 export class WorkProgressComponent {
@@ -45,7 +47,7 @@ export class WorkProgressComponent {
         this.data = this.data;
          this.appNoStatus = this.data.applicationStatus
         this.inspectionType = this.inspectionType;
-        this.prevTableId= this.prevTableId 
+        this.prevTableId= this.prevTableId
          if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {
@@ -54,7 +56,7 @@ export class WorkProgressComponent {
         if (this.prevTableId) {
             this.getDatabasedOnChecklistId();
         }
-      
+
     }
     getDatabasedOnChecklistId() {
         const payload: any = [
