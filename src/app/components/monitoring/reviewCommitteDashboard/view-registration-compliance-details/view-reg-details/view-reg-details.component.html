@@ -125,40 +125,38 @@
 
 
     <!-- Equipment Details Section -->
- <span class="font-size-14 font-weight-bold m-3">Mandatory Equipment Details</span>
-<hr>
-
-<div class="m-3 table-wrapper">
-  <table class="table table-bordered table-sm font-size-12 custom-table">
-    <thead>
-      <tr>
-        <th>Owner Name</th>
-         <th>Owner CID</th>
-         <th>Vehicle Type</th>
-          <th>Registration No</th>
-        <th>Equipment Type</th>
-        <th>Is equipment registered</th>
-        <th>Requirements Fulfilled</th>
-        <th>Resubmit Deadline</th>
-        <th>Remarks</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>{{ equipmentData.isRegistered || 'N/A' }}</td>
-        <td>{{ equipmentData.vehicleType || 'N/A' }}</td>
-        <td>{{ equipmentData.registrationNo || 'N/A' }}</td>
-        <td>{{ equipmentData.ownerName || 'N/A' }}</td>
-        <td>{{ equipmentData.ownerCid || 'N/A' }}</td>
-        <td>{{ equipmentData.equipmentType || 'N/A' }}</td>
-        <td>{{ equipmentData.mandatoryEquipmentFulfilled || 'N/A' }}</td>
-        <td>{{ equipmentData.resubmitDeadline || 'N/A' }}</td>
-        <td>{{ equipmentData.remarks || 'N/A' }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
+     <span class="font-size-14 font-weight-bold m-3">Equipment Details</span>
+     <hr>
+ <table class="table table-bordered table-sm font-size-12">
+  <thead >
+    <tr>
+      <th>#</th>
+      <th>Vehicle Type</th>
+      <th>Registration No</th>
+      <th>Owner Name</th>
+      <th>Owner CID</th>
+      <th>Equipment Type</th>
+      <th>Registered</th>
+      <th>Mandatory Equipment Fulfilled</th>
+      <th>Resubmit Deadline</th>
+      <th>Remarks</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let equip of equipmentData; let i = index">
+      <td>{{ i + 1 }}</td>
+      <td>{{ equip.vehicleType }}</td>
+      <td>{{ equip.registrationNo }}</td>
+      <td>{{ equip.ownerName }}</td>
+      <td>{{ equip.ownerCid }}</td>
+      <td>{{ equip.equipmentType }}</td>
+      <td>{{ equip.isRegistered }}</td>
+      <td>{{ equip.mandatoryEquipmentFulfilled }}</td>
+      <td>{{ equip.resubmitDeadline }}</td>
+      <td>{{ equip.remarks }}</td>
+    </tr>
+  </tbody>
+</table>
 
 
     <!-- Monitoring Team Section -->
@@ -184,13 +182,16 @@
 </div>
 
  <div class="m-3">
-    <div class="row justify-content-center">
-        <div class="col-md-6 mb-3">
-            <label class="form-label me-2 font-size-12">Reviewed Date:</label>
-           <input type="date" class="form-control" name="moniterReviewDate"
-       [value]="formData.moniterReviewDate | date:'yyyy-MM-dd'"
-       (input)="formData.moniterReviewDate = $event.target.value"
-       readonly>
-        </div>
+  <div class="row">
+    <div class="col-md-6 mb-3">
+      <label class="form-label me-2 font-size-12">Reviewed Date:</label>
+      <input type="date"
+             class="form-control"
+             name="moniterReviewDate"
+             [value]="formData.moniterReviewDate | date:'yyyy-MM-dd'"
+             (input)="formData.moniterReviewDate = $event.target.value"
+             readonly
+             style="width: 250px;">
     </div>
+  </div>
 </div>

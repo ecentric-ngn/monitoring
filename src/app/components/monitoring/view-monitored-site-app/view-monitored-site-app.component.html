@@ -551,7 +551,7 @@
             <div class="col-md-6">
               <label class="form-label">Contractor Class</label>
               <select class="form-select form-control-sm" name="contractorClass"
-                [(ngModel)]="formData.workClassification">
+                [(ngModel)]="formData.workClassification" multiple>
                 <option value="" selected>-- Select --</option>
                 <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
               </select>
@@ -675,13 +675,16 @@
       </div>
 
       <div class="col-md-6">
-        <label class="form-label">Contractor Class</label>
-        <select class="form-select form-control-sm" name="contractorClass"
-                [(ngModel)]="formData.workClassification">
-          <option value="" selected>-- Select --</option>
-          <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
-        </select>
-      </div>
+  <label class="form-label">Contractor Class</label>
+  <select class="form-select form-control-sm"
+          name="contractorClass"
+          [(ngModel)]="formData.workClassification"
+          multiple
+          style="height: 60px;">
+    <option value="" selected>-- Select --</option>
+    <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
+  </select>
+</div>
     </div>
 
     <!-- Continue same for other fields -->

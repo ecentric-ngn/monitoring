@@ -17,6 +17,7 @@ export class ViewRegDetailsComponent {
   moniterTeamList: any;
   moniterReviewDate: any;
   consultantEmployeesData: any;
+  
 
   
   constructor(private service: CommonService) {}
@@ -53,7 +54,7 @@ export class ViewRegDetailsComponent {
       },
     ];
 
-    this.service.fetchDetails(payload, 1, 2, 'view_registration_review_summary').subscribe(
+    this.service.fetchDetails(payload, 1, 100, 'view_registration_review_summary').subscribe(
       (response: any) => {
         if (response.data && response.data.length > 0) {
           const apiData = response.data[0];
@@ -106,39 +107,40 @@ export class ViewRegDetailsComponent {
     );
   }
 
-  FetchWorkBaseOnEquipmentDetails() {
-    const payload: any = [
-      {
-        "field": "contractor_registration_review_id",
-        "value": this.tableId,
-        "condition": "AND",
-        "operator": "="
-      },
-    ];
+  
+FetchWorkBaseOnEquipmentDetails() {
+  const payload: any = [
+    {
+      field: "contractor_registration_review_id",
+      value: this.tableId,
+      condition: "AND",
+      operator: "="
+    },
+  ];
 
-    this.service.fetchDetails(payload, 1, 2, 'view_equipment_review_summary').subscribe(
-      (response: any) => {
-        if (response.data && response.data.length > 0) {
-          const equipment = response.data[0];
-          // Store equipment data in equipmentData
-          this.equipmentData = {
-            isRegistered: equipment.is_registered ? 'Yes' : 'No',
-            vehicleType: equipment.vehicle_type || 'N/A',
-            registrationNo: equipment.registration_no || 'N/A',
-            ownerName: equipment.owner_name || 'N/A',
-            ownerCid: equipment.owner_cid || 'N/A',
-            equipmentType: equipment.equipment_type || 'N/A',
-            mandatoryEquipmentFulfilled: equipment.mandatory_equipment_fulfilled ? 'Yes' : 'No',
-            resubmitDeadline: equipment.resubmit_deadline || 'N/A',
-            remarks: equipment.remarks || 'N/A'
-          };
-        }
-      },
-      (error) => {
-        console.error('Error fetching equipment details:', error);
+  this.service.fetchDetails(payload, 1, 100, 'view_equipment_review_summary').subscribe(
+    (response: any) => {
+      if (response.data && response.data.length > 0) {
+        this.equipmentData = response.data.map((equipment: any) => ({
+          isRegistered: equipment.is_registered ? 'Yes' : 'No',
+          vehicleType: equipment.vehicle_type || 'N/A',
+          registrationNo: equipment.registration_no || 'N/A',
+          ownerName: equipment.owner_name || 'N/A',
+          ownerCid: equipment.owner_cid || 'N/A',
+          equipmentType: equipment.equipment_type || 'N/A',
+          mandatoryEquipmentFulfilled: equipment.mandatory_equipment_fulfilled ? 'Yes' : 'No',
+          resubmitDeadline: equipment.resubmit_deadline || 'N/A',
+          remarks: equipment.remarks || 'N/A'
+        }));
+      } else {
+        this.equipmentData = [];
       }
-    );
-  }
+    },
+    (error) => {
+      console.error('Error fetching equipment details:', error);
+    }
+  );
+}
 
   FetchPermanentEmployeesDetails() {
     const payload: any = [
@@ -150,7 +152,7 @@ export class ViewRegDetailsComponent {
       },
     ]
 
-    this.service.fetchDetails(payload, 1, 2, 'view_employee_review_summary').subscribe(
+    this.service.fetchDetails(payload, 1, 100, 'view_employee_review_summary').subscribe(
       (response: any) => {
         if (response.data && response.data.length > 0) {
           // Store employee data in employeesData array
