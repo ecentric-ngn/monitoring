@@ -1,15 +1,7 @@
 <div *ngIf="formData">
-  <div class="row m-4">
-    <!-- Office Signboard -->
-    <div class="col-md-4 mb-3">
-      <label class="form-label">Office signboard:<span class="text-danger font-size-12">*</span></label>
-      <button *ngIf="formData.officeSignboardPath" class="btn btn-sm btn-outline-primary"
-        (click)="viewFile(formData.officeSignboardPath)">
-        View doc
-      </button>
-    </div>
 
-    <!-- Location -->
+  <div class="row m-4">
+     <!-- Location -->
     <div class="col-md-4 mb-3">
       <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
       <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation"
@@ -18,9 +10,20 @@
         Location is required
       </div>
     </div>
+  </div>
+
+  <div class="row m-4">
+    <!-- Office Signboard -->
+    <div class="col-md-6 mb-3">
+      <label class="form-label">Office signboard:<span class="text-danger font-size-12">*</span></label>
+      <button *ngIf="formData.officeSignboardPath" class="btn btn-sm btn-outline-primary"
+        (click)="viewFile(formData.officeSignboardPath)">
+        View doc
+      </button>
+    </div>
 
     <!-- Review for Signboard -->
-    <div class="col-md-4 mb-3">
+    <div class="col-md-6 mb-3">
       <label class="form-label">Review (Office signboard):<span class="text-danger font-size-12">*</span></label>
       <select class="form-select form-control-sm" [(ngModel)]="formData.signboardReview" name="signboardReview" required
         #signboardReview="ngModel" (change)="onReviewChange()">
