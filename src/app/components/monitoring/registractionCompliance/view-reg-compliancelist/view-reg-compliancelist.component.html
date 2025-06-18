@@ -45,6 +45,7 @@
                     <!-- <th>Category</th> -->
                     <th>License Status</th>
                     <th>Verified By</th>
+                    <th>select</th>
                 </tr>
             </thead>
             <tbody>
@@ -60,7 +61,8 @@
                             'badge-secondary': data.applicationStatus== 'Not Submitted',
                             'badge-warning': data.applicationStatus== 'In Process',
                             'badge-success': data.applicationStatus== 'Verified',
-                            'badge-primary': data.applicationStatus== 'Submitted'
+                            'badge-primary': data.applicationStatus== 'Submitted',
+                            'badge-info': data.applicationStatus== 'Ready for Review'
                             }">
                             {{ data.applicationStatus }}
                         </span>
@@ -72,7 +74,25 @@
                         <span *ngIf="data.applicationStatus === 'Verified'">Bilana Ghalley</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
-                    <!-- <td>
+                    <td>
+                        <input
+                            type="checkbox"
+                            [disabled]="data.applicationStatus !== 'Ready for Review'"
+                            [value]="data.contractorNo"
+                            (change)="onCheckboxChange($event, data.id)">
+                    </td>
+
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="text-end">
+            <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>
+        </div>
+        
+    </div>
+</div>
+<!-- <td>
                         <div *ngIf="data.status === 'Not Submitted'">
                             <div *ngIf="data.isEditing; else viewMode">
                                 <textarea [(ngModel)]="data.notification" rows="2" class="notification-textarea"
@@ -94,7 +114,7 @@
                         </div>
                     </td> -->
 
-                    <!-- <td class="text-bold pointer-event" [ngClass]="{ 'text-primary': app.status === 'Not Submitted' }"
+<!-- <td class="text-bold pointer-event" [ngClass]="{ 'text-primary': app.status === 'Not Submitted' }"
                         (click)="navigate(app)">
                         {{ app.bctaNo }}
                     </td>
@@ -119,8 +139,8 @@
                         <ng-template #noVerifier><span>-</span></ng-template>
                     </td>
                     <td> -->
-                    <!-- Editable Notification -->
-                    <!-- <div *ngIf="app.status === 'Not Submitted'">
+<!-- Editable Notification -->
+<!-- <div *ngIf="app.status === 'Not Submitted'">
                             <div *ngIf="app.isEditing; else viewMode">
                                 <textarea [(ngModel)]="app.notification" rows="2" class="notification-textarea"
                                     placeholder="Enter message..."></textarea>
@@ -140,21 +160,17 @@
                             </ng-template>
                         </div> -->
 
-                    <!-- Readonly Notification -->
-                    <!-- <div *ngIf="app.status !== 'Not Submitted'">
+<!-- Readonly Notification -->
+<!-- <div *ngIf="app.status !== 'Not Submitted'">
                             <span *ngIf="app.notification; else noNoteReadonly">{{ app.notification }}</span>
                             <ng-template #noNoteReadonly><span>-</span></ng-template>
                         </div>
                     </td> -->
-                </tr>
-            </tbody>
-        </table>
 
-        <!-- Empty State -->
-        <!-- <div *ngIf="filteredApplications.length === 0" class="empty-state">
+
+<!-- Empty State -->
+<!-- <div *ngIf="filteredApplications.length === 0" class="empty-state">
             <div class="empty-icon">🔍</div>
             <h3>No applications found</h3>
             <p>Try adjusting your search or filters.</p>
         </div> -->
-    </div>
-</div>

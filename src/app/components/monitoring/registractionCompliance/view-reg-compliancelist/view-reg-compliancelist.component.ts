@@ -2,6 +2,7 @@ import { Component, ViewChild } from '@angular/core';
 import { CommonService } from '../../../../service/common.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 interface RegistrationApplication {
     id: number;
     bctaNo: string;
@@ -25,6 +26,9 @@ export class ViewRegCompliancelistComponent {
     formData: any = {};
     tableData: any = [];
 
+    selectedIds: number[] = [];
+    private isFetching = false;
+    private autoRefreshInterval: any;
     private statusPriority = {
         'Submitted': 1,
         'Verified': 2,
@@ -42,43 +46,58 @@ export class ViewRegCompliancelistComponent {
 
     searchTerm: string = '';
     statusFilter: string = 'All';
+
     ngOnInit() {
         this.fetchComplianceDetails();
-        // this.autoUpdateLicenseStatus();
-        // this.filterApplications();
+
+        // Auto-refresh every 60 seconds (60000 ms)
+        this.autoRefreshInterval = setInterval(() => {
+            this.fetchComplianceDetails();
+            console.log('Auto-refreshed compliance data');
+        }, 60000); // 60 seconds
     }
 
+    ngOnDestroy() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+        }
+    }
     onChangeFirmType(firmType: string) {
-    this.firmType = firmType;
+        this.firmType = firmType;
 
-    switch (firmType) {
-        // case 'constructionFirm':
-        //     this.router.navigate(['/reg-compliance/construction']);
-        //     break;
-        case 'consultancyFirm':
-            this.router.navigate(['/monitoring/consultancy']);
-            break;
-        case 'specializedFirm':
-            this.router.navigate(['/monitoring/specialized']);
-            break;
-        case 'certifiedBuilders':
-            this.router.navigate(['/monitoring/certified']);
-            break;
-        default:
-            break;
+        switch (firmType) {
+            // case 'constructionFirm':
+            //     this.router.navigate(['/reg-compliance/construction']);
+            //     break;
+            case 'consultancyFirm':
+                this.router.navigate(['/monitoring/consultancy']);
+                break;
+            case 'specializedFirm':
+                this.router.navigate(['/monitoring/specialized']);
+                break;
+            case 'certifiedBuilders':
+                this.router.navigate(['/monitoring/certified']);
+                break;
+            default:
+                break;
         }
     }
 
     fetchComplianceDetails() {
+        if (this.isFetching) return;
+
+        this.isFetching = true;
         this.service.fetchComplianceData().subscribe(
             (response: any) => {
                 this.tableData = response;
                 console.log('Fetched Data', this.tableData);
+                this.isFetching = false;
             },
             (error) => {
                 console.error('Error fetching compliance data:', error);
+                this.isFetching = false;
             }
-        )
+        );
     }
 
     Searchfilter() { }
@@ -109,6 +128,43 @@ export class ViewRegCompliancelistComponent {
             'monitoring/RegFirmInformation'
         );
     }
+
+    onCheckboxChange(event: Event, id: string) {
+        const isChecked = (event.target as HTMLInputElement).checked;
+        const numericId = Number(id); // convert to number
+
+        if (isChecked) {
+            if (!this.selectedIds.includes(numericId)) {
+                this.selectedIds.push(numericId);
+            }
+        } else {
+            this.selectedIds = this.selectedIds.filter(item => item !== numericId);
+        }
+
+        console.log('Selected IDs (as numbers):', this.selectedIds);
+    }
+
+
+    forwardToRC() {
+        if (this.selectedIds.length === 0) {
+            Swal.fire('Warning', 'No items selected', 'warning');
+            return;
+        }
+
+        const payload = this.selectedIds
+
+        this.service.forwardToReviewCommitee(payload).subscribe(
+            (res) => {
+                console.log('Successfully sent selected IDs:', res);
+                Swal.fire('Success', 'Selected contractors submitted successfully', 'success');
+            },
+            (error) => {
+                console.error('Error sending selected IDs:', error);
+                Swal.fire('Error', 'Failed to submit selected contractors', 'error');
+            }
+        );
+    }
+
 
 
     // autoUpdateLicenseStatus(): void {

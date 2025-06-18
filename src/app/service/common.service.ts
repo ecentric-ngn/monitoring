@@ -193,8 +193,10 @@ export class CommonService {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/save`, payload, { responseType: 'text' as 'json' });
   }
 
-  forwardToReviewCommitee(id: any) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/contractor/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
+  forwardToReviewCommitee(payload: any) {
+    return this.http.post(`${api_url_Monitoring_siteEngineer}/contractor/compliance/forward-to-committee`, payload, {
+      responseType: 'text'
+    });
   }
 
   forwardToReviewCommiteeConsultancy(id: any) {

@@ -96,9 +96,9 @@ onFilingReviewChange() {
       registrationReview: {
         bctaNo: this.data.contractorNo,
         firmName: this.data.nameOfFirm,
-        contactNo: this.data.mobileNo,
-        email: this.data.emailAddress,
-        classification: this.data.classificationDescription,
+        contactNo: this.formData.mobileNo,
+        email: this.formData.emailAddress,
+        classification: this.formData.classification,
         applicationStatus: this.data.status,
         officeSignboard: this.formData.signboardReview,
         signageResubmitDeadline: this.formData.signboardResubmitDate, // Fixed to match formData

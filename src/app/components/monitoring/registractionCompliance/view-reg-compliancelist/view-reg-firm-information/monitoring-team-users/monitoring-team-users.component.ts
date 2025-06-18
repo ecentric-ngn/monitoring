@@ -2,6 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonService } from '../../../../../../service/common.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
+import { switchMap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-monitoring-team-users',
@@ -46,44 +47,42 @@ export class MonitoringTeamUsersComponent implements OnInit {
     );
   }
 
-  onSubmit(monitoringForm: any) {
-    this.tableId = this.id; // Assign the input id to tableId at submit time
-    if (!this.tableId) {
-      console.error('No tableId available');
-      Swal.fire('Error', 'Missing required ID', 'error');
-      return;
-    }
 
-    // Prepare the payload as required
-    const payload = {
-      registrationReview: {
-        id: this.tableId,
-        reviewedDate: this.formData.reviewDate
-      }
-    };
+onSubmit(monitoringForm: any) {
+  this.tableId = this.id;
 
-    // Call the service with the payload (replace with your actual service method)
-    this.service.setData(payload, 'registrationReview', 'monitoring-review');
-
-    // Then forward to review committee
-    this.service.forwardToReviewCommitee(this.tableId).subscribe(
-      (res: any) => {
-        console.log('res', res);
-        Swal.fire({
-          icon: 'success',
-          title: 'Submission Successful',
-          text: `BCTA No ${this.tableId} forwarded to review committee.`,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.router.navigate(['/monitoring/RegFirmInformation']);
-          }
-        });
-      },
-      (error) => {
-        console.error('Error forwarding to committee:', error);
-        Swal.fire('success', 'Forwarded to review committee', 'success');
-       this.router.navigate(['/monitoring/RegFirmInformation']);
-      }
-    );
+  if (!this.tableId) {
+    console.error('No tableId available');
+    Swal.fire('Error', 'Missing required ID', 'error');
+    return;
   }
+
+  const payload = {
+    registrationReview: {
+      id: this.tableId,
+      reviewDate: this.formData.reviewDate
+    }
+  };
+
+  this.service.saveOfficeSignageAndDoc(payload).subscribe(
+    (res: any) => {
+      console.log('res', res);
+      Swal.fire({
+        icon: 'success',
+        title: 'Submission Successful',
+        text: `Details Saved Successfully!`,
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.router.navigate(['/monitoring/construction']);
+        }
+      });
+    },
+    (error) => {
+      console.error('Error during submission:', error);
+      Swal.fire('Error', 'Failed to complete submission', 'error');
+      this.router.navigate(['/monitoring/construction']);
+    }
+  );
+}
+
 }
