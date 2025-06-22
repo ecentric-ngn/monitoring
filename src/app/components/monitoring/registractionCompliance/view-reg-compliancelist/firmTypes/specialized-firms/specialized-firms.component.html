@@ -5,9 +5,10 @@
     <div class="row">
         <div class="col-md-4">
             <label class="form-label">Firm Type<span class="text-danger">*</span></label>
-            <select class="form-select" name="firmType" [(ngModel)]="formData.firmType" (ngModelChange)="onChangeFirmType($event)" required #firmType="ngModel">
+            <select class="form-select" name="firmType" [(ngModel)]="formData.firmType"
+                (ngModelChange)="onChangeFirmType($event)" required #firmType="ngModel">
                 <option value="" class="text-muted">Select Firm Type</option>
-                <option value="constructionFirm">CONSTRUCTIONS FIRMS</option>
+                <option value="constructionFirm">CONSTRUCTION FIRMS</option>
                 <option value="consultancyFirm">CONSULTANCY FIRMS</option>
                 <!-- <option value="specializedFirm">SPECIALIZED FIRMS</option> -->
                 <option value="certifiedBuilders">CERTIFIED BUILDERS</option>
@@ -37,18 +38,24 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
+                    <th>Select</th>
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
                     <th>Application Status</th>
-                    <th>Category</th>
                     <th>License Status</th>
+                    <th>Verified By</th>
+                    <th>Action</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let data of tableData" class="table-row">
+                    <td>
+                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
+                            [value]="data.specializedFirmNo" (change)="onCheckboxChange($event, data.id)">
+                    </td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus== 'Submitted'" (click)="navigate(data)">
+                        [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'" (click)="navigate(data)">
                         {{ data.specializedFirmNo }}
                     </td>
                     <td>{{ data.nameOfFirm }}</td>
@@ -58,96 +65,151 @@
                             'badge-secondary': data.applicationStatus== 'Not Submitted',
                             'badge-warning': data.applicationStatus== 'In Process',
                             'badge-success': data.applicationStatus== 'Verified',
-                            'badge-primary': data.applicationStatus== 'Submitted'
+                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'
                             }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
-                    <td>{{ data.category }}</td>
                     <td>{{ data.licenseStatus }}</td>
-                    <!-- <td>
-                        <div *ngIf="data.status === 'Not Submitted'">
-                            <div *ngIf="data.isEditing; else viewMode">
-                                <textarea [(ngModel)]="data.notification" rows="2" class="notification-textarea"
-                                    placeholder="Enter message..."></textarea>
-                                <button (click)="saveNotification(data.id)">💾</button>
-                                <button (click)="cancelEdit(data.id)">❌</button>
-                            </div>
-                            <ng-template #viewMode>
-                                <div class="view-mode">
-                                    <div *ngIf="data.notification; else noNote">
-                                        <span>{{ data.notification }}</span>
-                                    </div>
-                                    <ng-template #noNote>
-                                        <span class="no-notification">Click to add message</span>
-                                    </ng-template>
-                                    <button (click)="toggleEditNotification(data.id)">✏️</button>
-                                </div>
-                            </ng-template>
-                        </div>
-                    </td> -->
 
-                    <!-- <td class="text-bold pointer-event" [ngClass]="{ 'text-primary': app.status === 'Not Submitted' }"
-                        (click)="navigate(app)">
-                        {{ app.bctaNo }}
-                    </td>
-                    <td>{{ app.firmName }}</td>
-                    <td>{{ app.submittedOn || '-' }}</td>
                     <td>
-                        <span class="status-badge" [ngClass]="getStatusClass(app.status)">
-                            <ng-container [ngSwitch]="app.status">
-                                <span *ngSwitchCase="'Verified'">Verified</span>
-                                <span *ngSwitchCase="'In Process'">In Process</span>
-                                <span *ngSwitchCase="'Not Submitted'">Not Submitted</span>
-                            </ng-container>
-                        </span>
+                        <span *ngIf="data.applicationStatus === 'Verified'">Bilana Ghalley</span>
+                        <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
-                    <td>
-                        <span class="license-badge" [ngClass]="getLicenseStatusClass(app.licenseStatus)">
-                            {{ app.licenseStatus }}
-                        </span>
-                    </td>
-                    <td>
-                        <span *ngIf="app.verifiedBy; else noVerifier"> {{ app.verifiedBy }}</span>
-                        <ng-template #noVerifier><span>-</span></ng-template>
-                    </td>
-                    <td> -->
-                    <!-- Editable Notification -->
-                    <!-- <div *ngIf="app.status === 'Not Submitted'">
-                            <div *ngIf="app.isEditing; else viewMode">
-                                <textarea [(ngModel)]="app.notification" rows="2" class="notification-textarea"
-                                    placeholder="Enter message..."></textarea>
-                                <button (click)="saveNotification(app.id)">💾</button>
-                                <button (click)="cancelEdit(app.id)">❌</button>
-                            </div>
-                            <ng-template #viewMode>
-                                <div class="view-mode">
-                                    <div *ngIf="app.notification; else noNote">
-                                        <span>{{ app.notification }}</span>
-                                    </div>
-                                    <ng-template #noNote>
-                                        <span class="no-notification">Click to add message</span>
-                                    </ng-template>
-                                    <button (click)="toggleEditNotification(app.id)">✏️</button>
-                                </div>
-                            </ng-template>
-                        </div> -->
 
-                    <!-- Readonly Notification -->
-                    <!-- <div *ngIf="app.status !== 'Not Submitted'">
-                            <span *ngIf="app.notification; else noNoteReadonly">{{ app.notification }}</span>
-                            <ng-template #noNoteReadonly><span>-</span></ng-template>
+                    <td>
+                        <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
+                        <div *ngIf="data.licenseStatus === 'Suspended'">
+                            <button class="btn btn-danger btn-sm" (click)="reinstate(data)">Reinstate</button>
                         </div>
-                    </td> -->
+                    </td>
+
+                </tr>
+                <tr *ngIf="tableData.length === 0">
+                    <td colspan="10" class="text-center text-muted">No data available</td>
                 </tr>
             </tbody>
         </table>
 
-        <!-- Empty State -->
-        <!-- <div *ngIf="filteredApplications.length === 0" class="empty-state">
-            <div class="empty-icon">🔍</div>
-            <h3>No applications found</h3>
-            <p>Try adjusting your search or filters.</p>
-        </div> -->
+         <div class="text-end" *ngIf="selectedIds.length !== 0">
+            <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>
+        </div>
+
+    </div>
+</div>
+
+
+<!-- Action Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form #actionForm="ngForm">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="actionModalLabel">Take Action</h5>
+                    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Action Type<span class="text-danger">*</span></label>
+                            <select class="form-select" [(ngModel)]="selectedAction.actionType" name="actionType"
+                                required (change)="onActionTypeChange()">
+                                <option value="">-- Select --</option>
+                                <option value="cancel">Cancel</option>
+                                <option value="downgrade">Downgrade</option>
+                                <option value="suspend">Suspend</option>
+                            </select>
+                        </div>
+
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Action Date<span class="text-danger">*</span></label>
+                            <input type="date" class="form-control" [(ngModel)]="selectedAction.actionDate"
+                                name="actionDate" required>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Remarks<span class="text-danger">*</span></label>
+                        <textarea rows="3" class="form-control" [(ngModel)]="selectedAction.remarks" name="remarks"
+                            required></textarea>
+                    </div>
+
+                    <!-- Downgrade Table -->
+                    <div *ngIf="selectedAction.actionType === 'downgrade'" class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Work Category</th>
+                                    <th>Existing Class</th>
+                                    <th>New Class</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                                    <td>{{ downgrade.workCategory }}</td>
+                                    <td>{{ downgrade.existingClass }}</td>
+                                    <td>
+                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
+                                            [name]="'newClass_' + downgrade.workCategory" required>
+                                            <option value="">-- Select --</option>
+                                            <option *ngFor="let option of getClassOptions(downgrade.existingClass)"
+                                                [value]="option.value">
+                                                {{ option.label }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                </tr> -->
+
+                                <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                                    <td>{{ downgrade.workCategory }}</td>
+                                    <td>{{ downgrade.existingClass }}</td>
+
+                                    <td *ngIf="downgrade.existingClass === 'L-Large'">
+                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
+                                            [name]="'newClass_' + downgrade.workCategory" required>
+                                            <option value="">-- Select --</option>
+                                            <option value="M-Medium">M-Medium</option>
+                                            <option value="S-Small">S-Small</option>
+                                        </select>
+                                    </td>
+
+                                    <td *ngIf="downgrade.existingClass === 'M-Medium'">
+                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
+                                            [name]="'newClass_' + downgrade.workCategory" required>
+                                            <option value="">-- Select --</option>
+                                            <option value="S-Small">S-Small</option>
+                                        </select>
+                                    </td>
+
+                                    <td *ngIf="downgrade.existingClass === 'S-Small'">
+                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
+                                            [name]="'newClass_' + downgrade.workCategory" required>
+                                            <option value="">-- Select --</option>
+                                            <option value="S-Small">S-Small</option>
+                                        </select>
+                                    </td>
+
+                                    <td
+                                        *ngIf="downgrade.existingClass !== 'L-Large' && downgrade.existingClass !== 'M-Medium' && downgrade.existingClass !== 'S-Small'">
+                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
+                                            [name]="'newClass_' + downgrade.workCategory" required>
+                                            <option value="">-- Select --</option>
+                                        </select>
+                                    </td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" (click)="closeModal()"
+                        data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
+                </div>
+            </form>
+        </div>
     </div>
 </div>

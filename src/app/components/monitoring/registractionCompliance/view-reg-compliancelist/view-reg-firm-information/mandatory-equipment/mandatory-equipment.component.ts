@@ -24,8 +24,9 @@ export class MandatoryEquipmentComponent {
   tableData: any
   @Input() id: string = ''
   data: any;
+  applicationStatus: string = '';
 
-  constructor(private service: CommonService,  private router: Router){}
+  constructor(private service: CommonService, private router: Router) { }
 
   ngOnInit() {
     console.log('id', this.id);
@@ -33,12 +34,11 @@ export class MandatoryEquipmentComponent {
     this.formData = {
       equipmentType: '',
       requiredEquipment: '',
-      categoryOfService: 'Auto-generated category',
+      categoryOfService: '',
       equipmentDeployed: '',
-      remarks: '',
-      fulfillsRequirement: '',
-      lastDateToResubmit: '',
-      remarksIfNo: ''
+      finalRemarks: '',
+      resubmitDate: '',
+      resubmitRemarks: '',
     };
     // Set the id from input
     this.id = this.id;
@@ -49,6 +49,7 @@ export class MandatoryEquipmentComponent {
     }
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.contractorNo;
+    this.applicationStatus = WorkDetail.data.applicationStatus;
     this.data = WorkDetail.data;
     console.log('WorkDetail', WorkDetail);
     console.log('bctaNo', this.bctaNo);
@@ -82,16 +83,16 @@ export class MandatoryEquipmentComponent {
   saveAndNext() {
     const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
     this.tableId = this.id;
-     const eq = this.tableData.map((item: any) => ({
-      "equipmentType": item.equipmentName,
+    const eq = this.tableData.map((item: any) => ({
       "isRegistered": item.equipmentType,
+      "vehicleType": item.vehicleType,
       "registrationNo": item.registrationNo,
-      "equipmentDeployed": "string",
-      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement, // fixed here
-      "resubmitDeadline": this.formData.ResubmitDate, // fixed here
-      "deadlineRemarks": this.formData.resubmitRemarks, // fixed here
-      "remarks": "string",
-      "edremarks": "string" }));
+      "ownerName": item.ownerName,
+      "ownerCid": item.ownerCid,
+      "equipmentType": item.equipmentName,
+      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
+      "remarks": this.formData.finalRemarks,
+    }));
 
     const payload = {
       registrationReview: { id: this.tableId },
@@ -105,42 +106,77 @@ export class MandatoryEquipmentComponent {
   }
 
   notifyContractor() {
-  const table = this.service.setData(this.id, 'tableId', 'office-signage');
-  this.tableId = this.id;
+    const table = this.service.setData(this.id, 'tableId', 'office-signage');
+    this.tableId = this.id;
 
-   const eq = this.tableData.map((item: any) => ({
-      "equipmentType": item.vehicleType,
-      "requiredEquipment": "string",
-      "categoryOfService": "string",
-      "equipmentDeployed": "string",
-      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement, // fixed here
-      "resubmitDeadline": this.formData.ResubmitDate, // fixed here
-      "deadlineRemarks": this.formData.resubmitRemarks, // fixed here
-      "remarks": "string",
-      "edremarks": "string" }));
+    const eq = this.tableData.map((item: any) => ({
+      "isRegistered": item.equipmentType,
+      "vehicleType": item.vehicleType,
+      "registrationNo": item.registrationNo,
+      "ownerName": item.ownerName,
+      "ownerCid": item.ownerCid,
+      "equipmentType": item.equipmentName,
+      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
+      "resubmitDeadline": this.formData.resubmitDate,
+      "deadlineRemarks": this.formData.resubmitRemarks,
+      "remarks": this.formData.finalRemarks,
+    }));
 
-  const payload = {
-     registrationReview: { id: this.tableId },
+    const payload = {
+      registrationReview: { id: this.tableId },
+      
       equipmentReviews: eq
-  };
+    };
+
+    this.service.saveOfficeSignageAndDoc(payload).subscribe({
+      next: (res: any) => {
+        Swal.fire({
+          title: 'Requirements Not Met',
+          text: 'The contractor has been notified to resubmit the form',
+          icon: 'warning',
+          confirmButtonText: 'OK'
+        });
+        this.router.navigate(['monitoring/construction']);
+      },
+      error: (error) => {
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to notify contractor',
+          icon: 'error'
+        });
+      }
+    });
+  }
+
+  update() {
+    const payload = {
+      registrationReview: { bctaNo: this.bctaNo },
+      equipmentReviews: [{
+        mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
+       resubmitDeadline: this.formData.resubmitDate,
+       resubmitRemarks: this.formData.resubmitRemarks
+      }]
+    };
   
-  this.service.saveOfficeSignageAndDoc(payload).subscribe({
-    next: (res: any) => {
-      Swal.fire({
-        title: 'Requirements Not Met',
-        text: 'The contractor has been notified to resubmit the form',
-        icon: 'warning',
-        confirmButtonText: 'OK'
-      });
-      this.router.navigate(['monitoring/construction']);
-    },
-    error: (error) => {
-      Swal.fire({
-        title: 'Error',
-        text: 'Failed to notify contractor',
-        icon: 'error'
-      });
-    }
-  });
-}
+    this.service.saveOfficeSignageAndDoc(payload).subscribe({
+      next: (res: any) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated successfully!',
+          showConfirmButton: false,
+          timer: 2000
+        }).then(() => {
+          this.router.navigate(['monitoring/construction']);
+        });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Update failed!',
+          text: err?.error?.message || 'Something went wrong. Please try again.',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
 }

@@ -9,18 +9,13 @@ import Swal from 'sweetalert2';
   styleUrls: ['./cb-mandatory-equipment.component.scss']
 })
 export class CbMandatoryEquipmentComponent {
-  formData: any = {
-  
-    };
+  formData: any = {};
     @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
-    equipmentMasterList = [
-      { id: 'eq1', name: 'Excavator' },
-      { id: 'eq2', name: 'Bulldozer' },
-      { id: 'eq3', name: 'Concrete Mixer' }
-    ];
-    firmType: any
-    bctaNo: any
-    tableData: any
+    firmType: any;
+    bctaNo: any;
+    tableData: any;
+    applicationStatus: string = '';
+
     @Input() id: string = ''
   
     constructor(@Inject(CommonService) private service: CommonService,  private router: Router){}
@@ -29,21 +24,20 @@ export class CbMandatoryEquipmentComponent {
       console.log('id', this.id);
       // Initialize formData with default values
       this.formData = {
-        equipmentType: '',
+        vehicleType: '',
         requiredEquipment: '',
-        categoryOfService: 'Auto-generated category',
-        equipmentDeployed: '',
-        remarks: '',
+        finalRemarks: '',
         fulfillsRequirement: '',
-        lastDateToResubmit: '',
-        remarksIfNo: ''
+        resubmitRemarks: '',
+        resubmitDate:''
       };
       // Set the id from input
   
       this.id = this.id
       const WorkDetail = this.service.getData('BctaNo');
-      this.formData.firmType = WorkDetail.data
-      this.bctaNo = WorkDetail.data.certifiedBuilderNo
+      this.formData.firmType = WorkDetail.data;
+      this.bctaNo = WorkDetail.data.certifiedBuilderNo;
+      this.applicationStatus = WorkDetail.data.applicationStatus;
       if (this.bctaNo) {
         this.fetchDataBasedOnBctaNo()
       }
@@ -71,70 +65,110 @@ export class CbMandatoryEquipmentComponent {
     }
   
     tableId: any
-    saveAndNext() {
-      const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
-      this.tableId = this.id;
-      // const eq = this.tableData.map((item: any) => ({
-      //   isRegistered: 'true',
-      //   vehicleType: item.vehicleType,
-      //   registrationNo: item.vehicleNumber,
-      //   ownerName: item.owner,
-      //   ownerCid: item.vehicleType,
-      //   equipmentType: item.vehicleType,
-      //   mandatoryEquipmentFulfilled: 'true',
-      //   resubmitDeadline: '2023-09-01',
-      //   remarks: this.formData.remarks, // fixed here
-      // }));
-      const payload = {
-        cbReviewDto: { id: this.tableId },
-        cbEquipmentReviewDto: [
-          {
-            equipmentDescription: "Heavy Earth Moving Equipment",
-            requiredEquipment: "Excavator",
-            requiredEquipmentFulfilled: this.formData.fulfillsRequirement,
-            remark: this.formData.resubmitRemarks,
-          }
-        ]
-      };
-      this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
-        console.log('res', res);
-        // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
-        this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
-      });
-    }
   
-    notifyContractor() {
-    const table = this.service.setData(this.id, 'tableId', 'office-signage');
+    saveAndNext() {
+    const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
     this.tableId = this.id;
+
+    const eq = this.tableData.map((item: any) => ({
+       "isRegistered": item.equipmentType,
+      "vehicleType": item.vehicleType,
+      "registrationNo": item.registrationNo,
+      "ownerName": item.ownerName,
+      "ownerCid": item.ownerCid,
+      "equipmentType": item.equipmentName,
+      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
+      "remarks": this.formData.finalRemarks,
+    }));
+
     const payload = {
-       cbReviewDto: { id: this.tableId },
-          cbEquipmentReviewDto: [
-            {
-            equipmentDescription: "Heavy Earth Moving Equipment",
-            requiredEquipment: "Excavator",
-            requiredEquipmentFulfilled: this.formData.fulfillsRequirement,
-            remark: this.formData.resubmitRemarks,
-            }
-          ]
-    };
-    
-    this.service.saveOfficeSignageAndDocCB(payload).subscribe({
-      next: (res: any) => {
-        Swal.fire({
-          title: 'Requirements Not Met',
-          text: 'The Firm has been notified to resubmit the form',
-          icon: 'warning',
-          confirmButtonText: 'OK'
-        });
-        this.router.navigate(['monitoring/cerified-builders']);
+      cbReviewDto: {
+        id: this.tableId,
       },
-      error: (error) => {
-        Swal.fire({
-          title: 'Error',
-          text: 'Failed to notify contractor',
-          icon: 'error'
-        });
-      }
+      cbEquipmentReviewDto: eq
+    };
+    this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
+      console.log('res', res);
+      // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
+      console.log('Emitting cbMonitoring', this.tableId);
+
+      this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
     });
   }
+
+  notifyContractor() {
+      const table = this.service.setData(this.id, 'tableId', 'office-signage');
+      this.tableId = this.id;
+  
+      const eq = this.tableData.map((item: any) => ({
+      "isRegistered": item.equipmentType,
+      "vehicleType": item.vehicleType,
+      "registrationNo": item.registrationNo,
+      "ownerName": item.ownerName,
+      "ownerCid": item.ownerCid,
+      "equipmentType": item.equipmentName,
+      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
+      "resubmitDeadline": this.formData.resubmitDate,
+      "deadlineRemarks": this.formData.resubmitRemarks,
+      "remarks": this.formData.finalRemarks,
+      }));
+  
+      const payload = {
+        cbReviewDto: {
+          id: this.tableId,
+        },
+        cbEquipmentReviewDto: eq
+      };
+  
+      this.service.saveOfficeSignageAndDocCB(payload).subscribe({
+        next: (res: any) => {
+          Swal.fire({
+            title: 'Requirements Not Met',
+            text: 'The firm has been notified to resubmit the form',
+            icon: 'warning',
+            confirmButtonText: 'OK'
+          });
+          this.router.navigate(['monitoring/cerified-builders']);
+        },
+        error: (error) => {
+          Swal.fire({
+            title: 'Error',
+            text: 'Failed to notify firm',
+            icon: 'error'
+          });
+        }
+      });
+    }
+
+    update() {
+        const payload = {
+          cbReviewDto: { bctaNo: this.bctaNo },
+          cbEquipmentReviewDto: [{
+            mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
+           resubmitDeadline: this.formData.resubmitDate,
+           resubmitRemarks: this.formData.resubmitRemarks
+          }]
+        };
+      
+        this.service.saveOfficeSignageAndDocCB(payload).subscribe({
+          next: (res: any) => {
+            Swal.fire({
+              icon: 'success',
+              title: 'Updated successfully!',
+              showConfirmButton: false,
+              timer: 2000
+            }).then(() => {
+              this.router.navigate(['monitoring/certified']);
+            });
+          },
+          error: (err) => {
+            Swal.fire({
+              icon: 'error',
+              title: 'Update failed!',
+              text: err?.error?.message || 'Something went wrong. Please try again.',
+              confirmButtonText: 'OK'
+            });
+          }
+        });
+      }
 }

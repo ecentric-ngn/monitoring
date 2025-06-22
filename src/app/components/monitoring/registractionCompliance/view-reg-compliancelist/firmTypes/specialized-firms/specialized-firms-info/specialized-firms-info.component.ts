@@ -8,7 +8,10 @@ import { CommonService } from 'src/app/service/common.service';
 })
 export class SpecializedFirmsInfoComponent {
 formData: any = {};
-  bctaNo: any
+  bctaNo: any;
+  applicationStatus: string = '';
+  activeTabId: string = 'sfemployee';
+
   constructor(@Inject(CommonService) private service: CommonService) { }
 
   ngOnInit(): void {
@@ -19,6 +22,7 @@ formData: any = {};
       return;
     }
 
+    this.applicationStatus = WorkDetail.data.applicationStatus;
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.specializedFirmNo;
 
@@ -29,8 +33,6 @@ formData: any = {};
       this.fetchDataBasedOnBctaNo();
     }
   }
-
-  activeTabId: string = 'sfemployee'; // default tab
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {

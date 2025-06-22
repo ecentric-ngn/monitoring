@@ -2,7 +2,7 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Agency_api_url, api_url, api_url_Monitoring, api_url_Monitoring_siteEngineer, fileUpload_api, fileUpload_api_url_Monitoring, g2c_url, otp_api_url, userManagmentAPI, web_service_url } from "../app.const/const";
 import { NavigationExtras, Router } from "@angular/router";
-import { Observable } from "rxjs";
+import { catchError, map, Observable, throwError } from "rxjs";
 
 @Injectable({
   providedIn: "root",
@@ -389,6 +389,16 @@ export class CommonService {
     return this.http.get(`${g2c_url}/compliance/full/${bctaNo}`);
   }
 
+  // download file
+  downloadFileFirm(filePath: string): Observable<any> {
+    const params = new HttpParams().set('path', filePath);
+
+    return this.http.get(`${g2c_url}/compliance/download`, {
+      params: params,
+      responseType: 'blob',
+      observe: 'response'
+    });
+  }
 
 
 
@@ -424,6 +434,196 @@ export class CommonService {
   getVehicleDetails(vehicleNo: any, vehicleType: string) {
     return this.http.get(`${web_service_url}/getVehicleDetails/${vehicleNo}/${vehicleType}`);
   }
+
+  getWorkCategory(type: string) {
+    const params = new HttpParams().set('type', type);
+    return this.http.get<any>(
+      `${api_url_Monitoring_siteEngineer}/classification/workCategoryClassification`,
+      { params }
+    );
+  }
+
+
+  getClassification(firmType: string, firmId: string) {
+    const params = new HttpParams()
+      .set('firmType', firmType)
+      .set('firmId', firmId);
+
+    return this.http.get<any>(
+      `${api_url_Monitoring_siteEngineer}/classification/all-existing-classifications`,
+      { params }
+    );
+  }
+
+  reinstateLicense(payload: any) {
+    return this.http.post(`${api_url_Monitoring_siteEngineer}/status/license-status/update`, payload, { responseType: 'text' });
+  }
+
+  // getReinstateApplication(firmId: string) {
+  //   return this.http.get<any>(`${g2c_url_2}/compliance/suspensionFirm/${firmId}`);
+  // }
+
+  downgradeFirm(payload: any) {
+    return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/downgrade/request`, payload, { responseType: 'text' });
+  }
+
+  cancelFirm(payload: any) {
+    return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/firm/cancel`, payload, { responseType: 'text' });
+  }
+
+  suspendFirm(payload: any) {
+    return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/firm/suspend`, payload);
+  }
+
+  getDatabasedOnReviewAction() {
+    return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/classification/review-actions/suspensions`);
+
+  }
+  endorseApplications(payload: { suspensionIds: number[], reviewedBy: string }): Observable<string> {
+    return this.http.post(
+      `${api_url_Monitoring_siteEngineer}/classification/endorse-suspensions`,
+      payload,
+      {
+        responseType: 'text' as const,  // Crucial for text responses
+        observe: 'response'  // Get full response object
+      }
+    ).pipe(
+      map(response => {
+        // Return the response body text
+        return response.body || 'Suspensions endorsed successfully';
+      }),
+      catchError(error => {
+        // Convert HttpErrorResponse to error message string
+        let errorMessage = 'Failed to forward applications';
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error
+          errorMessage = error.error.message;
+        } else {
+          // Server-side error
+          errorMessage = error.error || error.message;
+        }
+        return throwError(errorMessage);
+      })
+    );
+  }
+
+  getDownGradeDetails() {
+    return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/classification/review-actions/downgrades`);
+
+  }
+  DownGradeApplications(payload: { downgradeIds: number[], reviewedBy: string }): Observable<string> {
+    return this.http.post(
+      `${api_url_Monitoring_siteEngineer}/classification/downgrade/endorse`,
+      payload,
+      {
+        responseType: 'text' as const,  // Expect text response
+        observe: 'response'  // Get full response object
+      }
+    ).pipe(
+      map(response => {
+        // Return the response body text or default success message
+        return response.body || 'Applications downgraded successfully';
+      }),
+      catchError(error => {
+        // Convert HttpErrorResponse to error message string
+        let errorMessage = 'Failed to downgrade applications';
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error (network issues, etc.)
+          errorMessage = `Client error: ${error.error.message}`;
+        } else {
+          // Server-side error (4xx, 5xx responses)
+          errorMessage = error.error || error.message || `Server error: ${error.status} ${error.statusText}`;
+        }
+        return throwError(errorMessage);
+      })
+    );
+  }
+
+  getCancelApplication() {
+    return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/classification/cancellations`);
+  }
+  CancelApplications(payload: { cancellationIds: number[], reviewedBy: string }): Observable<string> {
+    return this.http.post(
+      `${api_url_Monitoring_siteEngineer}/classification/endorse-cancellations`,
+      payload,
+      {
+        responseType: 'text' as const,  // Expect text response
+        observe: 'response'  // Get full response object
+      }
+    ).pipe(
+      map(response => {
+        // Return the response body text or default success message
+        return response.body || 'Applications downgraded successfully';
+      }),
+      catchError(error => {
+        // Convert HttpErrorResponse to error message string
+        let errorMessage = 'Failed to downgrade applications';
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error (network issues, etc.)
+          errorMessage = `Client error: ${error.error.message}`;
+        } else {
+          // Server-side error (4xx, 5xx responses)
+          errorMessage = error.error || error.message || `Server error: ${error.status} ${error.statusText}`;
+        }
+        return throwError(errorMessage);
+      })
+    );
+  }
+  suspendApplications(payload: { cdbNos: string[]; firmType: string }): Observable<string> {
+    return this.http.post(
+      `${g2c_url}/compliance/suspend`,
+      payload,
+      {
+        responseType: 'text' as const,  // Expect text response
+        observe: 'response'  // Get full response object
+      }
+    ).pipe(
+      map(response => {
+        // Return the response body text or default success message
+        return response.body || 'Applications suspended successfully';
+      }),
+      catchError(error => {
+        // Convert HttpErrorResponse to error message string
+        let errorMessage = 'Failed to suspend applications';
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error (network issues, etc.)
+          errorMessage = `Client error: ${error.error.message}`;
+        } else {
+          // Server-side error (4xx, 5xx responses)
+          errorMessage = error.error || error.message || `Server error: ${error.status} ${error.statusText}`;
+        }
+        return throwError(errorMessage);
+      })
+    );
+  }
+  cancelApplications(payload: { cdbNos: string[]; firmType: string }): Observable<string> {
+    return this.http.post(
+      `${g2c_url}/compliance/cancel`,
+      payload,
+      {
+        responseType: 'text' as const,  // Expect text response
+        observe: 'response'  // Get full response object
+      }
+    ).pipe(
+      map(response => {
+        // Return the response body text or default success message
+        return response.body || 'Applications suspended successfully';
+      }),
+      catchError(error => {
+        // Convert HttpErrorResponse to error message string
+        let errorMessage = 'Failed to suspend applications';
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error (network issues, etc.)
+          errorMessage = `Client error: ${error.error.message}`;
+        } else {
+          // Server-side error (4xx, 5xx responses)
+          errorMessage = error.error || error.message || `Server error: ${error.status} ${error.statusText}`;
+        }
+        return throwError(errorMessage);
+      })
+    );
+  }
+
 }
 
 function specilizedFirmNotifyingMonitoringCommittee(ids: number[], arg1: any) {

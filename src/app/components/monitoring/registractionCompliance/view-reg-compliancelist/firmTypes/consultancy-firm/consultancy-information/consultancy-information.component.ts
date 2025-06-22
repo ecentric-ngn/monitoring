@@ -8,10 +8,28 @@ import { CommonService } from '../../../../../../../service/common.service';
 })
 export class ConsultancyInformationComponent implements OnInit {
   formData: any = {};
-  bctaNo: any
+  bctaNo: any;
+  applicationStatus: string = '';
+  activeTabId: string = '';
+
   constructor(@Inject(CommonService) private service: CommonService) { }
 
   ngOnInit(): void {
+
+    const status = this.applicationStatus;
+
+    if (status === 'Resubmitted OS') {
+      this.activeTabId = 'office';
+    } else if (status === 'Resubmitted PFS') {
+      this.activeTabId = 'office';
+    } else if (status === 'Resubmitted HR') {
+      this.activeTabId = 'employee';
+    } else if (status === 'Resubmitted EQ') {
+      this.activeTabId = 'equipment';
+    } else if (status === 'Resubmitted OS and PFS') {
+      this.activeTabId = 'office';
+    }
+    
     const WorkDetail = this.service.getData('BctaNo');
 
     if (!WorkDetail || !WorkDetail.data) {
@@ -19,6 +37,7 @@ export class ConsultancyInformationComponent implements OnInit {
       return;
     }
 
+    this.applicationStatus = WorkDetail.data.applicationStatus;
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.consultantNo;
 
@@ -29,8 +48,6 @@ export class ConsultancyInformationComponent implements OnInit {
       this.fetchDataBasedOnBctaNo();
     }
   }
-
-  activeTabId: string = 'consultancyOffice'; // default tab
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {

@@ -10,6 +10,13 @@ $gutter: 1rem; //for primeflex grid system
 @import "assets/demo/styles/flags/flags.css";
 @import "assets/demo/styles/badges.scss";
 @import "assets/demo/styles/code.scss";
+
+.scroll-wrapper {
+  max-height: 80vh; /* or 100vh, adjust as needed */
+  overflow-y: auto;
+  padding: 16px;
+}
+
 /* Style for Prev button */
 .prev-btn {
     background-color: #f4c273;

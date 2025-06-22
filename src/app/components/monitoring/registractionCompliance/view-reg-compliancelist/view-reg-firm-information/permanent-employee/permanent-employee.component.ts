@@ -1,5 +1,7 @@
 import { Component, EventEmitter, Input, Output, SimpleChanges } from '@angular/core';
 import { CommonService } from '../../../../../../service/common.service';
+import { Router } from '@angular/router';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-permanent-employee',
@@ -13,7 +15,9 @@ export class PermanentEmployeeComponent {
   tableData: any;
   @Input() id: string = '';
   data: any;
-  constructor(private service: CommonService) { }
+  applicationStatus: string = '';
+
+  constructor(private service: CommonService, private router: Router) { }
 
   ngOnInit() {
     const WorkDetail = this.service.getData('BctaNo');
@@ -25,6 +29,7 @@ export class PermanentEmployeeComponent {
 
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.contractorNo;
+    this.applicationStatus = WorkDetail.data.applicationStatus;
     this.data = WorkDetail.data;
 
     console.log('WorkDetail', WorkDetail);
@@ -45,6 +50,42 @@ export class PermanentEmployeeComponent {
   fetchTdsHcPension() {
   }
 
+  downloadFile(filePath: string) {
+    this.service.downloadFileFirm(filePath).subscribe({
+      next: (response) => {
+        this.handleFileDownload(response);
+      },
+      error: (error) => {
+        console.error('Download failed:', error);
+        // Handle error (show toast/message to user)
+      }
+    });
+  }
+
+  private handleFileDownload(response: any) {
+    // Extract filename from content-disposition header if available
+    let filename = 'document.pdf'; // default filename
+    const contentDisposition = response.headers.get('content-disposition');
+
+    if (contentDisposition) {
+      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+      if (filenameMatch && filenameMatch.length > 1) {
+        filename = filenameMatch[1];
+      }
+    }
+
+    // Create download link
+    const blob = new Blob([response.body], { type: response.headers.get('content-type') });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+  }
+
   tableId: any
 
   saveAndNext() {
@@ -53,9 +94,6 @@ export class PermanentEmployeeComponent {
     const hr = this.tableData.map((item: any) => ({
       cidNo: item.cId,
       fullName: item.name,
-      mobileNo: item.mobileNo,
-      designation: item.designationName,
-      email: item.email,
       gender: item.sex,
       nationality: item.countryName,
       qualification: item.qualification,
@@ -65,13 +103,13 @@ export class PermanentEmployeeComponent {
       paySlip: item.paySlipFileName,
       hrFulfilled: this.formData.hrFulfilled,
       resubmitDeadline: this.formData.resubmitDate,
-      deadlineRemarks: this.formData.remarksNo,
+      resubmitRemarks: this.formData.remarksNo,
       remarks: this.formData.remarksYes,
-      psremarks: ""
+      tdsFetched: true
     }));
     const payload = {
 
-      registrationReview: { id: this.tableId }, // fixed here
+      registrationReview: { id: this.tableId },
       employeeReviews: hr
 
     };
@@ -86,30 +124,63 @@ export class PermanentEmployeeComponent {
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
 
     this.tableId = this.id;
+    const hr = this.tableData.map((item: any) => ({
+      cidNo: item.cId,
+      fullName: item.name,
+      gender: item.sex,
+      nationality: item.countryName,
+      qualification: item.qualification,
+      // joiningDate:  item.joiningDate, encountered an issue with date format
+      joiningDate: "2024-01-01",
+      tradeField: item.tradeName,
+      paySlip: item.paySlipFileName,
+      hrFulfilled: this.formData.hrFulfilled,
+      resubmitDeadline: this.formData.resubmitDate,
+      resubmitRemarks: this.formData.remarksNo,
+      remarks: this.formData.remarksYes,
+      tdsFetched: true
+    }));
     const payload = {
-      registrationReview: { id: this.tableId }, // fixed here
-      // employeeReviews: hr
-      employeeReviews: [
-        {
-          cidNo: this.data.cId,
-          fullName: this.data.name,
-          gender: this.data.sex,
-          nationality: this.data.countryName,
-          qualification: this.data.qualification,
-          joiningDate: this.data.joiningDate || "2025-06-12", // default date if not provided
-          tradeField: this.data.tradeName, // fixed here
-          paySlip: this.data.paySlipFileName || "paySlipFileName.pdf", // default value if not provided
-          hrFulfilled: this.formData.hrFulfilled,
-          resubmitDeadline: this.formData.resubmitDate,
-          remarks: "Requirements not met!",
-          tdsFetched: true
-        }
-      ]
+
+      registrationReview: { id: this.tableId },
+      employeeReviews: hr
+
     };
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
       console.log('res', res);
-      //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       this.activateTab.emit({ id: this.tableId, tab: 'equipment' });
+    });
+  }
+
+  update() {
+    const payload = {
+      registrationReview: { bctaNo: this.bctaNo },
+      employeeReviews: [{
+        hrFulfilled: this.formData.hrFulfilled,
+        resubmitDeadline: this.formData.resubmitDate,
+        resubmitRemarks: this.formData.remarksNo,
+      }]
+    };
+
+    this.service.saveOfficeSignageAndDoc(payload).subscribe({
+      next: (res: any) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated successfully!',
+          showConfirmButton: false,
+          timer: 2000
+        }).then(() => {
+          this.router.navigate(['monitoring/construction']);
+        });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Update failed!',
+          text: err?.error?.message || 'Something went wrong. Please try again.',
+          confirmButtonText: 'OK'
+        });
+      }
     });
   }
 

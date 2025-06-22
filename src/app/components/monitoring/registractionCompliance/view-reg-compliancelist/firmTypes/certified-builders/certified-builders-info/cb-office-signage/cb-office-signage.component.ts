@@ -1,6 +1,7 @@
 import { Component, EventEmitter, Inject, Output } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonService } from 'src/app/service/common.service';
+import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-cb-office-signage',
@@ -8,10 +9,12 @@ import { CommonService } from 'src/app/service/common.service';
   styleUrls: ['./cb-office-signage.component.scss']
 })
 export class CbOfficeSignageComponent {
-formData: any = {}
+  formData: any = {}
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
   bctaNo: any;
-  data: any
+  data: any;
+  applicationStatus: string = '';
+
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
   ngOnInit() {
@@ -25,7 +28,7 @@ formData: any = {}
 
     this.formData.firmType = WorkDetail.data;
     this.data = WorkDetail.data;
-
+    this.applicationStatus = WorkDetail.data.applicationStatus;
     console.log('Checking cdbNo from WorkDetail.data:', WorkDetail.data.certifiedBuilderNo);
     this.bctaNo = WorkDetail.data.certifiedBuilderNo;
 
@@ -36,7 +39,6 @@ formData: any = {}
       console.warn('bctaNo is undefined or null. Skipping API call.');
     }
   }
-
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
@@ -52,6 +54,120 @@ formData: any = {}
     }
   }
 
+  // Handle review change
+  onFilingReviewChange() {
+    if (this.formData.filingReview === 'No') {
+      // Reset fields when switching to "No"
+      this.formData.filingResubmitDate = null;
+      this.formData.filingRemarks = '';
+    }
+  }
+
+  downloadFile(filePath: string) {
+      this.service.downloadFileFirm(filePath).subscribe({
+        next: (response) => {
+          this.handleFileDownload(response);
+        },
+        error: (error) => {
+          console.error('Download failed:', error);
+          // Handle error (show toast/message to user)
+        }
+      });
+    }
+  
+    private handleFileDownload(response: any) {
+      // Extract filename from content-disposition header if available
+      let filename = 'document.pdf'; // default filename
+      const contentDisposition = response.headers.get('content-disposition');
+  
+      if (contentDisposition) {
+        const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
+        if (filenameMatch && filenameMatch.length > 1) {
+          filename = filenameMatch[1];
+        }
+      }
+  
+      // Create download link
+      const blob = new Blob([response.body], { type: response.headers.get('content-type') });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }
+  
+    isOfficeSignboardEnabled(): boolean {
+      return ['Resubmitted OS', 'Resubmitted OS and PFS', 'Submitted'].includes(this.applicationStatus);
+    }
+  
+    isFilingSystemEnabled(): boolean {
+      return ['Resubmitted PFS', 'Resubmitted OS and PFS', 'Submitted'].includes(this.applicationStatus);
+    }
+  
+    isOhsEnabled(): boolean {
+      return this.applicationStatus === 'Submitted';
+    }
+  
+    isFieldEditable(field: string): boolean {
+      switch (field) {
+        case 'officeSignboard':
+        case 'signboardReview':
+          return this.isOfficeSignboardEnabled();
+        case 'filingSystem':
+        case 'filingReview':
+          return this.isFilingSystemEnabled();
+        case 'ohs':
+        case 'ohsReview':
+          return this.isOhsEnabled();
+        default:
+          return false;
+      }
+    }
+  
+    update() {
+      const payload = {
+        cbReviewDto: {
+          bctaNo: this.data.certifiedBuilderNo || null,
+          officeSignboard: this.formData.officeSignboardPath || null,
+          signageResubmitDeadline: this.formData.signboardResubmitDate || null,
+          osreview: this.formData.signboardReview || null,
+          osremarks: this.formData.signboardRemarks || null,
+          filingSystem: this.formData.properFillingPath || null,
+          fsreview: this.formData.filingReview || null,
+          fsremarks: this.formData.filingRemarks || null,
+          fsresubmitDeadline: this.formData.filingResubmitDate || null
+        }
+      };
+  
+      this.service.saveOfficeSignageAndDocCB(payload).subscribe(
+        (response: any) => {
+          try {
+            const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+            this.id = parsedResponse.cbReviewDto?.id;
+  
+            Swal.fire({
+              icon: 'success',
+              title: 'Saved!',
+              text: 'Office signage and documents review saved successfully.',
+              timer: 2000,
+              showConfirmButton: false
+            });
+            this.router.navigate(['monitoring/construction']);
+          } catch (e) {
+            console.error('Error parsing response:', e);
+            Swal.fire('Error', 'An unexpected error occurred while parsing the response.', 'error');
+          }
+        },
+        (error) => {
+          console.error('Error saving data:', error);
+          Swal.fire('Error', 'Failed to save office signage and documents review.', 'error');
+        }
+      );
+    }
+
   id: any;
   saveAndNext() {
     const payload = {
@@ -59,27 +175,18 @@ formData: any = {}
         bctaNo: this.data.certifiedBuilderNo,
         firmName: this.data.nameOfFirm,
         contactNo: this.formData.mobileNo,
-        email: "yesheydorjee4@gmail.com",
-        location: this.data.location,
-        applicationStatus: this.data.applicationStatus,
-        officeSignboard: this.formData.signboardReview,
-        signageResubmitDeadline: this.formData.resubmitDate,
+        email: this.formData.emailAddress,
+        location: this.formData.officeLocation,
+        locationReview: this.formData.reviewLocation,
+        lastDateResubmit: this.formData.resubmitDate,
+        resubmitRemarks: this.formData.resubmitRemarks,
         filingSystem: this.formData.properFillingPath,
         ohsHandbook: this.formData.ohsHandBook,
         ohsReview: this.formData.ohsReview,
-        ohsRemarks: this.formData.generalRemarks,
+        remarks: this.formData.generalRemarks,
+        fsresubmitDeadline: this.formData.fsresubmitDeadline,
         fsreview: this.formData.filingReview,
-        osreview: this.formData.signboardReview,
-        osremarks: this.formData.signboardRemarks,
-
-        // signageReview: true,
-        // filingReview: this.formData.filingReview,
-        // officeRemarks: this.formData.remarks,
-        // submittedOn: this.data.createdBy,
-        // status: this.data.status,
-        // licenseStatus: this.data.licenseStatus,
-        // notification: this.data.notification,
-        // verifiedBy: this.data.verifiedBy,
+        fsremarks: this.formData.fsRemarks,
       }
 
     }

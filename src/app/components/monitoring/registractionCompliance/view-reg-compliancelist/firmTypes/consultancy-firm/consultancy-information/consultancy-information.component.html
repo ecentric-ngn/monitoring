@@ -35,28 +35,31 @@
                 <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
                     <li class="nav-item" role="presentation">
                         <button class="nav-link border" [class.active]="activeTabId === 'consultancyOffice'" id="office-tab"
-                            (click)="setActiveTab('consultancyOffice')" type="button" role="tab">
+                            (click)="setActiveTab('consultancyOffice')" [disabled]="applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ'" type="button" role="tab">
                             Office Signage & Document
                         </button>
                     </li>
 
                     <li class="nav-item" role="presentation">
                         <button  (click)="specializedFirmForm()"  class="nav-link border" [class.active]="activeTabId === 'consultancyEmployee'" id="employee-tab"
-                            (click)="setActiveTab('consultancyEmployee')" type="button" role="tab">
+                            (click)="setActiveTab('consultancyEmployee')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
+                            type="button" role="tab">
                             {{ formData?.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent Employees' }}
                         </button>
                     </li>
 
                     <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
                         <button (click)="equipmentForm()"  class="nav-link border" [class.active]="activeTabId === 'consultancyEquipment'" id="equipment-tab"
-                            (click)="setActiveTab('consultancyEquipment')" type="button" role="tab">
+                            (click)="setActiveTab('consultancyEquipment')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
+                            type="button" role="tab">
                             Mandatory Equipment
                         </button>
                     </li>
 
                     <li class="nav-item" role="presentation">
                         <button (click)="monitoringTeam()" class="nav-link border" [class.active]="activeTabId === 'consultancyMonitoring'" class="nav-link border" [class.active]="activeTabId === 'consultancyMonitoring'"
-                            id="monitoring-tab" (click)="setActiveTab('consultancyMonitoring')" type="button" role="tab">
+                            id="monitoring-tab" (click)="setActiveTab('consultancyMonitoring')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
+                            type="button" role="tab">
                             Monitoring Team Users
                         </button>
                     </li>

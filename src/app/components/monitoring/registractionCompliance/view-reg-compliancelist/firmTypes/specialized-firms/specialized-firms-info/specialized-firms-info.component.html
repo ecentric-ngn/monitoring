@@ -6,24 +6,24 @@
         <div class="row m-3">
             <div class="col-md-4 mb-3">
                 <label class="form-label me-2 font-size-12">Firm Name:</label>
-                <span class="font-size-12">{{formData.firmName || 'N/A'}}</span>
+                <span class="font-size-12">{{formData?.firmName || 'N/A'}}</span>
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label me-2 font-size-12">BCTA No:</label>
-                <span class="font-size-12">{{formData.cdbNo || 'N/A'}}</span>
+                <span class="font-size-12">{{formData?.cdbNo || 'N/A'}}</span>
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label me-2 font-size-12">Contact No:</label>
-                <span class="font-size-12">{{formData.mobileNo || 'N/A'}}</span>
+                <span class="font-size-12">{{formData?.mobileNo || 'N/A'}}</span>
             </div>
 
             <div class="col-md-4 mb-3">
                 <label class="form-label me-2 font-size-12">Email Address:</label>
-                <span class="font-size-12">{{formData.emailAddress || 'N/A'}}</span>
+                <span class="font-size-12">{{formData?.emailAddress || 'N/A'}}</span>
             </div>
             <div class="col-md-4 mb-3">
                 <label class="form-label me-2 font-size-12">Classification:</label>
-                <span class="font-size-12" [ngSwitch]="formData.classification">
+                <span class="font-size-12" [ngSwitch]="formData?.classification">
                     <span *ngSwitchCase="'S'">S - Small</span>
                     <span *ngSwitchCase="'M'">M - Medium</span>
                     <span *ngSwitchCase="'L'">L - Large</span>
@@ -38,13 +38,13 @@
                     <li class="nav-item" role="presentation">
                         <button  (click)="specializedFirmForm()"  class="nav-link border" [class.active]="activeTabId === 'sfemployee'" id="employee-tab"
                             (click)="setActiveTab('sfemployee')" type="button" role="tab">
-                            {{ formData.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent Employees' }}
+                            {{ formData?.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent Employees' }}
                         </button>
                     </li> 
 
                     <li class="nav-item" role="presentation">
                         <button (click)="monitoringTeam()" class="nav-link border" [class.active]="activeTabId === 'sfmonitoring'" class="nav-link border" [class.active]="activeTabId === 'sfmonitoring'"
-                            id="monitoring-tab" (click)="setActiveTab('sfmonitoring')" type="button" role="tab">
+                            id="monitoring-tab" (click)="setActiveTab('sfmonitoring')" [disabled]="applicationStatus === 'Resubmitted HR'" type="button" role="tab">
                             Monitoring Team Users
                         </button>
                     </li>

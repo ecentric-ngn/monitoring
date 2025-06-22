@@ -7,31 +7,50 @@ import { es_ES } from 'ng-zorro-antd/i18n';
   templateUrl: './view-reg-firm-information.component.html',
   styleUrls: ['./view-reg-firm-information.component.scss']
 })
-export class ViewRegFirmInformationComponent implements OnInit{
+export class ViewRegFirmInformationComponent implements OnInit {
   formData: any = {};
-  bctaNo: any
+  bctaNo: any;
+  applicationStatus: string = '';
+  activeTabId: string = '';
+
   constructor(private service: CommonService) { }
-  
- ngOnInit(): void {
-  const WorkDetail = this.service.getData('BctaNo');
-  
-  if (!WorkDetail || !WorkDetail.data) {
-    console.error('WorkDetail or WorkDetail.data is undefined');
-    return;
+
+  ngOnInit(): void {
+
+    const status = this.applicationStatus;
+
+    if (status === 'Resubmitted OS') {
+      this.activeTabId = 'office';
+    } else if (status === 'Resubmitted PFS') {
+      this.activeTabId = 'office';
+    } else if (status === 'Resubmitted HR') {
+      this.activeTabId = 'employee';
+    } else if (status === 'Resubmitted EQ') {
+      this.activeTabId = 'equipment';
+    } else if (status === 'Resubmitted OS and PFS') {
+      this.activeTabId = 'office';
+    }
+
+    const WorkDetail = this.service.getData('BctaNo');
+
+    if (!WorkDetail || !WorkDetail.data) {
+      console.error('WorkDetail or WorkDetail.data is undefined');
+      return;
+    }
+    this.applicationStatus = WorkDetail.data.applicationStatus;
+    console.log("application Status:", this.applicationStatus);
+
+    this.formData.firmType = WorkDetail.data;
+    this.bctaNo = WorkDetail.data.contractorNo;
+
+    console.log('WorkDetail', WorkDetail);
+    console.log('bctaNo', this.bctaNo);
+
+    if (this.bctaNo) {
+      this.fetchDataBasedOnBctaNo();
+    }
   }
 
-  this.formData.firmType = WorkDetail.data;
-  this.bctaNo = WorkDetail.data.contractorNo;
-  
-  console.log('WorkDetail', WorkDetail);
-  console.log('bctaNo', this.bctaNo);
-  
-  if (this.bctaNo) {
-    this.fetchDataBasedOnBctaNo();
-  }
-}
-
-  activeTabId: string = 'office'; // default tab
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {

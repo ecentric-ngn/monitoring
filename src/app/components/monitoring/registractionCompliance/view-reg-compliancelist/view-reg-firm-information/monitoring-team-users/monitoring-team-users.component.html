@@ -1,41 +1,44 @@
-<form #monitoringForm="ngForm" (ngSubmit)="onSubmit(monitoringForm)">
-  <div class="m-4">
+<div class="scroll-wrapper">
 
-    <div class="table-responsive">
-      <table class="table table-bordered align-middle">
-        <thead class="table-light text-center">
-          <tr>
-            <th>Full Name</th>
-            <th>Designation</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let team of teamList; let i = index">
-            <td class="text-center">{{team.full_name}}</td>
-            <td class="text-center">{{team.designation}}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-    <div class="row">
-      <!-- Review Date -->
-      <div class="col-md-6 mb-3">
-        <label class="form-label">
-          Review Date* <span class="text-danger">*</span>
-        </label>
-        <input type="date" class="form-control form-control-sm" name="reviewDate" [(ngModel)]="formData.reviewDate"
-          #reviewDate="ngModel" required />
-        <div *ngIf="reviewDate.invalid && reviewDate.touched" class="text-danger font-size-12">
-          Please provide a review date
+  <form #monitoringForm="ngForm" (ngSubmit)="onSubmit(monitoringForm)">
+    <div class="m-4">
+
+      <div class="table-responsive">
+        <table class="table table-bordered align-middle">
+          <thead class="table-light text-center">
+            <tr>
+              <th>Full Name</th>
+              <th>Designation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let team of teamList; let i = index">
+              <td class="text-center">{{team.full_name}}</td>
+              <td class="text-center">{{team.designation}}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="row">
+        <!-- Review Date -->
+        <div class="col-md-6 mb-3">
+          <label class="form-label">
+            Review Date* <span class="text-danger">*</span>
+          </label>
+          <input type="date" class="form-control form-control-sm" name="reviewDate" [(ngModel)]="formData.reviewDate"
+            #reviewDate="ngModel" required />
+          <div *ngIf="reviewDate.invalid && reviewDate.touched" class="text-danger font-size-12">
+            Please provide a review date
+          </div>
         </div>
       </div>
-    </div>
 
-    <!-- Save & Forward Button -->
-    <div class="d-flex justify-content-end mt-4">
-      <button type="submit" class="btn btn-success" [disabled]="monitoringForm.invalid">
-        Save
-      </button>
+      <!-- Save & Forward Button -->
+      <div class="d-flex justify-content-end mt-4">
+        <button type="submit" class="btn btn-success" [disabled]="monitoringForm.invalid">
+          Save
+        </button>
+      </div>
     </div>
-  </div>
-</form>
+  </form>
+</div>

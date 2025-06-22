@@ -66,12 +66,12 @@ export class ViewRegDetailsComponent {
         }
 
           // Format the date for the input field (YYYY-MM-DD)
-          // const reviewedDate = apiData.review_date ? 
-          //   new Date(apiData.reviewed_date).toISOString().split('T')[0] : 
-          //   null;
+          const reviewedDate = apiData.reviewed_date ? 
+            new Date(apiData.reviewed_date).toISOString().split('T')[0] : 
+            null;
           
-          // this.formData.moniterReviewDate = reviewedDate;
-          // console.log('Formatted Review Date:', this.formData.moniterReviewDate);
+          this.formData.moniterReviewDate = reviewedDate;
+          console.log('Formatted Review Date:', this.formData.moniterReviewDate);
           
           this.tableId = apiData.id;
           if(this.tableId) {
@@ -98,7 +98,6 @@ export class ViewRegDetailsComponent {
             ohsHandbook: apiData.ohs_handbook || 'N/A',
             ohsReview: apiData.ohs_review ? 'Yes' : 'No',
             generalRemarks: apiData.office_remarks,
-            moniterReviewDate: apiData.review_date
           };
         }
       },
