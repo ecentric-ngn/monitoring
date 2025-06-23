@@ -94,7 +94,7 @@
 
         <!-- Qualification of Subcontractors Tab -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #qualificationofSubcontractorsTab
+          <!-- <button #qualificationofSubcontractorsTab
             (click)="qualificationofSubcontractorsTabEnabled ? DisplayQualificationForm() : $event.preventDefault()"
             class="border nav-link step-tab rounded-0"
             [ngClass]="{'active': qualificationofSubcontractorsTabEnabled,'non-clickable': qualificationofSubcontractorsTabEnabled}"
@@ -102,6 +102,18 @@
             role="tab" aria-controls="qualification-tab" aria-selected="false"
             [disabled]="!qualificationofSubcontractorsTabEnabled">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 4 }">
+              {{ highestCompletedStep >= 4 ? '✓' : '4' }}
+            </span>
+            <b class="text-black step-label font-size-14">Qualification of Subcontractors</b>
+          </button> -->
+            <button #qualificationofSubcontractorsTab
+            (click)="DisplayQualificationForm()"
+            class="border nav-link step-tab rounded-0"
+            
+            id="qualification-work-tab" data-bs-toggle="tab" data-bs-target="#qualification-tab" type="button"
+            role="tab" aria-controls="qualification-tab" aria-selected="false"
+           >
+            <span class="step-badge">
               {{ highestCompletedStep >= 4 ? '✓' : '4' }}
             </span>
             <b class="text-black step-label font-size-14">Qualification of Subcontractors</b>
