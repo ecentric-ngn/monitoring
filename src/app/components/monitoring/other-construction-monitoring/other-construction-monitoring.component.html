@@ -1,6 +1,69 @@
 <div class="container-fluid">
   <form #form="ngForm">
-    <div class="p-3 border mt-6">
+    <div class="p-3 border">
+      <div class="font-bold">Client Details</div>
+      <hr>
+      <div class="row font-size-14">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">
+            Owner Name:
+            <span class="text-danger font-size-12">*</span>
+          </label>
+          <div class="d-flex">
+            <input type="text" class="form-control form-control-sm me-2" [(ngModel)]="formData.ClientOwnerName"
+              placeholder="Text" name="ClientOwnerName" id="ClientOwnerName" required #ClientOwnerName="ngModel">
+          </div>
+          <!-- <div *ngIf="ClientOwnerName.invalid && ClientOwnerName.touched" class="text-danger font-size-12">
+            Please enter Owner Name
+          </div> -->
+
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label">
+            Current Address:
+            <span class="text-danger font-size-12">*</span>
+          </label>
+          <div class="d-flex">
+            <input type="text" class="form-control form-control-sm me-2" [(ngModel)]="formData.clientCurrentAddress"
+              placeholder="Text" name="clientCurrentAddress" id="clientCurrentAddress" required
+              #clientCurrentAddress="ngModel">
+          </div>
+          <!-- <div *ngIf="clientCurrentAddress.invalid && clientCurrentAddress.touched" class="text-danger font-size-12">
+            Please enter Current Address
+          </div> -->
+
+        </div>
+
+        <div class="col-md-4 mb-3">
+          <label class="form-label">
+            Mobile No:
+            <span class="text-danger font-size-12">*</span>
+          </label>
+          <div class="d-flex">
+            <input type="text" class="form-control form-control-sm me-2" [(ngModel)]="formData.clientMobileNo"
+              placeholder="number" name="clientMobileNo" id="clientMobileNo" required #clientMobileNo="ngModel">
+          </div>
+          <!-- <div *ngIf="clientMobileNo.invalid && clientMobileNo.touched" class="text-danger font-size-12">
+            Please enter Current Address
+          </div> -->
+
+        </div>
+        
+      </div>
+      <div class="row  mb-3">
+          <div class="col-md-4">
+            <label class="form-label">Email Address:<span class="text-danger font-size-12">*</span></label>
+            <input (input)="clearErrorMessage()" type="text" class="form-control form-control-sm"
+              [(ngModel)]="formData.clientEmailAddress" placeholder="Enter Owner Name" name="clientEmailAddress"
+              required #clientEmailAddress="ngModel">
+            <!-- <div *ngIf="clientEmailAddress.invalid && clientEmailAddress.touched" class="text-danger font-size-12">
+              Please enter Owner Name
+            </div> -->
+          </div>
+        </div>
+      <div class="font-bold font-size-14">Contractor Details</div>
+      <hr>
       <div class="row">
         <div class="col-md-4 mb-3">
           <label class="form-label">
@@ -19,10 +82,13 @@
             {{displayMessage}}
           </div>
         </div>
+
+
         <div class="col-md-4 mb-3">
           <label class="form-label">Owner Name:<span class="text-danger font-size-12">*</span></label>
-          <input (input)="clearErrorMessage()" type="text" class="form-control form-control-sm" [(ngModel)]="formData.ownerDetails"
-            placeholder="Enter Owner Name" name="ownerDetails" required #ownerDetails="ngModel">
+          <input (input)="clearErrorMessage()" type="text" class="form-control form-control-sm"
+            [(ngModel)]="formData.ownerDetails" placeholder="Enter Owner Name" name="ownerDetails" required
+            #ownerDetails="ngModel">
           <div *ngIf="ownerDetails.invalid && ownerDetails.touched" class="text-danger font-size-12">
             Please enter Owner Name
           </div>
@@ -59,11 +125,16 @@
           <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.mobileNo"
             placeholder="Enter mobileNo" name="mobileNo" required #mobileNo="ngModel" maxlength="8"
             pattern="^[0-9]{1,8}$">
+
           <div *ngIf="mobileNo.invalid && mobileNo.touched" class="text-danger font-size-12">
             Please enter mobileNo
           </div>
-          <div *ngIf="mobileNo.errors.pattern" class="text-danger">Mobile number must be digits only and up to 8 digits</div>
+
+          <div *ngIf="mobileNo.errors?.['pattern'] && mobileNo.touched" class="text-danger">
+            Mobile number must be digits only and up to 8 digits
+          </div>
         </div>
+
 
 
       </div>

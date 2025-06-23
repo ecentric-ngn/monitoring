@@ -125,9 +125,9 @@ export class QualificationComponent {
                     // If data is found, populate the form fields
                     const data = response.data[0];
                     this.formData.expiryDate = data.expiryDate?.split('T')[0];
-                    const ownerDetails = data.ownerDetails || '';
+                    const ownerDetails = data.nameOfFirm || '';
                     const nameOnly = ownerDetails.split(' ').slice(1).join(' ');
-                    this.formData.fullName = nameOnly;
+                    this.formData.nameOfFirm = nameOnly;
                     this.disableField = true;
                     this.isFetching = false; // Stop loading
                 } else if (viewName === 'contractor') {
@@ -241,7 +241,7 @@ export class QualificationComponent {
             subContractorExists: this.formData.contractorType,
             bctaRegistrationNo: this.formData.bctaRegistrationNo,
             registrationValidUntil: this.formData.expiryDate,
-            subContractorFullName: this.formData.fullName,
+            subContractorFullName: this.formData.nameOfFirm,
             subContractorLicensingCompliance: this.formData.LicensingContractor,
         };
 
