@@ -8,7 +8,6 @@ import { map, switchMap } from 'rxjs';
 
 interface ActionItem {
    id: number;
-  contractorId: string;
   contractorNo: string | null;
   type: string;
   actionType: string;
@@ -82,7 +81,7 @@ activeTab = 'suspend';
       (response: any[]) => {
         this.tableData = response.map(item => ({
           id: Number(item.id) || 0,
-          contractorId: item.firmId || '',  // Map firmId to contractorId
+          
           contractorNo: item.firmId || '', // Map bctaNo to contractorNo
           type: this.formatType(item.firmType), // Map firmType to type
           rawFirmType: item.firmType, // Store the original firmType
@@ -119,7 +118,6 @@ activeTab = 'suspend';
     this.filteredApplications = this.tableData.filter((app) => {
       const matchesSearch =
         this.searchTerm === '' ||
-        (app.contractorId?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
         (app.contractorNo?.toLowerCase().includes(this.searchTerm.toLowerCase())) ||
         (app.initiatedBy?.toLowerCase().includes(this.searchTerm.toLowerCase()));
 
@@ -278,9 +276,18 @@ private handleError(operation: string, error: any): void {
     confirmButtonColor: '#d33'
   });
 }
-  navigate(bctaNo: string) {
-    this.router.navigate(['/monitoring/ViewConultencyDetails', bctaNo]);
-  }
+  navigate(firmId: any,) {
+            const employeeDetail = {
+                data: firmId,
+    
+            };
+            console.log('employeeDetail', employeeDetail);
+            this.service.setData(
+                employeeDetail,
+                'firmId',
+                'monitoring/ViewConultencyDetails'
+            );
+        }
 
   onChangeFirmType(firmType: string) {
     this.firmType = firmType;
@@ -321,7 +328,7 @@ private handleError(operation: string, error: any): void {
   }
 
  workCategoryMap: Record<string, string> = {
-  // Existing categories
+  // Existing categories from your example
   '6cd737d4-a2b7-11e4-b4d2-080027dcfac6': 'W1-Roads and Bridges',
   '8176bd2d-a2b7-11e4-b4d2-080027dcfac6': 'W2-Traditional Bhutanese Painting/Finishing Works',
   '8afc0568-a2b7-11e4-b4d2-080027dcfac6': 'W3-Buildings,Irrigation,Drainage,Flood Control,Water Supply and Sewerage',
@@ -331,8 +338,17 @@ private handleError(operation: string, error: any): void {
   '2adfae00-be66-11e9-9ac2-0026b988eaa8': 'S-Surveying Services',
   'e6372584-bc15-11e4-81ac-080027dcfac6': 'A-Architectural Services',
   'f39b9245-bc15-11e4-81ac-080027dcfac6': 'C-Civil Engineering Services',
-  'fb2aa1a7-bc15-11e4-81ac-080027dcfac6': 'E-Electrical Engineering Services'
+  'fb2aa1a7-bc15-11e4-81ac-080027dcfac6': 'E-Electrical Engineering Services',
+
+  // Specialized Firm categories from your JSON
+  '3h1f937c-c74f-11e4-bf37-080027dcfac6': 'SF1-Masonry',
+  '3h2f937c-c74f-11e4-bf37-080027dcfac6': 'SF2-Construction Carpentry',
+  '3h3f937c-c74f-11e4-bf37-080027dcfac6': 'SF3-Plumbing',
+  '3h4f937c-c74f-11e4-bf37-080027dcfac6': 'SF4-Electrical',
+  '3h5f937c-c74f-11e4-bf37-080027dcfac6': 'SF5-Welding & Fabrication',
+  '3h6f937c-c74f-11e4-bf37-080027dcfac6': 'SF6-Painting'
 };
+
 
 // Work Classification Mapping
 workClassificationMap: Record<string, string> = {
@@ -369,28 +385,40 @@ workClassificationMap: Record<string, string> = {
   'cc3bfc36-bc17-11e4-81ac-080027dcfac6': 'C7-Water Resources & Hydro Power Projects',
   '003f9a02-c3eb-11e4-af9f-080027dcfac6': 'M-Medium',
   '0c14ebea-c3eb-11e4-af9f-080027dcfac6': 'R-Registered',
-  'e19afe94-c3ea-11e4-af9f-080027dcfac6' : 'L-Large',
-  'ef832830-c3ea-11e4-af9f-080027dcfac6': 'S-Small'
-
+  'e19afe94-c3ea-11e4-af9f-080027dcfac6': 'L-Large',
+  'ef832830-c3ea-11e4-af9f-080027dcfac6': 'S-Small',
+  '3h1f937c-c74f-11e4-bf37-080027dcfac6': 'SF1-Masonry',
+  '3h2f937c-c74f-11e4-bf37-080027dcfac6': 'SF2-Construction Carpentry',
+  '3h3f937c-c74f-11e4-bf37-080027dcfac6': 'SF3-Plumbing',
+  '3h4f937c-c74f-11e4-bf37-080027dcfac6': 'SF4-Electrical',
+  '3h5f937c-c74f-11e4-bf37-080027dcfac6': 'SF5-Welding & Fabrication',
+  '3h6f937c-c74f-11e4-bf37-080027dcfac6': 'SF6-Painting'
 };
 
 getDownGradeList(searchQuery?: string) {
   this.isLoading = true;
   this.service.getDownGradeDetails().subscribe(
     (response: any[]) => {
-      this.tableData = response.map(item => ({
-        id: Number(item.id) || 0,
-        contractorId: item.firmId || '',
-        contractorNo: item.bctaNo || '',
-        type: this.formatType(item.firmType),
-        details: this.workCategoryMap[item.workCategoryId] || '-', // Use the mapped name
-        fromTo: `${this.workClassificationMap[item.oldClassificationId] || item.oldClassificationId} → ${this.workClassificationMap[item.newClassificationId] || item.newClassificationId}`,
-        initiatedBy: item.requestedBy || '-',
-        initiatedDate: item.requestedOn || '',
-        status: item.status || 'PENDING',
-        actionType: '',
-        selected: false
-      }));
+      this.tableData = response.map(item => {
+        const oldClassification = this.workClassificationMap[item.oldClassificationId] || item.oldClassificationId;
+        const newClassification = item.newClassificationId 
+          ? ` → ${this.workClassificationMap[item.newClassificationId] || item.newClassificationId}`
+          : '';
+          
+        return {
+          id: Number(item.id) || 0,
+          contractorId: item.firmId || '',
+          contractorNo: item.bctaNo || '',
+          type: this.formatType(item.firmType),
+          details: this.workCategoryMap[item.workCategoryId] || '-', // Use the mapped name
+          fromTo: `${oldClassification}${newClassification}`,
+          initiatedBy: item.requestedBy || '-',
+          initiatedDate: item.requestedOn || '',
+          status: item.status || 'PENDING',
+          actionType: '',
+          selected: false
+        };
+      });
       this.filteredApplications = [...this.tableData];
       this.totalCount = this.tableData.length;
       this.isLoading = false;
@@ -421,6 +449,7 @@ DownGrade(): void {
   this.service.DownGradeApplications(payload).subscribe({
     next: (response) => {
       this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
+       this.getDownGradeList();
       this.selectedIds = [];
       Swal.fire('Success', 'Operation completed', 'success');
     },
@@ -507,6 +536,7 @@ cancel(): void {
         next: (otherSystemResponse: any) => {
           // Both operations succeeded
           this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
+          this.getCancelList();
           this.selectedIds = [];
           this.selectedContractorNumbers = [];
           this.isLoading = false;
@@ -530,17 +560,18 @@ cancel(): void {
     }
   });
 }
+filterByType(firmType: string) {
 
-filterTable(type: string) {
-        this.currentFilter = type;
-        
-        if (type) {
-            this.filteredTableData = this.originalTableData.filter(
-                item => item.firmType === type
-            );
-        } else {
-            this.filteredTableData = [...this.originalTableData];
-        }
-    }
+  // If no firmType is selected (or 'all' is selected), show all data
+  if (!firmType || firmType === this.firmTypesssss) {
+    this.filteredApplications = [...this.tableData];
+  } else {
+    // Filter the data based on the selected firmType
+    this.filteredApplications = this.tableData.filter(item => item.firmType === firmType);
+  }
+  
+  // Update the total count
+  this.totalCount = this.filteredApplications.length;
+}
 }
 

@@ -48,6 +48,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
       console.error('WorkDetail data not available');
       return;
     }
+    
 
     this.data = WorkDetail.data;
     this.bctaNo = this.data.contractorNo;
@@ -62,6 +63,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe(
       (res: any) => {
+        debugger
         if (res?.complianceEntities?.length) {
           // Merge API response with initialized formData
           this.formData = { ...this.formData, ...res.complianceEntities[0] };

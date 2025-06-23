@@ -145,7 +145,7 @@
                             <thead>
                                 <tr>
                                     <th>Work Category</th>
-                                    <th>Existing Class</th>
+
                                     <th>New Class</th>
                                 </tr>
                             </thead>
@@ -153,21 +153,22 @@
 
                                 <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
                                     <td>{{ downgrade.workCategory }}</td>
-                                    <td>{{ downgrade.existingClass }}</td>
-
+                                    <!-- <td>
+        <div *ngFor="let cls of downgrade.classifications">
+            <span *ngIf="cls.checked">{{ cls.name }}</span>
+        </div>
+    </td> -->
                                     <td>
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option [ngValue]="''">-- Select --</option>
-                                            <option
-                                                *ngFor="let option of getClassOptions(downgrade.existingClass, downgrade.workCategory)"
-                                                [ngValue]="option.value">
-                                                {{ option.label }}
-                                            </option>
-                                        </select>
+                                        <div *ngFor="let cls of downgrade.classifications">
+                                            <label [class.text-muted]="!cls.checked">
+                                                <input type="checkbox" [(ngModel)]="cls.checked"
+                                                    [name]="'checked_' + downgrade.workCategory + '_' + cls.id"
+                                                    [disabled]="!cls.checked" />
+                                                {{ cls.name }}
+                                            </label>
+                                        </div>
                                     </td>
                                 </tr>
-
                             </tbody>
                         </table>
                     </div>

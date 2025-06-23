@@ -443,7 +443,6 @@ export class CommonService {
     );
   }
 
-
   getClassification(firmType: string, firmId: string) {
     const params = new HttpParams()
       .set('firmType', firmType)
@@ -465,6 +464,14 @@ export class CommonService {
 
   downgradeFirm(payload: any) {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/downgrade/request`, payload, { responseType: 'text' });
+  }
+
+  downgradeConsultancy(payload: any){
+        return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/consultant/request-downgrade`, payload, { responseType: 'text' });
+  }
+
+  downgradeSF(payload: any){
+        return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/specialized-firm/downgrade/request`, payload, { responseType: 'text' });
   }
 
   cancelFirm(payload: any) {

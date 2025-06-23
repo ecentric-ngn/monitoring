@@ -55,7 +55,8 @@
                             [value]="data.specializedFirmNo" (change)="onCheckboxChange($event, data.id)">
                     </td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'" (click)="navigate(data)">
+                        [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'"
+                        (click)="navigate(data)">
                         {{ data.specializedFirmNo }}
                     </td>
                     <td>{{ data.nameOfFirm }}</td>
@@ -91,7 +92,7 @@
             </tbody>
         </table>
 
-         <div class="text-end" *ngIf="selectedIds.length !== 0">
+        <div class="text-end" *ngIf="selectedIds.length !== 0">
             <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>
         </div>
 
@@ -141,64 +142,19 @@
                             <thead>
                                 <tr>
                                     <th>Work Category</th>
-                                    <th>Existing Class</th>
-                                    <th>New Class</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
-                                    <td>{{ downgrade.workCategory }}</td>
-                                    <td>{{ downgrade.existingClass }}</td>
-                                    <td>
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                            <option *ngFor="let option of getClassOptions(downgrade.existingClass)"
-                                                [value]="option.value">
-                                                {{ option.label }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                </tr> -->
-
                                 <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
-                                    <td>{{ downgrade.workCategory }}</td>
-                                    <td>{{ downgrade.existingClass }}</td>
-
-                                    <td *ngIf="downgrade.existingClass === 'L-Large'">
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                            <option value="M-Medium">M-Medium</option>
-                                            <option value="S-Small">S-Small</option>
-                                        </select>
-                                    </td>
-
-                                    <td *ngIf="downgrade.existingClass === 'M-Medium'">
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                            <option value="S-Small">S-Small</option>
-                                        </select>
-                                    </td>
-
-                                    <td *ngIf="downgrade.existingClass === 'S-Small'">
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                            <option value="S-Small">S-Small</option>
-                                        </select>
-                                    </td>
-
-                                    <td
-                                        *ngIf="downgrade.existingClass !== 'L-Large' && downgrade.existingClass !== 'M-Medium' && downgrade.existingClass !== 'S-Small'">
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                        </select>
+                                    <td>
+                                        <label [class.text-muted]="!downgrade.checked">
+                                            <input type="checkbox" [(ngModel)]="downgrade.checked"
+                                                [name]="'checked_' + downgrade.workCategoryId"
+                                                [disabled]="!downgrade.checked" />
+                                            {{ downgrade.workCategory }}
+                                        </label>
                                     </td>
                                 </tr>
-
                             </tbody>
                         </table>
                     </div>

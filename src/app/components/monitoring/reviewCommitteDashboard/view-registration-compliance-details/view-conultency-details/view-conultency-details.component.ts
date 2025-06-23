@@ -1,8 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonService } from '../../../../../service/common.service';
 
-
-
 @Component({
   selector: 'app-view-conultency-details',
   templateUrl: './view-conultency-details.component.html',
@@ -50,7 +48,7 @@ formData: any = {}; // For registration details
     }
   ];
 
-  this.service.fetchconsultantDetails(payload, 1, 2, 'view_consultant_registration_review').subscribe(
+  this.service.fetchconsultantDetails(payload, 1, 2, 'view_registration_review_summary').subscribe(
     (response: any) => {
       if (response.data && response.data.length > 0) {
         this.registrationReviewData = response.data; // Store the data for the table
@@ -104,7 +102,7 @@ FetchEmployeeBasedOnTableId() {
     },
   ];
 
-  this.service.fetchconsultantDetails(payload, 1, 2, 'view_consultant_employee_review').subscribe(
+  this.service.fetchconsultantDetails(payload, 1, 2, 'view_employee_review_summary').subscribe(
     (response: any) => {
       if (response.data && response.data.length > 0) {
         this.employeeReviewData = response.data;
@@ -126,7 +124,7 @@ FetchWorkBasedOnEquipmentDetails() {
     },
   ];
 
-  this.service.fetchconsultantDetails(payload, 1, 2, 'view_consultant_equipment_review').subscribe(
+  this.service.fetchconsultantDetails(payload, 1, 2, 'view_equipment_review_summary').subscribe(
     (response: any) => {
       if (response.data && response.data.length > 0) {
         this.equipmentData = response.data; // Store all equipment data

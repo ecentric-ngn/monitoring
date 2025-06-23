@@ -165,14 +165,21 @@ export class ConsultancyFirmComponent {
         this.bsModal.show();
     }
 
+    private getPrefix(workCategory: string): string {
+        if (workCategory.startsWith('S-')) return 'S';
+        if (workCategory.startsWith('A-')) return 'A';
+        if (workCategory.startsWith('C-')) return 'C';
+        if (workCategory.startsWith('E-')) return 'E';
+        return '';
+    }
+
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'downgrade') {
             const firmId = this.selectedAction.target?.consultantId;
             const firmType = 'consultant';
 
-            console.log("firmId:", firmId);
             if (!firmId) {
-                console.error('firmId is undefined. Check if the selected row has contractorId or consultantNo.');
+                console.error('firmId is undefined. Check if the selected row has consultantNo.');
                 return;
             }
 
@@ -182,19 +189,44 @@ export class ConsultancyFirmComponent {
             }).subscribe({
                 next: ({ categoryData, existingClassData }) => {
                     const workCategories = categoryData.workCategory;
-                    this.workClassificationList = categoryData.workClassification;
+                    const workClassifications = categoryData.workClassification;
 
-                    const classificationMap = existingClassData.reduce((acc: any, item: any) => {
-                        acc[item.workCategory] = item.existingWorkClassification;
-                        return acc;
-                    }, {});
+                    // Build a map: workCategory -> Set of existing classification IDs
+                    const existingMap: { [cat: string]: Set<string> } = {};
+                    for (const item of existingClassData) {
+                        if (item.workCategory && item.consultantWorkClassificationId) {
+                            const key = String(item.workCategory).trim();
+                            if (!existingMap[key]) {
+                                existingMap[key] = new Set();
+                            }
+                            existingMap[key].add(String(item.consultantWorkClassificationId).trim());
+                        }
+                    }
 
-                    this.downgradeList = workCategories.map((category: any) => ({
-                        workCategory: category.workCategory,
-                        workCategoryId: category.id,
-                        existingClass: classificationMap[category.workCategory] || 'Unknown',
-                        newClass: ''
-                    }));
+                    this.downgradeList = workCategories.map((category: any) => {
+                        const prefix = this.getPrefix(category.workCategory);
+                        const categoryKey = String(category.workCategory).trim();
+                        const possibleClassifications = workClassifications
+                            .filter((cls: any) =>
+                                cls.type === 'consultant' &&
+                                cls.workClassification.startsWith(prefix)
+                            )
+                            .map((cls: any) => {
+                                const isChecked = !!(existingMap[categoryKey] && existingMap[categoryKey].has(String(cls.id).trim()));
+                                return {
+                                    id: cls.id,
+                                    name: cls.workClassification,
+                                    checked: isChecked,
+                                    preChecked: isChecked // Track if it was pre-checked from backend
+                                };
+                            });
+
+                        return {
+                            workCategory: category.workCategory,
+                            workCategoryId: category.id,
+                            classifications: possibleClassifications
+                        };
+                    });
                 },
                 error: (err) => {
                     console.error('Error fetching downgrade data:', err);
@@ -204,7 +236,6 @@ export class ConsultancyFirmComponent {
             this.downgradeList = [];
         }
     }
-
 
     getClassOptions(existingClass: string, workCategory: string) {
         const allOptions = this.getOptionsByCategory(workCategory);
@@ -295,32 +326,31 @@ export class ConsultancyFirmComponent {
         }
 
         if (this.selectedAction.actionType === 'downgrade') {
-            const downgradeEntries = this.downgradeList
-                .filter(entry => entry.newClass && entry.newClass !== '')
-                .map(entry => {
-                    // Find the id for the selected newClass label
-                    const classification = this.workClassificationList.find(
-                        (c: any) => c.workClassification === entry.newClass
-                    );
-                    return {
-                        workCategoryId: entry.workCategoryId,
-                        newWorkClassificationId: classification ? classification.id : null
-                    };
+            // Collect all unchecked, previously pre-checked classifications
+            const downgradeEntries: any[] = [];
+            this.downgradeList.forEach(entry => {
+                entry.classifications.forEach((cls: any) => {
+                    if (cls.preChecked && !cls.checked) {
+                        downgradeEntries.push({
+                            workCategoryId: entry.workCategoryId,
+                            existingWorkClassificationId: cls.id
+                        });
+                    }
                 });
+            });
 
             if (downgradeEntries.length === 0) {
-                Swal.fire('Error', 'Please select at least one new class to downgrade.', 'error');
+                Swal.fire('Error', 'Please uncheck at least one existing class to downgrade.', 'error');
                 return;
             }
 
             const payload = {
-                firmId: this.selectedAction.target?.consultantId,
-                firmType: "Consultant",
-                downgradeEntries,
-                requestedBy: "Bilana Ghalley"
+                consultantId: this.selectedAction.target?.consultantId,
+                requestedBy: "Bilana Ghalley",
+                downgradeEntries
             };
 
-            this.service.downgradeFirm(payload).subscribe({
+            this.service.downgradeConsultancy(payload).subscribe({
                 next: (res: string) => {
                     if (res && res.toLowerCase().includes('downgrade request submitted')) {
                         Swal.fire('Success', 'Forwarded to Review Committee', 'success');
@@ -337,7 +367,9 @@ export class ConsultancyFirmComponent {
                 }
             });
 
-        } else if (this.selectedAction.actionType === 'cancel') {
+        }
+
+        else if (this.selectedAction.actionType === 'cancel') {
             const payload = {
                 firmNo: this.selectedAction.target?.consultantNo,
                 cancelledBy: "Bilana Ghalley",

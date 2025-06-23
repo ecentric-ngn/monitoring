@@ -24,11 +24,26 @@
                     [class.active]="activeTab === 'downgrade'">
                 Downgrade
             </button>
-
-    </div>
-        </div>
-
-   </div>
+        <!-- <div class="dropdown">
+  <button class="btn btn-secondary dropdown-toggle" 
+          type="button" 
+          data-toggle="dropdown"
+          aria-haspopup="true" 
+          aria-expanded="false">
+      {{selectedFilter || 'Filter by Type'}}
+  </button>
+  <div class="dropdown-menu">
+    <a class="dropdown-item" (click)="filterByType('contractor')">Contractor</a>
+    <a class="dropdown-item" (click)="filterByType('consultancy')">Consultancy</a>
+    <a class="dropdown-item" (click)="filterByType('specialized-firm')">Specialized Firm</a>
+    <a class="dropdown-item" (click)="filterByType('certified-builder')">Certified Builder</a>
+    <div class="dropdown-divider"></div>
+    <a class="dropdown-item" (click)="filterByType('')">Show All</a>
+  </div>
+</div> -->
+  </div>
+</div>
+  
    
     <!-- Suspend Tab -->
    <div *ngIf="activeTab === 'suspend'">
@@ -48,10 +63,14 @@
       </thead>
       <tbody>
         <tr *ngFor="let action of tableData">
-          <td (click)="navigate(app.firm_name)">{{ action.contractorNo }}</td>
+           <td>
+            <a href="javascript:void(0)" (click)="navigate(action.firmId)">
+                {{ action.contractorNo || '-' }}
+            </a>
+        </td>
           <td>{{ action.type }}</td>
           <td>{{ action.details }}</td>
-          <td>{{ action.initiatedBy }}</td>
+          <td>{{ action.initiatedBy }}</td> 
           <td>{{ action.initiatedDate | date: 'mediumDate' }}</td>
           <td>
             <span [ngClass]="getStatusClass(action.status)">

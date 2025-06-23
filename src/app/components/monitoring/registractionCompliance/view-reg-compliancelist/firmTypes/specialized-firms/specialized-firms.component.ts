@@ -30,7 +30,7 @@ export class SpecializedFirmsComponent {
         actionDate: '',
         remarks: '',
         newClassification: '',
-        specialFirmId: '',
+        specializedFirmId: '',
         specializedFirmNo: ''
     };
 
@@ -168,12 +168,11 @@ export class SpecializedFirmsComponent {
 
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'downgrade') {
-            const firmId = this.selectedAction.target?.specializedFirmNo;
+            const firmId = this.selectedAction.target?.specializedFirmId; // Use the correct property for firmId
             const firmType = 'specializedfirm';
 
-            console.log("firmId:", firmId);
             if (!firmId) {
-                console.error('firmId is undefined. Check if the selected row has contractorId or consultantNo.');
+                console.error('firmId is undefined.');
                 return;
             }
 
@@ -183,18 +182,19 @@ export class SpecializedFirmsComponent {
             }).subscribe({
                 next: ({ categoryData, existingClassData }) => {
                     const workCategories = categoryData.workCategory;
-                    this.workClassificationList = categoryData.workClassification;
 
-                    const classificationMap = existingClassData.reduce((acc: any, item: any) => {
-                        acc[item.workCategory] = item.existingWorkClassification;
-                        return acc;
-                    }, {});
+                    // Only pre-check categories with a non-null specializedFirmWorkCategoryId
+                    const preCheckedSet = new Set(
+                        (existingClassData || [])
+                            .filter((item: any) => item.specializedFirmWorkCategoryId)
+                            .map((item: any) => item.workCategory)
+                    );
 
                     this.downgradeList = workCategories.map((category: any) => ({
                         workCategory: category.workCategory,
                         workCategoryId: category.id,
-                        existingClass: classificationMap[category.workCategory] || 'Unknown',
-                        newClass: ''
+                        checked: preCheckedSet.has(category.workCategory),
+                        preChecked: preCheckedSet.has(category.workCategory)
                     }));
                 },
                 error: (err) => {
@@ -204,24 +204,6 @@ export class SpecializedFirmsComponent {
         } else {
             this.downgradeList = [];
         }
-    }
-
-
-    getClassOptions(existingClass: string) {
-        const all = [
-            { label: 'L - Large', value: 'L-Large' },
-            { label: 'M - Medium', value: 'M-Medium' },
-            { label: 'S - Small', value: 'S-Small' }
-        ];
-
-        if (existingClass === 'L-Large') {
-            return all.filter(opt => opt.value !== 'L-Large');
-        } else if (existingClass === 'M-Medium') {
-            return all.filter(opt => opt.value === 'S-Small');
-        } else if (existingClass === 'S-Small') {
-            return []; // No downgrade options
-        }
-        return [];
     }
 
     trackByWorkCategory(index: number, item: any) {
@@ -241,32 +223,25 @@ export class SpecializedFirmsComponent {
         }
 
         if (this.selectedAction.actionType === 'downgrade') {
+            // Collect all unchecked, previously pre-checked categories
             const downgradeEntries = this.downgradeList
-                .filter(entry => entry.newClass && entry.newClass !== '')
-                .map(entry => {
-                    // Find the id for the selected newClass label
-                    const classification = this.workClassificationList.find(
-                        (c: any) => c.workClassification === entry.newClass
-                    );
-                    return {
-                        workCategoryId: entry.workCategoryId,
-                        newWorkClassificationId: classification ? classification.id : null
-                    };
-                });
+                .filter(entry => entry.preChecked && !entry.checked)
+                .map(entry => ({
+                    workCategoryId: entry.workCategoryId
+                }));
 
             if (downgradeEntries.length === 0) {
-                Swal.fire('Error', 'Please select at least one new class to downgrade.', 'error');
+                Swal.fire('Error', 'Please uncheck at least one existing category to downgrade.', 'error');
                 return;
             }
 
             const payload = {
-                firmId: this.selectedAction.target?.specialFirmId,
-                firmType: "specialized-firm",
-                downgradeEntries,
-                requestedBy: "Bilana Ghalley"
+                specializedFirmId: this.selectedAction.target?.specializedFirmId,
+                requestedBy: "Bilana Ghalley", // Replace with actual user/requestor if needed
+                downgradeEntries
             };
 
-            this.service.downgradeFirm(payload).subscribe({
+            this.service.downgradeSF(payload).subscribe({
                 next: (res: string) => {
                     if (res && res.toLowerCase().includes('downgrade request submitted')) {
                         Swal.fire('Success', 'Forwarded to Review Committee', 'success');
@@ -282,7 +257,6 @@ export class SpecializedFirmsComponent {
                     this.closeModal();
                 }
             });
-
         } else if (this.selectedAction.actionType === 'cancel') {
             const payload = {
                 firmNo: this.selectedAction.target?.specializedFirmNo,
