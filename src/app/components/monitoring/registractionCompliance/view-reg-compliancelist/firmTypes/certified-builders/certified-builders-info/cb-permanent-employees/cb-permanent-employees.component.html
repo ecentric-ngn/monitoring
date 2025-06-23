@@ -50,13 +50,13 @@
                 <select class="form-select form-control-sm" [(ngModel)]="formData.hrFulfilled" name="hrFulfilled"
                     required>
                     <option value="">-- Select --</option>
-                    <option value="True">Yes</option>
-                    <option value="False">No</option>
+                    <option value="Yes">Yes</option>
+                    <option value="No">No</option>
                 </select>
             </div>
 
             <!-- Conditional fields when HR not fulfilled -->
-            <ng-container *ngIf="formData.hrFulfilled === 'False'">
+            <ng-container *ngIf="formData.hrFulfilled === 'No'">
                 <div class="row pt-4">
                     <div class="col-md-4">
                         <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
@@ -72,7 +72,7 @@
             </ng-container>
 
             <!-- Remarks when HR is fulfilled -->
-            <ng-container *ngIf="formData.hrFulfilled === 'True'">
+            <ng-container *ngIf="formData.hrFulfilled === 'Yes'">
                 <div class="col-md-12">
                     <label class="form-label">Remarks</label>
                     <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="formData.remarksYes"
@@ -83,7 +83,7 @@
             <!-- Buttons -->
            <div class="col-md-12 d-flex justify-content-end gap-2 mt-3" *ngIf="applicationStatus !== 'Resubmitted HR'" >
                 <button *ngIf="formData.hrFulfilled === 'No'" type="button" class="btn btn-success"
-                    (click)="saveAndForward()">
+                    (click)="saveAndNext()">
                     Save & Forward
                 </button>
                 <button *ngIf="formData.hrFulfilled === 'Yes'" type="button" class="btn btn-success"

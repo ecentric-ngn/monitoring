@@ -83,14 +83,16 @@ export class ConsultancyMandatoryEquipmentComponent {
     this.tableId = this.id;
 
     const eq = this.tableData.map((item: any) => ({
-      "isRegistered": item.equipmentType,
-      "vehicleType": item.vehicleType,
-      "registrationNo": item.registrationNo,
-      "ownerName": item.ownerName,
-      "ownerCid": item.ownerCid,
       "equipmentType": item.equipmentName,
+      "requiredEquipment": "string",
+      "categoryOfService": "string",
+      "equipmentDeployed": "string",
       "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
+      "resubmitDeadline": this.formData.resubmitDate,
+      "deadlineRemarks": this.formData.resubmitRemarks,
+      "vehicleType": item.vehicleType,
       "remarks": this.formData.finalRemarks,
+      "edremarks": "string"
     }));
 
     const payload = {
@@ -113,16 +115,16 @@ export class ConsultancyMandatoryEquipmentComponent {
     this.tableId = this.id;
 
     const eq = this.tableData.map((item: any) => ({
-      "isRegistered": item.equipmentType,
-      "vehicleType": item.vehicleType,
-      "registrationNo": item.registrationNo,
-      "ownerName": item.ownerName,
-      "ownerCid": item.ownerCid,
       "equipmentType": item.equipmentName,
+      "requiredEquipment": "string",
+      "categoryOfService": "string",
+      "equipmentDeployed": "string",
       "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
       "resubmitDeadline": this.formData.resubmitDate,
       "deadlineRemarks": this.formData.resubmitRemarks,
+      "vehicleType": item.vehicleType,
       "remarks": this.formData.finalRemarks,
+      "edremarks": "string"
     }));
 
     const payload = {
@@ -153,34 +155,34 @@ export class ConsultancyMandatoryEquipmentComponent {
   }
 
   update() {
-      const payload = {
-        consultantRegistrationDto: { bctaNo: this.bctaNo },
-        consultantEquipmentDto: [{
-          mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
-         resubmitDeadline: this.formData.resubmitDate,
-         resubmitRemarks: this.formData.resubmitRemarks
-        }]
-      };
-    
-      this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({
-        next: (res: any) => {
-          Swal.fire({
-            icon: 'success',
-            title: 'Updated successfully!',
-            showConfirmButton: false,
-            timer: 2000
-          }).then(() => {
-            this.router.navigate(['monitoring/consultancy']);
-          });
-        },
-        error: (err) => {
-          Swal.fire({
-            icon: 'error',
-            title: 'Update failed!',
-            text: err?.error?.message || 'Something went wrong. Please try again.',
-            confirmButtonText: 'OK'
-          });
-        }
-      });
-    }
+    const payload = {
+      consultantRegistrationDto: { bctaNo: this.bctaNo },
+      consultantEquipmentDto: [{
+        mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
+        resubmitDeadline: this.formData.resubmitDate,
+        resubmitRemarks: this.formData.resubmitRemarks
+      }]
+    };
+
+    this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({
+      next: (res: any) => {
+        Swal.fire({
+          icon: 'success',
+          title: 'Updated successfully!',
+          showConfirmButton: false,
+          timer: 2000
+        }).then(() => {
+          this.router.navigate(['monitoring/consultancy']);
+        });
+      },
+      error: (err) => {
+        Swal.fire({
+          icon: 'error',
+          title: 'Update failed!',
+          text: err?.error?.message || 'Something went wrong. Please try again.',
+          confirmButtonText: 'OK'
+        });
+      }
+    });
+  }
 }

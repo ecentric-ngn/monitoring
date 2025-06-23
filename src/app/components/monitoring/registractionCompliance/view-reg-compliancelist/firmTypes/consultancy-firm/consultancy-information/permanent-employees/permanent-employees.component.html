@@ -84,7 +84,7 @@
             <!-- Buttons -->
             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3" *ngIf="applicationStatus !== 'Resubmitted HR'" >
                 <button *ngIf="formData.hrFulfilled === 'No'" type="button" class="btn btn-success"
-                    (click)="saveAndForward()">
+                    (click)="saveAndNext()">
                     Save & Forward
                 </button>
                 <button *ngIf="formData.hrFulfilled === 'Yes'" type="button" class="btn btn-success"

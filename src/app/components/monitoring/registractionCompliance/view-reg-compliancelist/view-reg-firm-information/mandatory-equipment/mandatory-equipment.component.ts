@@ -118,7 +118,7 @@ export class MandatoryEquipmentComponent {
       "equipmentType": item.equipmentName,
       "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
       "resubmitDeadline": this.formData.resubmitDate,
-      "deadlineRemarks": this.formData.resubmitRemarks,
+      "resubmitRemarks": this.formData.resubmitRemarks,
       "remarks": this.formData.finalRemarks,
     }));
 

@@ -458,9 +458,13 @@ export class CommonService {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/status/license-status/update`, payload, { responseType: 'text' });
   }
 
-  // getReinstateApplication(firmId: string) {
-  //   return this.http.get<any>(`${g2c_url_2}/compliance/suspensionFirm/${firmId}`);
-  // }
+  getReinstateApplication(firmId: string) {
+    return this.http.get<any>(`${g2c_url}/compliance/suspensionFirm/${firmId}`);
+  }
+
+  approveReinstatement(firmId: string){
+    return this.http.get<any>(`${g2c_url}/compliance/approved/${firmId}`);
+  }  
 
   downgradeFirm(payload: any) {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/downgrade/request`, payload, { responseType: 'text' });

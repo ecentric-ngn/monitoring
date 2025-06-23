@@ -18,7 +18,6 @@ export const g2c_url = "http://172.30.4.159:8180/cdb/public_access";
 export const CInet_Redirection = "http://ezotin.bcta.gov.bt/cinet";
 export const userManagment_redirection = "http://172.30.4.159/user-management";
 
-
 // // //server
 // export const userManagmentAPI = "http://192.168.124.209:8081";
 // export const Agency_api_url = "http://103.252.84.86/api";
