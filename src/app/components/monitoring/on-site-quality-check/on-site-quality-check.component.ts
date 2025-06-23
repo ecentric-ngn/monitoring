@@ -35,7 +35,7 @@ export class OnSiteQualityCheckComponent {
     ) {}
 
     ngOnInit() {
-          this.getDatabasedOnChecklistId();
+        
         this.tableId = this.tableId;
         this.data = this.data;
          this.appNoStatus = this.data.applicationStatus
