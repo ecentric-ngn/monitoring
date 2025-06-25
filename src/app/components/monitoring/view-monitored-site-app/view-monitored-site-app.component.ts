@@ -29,7 +29,7 @@ export class ViewMonitoredSiteAppComponent {
     set_limit: number[] = [10, 15, 25, 100];
     dataList: any;
     loading: boolean = true;
-
+    
     contractorClasses = ['S-Small', 'M-Medium', 'L-Large', 'All'];
 
     Dzongkhags = ['Shrek', 'Thimphu', 'Paro', 'Wangdue', 'Punakha', 'Trashigang',
@@ -67,6 +67,7 @@ export class ViewMonitoredSiteAppComponent {
         if (serviceCall) {
             serviceCall.subscribe({
                 next: (response) => {
+                    this.loading = false;
                     this.handleSuccess(response);
                     this.resetForm();
                     this.closeModal();

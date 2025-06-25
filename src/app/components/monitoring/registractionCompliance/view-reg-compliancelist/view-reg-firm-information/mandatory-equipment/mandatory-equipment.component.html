@@ -53,7 +53,7 @@
       <div class="col-md-4">
         <label class="form-label">Does the firm fulfill the required mandatory equipment:<span
             class="text-danger font-size-12">*</span></label>
-        <select class="form-select h-50" name="fulfillsRequirement" [(ngModel)]="formData.fulfillsRequirement" required
+        <select class="form-select h-50" name="fulfillsRequirement" [(ngModel)]="tData.fulfillsRequirement" required
           #fulfillsRequirement="ngModel">
           <option value="">Select</option>
           <option value="Yes">Yes</option>
@@ -64,13 +64,13 @@
         </div>
       </div>
       
-      <div class="row m-0 mt-5" *ngIf="formData.fulfillsRequirement === 'No'">
+      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No'">
         <div class="col-md-4 mb-3">
           <label class="form-label">
             Last Date to Resubmit:<span class="text-danger font-size-12">*</span>
           </label>
           <input type="date" class="form-control form-control-sm" name="resubmitDate"
-            [(ngModel)]="formData.resubmitDate" #resubmitDate="ngModel" required [min]="minResubmitDate" />
+            [(ngModel)]="tData.resubmitDate" #resubmitDate="ngModel" required [min]="minResubmitDate" />
           <div *ngIf="resubmitDate?.invalid && resubmitDate?.touched" class="text-danger font-size-12">
             Please provide a date
           </div>
@@ -79,12 +79,12 @@
         <div class="col-md-8 mb-3">
           <label class="form-label">Remarks</label>
           <textarea class="form-control form-control-sm" rows="2" name="resubmitRemarks"
-            [(ngModel)]="formData.resubmitRemarks" #resubmitRemarks="ngModel"></textarea>
+            [(ngModel)]="tData.resubmitRemarks" #resubmitRemarks="ngModel"></textarea>
         </div>
 
       </div>
 
-      <div class="col-md-12 mb-3" *ngIf="formData.fulfillsRequirement === 'Yes'">
+      <div class="col-md-12 mb-3" *ngIf="tData.fulfillsRequirement === 'Yes'">
         <label class="form-label">Remarks</label>
         <textarea class="form-control form-control-sm" rows="2" name="finalRemarks"
           [(ngModel)]="formData.finalRemarks"></textarea>
@@ -93,11 +93,11 @@
       <!-- Buttons -->
       <div class="d-flex justify-content-end mt-4"  *ngIf="applicationStatus !== 'Resubmitted EQ'">
         <button type="submit" class="btn btn-success me-2" (click)="notifyContractor()"
-          *ngIf="formData.fulfillsRequirement === 'No'">
+          *ngIf="tData.fulfillsRequirement === 'No'">
           Save & Forward
         </button>
         <button (click)="saveAndNext()" type="submit" class="btn btn-primary"
-          *ngIf="formData.fulfillsRequirement === 'Yes'">
+          *ngIf="tData.fulfillsRequirement === 'Yes'">
           Save & Next
         </button>
       </div>

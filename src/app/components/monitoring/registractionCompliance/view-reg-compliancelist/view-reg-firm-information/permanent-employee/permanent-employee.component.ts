@@ -15,6 +15,7 @@ export class PermanentEmployeeComponent {
   tableData: any;
   @Input() id: string = '';
   data: any;
+  tData: any;
   applicationStatus: string = '';
 
   constructor(private service: CommonService, private router: Router) { }
@@ -31,6 +32,11 @@ export class PermanentEmployeeComponent {
     this.bctaNo = WorkDetail.data.contractorNo;
     this.applicationStatus = WorkDetail.data.applicationStatus;
     this.data = WorkDetail.data;
+    this.tData = { 
+       hrFulfilled: '',
+       resubmitDate: '',
+       remarksNo: ''
+    };
 
     console.log('WorkDetail', WorkDetail);
     console.log('bctaNo', this.bctaNo);
@@ -101,18 +107,22 @@ export class PermanentEmployeeComponent {
       joiningDate: "2024-01-01",
       tradeField: item.tradeName,
       paySlip: item.paySlipFileName,
-      hrFulfilled: this.formData.hrFulfilled,
-      resubmitDeadline: this.formData.resubmitDate,
-      resubmitRemarks: this.formData.remarksNo,
       remarks: this.formData.remarksYes,
       tdsFetched: true
     }));
     const payload = {
-
-      registrationReview: { id: this.tableId },
+      registrationReview: { 
+        // id: this.tableId,
+        bctaNo: this.bctaNo,
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarksNo
+       },
+       
       employeeReviews: hr
 
     };
+    
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
       console.log('res', res);
       //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
@@ -134,15 +144,17 @@ export class PermanentEmployeeComponent {
       joiningDate: "2024-01-01",
       tradeField: item.tradeName,
       paySlip: item.paySlipFileName,
-      hrFulfilled: this.formData.hrFulfilled,
-      resubmitDeadline: this.formData.resubmitDate,
-      resubmitRemarks: this.formData.remarksNo,
       remarks: this.formData.remarksYes,
       tdsFetched: true
     }));
     const payload = {
 
-      registrationReview: { id: this.tableId },
+      registrationReview: { 
+        bctaNo: this.bctaNo,
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarksNo
+      },
       employeeReviews: hr
 
     };
@@ -154,12 +166,12 @@ export class PermanentEmployeeComponent {
 
   update() {
     const payload = {
-      registrationReview: { bctaNo: this.bctaNo },
-      employeeReviews: [{
+      registrationReview: { 
+        bctaNo: this.bctaNo,
         hrFulfilled: this.formData.hrFulfilled,
-        resubmitDeadline: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.remarksNo,
-      }]
+        hrResubmitDeadline: this.formData.resubmitDate,
+        hrRemarks: this.formData.remarksNo
+       }
     };
 
     this.service.saveOfficeSignageAndDoc(payload).subscribe({

@@ -10,20 +10,15 @@ import Swal from 'sweetalert2';
   styleUrls: ['./mandatory-equipment.component.scss']
 })
 export class MandatoryEquipmentComponent {
-  formData: any = {
-
-  };
+  formData: any = {};
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
-  equipmentMasterList = [
-    { id: 'eq1', name: 'Excavator' },
-    { id: 'eq2', name: 'Bulldozer' },
-    { id: 'eq3', name: 'Concrete Mixer' }
-  ];
+  
   firmType: any
   bctaNo: any
   tableData: any
   @Input() id: string = ''
   data: any;
+  tData: any;
   applicationStatus: string = '';
 
   constructor(private service: CommonService, private router: Router) { }
@@ -37,9 +32,14 @@ export class MandatoryEquipmentComponent {
       categoryOfService: '',
       equipmentDeployed: '',
       finalRemarks: '',
-      resubmitDate: '',
-      resubmitRemarks: '',
     };
+
+    this.tData = {
+      eqFulfilled: '',
+      eqResubmitDeadline: '',
+      eqRemarks: ''
+    }
+
     // Set the id from input
     this.id = this.id;
     const WorkDetail = this.service.getData('BctaNo');
@@ -56,6 +56,8 @@ export class MandatoryEquipmentComponent {
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo();
     }
+
+    this.service.setBctaNo(this.bctaNo);
   }
 
   fetchDataBasedOnBctaNo() {
@@ -95,7 +97,12 @@ export class MandatoryEquipmentComponent {
     }));
 
     const payload = {
-      registrationReview: { id: this.tableId },
+      registrationReview: {
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.resubmitRemarks
+      },
       equipmentReviews: eq
     };
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
@@ -116,15 +123,17 @@ export class MandatoryEquipmentComponent {
       "ownerName": item.ownerName,
       "ownerCid": item.ownerCid,
       "equipmentType": item.equipmentName,
-      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
-      "resubmitDeadline": this.formData.resubmitDate,
-      "resubmitRemarks": this.formData.resubmitRemarks,
       "remarks": this.formData.finalRemarks,
     }));
 
     const payload = {
-      registrationReview: { id: this.tableId },
-      
+      registrationReview: {
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.resubmitRemarks
+      },
+
       equipmentReviews: eq
     };
 
@@ -136,7 +145,8 @@ export class MandatoryEquipmentComponent {
           icon: 'warning',
           confirmButtonText: 'OK'
         });
-        this.router.navigate(['monitoring/construction']);
+        // this.router.navigate(['monitoring/construction']);   
+        this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
       },
       error: (error) => {
         Swal.fire({
@@ -150,14 +160,14 @@ export class MandatoryEquipmentComponent {
 
   update() {
     const payload = {
-      registrationReview: { bctaNo: this.bctaNo },
-      equipmentReviews: [{
-        mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
-       resubmitDeadline: this.formData.resubmitDate,
-       resubmitRemarks: this.formData.resubmitRemarks
-      }]
+      registrationReview: {
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.resubmitRemarks
+      },
     };
-  
+
     this.service.saveOfficeSignageAndDoc(payload).subscribe({
       next: (res: any) => {
         Swal.fire({

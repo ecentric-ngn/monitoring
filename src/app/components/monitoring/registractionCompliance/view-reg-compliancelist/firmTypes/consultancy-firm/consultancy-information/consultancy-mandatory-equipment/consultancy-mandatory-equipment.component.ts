@@ -24,6 +24,7 @@ export class ConsultancyMandatoryEquipmentComponent {
   @Input() id: string = ''
   data: any;
   applicationStatus: string = '';
+  isSaving = false;
 
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
@@ -79,6 +80,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
   tableId: any
   saveAndNext() {
+    this.isSaving = true;
     const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
     this.tableId = this.id;
 
@@ -102,15 +104,26 @@ export class ConsultancyMandatoryEquipmentComponent {
       consultantEquipmentDto: eq
     };
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       console.log('Emitting consultancyMonitoring', this.tableId);
 
       this.activateTab.emit({ id: this.tableId, tab: 'consultancyMonitoring' });
-    });
+    },
+    (error) => {
+        this.isSaving = false;
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to save',
+          icon: 'error'
+        });
+      }
+  );
   }
 
   notifyContractor() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
 
@@ -136,6 +149,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Requirements Not Met',
           text: 'The firm has been notified to resubmit the form',
@@ -145,6 +159,7 @@ export class ConsultancyMandatoryEquipmentComponent {
         this.router.navigate(['monitoring/consultancy']);
       },
       error: (error) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Error',
           text: 'Failed to notify firm',
@@ -155,6 +170,7 @@ export class ConsultancyMandatoryEquipmentComponent {
   }
 
   update() {
+    this.isSaving = true;
     const payload = {
       consultantRegistrationDto: { bctaNo: this.bctaNo },
       consultantEquipmentDto: [{
@@ -166,6 +182,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -176,6 +193,7 @@ export class ConsultancyMandatoryEquipmentComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',
