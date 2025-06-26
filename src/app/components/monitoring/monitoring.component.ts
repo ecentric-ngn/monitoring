@@ -152,59 +152,67 @@ export class MonitoringComponent {
         }
     }
 
-    FetchWorkBaseOnDzoId(searchQuery?: string): void {
-        // Base filter conditions that are always included
-        const baseConditions: Condition[] = [
-            {
-                field: 'dzongkhagId',
-                value: this.dzongkhagId,
-            },
-            {
-                field: 'workStatus',
-                value: 'Awarded',
-            },
-        ];
+  FetchWorkBaseOnDzoId(searchQuery?: string): void {
+    // Base filter conditions that are always included
+  const baseConditions: Condition[] = [
+    {
+        field: 'dzongkhagId',
+        value: this.dzongkhagId,
+    },
+    {
+        field: 'workStatus',
+        value: 'Awarded',
+    },
+    // {
+    //     field: 'agency_name',
+    //     operator: '!=',  // or 'NOT LIKE' if you need pattern matching
+    //     value: 'Private Construction'
+    // }
+];
+    // If there's a search query, add a LIKE condition for BCTANo
+    if (searchQuery) {
+        baseConditions.push({
+            field: 'awardedBctaNo',
+            value: `%${searchQuery}%`,
+            condition: 'LIKE',
+            operator: 'AND',
+        });
 
-        // If there's a search query, add a LIKE condition for BCTANo
-        if (searchQuery) {
-            baseConditions.push(
-                {
-                    field: 'awardedBctaNo',
-                    value: `%${searchQuery}%`,
-                    condition: ' like ',
-                    operator: ' AND ',
-                },
-                // {
-                //     field: 'workType',
-                //     value: `%${searchQuery}%`,
-                //     condition: ' like ',
-                //     operator: ' OR ',
-                // }
-            );
-        }
-
-        // Prepare the request object
-        const dzongkhagRequest = {
-            viewName: 'monitorWorkDetails',
-            pageSize: this.pageSize,
-            pageNo: this.pageNo,
-            condition: baseConditions,
-        };
-        // Fetch data from the service
-        this.service.fetchAuditData(dzongkhagRequest).subscribe(
-            (response: any) => {
-                this.loading = false;
-                this.showTable = true;
-                this.tenderList = response.data;
-                this.total_records = response.totalCount;
-                this.totalPages = Math.ceil(this.total_records / this.pageSize);
-            },
-            (error) => {
-                this.loading = false;
-                console.error('Error fetching data:', error);
-            }
-        );
+        // Optional additional search field
+        // baseConditions.push({
+        //     field: 'workType',
+        //     value: `%${searchQuery}%`,
+        //     condition: 'LIKE',
+        //     operator: 'OR',
+        // });
     }
+
+    // Prepare the request object
+    const dzongkhagRequest = {
+        viewName: 'monitorWorkDetails',
+        pageSize: this.pageSize,
+        pageNo: this.pageNo,
+        condition: baseConditions,
+    };
+
+    // Fetch data from the service
+    this.service.fetchAuditData(dzongkhagRequest).subscribe(
+        (response: any) => {
+            this.loading = false;
+            this.showTable = true;
+            const data = response.data.filter((item: any) => item.agency !== 'Private Construction');
+            this.tenderList = data;
+            console.log('response', this.tenderList );
+            this.total_records = response.totalCount;
+            this.totalPages = Math.ceil(this.total_records / this.pageSize);
+        },
+        (error) => {
+            this.loading = false;
+            console.error('Error fetching data:', error);
+        }
+    );
+}
+
     FetchPrivateWorkBaseOnDzoId(searchQuery?: string) {
            const baseConditions: Condition[] = [
               {

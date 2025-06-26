@@ -26,14 +26,14 @@
         <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
       </select>
     </div>
-    <div class="col d-flex justify-content-end pr-2">
+    <div class="col-lg-7 d-flex justify-content-end pr-2">
       <p class="mr-1 p-1 text-gray-600">Search By : </p>
-      <input type="text" placeholder="BCTA No or Firm Name" class="form-control form-control-sm col-md-4" id="search "
-        [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+      <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
+        id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
     </div>
   </div>
 
-  <div class="d-flex justify-content-end align-items-center p-2 flex-wrap">
+  <div class="d-flex justify-content-end align-items-center mt--3 flex-wrap">
     <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#firmSelectionModal">
       Send Mass Notification
     </button>
@@ -76,7 +76,11 @@
           <td class="text-center text-nowrap ">{{ data.officialStartDate | date: 'dd-MM-yyyy' }}</td>
           <td class="text-center text-nowrap  ">{{ data.officialEndDate | date: 'dd-MM-yyyy' }}</td>
           <td class="text-center">{{ data.agency }}</td>
-          <td class="text-center">{{ data.inspection_type }}</td>
+          <td class="text-center">
+            {{ data.inspection_type }}
+            <span *ngIf="data.inspection_type === 'OTHERS'">{{ data.otherWorkType }}</span>
+          </td>
+
           <td class="text-center" [ngClass]="{
               'text-success': data.applicationStatus === 'APPROVED',
               'text-danger': data.applicationStatus === 'REJECTED'
@@ -115,8 +119,9 @@
         </tr>
       </tbody>
     </table>
-    <div class="justify-content-end d-flex" *ngIf="tableData && tableData?.length > 0">
-      <button (click)="forwardApplication()" class="btn btn-success  pointer-event">
+    <div class="justify-content-end d-flex"
+      *ngIf="tableData && tableData?.length > 0 && selectedChecklistIds.length > 0">
+      <button (click)="forwardApplication()" class="btn btn-success  pointer-event" [disabled]="formDisabled">
         <span class="text-white">Forward to Review</span>
         <i class="pi pi-forward text-white ms-2"></i>
       </button>
@@ -646,63 +651,60 @@
             <form>
               <!-- Construction firm fields -->
               <!-- Row 1: Date & Subject -->
-    <div class="row g-3 m-2">
-      <div class="col-md-6">
-        <label class="form-label">Date <span class="text-danger">*</span></label>
-        <input type="date" class="form-control form-control-sm" required name="date"
-               [(ngModel)]="dateData.date" #date="ngModel">
-        <div *ngIf="date.invalid && date.touched" class="text-danger small">
-          Date is required.
-        </div>
-      </div>
+              <div class="row g-3 m-2">
+                <div class="col-md-6">
+                  <label class="form-label">Date <span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" required name="date"
+                    [(ngModel)]="dateData.date" #date="ngModel">
+                  <div *ngIf="date.invalid && date.touched" class="text-danger small">
+                    Date is required.
+                  </div>
+                </div>
 
-      <div class="col-md-6">
-        <label class="form-label">Subject <span class="text-danger">*</span></label>
-        <input type="text" class="form-control form-control-sm" required name="subject"
-               [(ngModel)]="formData.subject" #subject="ngModel">
-        <div *ngIf="subject.invalid && subject.touched" class="text-danger small">
-          Subject is required.
-        </div>
-      </div>
-    </div>
+                <div class="col-md-6">
+                  <label class="form-label">Subject <span class="text-danger">*</span></label>
+                  <input type="text" class="form-control form-control-sm" required name="subject"
+                    [(ngModel)]="formData.subject" #subject="ngModel">
+                  <div *ngIf="subject.invalid && subject.touched" class="text-danger small">
+                    Subject is required.
+                  </div>
+                </div>
+              </div>
 
-    <!-- Row 2: Deadline & Contractor Class -->
-    <div class="row g-3 m-2">
-      <div class="col-md-6">
-        <label class="form-label">Deadline (Auto-calculated)<span class="text-danger">*</span></label>
-        <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
-               [(ngModel)]="formData.deadline" readonly name="deadline">
-      </div>
+              <!-- Row 2: Deadline & Contractor Class -->
+              <div class="row g-3 m-2">
+                <div class="col-md-6">
+                  <label class="form-label">Deadline (Auto-calculated)<span class="text-danger">*</span></label>
+                  <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
+                    [(ngModel)]="formData.deadline" readonly name="deadline">
+                </div>
 
-      <div class="col-md-6">
-  <label class="form-label">Contractor Class</label>
-  <select class="form-select form-control-sm"
-          name="contractorClass"
-          [(ngModel)]="formData.workClassification"
-          multiple
-          style="height: 60px;">
-    <option value="" selected>-- Select --</option>
-    <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
-  </select>
-</div>
-    </div>
+                <div class="col-md-6">
+                  <label class="form-label">Contractor Class</label>
+                  <select class="form-select form-control-sm" name="contractorClass"
+                    [(ngModel)]="formData.workClassification" multiple style="height: 60px;">
+                    <option value="" selected>-- Select --</option>
+                    <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
+                  </select>
+                </div>
+              </div>
 
-    <!-- Continue same for other fields -->
-    
-    <!-- Row 3: Dzongkhag & HR Requirements -->
-    <div class="row g-3 m-2">
-      <div class="col-md-6">
-        <label class="form-label">Dzongkhag</label>
-        <select class="form-select form-control-sm" name="dzongkhag" [(ngModel)]="formData.dzongkhagName">
-          <option [value]="">-- Select --</option>
-          <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">{{ dzongkhag }}</option>
-        </select>
-      </div>
+              <!-- Continue same for other fields -->
 
-    </div>
+              <!-- Row 3: Dzongkhag & HR Requirements -->
+              <div class="row g-3 m-2">
+                <div class="col-md-6">
+                  <label class="form-label">Dzongkhag</label>
+                  <select class="form-select form-control-sm" name="dzongkhag" [(ngModel)]="formData.dzongkhagName">
+                    <option [value]="">-- Select --</option>
+                    <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">{{ dzongkhag }}</option>
+                  </select>
+                </div>
 
-    <!-- Row 4: Equipment -->
- 
+              </div>
+
+              <!-- Row 4: Equipment -->
+
             </form>
           </div>
 
@@ -732,7 +734,7 @@
                   <label class="form-label">Subject <span class="text-danger">*</span></label>
                   <input type="text" class="form-control" [(ngModel)]="formData.subject" name="subject" required>
                 </div>
-                 <div class="col-md-6">
+                <div class="col-md-6">
                   <label class="form-label">Contractor Class</label>
                   <select class="form-select" [(ngModel)]="formData.contractorClass" name="contractorClass">
                     <option value="">-- Select Class --</option>
@@ -745,7 +747,7 @@
               </div>
 
               <!-- Second Row -->
-           
+
 
               <!-- Fourth Row -->
               <div class="row mb-3">
@@ -894,7 +896,7 @@
 
               <!-- Second Row -->
               <div class="row mb-3">
-                 <div class="col-md-6">
+                <div class="col-md-6">
                   <label class="form-label">Status</label>
                   <select class="form-select" [(ngModel)]="formData.status" name="status">
                     <option value="Active">Active</option>

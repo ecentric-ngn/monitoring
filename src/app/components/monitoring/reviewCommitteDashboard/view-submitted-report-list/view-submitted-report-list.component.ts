@@ -52,26 +52,31 @@ export class ViewSubmittedReportListComponent {
 
     }
      selectedChecklistIds: string[] = [];
-    onCheckboxChange(data: any): void {
-    if (data.rightSelected) {
-        if (!this.selectedChecklistIds.includes(data.checklist_id)) {
-            this.selectedChecklistIds.push(data.checklist_id);
+onCheckboxChange(tender: any): void {
+    if (tender.selected) {
+        if (!this.selectedChecklistIds.includes(tender.checklist_id)) {
+            this.selectedChecklistIds.push(tender.checklist_id);
             console.log('selectedChecklistIds', this.selectedChecklistIds);
-               this.checklistIds= Array.from(this.selectedChecklistIds);
+            this.checklistIds = Array.from(this.selectedChecklistIds);
         }
     } else {
         this.selectedChecklistIds = this.selectedChecklistIds.filter(
-            id => id !== data.checklist_id
+            id => id !== tender.checklist_id
         );
     }
+}
 
-/*************  ✨ Windsurf Command ⭐  *************/
-    /**
-     * Sets the checklist_id property to the given checklistid.
-     * This function is used in the template to pass the checklist id to the component.
-     * @param checklistid The checklist id to be set.
-     */
-/*******  eb0e638e-b941-45c4-9fa9-a00b2e0c1ee7  *******/    }
+hasForwardedSelected(): boolean {
+    return this.tenderList.some(tender => 
+        tender.selected && tender.applicationStatus === 'FORWARDED'
+    );
+}
+
+hasReviewSelected(): boolean {
+    return this.tenderList.some(tender => 
+        tender.selected && tender.applicationStatus === 'REVIEWED'
+    );
+}
 EndorseApplicationNo(type: string): void {
     const payload={
         checklistIds: Array.from(this.selectedChecklistIds),
@@ -106,7 +111,29 @@ EndorseApplicationNo(type: string): void {
                 this.closeRejectButton.nativeElement.click();
             });
     }
-
+   saveReviewedData(): void {
+        const payload = {
+            checklistIds: Array.from(this.selectedChecklistIds),
+            dto: {
+                reviewDate: this.formData.reviewDate,
+                remarks: this.formData.remarks,
+            },
+            reviewerId: this.userId,
+        };
+        this.service.saveReviewedData(payload).subscribe(
+            (response: any) => {
+                console.log('Data saved successfully:', response);
+                  this.createNotification('The data has been reviewed successfully');
+                // Delay navigation by 2 seconds (2000 milliseconds)
+                setTimeout(() => {
+                    this.router.navigate(['SubmittedReport']);
+                }, 2000);
+            },
+            (error) => {
+                console.error('Error saving data:', error);
+            }
+        );
+    }
     createNotification(type: string): void {
         const message =
             type.toLowerCase() === 'reject'
@@ -178,8 +205,7 @@ onDzongkhagChange(id: number) {
         this.dzongkhagId = id;
         this.FetchWorkBaseOnDzoId();
     }
- viewName = 'checklist_deduplicated_view';
-
+ viewName = 'submittedApp_view';
 FetchWorkBaseOnDzoId(searchQuery?: string) {
   const payload: any = [];
   if (searchQuery) {
@@ -197,21 +223,8 @@ FetchWorkBaseOnDzoId(searchQuery?: string) {
     condition: "=",
     operator: "AND"
   },
-  {
-    field: "applicationStatus",
-    value: "REVIEWED",
-    condition: "like",
-    operator: "OR"
-  },
-  {
-    field: "applicationStatus",
-    value: "FORWARDED",
-    condition: "like",
-    operator: "AND"  // Important: change last operator to AND to close the group properly
-  }
 )
   }
-
   this.service.fetchDetails(payload, this.pageNo, this.pageSize, this.viewName).subscribe(
     (response: any) => {
       this.tenderList = response.data;
@@ -278,8 +291,7 @@ FetchWorkBaseOnDzoId(searchQuery?: string) {
      */
 
     searchBasedOnBCTANo(
-        id: number,
-        viewName: string = 'checklist_deduplicated_view'
+        viewName: string = 'submittedApp_view'
     ) {
         const payload: any = [
             {
@@ -290,9 +302,7 @@ FetchWorkBaseOnDzoId(searchQuery?: string) {
             },
         ];
 
-        this.service
-            .fetchDetails(payload, this.pageNo, this.pageSize, viewName)
-            .subscribe(
+        this.service.fetchDetails(payload, this.pageNo, this.pageSize, viewName).subscribe(
                 (response: any) => {
                     this.tenderList = response.data;
                     this.showTable = true;

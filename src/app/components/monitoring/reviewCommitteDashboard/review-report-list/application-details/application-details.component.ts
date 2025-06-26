@@ -29,7 +29,7 @@ export class ApplicationDetailsComponent {
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
-        private router: Router
+        private router: Router,
     ) {}
     humanResources: any[] = [];
     committedEquipment: any[] = [];
@@ -57,76 +57,23 @@ export class ApplicationDetailsComponent {
         const data = this.service.getData('applicationNumber');
         this.data = data;
         this.appNoStatus = data.applicationStatus;
-        this.dzongkhagName = data.dzongkhag || data.dzongkhagName;
-        // this.awardedBctaNo = data.awardedBctaNo;
-        if(this.dzongkhagName){
-            this.FetchWorkBaseOnDzoId(this.dzongkhagName);
+        this.checklistId = data.checklist_id;
+        if(this.checklistId){
+            this.getAllData();
+            this.gethumanResourceList();
+            this.getReinforcementList();
+            this.getOnsiteQuantityList();
+            this.getMonitoringTeamList();
+            this.getSiteMonitoringTeamList();
+            this.getCommitedEquipmentList();
+            this.getSkilledWorkerList();
         }
-    }
-
-onSelectedApplication(checked: boolean, checklist_id: string) {
-  if (checked) {
-    if (!this.selectedChecklistIds.includes(checklist_id)) {
-      this.selectedChecklistIds.push(checklist_id);
-    }
-    this.selectedAppNoChecklisId = checklist_id;
-    this.getAllData();
-    this.gethumanResourceList();
-    this.getReinforcementList();
-    this.getOnsiteQuantityList();
-    this.getMonitoringTeamList();
-    this.getSiteMonitoringTeamList();
-    this.getCommitedEquipmentList();
-    this.getSkilledWorkerList();
-    this.showFormData = true;
-    this.disableSaveButton = false;
-  } else {
-    this.selectedChecklistIds = this.selectedChecklistIds.filter(id => id !== checklist_id);
-    if (this.selectedAppNoChecklisId === checklist_id) {
-      this.selectedAppNoChecklisId = null;
-      this.showFormData = false;
-    }
-  }
-}
-
-    FetchWorkBaseOnDzoId(id: any, viewName: string = 'checklist_deduplicated_view') {
-    const payload: any = [
-    {
-        "field": "dzongkhag",
-        "value": this.dzongkhagName,
-        "condition": "=", 
-        "operator": "AND"
-    },
-
-     {
-        "field": "applicationStatus",
-        "value": "FORWARDED",
-        "condition": "like",
-        "operator": "AND"
-    },
- 
-    ];
-
-    this.service.fetchDetails(payload, this.pageNo, this.pageSize, viewName).subscribe(
-    (response: any) => {
-        const application_number = response.data.map((item: any) => ({
-        application_number: item.application_number,
-        id: item.checklist_id,
-        awardedBctaNo: item.awardedBctaNo
-        }));
-        this.application_number = application_number;
-    },
-    (error) => {
-        console.error('Error fetching contractor details:', error);
-    }
-    );
-
     }
     gethumanResourceList() {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -145,7 +92,7 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -164,7 +111,7 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -184,7 +131,7 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -204,7 +151,7 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -224,7 +171,7 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -281,11 +228,15 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
         return parts[parts.length - 1];
     }
 
+
+    goBack() {
+          this.router.navigate(['SubmittedReport']);
+    }
     getSiteMonitoringTeamList() {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -305,7 +256,7 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value:this.selectedAppNoChecklisId,
+                value:this.checklistId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -331,51 +282,7 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
                 }
             );
     }
-    reviewedAppNos: Set<string> = new Set();
-    disableSaveButton: boolean = false;
-    storeReviewedChecklistId(): void {
-    if (this.selectedAppNoChecklisId) {
-        // Mark this checklist ID as reviewed
-        this.reviewedAppNos.add(this.selectedAppNoChecklisId);
-        this.reviewedAppNos = new Set(this.reviewedAppNos);
-        console.log('this.reviewedAppNos', this.reviewedAppNos);
-        // Hide the form since review is done
-        this.showFormData = false;
-        this.disableSaveButton = true;
-        console.log('Reviewed appNos:', Array.from(this.reviewedAppNos));
-    }
-    }
-
-
-    /**
-     * Save the reviewed data for the given checklist id.
-     *
-     * @param {number} checklistId The checklist id
-     * @returns {Observable<any>} An observable containing the response from the server
-     */
-    saveReviewedData(): void {
-        const payload = {
-            checklistIds: Array.from(this.reviewedAppNos),
-            dto: {
-                reviewDate: this.formData.reviewDate,
-                remarks: this.formData.remarks,
-            },
-            reviewerId: this.userId,
-        };
-        this.service.saveReviewedData(payload).subscribe(
-            (response: any) => {
-                console.log('Data saved successfully:', response);
-                this.createNotification();
-                // Delay navigation by 2 seconds (2000 milliseconds)
-                setTimeout(() => {
-                    this.router.navigate(['SubmittedReport']);
-                }, 2000);
-            },
-            (error) => {
-                console.error('Error saving data:', error);
-            }
-        );
-    }
+ 
     createNotification(): void {
         this.notification
             .success('Success', 'The data has been reviewed successfully')
@@ -433,54 +340,5 @@ onSelectedApplication(checked: boolean, checklist_id: string) {
             'downloaded-file'
         );
     }
-
-
-printCertificate(): void {
-  const certificateContent = document.querySelector('.certificate-container') as HTMLElement;
-
-  if (certificateContent) {
-    html2canvas(certificateContent, {
-      scale: 2,
-      useCORS: true,
-      scrollY: -window.scrollY,
-    }).then((canvas) => {
-      const imgData = canvas.toDataURL('image/jpeg', 1.0);
-      const pdf = new jsPDF({
-        orientation: 'portrait',
-        unit: 'pt',
-        format: 'a4',
-      });
-
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
-
-      const imgWidth = pdfWidth;
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
-      let heightLeft = imgHeight;
-      let position = 0;
-
-      // Add the first page
-      pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pdfHeight;
-
-      // Add more pages if needed
-      while (heightLeft > 0) {
-        position -= pdfHeight;
-        pdf.addPage();
-        pdf.addImage(imgData, 'JPEG', 0, position, imgWidth, imgHeight);
-        heightLeft -= pdfHeight;
-      }
-
-      pdf.save('Certificate.pdf');
-    }).catch((error) => {
-      console.error('PDF generation failed:', error);
-    });
-  } else {
-    console.error('Certificate container not found');
-  }
-}
-
-
   
 }

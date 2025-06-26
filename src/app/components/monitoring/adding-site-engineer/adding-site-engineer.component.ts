@@ -43,7 +43,7 @@ constructor(private service:CommonService,private router: Router,private notific
 ngOnInit() {
   this.tableId=this.tableId
   this.data = this.data
-   this.appNoStatus = this.data.applicationStatus
+  this.appNoStatus = this.data?.applicationStatus ?? null;
   this.prevTableId=this.prevTableId
     if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;

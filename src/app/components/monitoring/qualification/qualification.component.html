@@ -25,7 +25,7 @@
         <div class="d-flex">
           <input type="text" name="bctaRegistrationNo" class="form-control me-2 form-control-sm"
             [(ngModel)]="formData.bctaRegistrationNo" required #bctaRegistrationNo="ngModel" />
-          <button type="button" class="btn btn-primary" (click)="FetchBCTARegDetails()">
+          <button type="button" class="btn btn-primary" (click)="FetchBCTARegDetails()" [disabled]="appNoStatus === 'REJECTED'">
             {{ isFetching ? 'Fetching...' : 'Fetch' }}
           </button>
         </div>
@@ -39,16 +39,16 @@
 
 
       <div class="col-md-6 mb-3" *ngIf="formData.contractorType === 'Yes'">
-        <label class="form-label">Specialized Firm Name*:<span class="text-danger font-size-12">*</span></label>
+        <label class="form-label">Firm Name*:<span class="text-danger font-size-12">*</span></label>
         <input type="text" name="nameOfFirm" class="form-control form-control-sm" [(ngModel)]="formData.nameOfFirm"
-          required  [disabled]="disableField" />
+          required  [disabled]="disableField" [disabled]="appNoStatus === 'REJECTED'" />
        
       </div>
 
       <div class="col-md-6 mb-3" *ngIf="formData.contractorType === 'Yes'">
         <label class="form-label">Date Validity:<span class="text-danger font-size-12">*</span></label>
         <input type="text" name="dateValidity" class="form-control form-control-sm" [(ngModel)]="formData.expiryDate"
-          require [disabled]="disableField" />
+          require [disabled]="disableField" [disabled]="appNoStatus === 'REJECTED'"/>
         
       </div>
       <div class="col-md-6 m-auto">
@@ -122,7 +122,7 @@
       </div>
 
       <div class="col-md-6 mb-3">
-        <label class="form-label">Remarks:</label>
+        <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
         <textarea class="form-control " placeholder="Enter remarks" [(ngModel)]="formData.remarks" id="remarks"
           name="remarks" required #remarks> </textarea>
         <div *ngIf="remarks.invalid && remarks.touched" class="text-danger font-size-12">

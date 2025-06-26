@@ -64,17 +64,20 @@ export class OnsiteFacilitiesandManagementComponent {
         this.appNoStatus = this.workInformationdata?.applicationStatus || null;
         this.prevTableId = this.prevTableId || this.workInformationdata?.checklist_id || null;
         this.data = this.datas || this.workInformationdata;
-        this.getDatabasedOnChecklistId();
+
     } else {
         const WorkDetail = this.service.getData('BctaNo') || {};
         this.appNoStatus = WorkDetail.data?.applicationStatus || null;
         this.prevTableId = this.prevTableId || WorkDetail.data?.checklist_id || null;
         this.tableId = WorkDetail?.workId || WorkDetail?.checklist_id || null;
         this.data = WorkDetail?.data || this.datas || null;
-          this.getDatabasedOnChecklistId();
+        
     }
+    if(this.prevTableId){
+        this.getDatabasedOnChecklistId();
     }
 
+}
 
     pageNo: number = 1;
     pageSize: number = 10;
@@ -291,7 +294,7 @@ export class OnsiteFacilitiesandManagementComponent {
     private saveDraftPayload() {
     const payload: any = {
     inspectionId: this.userId,
-    id: parseInt(this.checkListId, 10) || this.data.checklist_id,
+    id: this.prevTableId,
     inspectionType: this.workType,
     projectSignInstalled: this.formData.projectSignBoard,
     siteOfficeAvailable: this.formData.siteOffice,

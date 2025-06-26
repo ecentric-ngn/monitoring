@@ -804,10 +804,11 @@ savedCertifiedSkilledWorkerData(event: { tableId: any, data: any,inspectionType:
 
 }
 hrstrengthAtSiteTabEnabled: boolean = false;	
-saveCommittedEquipmentData(event: { tableId: any, data: any}) {
+saveCommittedEquipmentData(event: { tableId: any, data: any,inspectionType:any }) {
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 11);
  this.tableId = event.tableId;
   this.data = event.data;
+  this.inspectionType = event.inspectionType;
   this.showHRStrengthAtSite = true;
   this.hrstrengthAtSiteTabEnabled = true;
   setTimeout(() => {
@@ -816,9 +817,10 @@ saveCommittedEquipmentData(event: { tableId: any, data: any}) {
 
 }
 contractorPresentDuringSiteMonitoringTabEnabled: boolean = false;
-humanResourcestrengthsitedata(event: { tableId: any, data: any}) {
- this.tableId = event.tableId;
+humanResourcestrengthsitedata(event: { tableId: any, data: any,inspectionType:any }) {
+  this.tableId = event.tableId;
   this.data = event.data;
+  this.inspectionType = event.inspectionType;
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 12);
   this.showHRStrengthAtSite = false
   this.showContractorPresentDuringSiteMonitoring = true;

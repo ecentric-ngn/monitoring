@@ -117,7 +117,7 @@
   </div>
 
   <div class="justify-content-end d-flex">
-    <button class="btn mr-1 text-white prev-btn" type="submit" (click)="onPreviousClick()" type="submit">Prev</button>
+    <button  *ngIf="appNoStatus !== 'REJECTED'" class="btn mr-1 text-white prev-btn" type="submit" (click)="onPreviousClick()" type="submit">Prev</button>
     <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
   </div>
 </form>

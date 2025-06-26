@@ -43,7 +43,7 @@ export class WorkProgressComponent {
         }
         this.tableId = this.tableId;
         this.data = this.data;
-         this.appNoStatus = this.data.applicationStatus
+        this.appNoStatus = this.data?.applicationStatus ?? null;
         this.inspectionType = this.inspectionType;
         this.prevTableId= this.prevTableId 
          if (this.appNoStatus === 'REJECTED') {

@@ -77,10 +77,11 @@
                 <option value="REPLACED">Replaced</option>
               </select>
             </td>
-
+          
             <!-- Remove Button -->
-            <td class="text-center" *ngIf="additionalItems.length > 1">
-              <button class="btn btn-danger btn-sm" (click)="removeAdditionalItem(j)">Remove</button>
+            <td class="text-center" >
+              <button class="btn btn-success btn-sm"(click)="showCertificateModal(item)"data-bs-toggle="modal" data-bs-target="#equipmentCertificateModal">Check</button>
+              <button *ngIf="additionalItems.length > 1" class="btn btn-danger btn-sm" (click)="removeAdditionalItem(j)">Remove</button>
             </td>
           </tr>
         </ng-container>
@@ -122,7 +123,7 @@
 
       <!-- Remarks Section -->
       <div class="col-md-6">
-        <label for="remarks" class="form-label fw-semibold">Remarks</label>
+        <label for="remarks" class="form-label fw-semibold">Remarks:<span class="text-danger font-size-12">*</span></label>
         <textarea class="form-control" id="remarks" name="remarks"  placeholder="Enter remarks"
           [(ngModel)]="formData.remarks" required #remarks="ngModel">
     </textarea>
@@ -291,6 +292,72 @@
           Cancel
         </button>
         <button type="button" class="btn btn-primary" (click)="VerifiedData()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="equipmentCertificateModal" tabindex="-1" aria-labelledby="equipmentCertificateLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="equipmentCertificateLabel">Vehicle Details</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="certificate-container border">
+          <img src="../../assets/logo.png" alt="Background Logo" class="background-logo">
+          <div class="content">
+            <div class="header">
+              <div class="subtitle">Bhutan Construction and Transport Authority - BCTA</div>
+            </div>
+
+             <!-- <p *ngIf="!VehicleDetails && !showMessage" class="text-danger text-center">
+              <b>{{showMessage}}</b>
+            </p>
+            <p *ngIf="showMessage" class="text-danger text-center">
+              <b>{{showMessage}}</b>
+            </p> -->
+           <p *ngIf="showErrorMessage" class="text-danger text-center">
+              <b>{{showErrorMessage}}</b>
+            </p> 
+
+            <div *ngIf="VehicleDetails && !showErrorMessage">
+              <table class="table col-lg-7 offset-lg-3">
+                <tr><th>Registration No :</th><td>{{VehicleDetails.vehicleNumber}}</td></tr>
+                <tr><th>Owner:</th><td>{{VehicleDetails.ownerName}}</td></tr>
+                <tr><th>Vehicle Type:</th><td>{{VehicleDetails.vehicleTypeName}}</td></tr>
+                <tr><th>Vehicle Model:</th><td>{{VehicleDetails.vehicleModel}}</td></tr>
+                <tr><th>Chassis Number :</th><td>{{VehicleDetails.chassisNumber}}</td></tr>
+                <tr><th>Engine Number:</th><td>{{VehicleDetails.engineNumber}}</td></tr>
+                <tr><th>Expiry Date:</th><td>{{VehicleDetails.expiryDate}}</td></tr>
+              </table>
+            </div>
+
+            <!-- <table class="table col-lg-8 offset-lg-2">
+              <tr>
+                <th *ngIf="!employeeEngaged" colspan="2" class="text-center text-success">This Equipment is not engaged in any work or project.</th>
+                <th *ngIf="employeeEngaged" colspan="2" class="text-center text-danger">This Equipment is engaged in work.</th>
+              </tr>
+            </table> -->
+          </div>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <!-- Optional footer buttons -->
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+        <button type="button" class="btn btn-primary" (click)="closeModalForm()" data-bs-dismiss="modal">OK</button>
       </div>
     </div>
   </div>

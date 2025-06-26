@@ -37,19 +37,32 @@ export class ReviewReportListComponent {
         if (searchQuery) {
             // When searching by application number, ignore applicationStatus
             payload.push({
-                field: 'application_number',
+                field: 'awardedBctaNo',
                 value: `%${searchQuery}%`,
                 condition: 'like',
                 operator: 'AND',
-            });
+            },
+             {
+                field: 'application_number',
+                value: `%${searchQuery}%`,
+                condition: 'like',
+                operator: 'OR',
+            },
+             {
+                field: 'applicationStatus',
+                value: `%${searchQuery}%`,
+                condition: 'like',
+                operator: 'OR',
+            }
+        );
         } else {
             // Default filter when no search query is provided
-            payload.push({
-                field: 'applicationStatus',
-                value: 'REVIEWED',
-                operator: 'AND',
-                condition: '=',
-            });
+            // payload.push({
+            //     field: 'applicationStatus',
+            //     value: 'REVIEWED',
+            //     operator: 'AND',
+            //     condition: '=',
+            // });
         }
 
         this.service

@@ -154,12 +154,10 @@
         <tr *ngFor="let tender of privateTenderList; let i = index">
           <td class="p-1 text-center">{{i + 1}}</td>
           <td class="text-center">
-            <a *ngIf="tender.awardedAmount >= 5000000" class="font-bold text-primary sl_no" (click)="navigate(tender)">
+            <a  class="font-bold text-primary sl_no" (click)="navigate(tender)">
               {{ tender.BCTANo }}
             </a>
-            <span *ngIf="tender.awardedAmount < 5000000" class="font-bold">
-              {{ tender.BCTANo }}
-            </span>
+          
           </td>
 
           <td class="text-center pointer">{{ tender.referenceNo}} </td>
