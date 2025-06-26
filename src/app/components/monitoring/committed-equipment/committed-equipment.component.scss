@@ -1,0 +1,21 @@
+.certificate-container {
+    padding: 20px;
+    background-color: white;
+    position: relative;
+}
+.background-logo {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 60%;
+    opacity: 0.1; /* Set the opacity for the background logo */
+    z-index: 0;
+}
+.content {
+    position: relative;
+    z-index: 1;
+}
+.header {
+    text-align: center;
+}

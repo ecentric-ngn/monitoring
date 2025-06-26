@@ -13,9 +13,9 @@
             <input type="text" class="form-control form-control-sm me-2" [(ngModel)]="formData.ClientOwnerName"
               placeholder="Text" name="ClientOwnerName" id="ClientOwnerName" required #ClientOwnerName="ngModel">
           </div>
-          <!-- <div *ngIf="ClientOwnerName.invalid && ClientOwnerName.touched" class="text-danger font-size-12">
+          <div *ngIf="ClientOwnerName.invalid && ClientOwnerName.touched" class="text-danger font-size-12">
             Please enter Owner Name
-          </div> -->
+          </div>
 
         </div>
 
@@ -29,9 +29,9 @@
               placeholder="Text" name="clientCurrentAddress" id="clientCurrentAddress" required
               #clientCurrentAddress="ngModel">
           </div>
-          <!-- <div *ngIf="clientCurrentAddress.invalid && clientCurrentAddress.touched" class="text-danger font-size-12">
+          <div *ngIf="clientCurrentAddress.invalid && clientCurrentAddress.touched" class="text-danger font-size-12">
             Please enter Current Address
-          </div> -->
+          </div>
 
         </div>
 
@@ -44,9 +44,9 @@
             <input type="text" class="form-control form-control-sm me-2" [(ngModel)]="formData.clientMobileNo"
               placeholder="number" name="clientMobileNo" id="clientMobileNo" required #clientMobileNo="ngModel">
           </div>
-          <!-- <div *ngIf="clientMobileNo.invalid && clientMobileNo.touched" class="text-danger font-size-12">
+          <div *ngIf="clientMobileNo.invalid && clientMobileNo.touched" class="text-danger font-size-12">
             Please enter Current Address
-          </div> -->
+          </div>
 
         </div>
         
@@ -57,9 +57,9 @@
             <input (input)="clearErrorMessage()" type="text" class="form-control form-control-sm"
               [(ngModel)]="formData.clientEmailAddress" placeholder="Enter Owner Name" name="clientEmailAddress"
               required #clientEmailAddress="ngModel">
-            <!-- <div *ngIf="clientEmailAddress.invalid && clientEmailAddress.touched" class="text-danger font-size-12">
+            <div *ngIf="clientEmailAddress.invalid && clientEmailAddress.touched" class="text-danger font-size-12">
               Please enter Owner Name
-            </div> -->
+            </div>
           </div>
         </div>
       <div class="font-bold font-size-14">Contractor Details</div>
@@ -68,16 +68,15 @@
         <div class="col-md-4 mb-3">
           <label class="form-label">
             BCTA Registration Number:
-            <span class="text-danger font-size-12">*</span>
           </label>
           <div class="d-flex">
             <input type="text" class="form-control form-control-sm me-2" [(ngModel)]="formData.contractorNo"
-              placeholder="Text" name="contractorNo" id="contractorNo" required #contractorNo="ngModel">
+              placeholder="Text" name="contractorNo" id="contractorNo">
             <button type="button" class="btn btn-primary btn-sm" (click)="searchBasedOnBCTANo()">Search</button>
           </div>
-          <div *ngIf="contractorNo.invalid && contractorNo.touched" class="text-danger font-size-12">
+          <!-- <div *ngIf="contractorNo.invalid && contractorNo.touched" class="text-danger font-size-12">
             Please enter BCTA Registration Number
-          </div>
+          </div> -->
           <div class="text-danger font-size-12" *ngIf="displayMessage">
             {{displayMessage}}
           </div>
@@ -85,54 +84,52 @@
 
 
         <div class="col-md-4 mb-3">
-          <label class="form-label">Owner Name:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Owner Name:</label>
           <input (input)="clearErrorMessage()" type="text" class="form-control form-control-sm"
-            [(ngModel)]="formData.ownerDetails" placeholder="Enter Owner Name" name="ownerDetails" required
-            #ownerDetails="ngModel">
-          <div *ngIf="ownerDetails.invalid && ownerDetails.touched" class="text-danger font-size-12">
+            [(ngModel)]="formData.ownerDetails" placeholder="Enter Owner Name" name="ownerDetails" >
+          <!-- <div *ngIf="ownerDetails.invalid && ownerDetails.touched" class="text-danger font-size-12">
             Please enter Owner Name
-          </div>
+          </div> -->
         </div>
         <div class="col-md-4 mb-3">
-          <label class="form-label">Specialized Firm Name:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Specialized Firm Name:</label>
           <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.nameOfFirm"
-            placeholder="Enter Specialized Firm Name" name="nameOfFirm" required #nameOfFirm="ngModel">
-          <div *ngIf="nameOfFirm.invalid && nameOfFirm.touched" class="text-danger font-size-12">
+            placeholder="Enter Specialized Firm Name" name="nameOfFirm">
+          <!-- <div *ngIf="nameOfFirm.invalid && nameOfFirm.touched" class="text-danger font-size-12">
             Please enter Name Of Firm
-          </div>
+          </div> -->
         </div>
       </div>
       <div class="row mb-3">
         <div class="col-md-4 mb-auto">
-          <label class="form-label">Specialized Class:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Specialized Class:</label>
           <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.workClassification"
-            placeholder="Enter Specialized Class" id="workClassification" name="workClassification" required
-            #workClassification="ngModel">
-          <div *ngIf="workClassification.invalid && workClassification.touched" class="text-danger font-size-12">
+            placeholder="Enter Specialized Class" id="workClassification" name="workClassification">
+          <!-- <div *ngIf="workClassification.invalid && workClassification.touched" class="text-danger font-size-12">
             Please enter Specialized Class
-          </div>
+          </div> -->
         </div>
         <div class="col-md-4 mb-auto">
-          <label class="form-label">Address:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Address:</label>
           <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.establishmentAddress"
-            placeholder="Enter Address" name="establishmentAddress" required #establishmentAddress="ngModel">
-          <div *ngIf="establishmentAddress.invalid && establishmentAddress.touched" class="text-danger font-size-12">
+            placeholder="Enter Address" name="establishmentAddress" >
+          <!-- <div *ngIf="establishmentAddress.invalid && establishmentAddress.touched" class="text-danger font-size-12">
             Please enter Address
-          </div>
+          </div> -->
         </div>
         <div class="col-md-4 mb-auto">
-          <label class="form-label">Mobile No:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Mobile No:</label>
           <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.mobileNo"
-            placeholder="Enter mobileNo" name="mobileNo" required #mobileNo="ngModel" maxlength="8"
+            placeholder="Enter mobileNo" name="mobileNo"  maxlength="8"
             pattern="^[0-9]{1,8}$">
 
-          <div *ngIf="mobileNo.invalid && mobileNo.touched" class="text-danger font-size-12">
+          <!-- <div *ngIf="mobileNo.invalid && mobileNo.touched" class="text-danger font-size-12">
             Please enter mobileNo
-          </div>
+          </div> -->
 
-          <div *ngIf="mobileNo.errors?.['pattern'] && mobileNo.touched" class="text-danger">
+          <!-- <div *ngIf="mobileNo.errors?.['pattern'] && mobileNo.touched" class="text-danger">
             Mobile number must be digits only and up to 8 digits
-          </div>
+          </div> -->
         </div>
 
 
@@ -140,11 +137,11 @@
       </div>
       <div class="row">
         <div class="col-md-4">
-          <label class="form-label">Email Address:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Email Address:</label>
           <input type="email" class="form-control form-control-sm" [(ngModel)]="formData.email"
             placeholder="Enter email" name="email" required email #email="ngModel">
           <div *ngIf="email.errors && email.touched" class="text-danger font-size-12">
-            <div *ngIf="email.errors.required">Please enter email</div>
+            <!-- <div *ngIf="email.errors.required">Please enter email</div> -->
             <div *ngIf="email.errors.email">Please enter a valid email (must contain @)</div>
           </div>
         </div>

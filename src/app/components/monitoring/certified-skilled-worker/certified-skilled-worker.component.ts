@@ -39,7 +39,7 @@ export class CertifiedSkilledWorkerComponent {
             this.userName = userDetails.username;
         }
         this.prevTableId = this.prevTableId 
-         this.appNoStatus = this.data.applicationStatus
+          this.appNoStatus = this.data?.applicationStatus ?? null;
          if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {

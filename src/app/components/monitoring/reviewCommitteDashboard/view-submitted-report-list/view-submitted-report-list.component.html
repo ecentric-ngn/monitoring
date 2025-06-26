@@ -8,7 +8,6 @@
 </div>
 <div class="card container-fluid" *ngIf="!loading">
     <p class="font-bold font-size-18"><strong>List of New sites</strong></p>
-
     <form>
         <div class=" border p-3">
             <div class="row align-items-end">
@@ -78,6 +77,7 @@
                     <th class="text-center">Procuring Agency</th>
                     <th class="text-center">Work Type</th>
                     <th class="text-center">Status</th>
+                    <th class="text-center">Monitored Date</th>
                     <th class="text-center">Action</th>
                     <th class="text-center">select</th>
                 </tr>
@@ -97,19 +97,19 @@
                     <td class="text-center">{{ tender.agency }}</td>
                     <td class="text-center">{{ tender.inspection_type }}</td>
                     <td class="text-center">{{ tender.applicationStatus }}</td>
+                    <td class="text-center text-nowrap">{{ tender.monitoredDate | date: 'dd-MM-yyyy' }}</td>
                     <td class="text-center">
                         <div class="d-flex justify-content-center gap-2">
                             <button *ngIf="tender.applicationStatus ==='FORWARDED'" class="btn btn-primary btn-sm h-100"
                                 (click)="navigate(tender)">View</button>
-
                         </div>
                     </td>
                     <td class="text-center">
                         <input type="checkbox"
-                            [disabled]="tender.applicationStatus === 'FORWARDED' || tender.applicationStatus === 'REJECTED' || tender.applicationStatus === 'APPROVED' || tender.applicationStatus === 'ACTION TAKEN' || tender.applicationStatus === 'SUBMITTED'"
-                            [(ngModel)]="tender.selected" [(ngModel)]="tender.rightSelected" (change)="onCheckboxChange(tender)" />
+                            [disabled]="tender.applicationStatus === 'REJECTED' || tender.applicationStatus === 'APPROVED' || tender.applicationStatus === 'ACTION TAKEN' || tender.applicationStatus === 'SUBMITTED'"
+                            [(ngModel)]="tender.selected" (change)="onCheckboxChange(tender)" />
                     </td>
-                       <!-- <td class="text-center">
+                    <!-- <td class="text-center">
                         <input type="checkbox"
                             [disabled]="tender.applicationStatus === 'FRWARDED' || tender.applicationStatus === 'REJECTED' || tender.applicationStatus === 'APPROVED'"
                             [(ngModel)]="tender.selected" [(ngModel)]="tender.rightSelected" (change)="onCheckboxChange(tender)" />
@@ -117,15 +117,19 @@
                 </tr>
             </tbody>
         </table>
-        <div class="d-flex justify-content-end align-items-center mb-4 gap-2" *ngIf="showTable && tenderList.length > 0">
+        <div class="d-flex justify-content-end align-items-center mb-4 gap-2"
+            *ngIf="showTable && tenderList.length > 0 && selectedChecklistIds.length > 0">
             <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to endorse the application?'"
                 (nzOnConfirm)="EndorseApplicationNo('ENDORSE')">
-                <button class="btn btn-primary btn-sm h-100">
+                <button class="btn btn-primary btn-sm h-100" [disabled]="hasForwardedSelected()">
                     Endorse
                 </button>
             </a>
-            <button class="btn btn-danger btn-sm h-100" (click)="getId('nbbb')" data-bs-toggle="modal"
+            <button class="btn btn-danger btn-sm h-100" [disabled]="hasForwardedSelected()"
+                (click)="onCheckboxChange('reject')" data-bs-toggle="modal"
                 data-bs-target="#rejectedReason">Reject</button>
+
+            <button class="btn btn-primary btn-sm h-100" data-bs-toggle="modal" data-bs-target="#review" [disabled]="hasReviewSelected()">Review</button>
         </div>
         <div *ngIf="tenderList && showTable" class="d-flex justify-content-between  align-items-center">
             <p class="mb-0 fw-bold font-size-12">{{ calculateOffset() }}</p>
@@ -149,7 +153,7 @@
 
     </div>
 
-
+    <!-- rejected modal -->
     <div class="modal fade" id="rejectedReason" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
         aria-labelledby="staticBackdropLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -183,3 +187,34 @@
             </div>
         </div>
     </div>
+</div>
+<div class="modal fade" id="review" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel">Review Application</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row p-3">
+                    <div class="col-md-6">
+                        <label class="form-label me-2 font-size-12">Review Date:<span class="text-danger">*</span></label>
+                        <input type="date" class="form-control form-control-sm border" [(ngModel)]="formData.reviewDate"
+                            name="reviewDate" required #reviewDate="ngModel">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label me-2 font-size-12">Remarks:<span class="text-danger">*</span></label>
+                        <textarea class="form-control form-control-sm border" placeholder="Enter remarks"
+                            [(ngModel)]="formData.remarks" name="remarks" required #remarks="ngModel"></textarea>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" #closeRejectButton class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary"
+                    (click)="saveReviewedData()">Save</button>
+            </div>
+        </div> <!-- This closes the modal-content div -->
+    </div> <!-- This closes the modal-dialog div -->
+</div> <!-- This closes the modal div -->

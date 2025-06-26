@@ -229,15 +229,28 @@ export class ViewMonitoredSiteAppComponent {
     pageSize: number = 10;
     getReportList(searchQuery?: string) {
         const payload: any = [];
-
         if (searchQuery) {
             // Only search by awardedBctaNo if searchQuery is provided
-            payload.push({
+            payload.push(
+                {
                 field: 'awardedBctaNo',
                 value: `%${searchQuery}%`,
                 condition: 'like',
-                operator: 'AND',
-            });
+                operator: 'OR',
+            },
+             {
+                field: 'application_number',
+                value: `%${searchQuery}%`,
+                condition: 'like',
+                operator: 'OR',
+            },
+             {
+                field: 'applicationStatus',
+                value: `%${searchQuery}%`,
+                condition: 'like',
+                operator: 'OR',
+            }
+        );
         } else {
             // Apply status filters only when not searching
             payload.push(
@@ -323,6 +336,7 @@ export class ViewMonitoredSiteAppComponent {
         this.service.saveActionTakenByData(payload, this.checkListId).subscribe(
             (response: any) => {
                 this.closeactionTakenModal.nativeElement.click();
+               this.formData.contractorNo='';
                 this.createNotification();
                 this.getReportList();
             },
@@ -332,12 +346,13 @@ export class ViewMonitoredSiteAppComponent {
         );
     }
     selectedChecklistIds: string[] = [];
-
+    formDisabled: boolean = false;
     onCheckboxChange(data: any): void {
         if (data.rightSelected) {
             // Add to list if not already there
             if (!this.selectedChecklistIds.includes(data.checklist_id)) {
                 this.selectedChecklistIds.push(data.checklist_id);
+                this.formDisabled = true
             }
         } else {
             // Remove from list if unchecked

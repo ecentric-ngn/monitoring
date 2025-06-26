@@ -27,7 +27,7 @@ export class ContractDocumentComponent {
   fileInputs: number[] = [0]; // Tracks each file input field
   fileErrors: string[] = [];
   selectedFiles: File[] = [];
-  appNoStatus: any;
+  appNoStatus: any ={};
   constructor(private notification: NzNotificationService,private service:CommonService,private router: Router) { }
 
   ngOnInit() {
@@ -39,10 +39,11 @@ export class ContractDocumentComponent {
     }
     this.tableId  =this.tableId
     this.data=this.data
-    this.appNoStatus = this.data.applicationStatus
+    this.appNoStatus = this.data?.applicationStatus ?? null;
     this.prevTableId = this.prevTableId 
-    if (this.appNoStatus === 'REJECTED') {
-            this.prevTableId = this.tableId;
+    if (this.appNoStatus=== 'REJECTED') {
+        this.prevTableId = this.tableId;
+        debugger
         } else {
             this.prevTableId = this.prevTableId
         }
@@ -77,6 +78,7 @@ export class ContractDocumentComponent {
               this.formData.journalMaintained= data.day_work_journal_maintained,
               this.formData.envManagementPlan= data.day_work_journal_maintained,
               this.formData.testReportsDocumented= data.day_work_journal_maintained,
+              this.formData.remarks= data.remarks,
               this.formData.HindranceRegisterSelectmaintained= data.hindrance_register_maintained
               this.formData.workplan= data.work_plan
               if (data.file_path) {

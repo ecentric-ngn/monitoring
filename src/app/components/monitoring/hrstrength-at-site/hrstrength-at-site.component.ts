@@ -16,12 +16,14 @@ export class HRStrengthAtSiteComponent {
      @Output() humanResourcestrengthsitedata = new EventEmitter<{
         tableId: any;
         data: any;
+        inspectionType: any;
     }>();
     @Output() previousClicked = new EventEmitter<{ tableId: any }>();
     fileAndRemark: any;
     userName: any;
     @Input() prevTableId: any;
     @Input() data: any;
+    @Input() inspectionType: any;
     
     appNoStatus: any;
     constructor(
@@ -31,9 +33,10 @@ export class HRStrengthAtSiteComponent {
     ) {}
 
     ngOnInit() {
+        this.inspectionType = this.inspectionType;
         this.tableId = this.tableId;
         this.prevTableId = this.prevTableId;
-         this.appNoStatus = this.data.applicationStatus
+        this.appNoStatus = this.data?.applicationStatus ?? null;
          if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {
@@ -114,6 +117,7 @@ export class HRStrengthAtSiteComponent {
                     this.humanResourcestrengthsitedata.emit({
                         tableId: this.tableId,
                         data: this.data,
+                        inspectionType: this.inspectionType
                     });
                     this.router.navigate([
                         'monitoring/contractor-present-during-site-monitoring',

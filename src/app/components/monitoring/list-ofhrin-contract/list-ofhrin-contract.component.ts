@@ -67,7 +67,7 @@ export class ListOFHRinContractComponent {
 
     ngOnInit() {
         this.inspectionType = this.inspectionType;
-        this.appNoStatus = this.data.applicationStatus;
+        this.appNoStatus = this.data?.applicationStatus ?? null;
         if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         }
@@ -98,7 +98,7 @@ export class ListOFHRinContractComponent {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value: 127,
+                value: this.prevTableId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -629,6 +629,7 @@ private saveDraftPayload() {
 }
 
 private sendPayload(finalPayload: any) {
+    debugger
     this.service.saveAsDraft(finalPayload).subscribe({
         next: (response: any) => {
             if (this.tableId) {

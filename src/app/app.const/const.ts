@@ -1,7 +1,9 @@
+
 // //server
 export const userManagmentAPI = "http://172.30.4.159:8081";
 export const Agency_api_url = "http://103.252.84.86/api";
 export const api_url = "http://103.252.84.86/api/crps";
+//export const api_url = "http://localhost:8080/crps";
 export const api_url_Monitoring = "http://172.30.4.159:8080/api/checklists";
 export const api_url_Monitoring_siteEngineer = "http://172.30.4.159:8080/api";
 export const fileUpload_api = "http://103.252.84.86/api";
@@ -15,7 +17,7 @@ export const g2c_url = "http://172.30.4.159:8180/cdb/public_access";
 
 //Pda
 export const CInet_Redirection = "http://ezotin.bcta.gov.bt/cinet";
-export const userManagment_redirection = "http://172.30.4.159/user-management";
+export const userManagment_redirection = "http://172.30.4.159";
 
 //Pda
 // export const CInet_Redirection = "http://ezotin.bcta.gov.bt/cinet";

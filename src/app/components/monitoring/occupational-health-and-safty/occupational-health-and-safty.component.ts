@@ -298,6 +298,7 @@ export class OccupationalHealthAndSaftyComponent {
             safetyGlovesUsed: this.formData.safetyGloves,
             earPlugsUsed: this.formData.earPlug,                                        
      };
+     debugger
       this.service.saveAsDraft(payload).subscribe({
         next: (response: any) => {
           const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;

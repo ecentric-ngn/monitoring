@@ -43,10 +43,10 @@ export class QualificationComponent {
     ngOnInit() {
         this.tableId = this.tableId;
         this.data = this.data;
-        this.appNoStatus = this.data.applicationStatus;
+        this.appNoStatus = this.data?.applicationStatus ?? null;
         this.inspectionType = this.inspectionType;
         const userDetailsString = sessionStorage.getItem('userDetails');
-        this.prevTableId = this.prevTableId;
+        this.prevTableId = this.prevTableId || this.tableId;
         if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {
@@ -76,8 +76,9 @@ export class QualificationComponent {
                     this.formData.contractorType = data.sub_contractor_exists;
                     this.formData.bctaRegistrationNo =
                     data.bcta_registration_no;
-                    this.formData.expiryDate = data.sub_contractor_full_name;
-                    this.formData.fullName = data.registration_valid_until;
+                    this.formData.nameOfFirm = data.sub_contractor_full_name;
+                    this.formData.expiryDate = data.registration_valid_until;
+                     this.formData.LicensingContractor = data.sub_contractor_licensing_compliance
                     this.formData.remarks = data.remarks;
                    if (data.file_path) {
                     this.formData.filePathList = data.file_path
