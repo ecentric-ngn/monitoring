@@ -26,7 +26,8 @@
       <div class="col-md-6 mb-3">
         <label class="form-label">Review (Office signboard):<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.signboardReview" name="signboardReview"
-          [disabled]="!isFieldEditable('signboardReview')" required #signboardReview="ngModel" (change)="onReviewChange()">
+          [disabled]="!isFieldEditable('signboardReview')" required #signboardReview="ngModel"
+          (change)="onReviewChange()">
           <option value="">-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
@@ -96,20 +97,22 @@
         </div>
       </div>
 
-     <!-- Update button: Show when status is NOT Submitted -->
+      <!-- Update button: Show when status is NOT Submitted -->
       <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
-        <button type="submit" class="btn btn-primary save-next-btn" (click)="update()">
-          Update
+        <button type="submit" class="btn btn-primary" (click)="update()" [disabled]="isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isSaving ? 'Saving...' : 'Update' }}
         </button>
       </div>
 
       <!-- Save & Next button: Show only when status is Submitted -->
       <div class="col-12 text-end mt-3" *ngIf="applicationStatus === 'Submitted'">
-        <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()">
-          Save & Next
+        <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()" [disabled]="isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isSaving ? 'Saving...' : 'Save & Next' }}
         </button>
       </div>
-      
+
     </div>
   </div>
 </div>

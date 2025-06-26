@@ -68,7 +68,7 @@ export class SfMonitoringTeamComponent {
           text: `BCTA No ${this.id} forwarded to review committee.`,
         }).then((result) => {
           if (result.isConfirmed) {
-            this.router.navigate(['/monitoring/sf-info']);
+        this.router.navigate(['/monitoring/specialized']);
           }
         });
       },
@@ -80,7 +80,7 @@ export class SfMonitoringTeamComponent {
           title: 'Forwarding Successful',
           text:  `Forwarded to review committee.`,
         });
-        this.router.navigate(['/monitoring/sf-info']);
+        this.router.navigate(['/monitoring/specialized']);
       }
     });
 }

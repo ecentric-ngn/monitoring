@@ -63,7 +63,6 @@ export class OfficeSignageAndDocComponent implements OnInit {
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe(
       (res: any) => {
-        
         if (res?.complianceEntities?.length) {
           // Merge API response with initialized formData
           this.formData = { ...this.formData, ...res.complianceEntities[0] };
@@ -171,7 +170,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
         filingSystem: this.formData.properFillingPath || null,
         fsreview: this.formData.filingReview || null,
         fsremarks: this.formData.filingRemarks || null,
-        fsresubmitDeadline: this.formData.filingResubmitDate || null
+        fsresubmitDeadline: this.formData.filingResubmitDate || null,
       }
     };
 
@@ -221,11 +220,11 @@ export class OfficeSignageAndDocComponent implements OnInit {
         classification: this.formData.classification,
         applicationStatus: this.data.status,
         officeSignboard: this.formData.officeSignboardPath,
-        signageResubmitDeadline: this.formData.signboardResubmitDate,
+        osresubmitDeadline: this.formData.signboardResubmitDate,
         filingSystem: this.formData.properFillingPath,
         ohsHandbook: this.formData.ohsHandBook,
         ohsReview: this.formData.ohsReview,
-        ohsRemarks: this.formData.ohsRemarks,
+        ohsRemarks: this.formData.generalRemarks,
         reviewDate: this.formData.reviewDate,
         fsreview: this.formData.filingReview,
         fsremarks: this.formData.filingRemarks,
@@ -233,6 +232,12 @@ export class OfficeSignageAndDocComponent implements OnInit {
         oslocation: this.formData.officeLocation,
         osreview: this.formData.signboardReview,
         osremarks: this.formData.signboardRemarks,
+        hrFulfilled: "",
+        hrResubmitDeadline: "",
+        hrRemarks: "",
+        eqFulfilled: "",
+        eqResubmitDeadline: "",
+        eqRemarks: ""
       }
     };
 

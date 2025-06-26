@@ -2,14 +2,20 @@ import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
 import { Agency_api_url, api_url, api_url_Monitoring, api_url_Monitoring_siteEngineer, fileUpload_api, fileUpload_api_url_Monitoring, g2c_url, otp_api_url, userManagmentAPI, web_service_url } from "../app.const/const";
 import { NavigationExtras, Router } from "@angular/router";
-import { catchError, map, Observable, throwError } from "rxjs";
+import { BehaviorSubject, catchError, map, Observable, throwError } from "rxjs";
 
 @Injectable({
   providedIn: "root",
 })
 export class CommonService {
   storage: any;
+  // In your CommonService
+  private bctaNoSource = new BehaviorSubject<string | null>(null);
+  bctaNo$ = this.bctaNoSource.asObservable();
 
+  setBctaNo(bctaNo: string) {
+    this.bctaNoSource.next(bctaNo);
+  }
 
   // Shared service method to get the data using the provided property name
   getData(propertyName: string): any {
@@ -111,8 +117,6 @@ export class CommonService {
       responseType: 'text' as 'text'
     });
   }
-
-
 
   updateWorkInformationData(payload: any, id: any): Observable<string> {
     return this.http.put(`${otp_api_url}/work-information/${id}`, payload, {
@@ -458,20 +462,24 @@ export class CommonService {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/status/license-status/update`, payload, { responseType: 'text' });
   }
 
-  // getReinstateApplication(firmId: string) {
-  //   return this.http.get<any>(`${g2c_url_2}/compliance/suspensionFirm/${firmId}`);
-  // }
+  getReinstateApplication(firmId: string) {
+    return this.http.get<any>(`${g2c_url}/compliance/suspensionFirm/${firmId}`);
+  }
+
+  approveReinstatement(payload: any) {
+    return this.http.post<any>(`${g2c_url}/compliance/approved`, payload);
+  }
 
   downgradeFirm(payload: any) {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/downgrade/request`, payload, { responseType: 'text' });
   }
 
-  downgradeConsultancy(payload: any){
-        return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/consultant/request-downgrade`, payload, { responseType: 'text' });
+  downgradeConsultancy(payload: any) {
+    return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/consultant/request-downgrade`, payload, { responseType: 'text' });
   }
 
-  downgradeSF(payload: any){
-        return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/specialized-firm/downgrade/request`, payload, { responseType: 'text' });
+  downgradeSF(payload: any) {
+    return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/specialized-firm/downgrade/request`, payload, { responseType: 'text' });
   }
 
   cancelFirm(payload: any) {

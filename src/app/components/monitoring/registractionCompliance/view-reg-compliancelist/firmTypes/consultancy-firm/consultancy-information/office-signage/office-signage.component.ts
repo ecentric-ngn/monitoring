@@ -14,6 +14,8 @@ export class OfficeSignageComponent {
   bctaNo: any;
   data: any;
   applicationStatus: string = '';
+  isSaving = false;
+
 
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
@@ -142,6 +144,8 @@ export class OfficeSignageComponent {
   }
 
   update() {
+    this.isSaving = true;
+
     const payload = {
       consultantRegistrationDto: {
         bctaNo: this.data.consultantNo || null,
@@ -158,6 +162,8 @@ export class OfficeSignageComponent {
 
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe(
       (response: any) => {
+        this.isSaving = false;
+
         try {
           const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
           this.id = parsedResponse.consultantRegistrationDto?.id;
@@ -176,6 +182,7 @@ export class OfficeSignageComponent {
         }
       },
       (error) => {
+        this.isSaving = false;
         console.error('Error saving data:', error);
         Swal.fire('Error', 'Failed to save office signage and documents review.', 'error');
       }
@@ -185,6 +192,8 @@ export class OfficeSignageComponent {
 
   id: any;
   saveAndNext() {
+    this.isSaving = true;
+
     const payload = {
       consultantRegistrationDto: {
         bctaNo: this.data.consultantNo,
@@ -192,14 +201,13 @@ export class OfficeSignageComponent {
         contactNo: this.formData.mobileNo,
         email: this.formData.emailAddress,
         classification: this.formData.classification,
-        officeSignboard: this.formData.signboardReview,
+        officeSignboard: this.formData.officeSignboardPath,
         // osNotificationDate: this.formData.createdAt,  faced an issue with date format
-        osNotificationDate: "2024-01-01",
         signageResubmitDeadline: this.formData.resubmitDate,
-        osResubmitted: false,
+        osResubmitted: true,
         filingSystem: this.formData.properFillingPath,
         fsreview: this.formData.filingReview,
-        oslocation: this.formData.officeLocation,
+        oslocation: this.data.officeLocation,
         osreview: this.formData.signboardReview,
         osremarks: this.formData.signboardRemarks,
         fsremarks: this.formData.filingRemarks,
@@ -208,12 +216,18 @@ export class OfficeSignageComponent {
     }
 
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe((response: any) => {
+      this.isSaving = false;
+
       const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
       this.id = parsedResponse.consultantRegistrationDto.id
       console.log('this.id', this.id);
       //  this.id = res.registrationReview.id
       this.activateTab.emit({ id: this.id, tab: 'consultancyEmployee' });
+    },
+    (error) => {
+      this.isSaving = false;
+       console.error('Error saving data:', error);
+       Swal.fire('Error', 'Failed to save office signage and documents review.', 'error');
     })
-
   }
 }

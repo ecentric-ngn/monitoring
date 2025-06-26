@@ -77,12 +77,15 @@
           <textarea class="form-control form-control-sm" rows="2" name="resubmitRemarks"
             [(ngModel)]="formData.resubmitRemarks"></textarea>
         </div>
-        <div class="col-md-12 mb-3">
+        
+      </div>
+
+      <div class="col-md-12 mb-3" *ngIf="formData.fulfillsRequirement === 'Yes'">
           <label class="form-label">Remarks</label>
           <textarea class="form-control form-control-sm" rows="2" name="finalRemarks"
             [(ngModel)]="formData.finalRemarks"></textarea>
-        </div>
       </div>
+
       <!-- Buttons -->
       <div class="d-flex justify-content-end mt-4"  *ngIf="applicationStatus !== 'Resubmitted EQ'">
         <button type="submit" class="btn btn-success me-2" (click)="notifyContractor()"

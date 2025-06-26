@@ -75,14 +75,14 @@ formData: any = {};
           text: `BCTA No ${this.tableId} forwarded to review committee.`,
         }).then((result) => {
           if (result.isConfirmed) {
-            this.router.navigate(['/monitoring/sf-info']);
+            this.router.navigate(['/monitoring/certified']);
           }
         });
       },
       (error) => {
         console.error('Error forwarding to committee:', error);
         Swal.fire('success', 'Forwarded to review committee', 'success');
-       this.router.navigate(['/monitoring/sf-info']);
+       this.router.navigate(['/monitoring/certified']);
       }
     );
   }

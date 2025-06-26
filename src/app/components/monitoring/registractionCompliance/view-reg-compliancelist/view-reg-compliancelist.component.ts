@@ -37,6 +37,9 @@ export class ViewRegCompliancelistComponent {
     downgradeList: any[] = [];
     workClassificationList: any[] = [];
 
+    reinstateData: any = null;
+    reinstateModal: any = null;
+
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
@@ -342,43 +345,68 @@ export class ViewRegCompliancelistComponent {
         }
     }
 
-    // getReinstateApplication(firmId: string) {
+    getReinstateApplication(firmId: string) {
+        if (!firmId) {
+            console.error('Firm ID is missing.');
+            return;
+        }
 
-    //     if (!firmId) {
-    //         console.error('Firm ID is missing.');
-    //         return;
-    //     }
+        this.service.getReinstateApplication(firmId).subscribe({
+            next: (data) => {
+                this.reinstateData = data[0];
 
-    //     this.service.getReinstateApplication(firmId).subscribe({
-    //         next: (data) => {
-    //             console.log('Reinstate data:', data);
-            
-    //         },
-    //         error: (err) => {
-    //             console.error('Error fetching reinstate data:', err);
-    //         }
-    //     });
-    // }
+                setTimeout(() => {
+                    const modalEl = document.getElementById('reinstateModal');
+                    this.reinstateModal = new bootstrap.Modal(modalEl, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    this.reinstateModal.show();
+                }, 0);
+            },
+            error: (err) => {
+                console.error('Error fetching reinstate data:', err);
+                this.reinstateData = null;
+            }
+        });
+    }
+
+    closeReinstateModal() {
+        if (this.reinstateModal) {
+            this.reinstateModal.hide();
+        }
+    }
 
     reinstate(row: any) {
         const payload = {
-            firmNo: row.contractorNo,
+            firmNo: row,
             firmType: "contractor",
             licenseStatus: "Active"
         };
-        this.service.reinstateLicense(payload).subscribe({
-            next: (res: string) => {
-                if (res && res.toLowerCase().includes('license status updated to active')) {
-                    Swal.fire('Success', 'License Reinstated Successfully', 'success');
-                    this.closeModal(); // Optional: close modal if needed
+
+        const approvePayload = {
+            firmType: "Contractor",
+            cdbNos:row
+        };
+
+        forkJoin({
+            reinstate: this.service.reinstateLicense(payload),
+            approve: this.service.approveReinstatement(approvePayload)
+        }).subscribe({
+            next: ({ reinstate, approve }) => {
+                if (reinstate && reinstate.toLowerCase().includes('license status updated to active')) {
+                    Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
+                    this.closeModal();
                 } else {
                     Swal.fire('Warning', 'Unexpected response from server.', 'warning');
                 }
+                this.router.navigate(['/reg-compliance/construction']);
+                this.closeModal();
             },
             error: (err) => {
                 console.error('Reinstatement error:', err);
-                Swal.fire('Error', 'Something went wrong while reinstating the license.', 'error');
-                this.closeModal(); // Optional: close modal even on error
+                this.closeModal();
+                Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
             }
         });
     }

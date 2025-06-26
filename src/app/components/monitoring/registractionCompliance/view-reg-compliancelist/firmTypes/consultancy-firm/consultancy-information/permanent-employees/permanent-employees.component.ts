@@ -15,6 +15,7 @@ export class PermanentEmployeesComponent {
   bctaNo: any;
   @Input() id: string = '';
   applicationStatus: string = '';
+  isSaving = false;
 
   constructor(@Inject(CommonService) private service: CommonService,private router: Router) { }
 
@@ -77,6 +78,8 @@ export class PermanentEmployeesComponent {
   }
 
   update() {
+    this.isSaving = true;
+
     const payload = {
       consultantRegistrationDto: { bctaNo: this.bctaNo },
       consultantEmployeeDto: [{
@@ -88,6 +91,8 @@ export class PermanentEmployeesComponent {
   
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
+
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -98,6 +103,8 @@ export class PermanentEmployeesComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
+
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',
@@ -110,6 +117,8 @@ export class PermanentEmployeesComponent {
 
   tableId: any;
   saveAndNext() {
+    this.isSaving = true;
+
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
     const hr = this.tableData.map((item: any) => ({
@@ -134,10 +143,21 @@ export class PermanentEmployeesComponent {
       consultantEmployeeDto: hr
     };
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       this.activateTab.emit({ id: this.tableId, tab: 'consultancyEquipment' });
-    });
+    },
+    (err) => {
+        this.isSaving = false;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: err?.error?.message || 'Something went wrong. Please try again.',
+          confirmButtonText: 'OK'
+        });
+      });
   }
 
 }
