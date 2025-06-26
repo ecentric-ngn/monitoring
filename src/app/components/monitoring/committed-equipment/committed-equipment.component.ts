@@ -16,9 +16,10 @@ export class CommittedEquipmentComponent {
     @Output() saveCommittedEquipmentData = new EventEmitter<{
         tableId: any;
         data: any;
+        inspectionType
     }>();
     
-    @Output() previousClicked = new EventEmitter<{ tableId: any }>();
+    @Output() previousClicked = new EventEmitter<{ tableId: any,  inspectionType: any;}>();
     fileError: string | null = null;
     fileId: any = [];
     TableData: any = [];
@@ -40,6 +41,7 @@ export class CommittedEquipmentComponent {
     @Input() prevTableId: any;
     //inspectionType='OTHERS';
     appStatus: any;
+  VehicleDetails: any;
     constructor(
         private service: CommonService,
         private router: Router,
@@ -52,7 +54,7 @@ export class CommittedEquipmentComponent {
         this.FetchEquipmentMasterData();
         this.prevTableId = this.prevTableId
         this.tableId = this.tableId
-        this.appStatus = this.data.applicationStatus;
+        this.appStatus = this.data?.applicationStatus ?? null;
         if (this.appStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         }
@@ -81,7 +83,7 @@ export class CommittedEquipmentComponent {
   const payload: any = [
     {
       field: 'checklist_id',
-      value: 131,
+      value: this.prevTableId,
       operator: 'AND',
       condition: '=',
     },
@@ -338,13 +340,18 @@ export class CommittedEquipmentComponent {
      */
     showSuccessMessage: string = '';
     showErrorMessage: string = '';
- getVehicleDetails() {this.service.getVehicleDetails(this.registrationNo, this.VehicleType).subscribe(
+ getVehicleDetails() 
+ {this.service.getVehicleDetails(this.registrationNo, this.VehicleType).subscribe(
             (response: any) => {
+                const data = response.vehicleDetail;
+                this.VehicleDetails = data;
                 if (this.type !== 'Replaced') {
                     this.formData.registrationNo = response.vehicleDetail.vehicleNumber;
                     this.formData.vehicleType = response.vehicleDetail.vehicleTypeName;
                 } else if(response.vehicleDetail.vehicleRegistrationDetailsId ===0) {
                     this.showErrorMessage = 'No details found for this RegNo in BCTA';
+                    debugger
+                    console.warn('No details found for this RegNo in BCTA');
                 }else{
                   this.showErrorMessage = ''; // Clear error if successful
                 }
@@ -738,6 +745,7 @@ resetForm() {
         this.saveCommittedEquipmentData.emit({
           tableId: this.tableId,
           data: this.data,
+          inspectionType: this.inspectionType,
         });
         this.router.navigate(['monitoring/hrstrength-at-site']);
       }
@@ -796,5 +804,19 @@ createNotification(type: 'success' | 'error' | 'info' | 'warning', title: string
 
 removeAdditionalItem(index: number) {
   this.additionalItems.splice(index, 1);
+}
+
+
+showCertificateModal(item: any) {
+  this.registrationNo = item.registrationNo;
+  this.VehicleType = item.vehicleType;
+  this.getVehicleDetails();
+    // this.selectedCertificate = item;
+    // this.certificateModal.show();
+}
+closeModalForm() {
+    // this.registrationNo = '';
+    // this.VehicleType = '';
+  // this.certificateModal.hide();
 }
 }

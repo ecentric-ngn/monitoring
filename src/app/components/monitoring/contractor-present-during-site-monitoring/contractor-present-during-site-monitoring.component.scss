@@ -1,0 +1,6 @@
+.save-next-btn:disabled {
+  opacity: 0.6;       /* Make it slightly transparent */
+  cursor: not-allowed; /* Change cursor to indicate it's disabled */
+  background-color: #d5dade !important; /* Optional: override background */
+  border: none;       /* Optional: tweak as needed */
+}

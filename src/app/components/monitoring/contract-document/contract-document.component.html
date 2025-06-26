@@ -163,7 +163,7 @@
     </div>
     <div class="row align-items-end">
       <div class="col-md-4 mb-3">
-        <label class="form-label">Hindrance Register Select maintained:<span
+        <label class="form-label">Hindrance Register maintained:<span
             class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm " [(ngModel)]="formData.HindranceRegisterSelectmaintained"
           name="HindranceRegisterSelectmaintained" required #HindranceRegisterSelectmaintained="ngModel" [disabled]="appNoStatus === 'REJECTED'">
@@ -247,7 +247,7 @@
         </div>
       </div>
 
-      <div class="col-md-4" *ngIf="formData.filePathList && formData.filePathList.length > 0">
+      <div class="col-md-4 mb-6" *ngIf="formData.filePathList && formData.filePathList.length > 0">
         <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
         <div class="flex-wrap align-items-center gap-2 flex-column">
           <!-- Show if at least one file is valid -->

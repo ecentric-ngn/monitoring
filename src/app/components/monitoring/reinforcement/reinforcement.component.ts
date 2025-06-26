@@ -40,7 +40,7 @@ export class ReinforcementComponent {
         this.tableId = this.tableId;
         this.data = this.data;
         this.inspectionType = this.inspectionType;
-        this.appNoStatus = this.data.applicationStatus;
+         this.appNoStatus = this.data?.applicationStatus ?? null;
         if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {

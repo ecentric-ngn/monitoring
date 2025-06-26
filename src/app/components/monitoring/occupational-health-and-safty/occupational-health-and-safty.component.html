@@ -324,15 +324,15 @@
                 </div>
             </div>
             <div class="col-md-4 ">
-                <label class="form-label">Remarks:</label>
+                <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
                 <textarea class="form-control form-control-sm" placeholder="Enter remarks"
-                    [(ngModel)]="formData.remarks" id="remarks" name="remarks" required [disabled]="appNoStatus === 'REJECTED'"></textarea>
+                    [(ngModel)]="formData.remarks" id="remarks" name="remarks" required></textarea>
                
             </div>
         </div>
     </div>
     <div class="justify-content-end d-flex">
-        <button class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()" type="submit">Prev</button>
+        <button  *ngIf="appNoStatus !== 'REJECTED'" class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()" type="submit">Prev</button>
         <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
     </div>
 </form>
