@@ -14,7 +14,7 @@ export const web_service_url = "http://103.252.84.86/api/dataHubApi";
 export const g2c_url = "http://172.30.4.159:8180/cdb/public_access";
 //Pda
 export const CInet_Redirection = "http://ezotin.bcta.gov.bt/cinet";
-export const userManagment_redirection = "http://172.30.4.159/user-management";
+export const userManagment_redirection = "http://172.30.4.159";
 // export const g2c_url_1 = "http://192.168.123.89:8180/public_access";
 
 // export const g2c_url_2 = "http://192.168.123.89:8180/public_access";
