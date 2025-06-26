@@ -225,7 +225,6 @@ export class ViewRegCompliancelistComponent {
         }
     }
 
-
     getClassOptions(existingClass: string) {
         const all = [
             { label: 'L - Large', value: 'L-Large' },
@@ -400,7 +399,7 @@ export class ViewRegCompliancelistComponent {
                 } else {
                     Swal.fire('Warning', 'Unexpected response from server.', 'warning');
                 }
-                this.router.navigate(['/reg-compliance/construction']);
+                this.router.navigate(['/monitoring/construction']);
                 this.closeModal();
             },
             error: (err) => {

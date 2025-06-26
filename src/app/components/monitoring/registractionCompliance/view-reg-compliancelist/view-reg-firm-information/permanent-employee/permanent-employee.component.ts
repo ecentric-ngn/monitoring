@@ -34,8 +34,8 @@ export class PermanentEmployeeComponent {
     this.data = WorkDetail.data;
     this.tData = { 
        hrFulfilled: '',
-       resubmitDate: '',
-       remarksNo: ''
+       hrResubmitDeadline: '',
+       hrRemarks: ''
     };
 
     console.log('WorkDetail', WorkDetail);
@@ -103,8 +103,9 @@ export class PermanentEmployeeComponent {
       gender: item.sex,
       nationality: item.countryName,
       qualification: item.qualification,
-      // joiningDate:  item.joiningDate, encountered an issue with date format
-      joiningDate: "2024-01-01",
+      joiningDate: (item.joiningDate && !isNaN(new Date(item.joiningDate).getTime()))
+        ? new Date(item.joiningDate).toISOString().split('T')[0]
+        : '',
       tradeField: item.tradeName,
       paySlip: item.paySlipFileName,
       remarks: this.formData.remarksYes,
@@ -168,9 +169,9 @@ export class PermanentEmployeeComponent {
     const payload = {
       registrationReview: { 
         bctaNo: this.bctaNo,
-        hrFulfilled: this.formData.hrFulfilled,
-        hrResubmitDeadline: this.formData.resubmitDate,
-        hrRemarks: this.formData.remarksNo
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarksNo
        }
     };
 

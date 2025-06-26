@@ -131,10 +131,10 @@ export class CbOfficeSignageComponent {
       const payload = {
         cbReviewDto: {
           bctaNo: this.data.certifiedBuilderNo || null,
-          officeSignboard: this.formData.officeSignboardPath || null,
-          signageResubmitDeadline: this.formData.signboardResubmitDate || null,
-          osreview: this.formData.signboardReview || null,
-          osremarks: this.formData.signboardRemarks || null,
+          location: this.formData.officeLocation || null,
+          locationReview: this.formData.reviewLocation || null,
+          locationResubmitDeadline: this.formData.resubmitDate || null,
+          locationRemarks: this.formData.resubmitRemarks || null,
           filingSystem: this.formData.properFillingPath || null,
           fsreview: this.formData.filingReview || null,
           fsremarks: this.formData.filingRemarks || null,
@@ -178,15 +178,22 @@ export class CbOfficeSignageComponent {
         email: this.formData.emailAddress,
         location: this.formData.officeLocation,
         locationReview: this.formData.reviewLocation,
-        lastDateResubmit: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.resubmitRemarks,
+        locationResubmitDeadline: this.formData.resubmitDate,
+        locationRemarks: this.formData.resubmitRemarks,
         filingSystem: this.formData.properFillingPath,
         ohsHandbook: this.formData.ohsHandBook,
         ohsReview: this.formData.ohsReview,
-        remarks: this.formData.generalRemarks,
+        ohsRemarks: this.formData.generalRemarks,
         fsresubmitDeadline: this.formData.fsresubmitDeadline,
         fsreview: this.formData.filingReview,
         fsremarks: this.formData.fsRemarks,
+        reviewDate: this.formData.reviewDate,
+        hrFulfilled: "",
+        hrResubmitDeadline: "",
+        hrRemarks: "",
+        eqFulfilled: "",
+        eqResubmitDeadline: "",
+        eqRemarks: ""
       }
 
     }

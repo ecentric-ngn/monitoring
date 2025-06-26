@@ -37,6 +37,9 @@ export class SpecializedFirmsComponent {
     downgradeList: any[] = [];
     workClassificationList: any[] = [];
 
+    reinstateData: any = null;
+    reinstateModal: any = null;
+
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
@@ -298,62 +301,70 @@ export class SpecializedFirmsComponent {
         }
     }
 
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row.specializedFirmNo,
-            firmType: "specializedfirm",
-            licenseStatus: "Active"
-        };
-        this.service.reinstateLicense(payload).subscribe({
-            next: (res: string) => {
-                if (res && res.toLowerCase().includes('license status updated to active')) {
-                    Swal.fire('Success', 'License Reinstated Successfully', 'success');
-                    this.closeModal(); // Optional: close modal if needed
-                } else {
-                    Swal.fire('Warning', 'Unexpected response from server.', 'warning');
-                }
+    getReinstateApplication(firmId: string) {
+        if (!firmId) {
+            console.error('Firm ID is missing.');
+            return;
+        }
+
+        this.service.getReinstateApplication(firmId).subscribe({
+            next: (data) => {
+                this.reinstateData = data[0];
+
+                setTimeout(() => {
+                    const modalEl = document.getElementById('reinstateModal');
+                    this.reinstateModal = new bootstrap.Modal(modalEl, {
+                        backdrop: 'static',
+                        keyboard: false
+                    });
+                    this.reinstateModal.show();
+                }, 0);
             },
             error: (err) => {
-                console.error('Reinstatement error:', err);
-                Swal.fire('Error', 'Something went wrong while reinstating the license.', 'error');
-                this.closeModal(); // Optional: close modal even on error
+                console.error('Error fetching reinstate data:', err);
+                this.reinstateData = null;
             }
         });
     }
 
-    toggleEditNotification(id: number) {
-        this.tableData = this.tableData.map(row =>
-            row.id === id ? { ...row, isEditing: true } : row
-        );
-    }
-
-    cancelEdit(id: number) {
-        this.tableData = this.tableData.map(row =>
-            row.id === id ? { ...row, isEditing: false } : row
-        );
-    }
-
-    getStatusClass(status: string): string {
-        switch (status) {
-            case 'Verified':
-                return 'status-verified';
-            case 'In Process':
-                return 'status-in-process';
-            case 'Not Submitted':
-                return 'status-not-submitted';
-            default:
-                return 'status-default';
+    closeReinstateModal() {
+        if (this.reinstateModal) {
+            this.reinstateModal.hide();
         }
     }
 
-    getLicenseStatusClass(status: string): string {
-        switch (status) {
-            case 'Active':
-                return 'license-active';
-            case 'Suspended':
-                return 'license-suspended';
-            default:
-                return 'license-default';
-        }
+    reinstate(row: any) {
+        const payload = {
+            firmNo: row,
+            firmType: "specialized-firm",
+            licenseStatus: "Active"
+        };
+
+        const approvePayload = {
+            firmType: "SpecializedFirm",
+            cdbNos: row
+        };
+
+        forkJoin({
+            reinstate: this.service.reinstateLicense(payload),
+            approve: this.service.approveReinstatement(approvePayload)
+        }).subscribe({
+            next: ({ reinstate, approve }) => {
+                if (reinstate && reinstate.toLowerCase().includes('license status updated to active')) {
+                    Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
+                    this.closeModal();
+                } else {
+                    Swal.fire('Warning', 'Unexpected response from server.', 'warning');
+                }
+                this.router.navigate(['/monitoring/special']);
+                this.closeModal();
+            },
+            error: (err) => {
+                console.error('Reinstatement error:', err);
+                this.closeModal();
+                Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
+            }
+        });
     }
+
 }

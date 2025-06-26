@@ -13,6 +13,7 @@ export class ConsultancyMonitoringTeamComponent {
    formData: any = {};
      teamList: any[] = [];
      tableId: string = ''; // Initialize as empty string
+     bctaNo: any;
    
      @Input() id: string = ''; // Input from parent component
    
@@ -24,6 +25,9 @@ export class ConsultancyMonitoringTeamComponent {
        this.id = this.id;
        // console.log('Table ID:', this.tableId);
         // Assign the input id to tableId
+        this.service.bctaNo$.subscribe(bctaNo => {
+        this.bctaNo = bctaNo;
+    });
        this.getDatabasedOnChecklistId();
      }
    
@@ -55,25 +59,20 @@ export class ConsultancyMonitoringTeamComponent {
          return;
        }
    
-       // Prepare the payload as required
        const payload = {
-         registrationReview: {
-           id: this.tableId,
-           reviewedDate: this.formData.reviewDate
+         consultantRegistrationDto: {
+           bctaNo: this.bctaNo,
+           reviewDate: this.formData.reviewDate
          }
        };
    
-       // Call the service with the payload (replace with your actual service method)
-       this.service.setData(payload, 'registrationReview', 'monitoring-review');
-   
-       // Then forward to review committee
-       this.service.forwardToReviewCommiteeConsultancy(this.tableId).subscribe(
+       this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe(
          (res: any) => {
            console.log('res', res);
            Swal.fire({
              icon: 'success',
              title: 'Submission Successful',
-             text: `BCTA No ${this.tableId} forwarded to review committee.`,
+             text: `Details Saved Successfully!`,
            }).then((result) => {
              if (result.isConfirmed) {
                this.router.navigate(['/monitoring/consultancy']);
@@ -82,7 +81,7 @@ export class ConsultancyMonitoringTeamComponent {
          },
          (error) => {
            console.error('Error forwarding to committee:', error);
-           Swal.fire('success', 'Forwarded to review committee', 'success');
+           Swal.fire('Error', 'Failed to complete submission', 'error');
            this.router.navigate(['/monitoring/consultancy']);
          }
        );

@@ -49,7 +49,7 @@ export class OfficeSignageComponent {
   initializeFormData() {
     this.formData = {
       officeSignboardPath: null,
-      officeLocation: '',
+      oslocation: '',
       signboardReview: '',
       resubmitDate: null,
       signboardRemarks: '',
@@ -203,15 +203,22 @@ export class OfficeSignageComponent {
         classification: this.formData.classification,
         officeSignboard: this.formData.officeSignboardPath,
         // osNotificationDate: this.formData.createdAt,  faced an issue with date format
-        signageResubmitDeadline: this.formData.resubmitDate,
-        osResubmitted: true,
+        osResubmitDeadline: this.formData.resubmitDate,
+        // osResubmitted: true,
         filingSystem: this.formData.properFillingPath,
         fsreview: this.formData.filingReview,
-        oslocation: this.data.officeLocation,
+        oslocation: this.formData.officeLocation,
         osreview: this.formData.signboardReview,
         osremarks: this.formData.signboardRemarks,
         fsremarks: this.formData.filingRemarks,
-        fsresubmitDeadline: this.formData.filingResubmitDate
+        fsresubmitDeadline: this.formData.filingResubmitDate,
+        reviewDate:"",
+        hrFulfilled: "",
+        hrResubmitDeadline: "",
+        hrRemarks: "",
+        eqFulfilled: "",
+        eqResubmitDeadline: "",
+        eqRemarks: ""
       }
     }
 

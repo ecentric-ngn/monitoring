@@ -7,7 +7,7 @@ import { CommonService } from 'src/app/service/common.service';
   styleUrls: ['./specialized-firms-info.component.scss']
 })
 export class SpecializedFirmsInfoComponent {
-formData: any = {};
+  formData: any = {};
   bctaNo: any;
   applicationStatus: string = '';
   activeTabId: string = 'sfemployee';
@@ -37,9 +37,15 @@ formData: any = {};
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
       this.formData = res.complianceEntities[0];
-      console.log('this.formData', this.formData);
-    })
+      // Set firm info in the service
+      this.service.setFirmInfo({
+        firmName: this.formData.firmName,
+        mobileNo: this.formData.mobileNo,
+        email: this.formData.emailAddress
+      });
+    });
   }
+
   /**
    * Set the active tab id when a tab is activated
    * @param {string} tabId - The id of the tab to activate
@@ -72,4 +78,3 @@ formData: any = {};
     this.activeTabId = 'sfmonitoring';
   }
 }
- 

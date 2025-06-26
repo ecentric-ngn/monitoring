@@ -11,7 +11,8 @@ import Swal from 'sweetalert2';
 export class CbMonitoringTeamComponent {
 formData: any = {};
   teamList: any[] = [];
-  tableId: string = ''; // Initialize as empty string
+  tableId: string = ''; 
+  bctaNo: any;
 
   @Input() id: string = ''; // Input from parent component
 
@@ -19,6 +20,10 @@ formData: any = {};
 
   ngOnInit() {
     console.log("Monitor table id:",this.id);
+
+    this.service.bctaNo$.subscribe(bctaNo => {
+        this.bctaNo = bctaNo;
+    });
     
     this.id = this.id;
     // console.log('Table ID:', this.tableId);
@@ -54,25 +59,20 @@ formData: any = {};
       return;
     }
 
-    // Prepare the payload as required
     const payload = {
-      registrationReview: {
-        id: this.tableId,
-        reviewedDate: this.formData.reviewDate
+      cbReviewDto: {
+        bctaNo: this.bctaNo,
+        reviewDate: this.formData.reviewDate
       }
     };
 
-    // Call the service with the payload (replace with your actual service method)
-    this.service.setData(payload, 'registrationReview', 'monitoring-review');
-
-    // Then forward to review committee
-    this.service.forwardToReviewCommiteeCB(this.tableId).subscribe(
+    this.service.saveOfficeSignageAndDocCB(payload).subscribe(
       (res: any) => {
         console.log('res', res);
         Swal.fire({
           icon: 'success',
           title: 'Submission Successful',
-          text: `BCTA No ${this.tableId} forwarded to review committee.`,
+          text: `Details Saved Successfully!`,
         }).then((result) => {
           if (result.isConfirmed) {
             this.router.navigate(['/monitoring/certified']);
@@ -81,7 +81,7 @@ formData: any = {};
       },
       (error) => {
         console.error('Error forwarding to committee:', error);
-        Swal.fire('success', 'Forwarded to review committee', 'success');
+        Swal.fire('Error', 'Failed to complete submission', 'error');
        this.router.navigate(['/monitoring/certified']);
       }
     );

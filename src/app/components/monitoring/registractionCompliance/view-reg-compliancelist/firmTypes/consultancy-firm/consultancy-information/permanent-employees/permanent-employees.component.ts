@@ -9,15 +9,16 @@ import Swal from 'sweetalert2';
   styleUrls: ['./permanent-employees.component.scss']
 })
 export class PermanentEmployeesComponent {
- tableData: any[] = [];
- formData: any = {};
+  tableData: any[] = [];
+  formData: any = {};
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
   bctaNo: any;
   @Input() id: string = '';
   applicationStatus: string = '';
+  tData: any;
   isSaving = false;
 
-  constructor(@Inject(CommonService) private service: CommonService,private router: Router) { }
+  constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
   ngOnInit() {
     this.id = this.id
@@ -26,6 +27,11 @@ export class PermanentEmployeesComponent {
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.consultantNo;
     this.applicationStatus = WorkDetail.data.applicationStatus;
+    this.tData = {
+      hrFulfilled: '',
+      resubmitDate: '',
+      remarksNo: ''
+    };
 
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo()
@@ -81,14 +87,14 @@ export class PermanentEmployeesComponent {
     this.isSaving = true;
 
     const payload = {
-      consultantRegistrationDto: { bctaNo: this.bctaNo },
-      consultantEmployeeDto: [{
-        hrFulfilled: this.formData.hrFulfilled,
-        resubmitDeadline: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.remarksNo,
-      }]
+      consultantRegistrationDto: {
+        bctaNo: this.bctaNo,
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarks
+      }
     };
-  
+
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({
       next: (res: any) => {
         this.isSaving = false;
@@ -127,18 +133,16 @@ export class PermanentEmployeesComponent {
       gender: item.sex,
       nationality: item.countryName,
       qualification: item.qualification,
-      // joiningDate:  item.joiningDate, encountered an issue with date format
-      joiningDate: "2024-01-01",
-      paySlip: item.paySlipFileName,
-      hrFulfilled: this.formData.hrFulfilled,
-      resubmitDeadline: this.formData.resubmitDate,
-      deadlineRemarks: this.formData.remarksNo,
-      remarks: this.formData.remarksYes,
-      psremarks: ""
+      joiningDate: (item.joiningDate && !isNaN(new Date(item.joiningDate).getTime()))
+        ? new Date(item.joiningDate).toISOString().split('T')[0]
+        : ''
     }));
     const payload = {
       consultantRegistrationDto: {
-        id: this.tableId,
+        bctaNo: this.bctaNo,
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarks
       },
       consultantEmployeeDto: hr
     };
@@ -148,7 +152,7 @@ export class PermanentEmployeesComponent {
       //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       this.activateTab.emit({ id: this.tableId, tab: 'consultancyEquipment' });
     },
-    (err) => {
+      (err) => {
         this.isSaving = false;
 
         Swal.fire({

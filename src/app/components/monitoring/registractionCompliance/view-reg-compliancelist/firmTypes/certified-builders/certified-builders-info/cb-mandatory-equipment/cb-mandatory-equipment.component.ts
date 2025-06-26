@@ -14,6 +14,7 @@ export class CbMandatoryEquipmentComponent {
   firmType: any;
   bctaNo: any;
   tableData: any;
+  tData: any;
   applicationStatus: string = '';
 
   @Input() id: string = ''
@@ -31,13 +32,20 @@ export class CbMandatoryEquipmentComponent {
       resubmitRemarks: '',
       resubmitDate: ''
     };
-    // Set the id from input
+
+     this.tData = {
+      eqFulfilled: '',
+      eqResubmitDeadline: '',
+      eqRemarks: ''
+    }
 
     this.id = this.id
     const WorkDetail = this.service.getData('BctaNo');
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.certifiedBuilderNo;
     this.applicationStatus = WorkDetail.data.applicationStatus;
+    this.service.setBctaNo(this.bctaNo);
+
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo()
     }
@@ -48,6 +56,7 @@ export class CbMandatoryEquipmentComponent {
       this.tableData = res.vehicles
       console.log('CB equipments', this.formData);
     })
+    
   }
 
 
@@ -71,12 +80,8 @@ export class CbMandatoryEquipmentComponent {
     this.tableId = this.id;
 
     const eq = this.tableData.map((item: any) => ({
-      "equipmentDescription": "string",
-      "requiredEquipment": "string",
-      "requiredEquipmentFulfilled": this.formData.fulfillsRequirement,
-      "resubmitDeadline": this.formData.resubmitDate,
-      "deadlineRemarks": this.formData.resubmitRemarks,
-      "remarks": this.formData.finalRemarks,
+      "equipmentDescription": null,
+      "requiredEquipment": null,
 
       //  "isRegistered": item.equipmentType,
       // "vehicleType": item.vehicleType,
@@ -89,7 +94,10 @@ export class CbMandatoryEquipmentComponent {
 
     const payload = {
       cbReviewDto: {
-        id: this.tableId,
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
       },
       cbEquipmentReviewDto: eq
     };
@@ -107,17 +115,16 @@ export class CbMandatoryEquipmentComponent {
     this.tableId = this.id;
 
     const eq = this.tableData.map((item: any) => ({
-      "equipmentDescription": "string",
-      "requiredEquipment": "string",
-      "requiredEquipmentFulfilled": this.formData.fulfillsRequirement,
-      "resubmitDeadline": this.formData.resubmitDate,
-      "deadlineRemarks": this.formData.resubmitRemarks,
-      "remarks": this.formData.finalRemarks,
+      "equipmentDescription": null,
+      "requiredEquipment": null
     }));
 
     const payload = {
       cbReviewDto: {
-        id: this.tableId,
+         bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
       },
       cbEquipmentReviewDto: eq
     };
@@ -130,7 +137,7 @@ export class CbMandatoryEquipmentComponent {
           icon: 'warning',
           confirmButtonText: 'OK'
         });
-        this.router.navigate(['monitoring/cerified-builders']);
+          this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
       },
       error: (error) => {
         Swal.fire({
@@ -144,12 +151,12 @@ export class CbMandatoryEquipmentComponent {
 
   update() {
     const payload = {
-      cbReviewDto: { bctaNo: this.bctaNo },
-      cbEquipmentReviewDto: [{
-        mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
-        resubmitDeadline: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.resubmitRemarks
-      }]
+      cbReviewDto: { 
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
+      }
     };
 
     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
