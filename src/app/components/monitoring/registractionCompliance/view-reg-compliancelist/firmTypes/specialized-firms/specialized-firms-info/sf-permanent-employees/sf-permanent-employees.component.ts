@@ -15,6 +15,7 @@ export class SfPermanentEmployeesComponent {
   tableData: any;
   applicationStatus: string = '';
   tData: any;
+  isSaving = false;
 
   @Input() id: string = '';
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
@@ -93,6 +94,7 @@ export class SfPermanentEmployeesComponent {
   }
 
   update() {
+    this.isSaving = true;
     const payload = {
       sfReviewDto: {
         bctaNo: this.bctaNo,
@@ -104,6 +106,7 @@ export class SfPermanentEmployeesComponent {
 
     this.service.saveOfficeSignageAndDocSF(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -114,6 +117,7 @@ export class SfPermanentEmployeesComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',
@@ -128,6 +132,7 @@ export class SfPermanentEmployeesComponent {
   tableId: any
 
   saveAndNext() {
+    this.isSaving = true;
     const sfReviewEmployeeDto = (this.tableData || []).map((item: any) => ({
       nationality: item?.countryName || 'string',
       qualification: item?.qualification || 'string',
@@ -151,6 +156,7 @@ export class SfPermanentEmployeesComponent {
 
     this.service.saveOfficeSignageAndDocSF(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         let emittedId = '';
         if (typeof res === 'string') {
           try {
@@ -168,6 +174,7 @@ export class SfPermanentEmployeesComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         console.error('Error Saving!', err);
       }
     });

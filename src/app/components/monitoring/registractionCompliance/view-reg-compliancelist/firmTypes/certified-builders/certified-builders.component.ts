@@ -5,6 +5,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
 declare var bootstrap: any;
+import { AuthServiceService } from 'src/app/auth.service';
 
 @Component({
     selector: 'app-certified-builders',
@@ -12,6 +13,12 @@ declare var bootstrap: any;
     styleUrls: ['./certified-builders.component.scss']
 })
 export class CertifiedBuildersComponent {
+
+    filteredData: any[] = [];
+    displayedData: any[] = [];
+    currentPage: number = 1;
+    itemsPerPage: number = 10;
+
     searchQuery: any;
     set_limit: number[] = [10, 15, 25, 100];
     formData: any = {};
@@ -33,14 +40,24 @@ export class CertifiedBuildersComponent {
 
     downgradeList: any[] = [];
     workClassificationList: any[] = [];
-
+    loading: boolean = false;
+    certifiedBuildersModal: any = null;
     reinstateData: any = null;
     reinstateModal: any = null;
+    username: string = '';
+
+    Dzongkhags = ['Shrek', 'Thimphu', 'Paro', 'Wangdue', 'Punakha', 'Trashigang',
+        'Trashiyangtse', 'Bumthang', 'Gasa', 'Haa', 'Lhuentse',
+        'Mongar', 'Pemagatshel', 'Samdrup Jongkhar', 'Samtse', 'Sarpang',
+        'Zhemgang', 'Chhukha', 'Dagana', 'Tsirang', 'Trongsa'];
+    
+    today: string = new Date().toISOString().substring(0, 10);
 
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
-        private router: Router
+        private router: Router,
+        private authService: AuthServiceService
     ) { }
 
     searchTerm: string = '';
@@ -48,7 +65,87 @@ export class CertifiedBuildersComponent {
 
     ngOnInit() {
         this.fetchComplianceDetails();
+        this.username = this.authService.getUsername() || 'NA';
     }
+
+    sendMassMail() {
+        this.loading = true;
+        this.formData.deadline = this.calculatedDeadline;
+        this.service.sendMassEmail(this.formData).subscribe({
+            next: (response) => {
+                this.loading = false;
+                this.handleSuccess(response);
+                this.resetForm();
+                this.closeFirmModal();
+                this.showSuccessNotification();
+            },
+            error: (error) => this.handleError(error)
+        });
+    }
+
+    closeFirmModal() {
+        if (this.certifiedBuildersModal) {
+            this.certifiedBuildersModal.hide();
+        } else {
+            const modalEl = document.getElementById('certifiedBuildersModal');
+            if (modalEl) {
+                modalEl.classList.remove('show');
+                modalEl.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(el => el.remove());
+            }
+        }
+    }
+
+    private resetForm() {
+            this.dateData = {};
+            this.formData = {};
+        }
+    
+        private showSuccessNotification() {
+            Swal.fire({
+                title: 'Success!',
+                text: 'The mass email has been sent successfully to the designated recipients.',
+                icon: 'success',
+                confirmButtonText: 'OK',
+                willClose: () => {
+                    // Cleanup before closing
+                    document.body.classList.remove('swal2-shown');
+                    document.body.style.overflow = '';
+                }
+            }).then(() => {
+                // Force cleanup
+                const backdrops = document.querySelectorAll('.swal2-backdrop, .modal-backdrop');
+                backdrops.forEach(el => el.remove());
+                document.body.classList.remove('modal-open', 'swal2-no-backdrop');
+                document.body.style.paddingRight = '';
+            });
+        }
+        private handleSuccess(response: any) {
+            console.log('Email sent successfully:', response);
+        }
+    
+        private handleError(error: any) {
+            console.error('Error sending email:', error);
+            Swal.fire({
+                title: 'Error!',
+                text: 'Failed to send mass email. Please try again.',
+                icon: 'error',
+                confirmButtonText: 'OK'
+            });
+        }
+    
+        dateData: any = {};
+    
+        get calculatedDeadline() {
+            if (this.dateData.date) {
+                const d = new Date(this.dateData.date);
+                d.setDate(d.getDate() + 7); // Example: 7 days deadline
+                return d.toISOString().substring(0, 10);
+            }
+            return '';
+        }
 
     onChangeFirmType(firmType: string) {
         this.firmType = firmType;
@@ -75,6 +172,8 @@ export class CertifiedBuildersComponent {
         this.service.fetchComplianceDataCertifiedBuilders().subscribe(
             (response: any) => {
                 this.tableData = response;
+                this.filteredData = this.tableData;
+                this.updateDisplayedData();
                 console.log('Fetched Data', this.tableData);
             },
             (error) => {
@@ -83,9 +182,43 @@ export class CertifiedBuildersComponent {
         )
     }
 
-    Searchfilter() { }
+    Searchfilter() {
+        const query = (this.searchQuery || '').toLowerCase();
+        this.filteredData = this.tableData.filter(item =>
+            (item.certifiedBuilderNo && item.certifiedBuilderNo.toString().toLowerCase().includes(query)) ||
+            (item.nameOfFirm && item.nameOfFirm.toLowerCase().includes(query)) ||
+            (item.applicationStatus && item.applicationStatus.toLowerCase().includes(query)) ||
+            (item.licenseStatus && item.licenseStatus.toLowerCase().includes(query))
+        );
+        this.currentPage = 1; // Reset to first page on new search
+        this.updateDisplayedData();
+    }
 
-    setLimitValue(value: any) { }
+    updateDisplayedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        this.displayedData = this.filteredData.slice(start, end);
+    }
+
+    setLimitValue(value: any) {
+        this.itemsPerPage = +value;
+        this.currentPage = 1;
+        this.updateDisplayedData();
+    }
+
+    goToPreviousPage() {
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.updateDisplayedData();
+        }
+    }
+
+    goToNextPage() {
+        if (this.currentPage * this.itemsPerPage < this.filteredData.length) {
+            this.currentPage++;
+            this.updateDisplayedData();
+        }
+    }
 
     navigate(data: any) {
         if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS'
@@ -150,7 +283,7 @@ export class CertifiedBuildersComponent {
     openActionModal(row: any) {
         this.selectedAction = {
             actionType: '',
-            actionDate: '',
+            actionDate: this.today,
             remarks: '',
             newClassification: '',
             target: row // attach row data if needed
@@ -241,7 +374,7 @@ export class CertifiedBuildersComponent {
         if (this.selectedAction.actionType === 'cancel') {
             const payload = {
                 firmNo: this.selectedAction.target?.certifiedBuilderNo,
-                cancelledBy: "Bilana Ghalley",
+                cancelledBy: this.authService.getUsername(),
                 cancelledOn: new Date(this.selectedAction.actionDate).toISOString(),
                 firmType: "certified-builder",
                 reason: this.selectedAction.remarks,
@@ -259,7 +392,7 @@ export class CertifiedBuildersComponent {
         } else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
                 firmNo: this.selectedAction.target?.certifiedBuilderNo,
-                suspendedBy: "Bilana Ghalley",
+                suspendedBy: this.authService.getUsername(),
                 suspensionDate: this.selectedAction.actionDate
                     ? new Date(this.selectedAction.actionDate).toISOString()
                     : null,

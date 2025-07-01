@@ -5,14 +5,14 @@ import { userManagment_redirection } from './app.const/const';
   providedIn: 'root',
 })
 export class AuthServiceService {
-  constructor() {}
+  constructor() { }
 
   loggedIn(): boolean {
     // Retrieve the user details from localStorage
     const userDetailsStr = sessionStorage.getItem('userDetails');
-    
+
     if (!userDetailsStr) return false;
-  
+
     try {
       const userDetails = JSON.parse(userDetailsStr);
       const token = userDetails.token; // Extract token from userDetails
@@ -21,15 +21,30 @@ export class AuthServiceService {
       return false; // Handle invalid JSON parsing
     }
   }
-  
+
+  getCurrentUser() {
+    const userDetailsStr = sessionStorage.getItem('userDetails');
+    if (!userDetailsStr) return null;
+    try {
+      return JSON.parse(userDetailsStr);
+    } catch {
+      return null;
+    }
+  }
+
+  getUsername(): string | null {
+    const user = this.getCurrentUser();
+    return user && user.username ? user.username : null;
+  }
+
   private isTokenExpired(token: string): boolean {
     const decoded = this.decodeToken(token);
     if (!decoded || !decoded.exp) return true; // Treat invalid tokens as expired
-  
+
     const expirationDate = decoded.exp * 1000; // Convert to milliseconds
     return expirationDate < Date.now();
   }
-  
+
   private decodeToken(token: string): any {
     try {
       const base64Url = token.split('.')[1];

@@ -81,21 +81,24 @@
             </ng-container>
 
             <!-- Buttons -->
-             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3" *ngIf="applicationStatus !== 'Resubmitted HR'" >
+            <div class="col-md-12 d-flex justify-content-end gap-2 mt-3" *ngIf="applicationStatus !== 'Resubmitted HR'" >
                 <button *ngIf="tData.hrFulfilled === 'No'" type="button" class="btn btn-success"
-                    (click)="saveAndNext()">
-                    Save & Forward
+                    (click)="saveAndNext()" [disabled]="isSaving">
+                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
                 </button>
                 <button *ngIf="tData.hrFulfilled === 'Yes'" type="button" class="btn btn-success"
-                    (click)="saveAndNext()">
-                    Save & Next
+                    (click)="saveAndNext()" [disabled]="isSaving">
+                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ isSaving ? 'Saving...' : 'Save and Next' }}
                 </button>
             </div>
 
-            <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
+             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
                 <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
-                    (click)="update()">
-                    Update
+                    (click)="update()" [disabled]="isSaving">
+                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ isSaving ? 'Saving...' : 'Update' }}
                 </button>
             </div>
         </div>

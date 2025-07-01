@@ -85,20 +85,23 @@
       </div>
 
       <!-- Buttons -->
-      <div class="d-flex justify-content-end mt-4"  *ngIf="applicationStatus !== 'Resubmitted EQ'">
+      <div class="d-flex justify-content-end mt-4" *ngIf="applicationStatus !== 'Resubmitted EQ'">
         <button type="submit" class="btn btn-success me-2" (click)="notifyContractor()"
-          *ngIf="tData.fulfillsRequirement === 'No'">
+          *ngIf="tData.fulfillsRequirement === 'No'" [disabled]="isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Forward
         </button>
         <button (click)="saveAndNext()" type="submit" class="btn btn-primary"
-          *ngIf="tData.fulfillsRequirement === 'Yes'">
+          *ngIf="tData.fulfillsRequirement === 'Yes'" [disabled]="isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Next
         </button>
       </div>
 
       <div class="d-flex justify-content-end mt-4">
         <button type="submit" class="btn btn-success me-2" (click)="update()"
-          *ngIf="applicationStatus === 'Resubmitted EQ'">
+          *ngIf="applicationStatus === 'Resubmitted EQ'" [disabled]="isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Update
         </button>
       </div>

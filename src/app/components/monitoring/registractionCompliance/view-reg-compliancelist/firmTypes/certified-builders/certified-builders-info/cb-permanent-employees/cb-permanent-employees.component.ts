@@ -9,13 +9,14 @@ import Swal from 'sweetalert2';
   styleUrls: ['./cb-permanent-employees.component.scss']
 })
 export class CbPermanentEmployeesComponent {
-formData: any = {};
+  formData: any = {};
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
   bctaNo: any;
   tableData: any
   @Input() id: string = '';
   applicationStatus: string = '';
   tData: any;
+  isSaving = false;
 
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
@@ -26,10 +27,10 @@ formData: any = {};
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.certifiedBuilderNo;
     this.applicationStatus = WorkDetail.data.applicationStatus;
-    this.tData = { 
-       hrFulfilled: '',
-       hrResubmitDeadline: '',
-       hrRemarks: ''
+    this.tData = {
+      hrFulfilled: '',
+      hrResubmitDeadline: '',
+      hrRemarks: ''
     };
 
     if (this.bctaNo) {
@@ -43,7 +44,7 @@ formData: any = {};
       console.log('employee', this.formData);
     })
   }
-  
+
   fetchTdsHcPension() {
   }
 
@@ -83,7 +84,8 @@ formData: any = {};
     window.URL.revokeObjectURL(url);
   }
 
-   update() {
+  update() {
+    this.isSaving = true;
     const payload = {
       cbReviewDto: {
         bctaNo: this.bctaNo,
@@ -92,9 +94,10 @@ formData: any = {};
         hrRemarks: this.tData.remarks
       }
     };
-  
+
     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -105,6 +108,7 @@ formData: any = {};
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',
@@ -117,6 +121,7 @@ formData: any = {};
 
   tableId: any
   saveAndNext() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
     const hr = this.tableData.map((item: any) => ({
@@ -139,9 +144,20 @@ formData: any = {};
       cbEmployeeReviewDto: hr
     };
     this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       this.activateTab.emit({ id: this.tableId, tab: 'cbEquipment' });
-    });
+    },
+      (err) => {
+        this.isSaving = false;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: err?.error?.message || 'Something went wrong. Please try again.',
+          confirmButtonText: 'OK'
+        });
+      });
   }
 }

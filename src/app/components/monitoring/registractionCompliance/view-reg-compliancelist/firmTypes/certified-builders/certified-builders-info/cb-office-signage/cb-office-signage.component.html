@@ -81,8 +81,8 @@
 
       <div class="col-md-12 mb-3">
         <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
-        <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.fsRemarks"
-          name="fsRemarks" required #fsRemarks="ngModel"></textarea>
+        <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.fsRemarks" name="fsRemarks"
+          required #fsRemarks="ngModel"></textarea>
         <div *ngIf="fsRemarks?.invalid && fsRemarks?.touched" class="text-danger font-size-12">
           Remarks are required
         </div>
@@ -92,8 +92,7 @@
 
     <div class="col-md-6 mb-3">
       <label class="form-label">OHS Handbook:<span class="text-danger font-size-12">*</span></label>
-      <button *ngIf="formData.ohsHandBook" class="btn btn-sm btn-outline-primary"
-        [disabled]="!isFieldEditable('ohs')"
+      <button *ngIf="formData.ohsHandBook" class="btn btn-sm btn-outline-primary" [disabled]="!isFieldEditable('ohs')"
         (click)="downloadFile(formData.ohsHandBook)">
         View doc
       </button>
@@ -116,20 +115,22 @@
       <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.generalRemarks"
         name="generalRemarks"></textarea>
     </div>
-   
-    <!-- Update button: Show when status is NOT Submitted -->
-      <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
-        <button type="submit" class="btn btn-primary save-next-btn" (click)="update()">
-          Update
-        </button>
-      </div>
 
-      <!-- Save & Next button: Show only when status is Submitted -->
-      <div class="col-12 text-end mt-3" *ngIf="applicationStatus === 'Submitted'">
-        <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()">
-          Save & Next
-        </button>
-      </div>
+    <!-- Update button: Show when status is NOT Submitted -->
+    <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
+      <button type="submit" class="btn btn-primary" (click)="update()" [disabled]="isSaving">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isSaving ? 'Saving...' : 'Update' }}
+      </button>
+    </div>
+
+    <!-- Save & Next button: Show only when status is Submitted -->
+    <div class="col-12 text-end mt-3" *ngIf="applicationStatus === 'Submitted'">
+      <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()" [disabled]="isSaving">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isSaving ? 'Saving...' : 'Save & Next' }}
+      </button>
+    </div>
 
   </div>
 </div>

@@ -2,10 +2,6 @@ import { Component, ViewChild } from '@angular/core';
 import { CommonService } from '../../../service/common.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import 'bootstrap/dist/js/bootstrap.bundle.min.js';
-import Swal from 'sweetalert2';
-
-declare var bootstrap: any;
-
 
 @Component({
     selector: 'app-view-monitored-site-app',
@@ -29,13 +25,6 @@ export class ViewMonitoredSiteAppComponent {
     set_limit: number[] = [10, 15, 25, 100];
     dataList: any;
     loading: boolean = true;
-    
-    contractorClasses = ['S-Small', 'M-Medium', 'L-Large', 'All'];
-
-    Dzongkhags = ['Shrek', 'Thimphu', 'Paro', 'Wangdue', 'Punakha', 'Trashigang',
-        'Trashiyangtse', 'Bumthang', 'Gasa', 'Haa', 'Lhuentse',
-        'Mongar', 'Pemagatshel', 'Samdrup Jongkhar', 'Samtse', 'Sarpang',
-        'Zhemgang', 'Chhukha', 'Dagana', 'Tsirang', 'Trongsa'];
 
     constructor(
         private service: CommonService,
@@ -48,112 +37,9 @@ export class ViewMonitoredSiteAppComponent {
         this.getPocuringAgency();
     }
 
-    selectedFirmType: string = '';
-
-    onFirmTypeChange() {
-        // You can add additional logic here when firm type changes
-        console.log('Selected firm type:', this.selectedFirmType);
-    }
-
-    // Unified send method
-    sendMassEmail() {
-        if (!this.selectedFirmType || !this.dateData.date) return;
-
-        // Auto-set deadline using your existing getter
-        this.formData.deadline = this.calculatedDeadline;
-
-        const serviceCall = this.getServiceCall();
-
-        if (serviceCall) {
-            serviceCall.subscribe({
-                next: (response) => {
-                    this.loading = false;
-                    this.handleSuccess(response);
-                    this.resetForm();
-                    this.closeModal();
-                    this.showSuccessNotification();
-                },
-                error: (error) => this.handleError(error)
-            });
-        }
-    }
-
-    private getServiceCall() {
-        switch (this.selectedFirmType) {
-            case 'construction':
-                return this.service.sendMassEmail(this.formData);
-            case 'certified':
-                return this.service.sendMassMailToCertifiedBuilders(this.formData);
-            case 'consultancy':
-                return this.service.sendMassMailToConsultant(this.formData);
-            case 'specialized':
-                return this.service.sendMassMailToSpecializedFirm(this.formData);
-            default:
-                return null;
-        }
-    }
-
-    private closeModal() {
-        // Use native Bootstrap JS to close the modal
-        // const modal = bootstrap.Modal.getInstance(this.modalContent.nativeElement);
-        // if (modal) {
-        //     modal.hide();
-        // }
-        // // Alternative if using ng-bootstrap:
-        // this.modalService.dismissAll();
-    }
-
     private resetForm() {
-        this.selectedFirmType = '';
         this.dateData = {};
         this.formData = {};
-    }
-
-   private showSuccessNotification() {
-  Swal.fire({
-    title: 'Success!',
-    text: 'The mass email has been sent successfully to the designated recipients.',
-    icon: 'success',
-    confirmButtonText: 'OK',
-    willClose: () => {
-      // Cleanup before closing
-      document.body.classList.remove('swal2-shown');
-      document.body.style.overflow = '';
-    }
-  }).then(() => {
-    // Force cleanup
-    const backdrops = document.querySelectorAll('.swal2-backdrop, .modal-backdrop');
-    backdrops.forEach(el => el.remove());
-    document.body.classList.remove('modal-open', 'swal2-no-backdrop');
-    document.body.style.paddingRight = '';
-  });
-}
-    private handleSuccess(response: any) {
-        console.log('Email sent successfully:', response);
-        this.getReportList();
-    }
-
-    private handleError(error: any) {
-        console.error('Error sending email:', error);
-        Swal.fire({
-            title: 'Error!',
-            text: 'Failed to send mass email. Please try again.',
-            icon: 'error',
-            confirmButtonText: 'OK'
-        });
-    }
-
-    createNotificationsTosendMassEmail(): void {
-        Swal.fire({
-            title: 'Success!',
-            text: 'The mass email has been sent successfully to the designated recipients.',
-            icon: 'success',
-            confirmButtonText: 'OK'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                console.log('notification clicked!');
-            }
-        });
     }
 
 
@@ -166,10 +52,6 @@ export class ViewMonitoredSiteAppComponent {
             return d.toISOString().substring(0, 10);
         }
         return '';
-    }
-
-    sendNotification() {
-
     }
 
     Searchfilter() {
@@ -233,24 +115,24 @@ export class ViewMonitoredSiteAppComponent {
             // Only search by awardedBctaNo if searchQuery is provided
             payload.push(
                 {
-                field: 'awardedBctaNo',
-                value: `%${searchQuery}%`,
-                condition: 'like',
-                operator: 'OR',
-            },
-             {
-                field: 'application_number',
-                value: `%${searchQuery}%`,
-                condition: 'like',
-                operator: 'OR',
-            },
-             {
-                field: 'applicationStatus',
-                value: `%${searchQuery}%`,
-                condition: 'like',
-                operator: 'OR',
-            }
-        );
+                    field: 'awardedBctaNo',
+                    value: `%${searchQuery}%`,
+                    condition: 'like',
+                    operator: 'OR',
+                },
+                {
+                    field: 'application_number',
+                    value: `%${searchQuery}%`,
+                    condition: 'like',
+                    operator: 'OR',
+                },
+                {
+                    field: 'applicationStatus',
+                    value: `%${searchQuery}%`,
+                    condition: 'like',
+                    operator: 'OR',
+                }
+            );
         } else {
             // Apply status filters only when not searching
             payload.push(
@@ -336,7 +218,7 @@ export class ViewMonitoredSiteAppComponent {
         this.service.saveActionTakenByData(payload, this.checkListId).subscribe(
             (response: any) => {
                 this.closeactionTakenModal.nativeElement.click();
-               this.formData.contractorNo='';
+                this.formData.contractorNo = '';
                 this.createNotification();
                 this.getReportList();
             },

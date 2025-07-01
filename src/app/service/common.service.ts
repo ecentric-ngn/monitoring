@@ -9,7 +9,7 @@ import { BehaviorSubject, catchError, map, Observable, throwError } from "rxjs";
 })
 export class CommonService {
   storage: any;
-  // In your CommonService
+
   private bctaNoSource = new BehaviorSubject<string | null>(null);
   bctaNo$ = this.bctaNoSource.asObservable();
 

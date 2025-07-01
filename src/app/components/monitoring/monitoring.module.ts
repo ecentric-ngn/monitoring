@@ -46,7 +46,7 @@ import { SfMonitoringTeamComponent } from './registractionCompliance/view-reg-co
 import { SfPermanentEmployeesComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/specialized-firms/specialized-firms-info/sf-permanent-employees/sf-permanent-employees.component';
 import { SpecializedFirmsInfoComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/specialized-firms/specialized-firms-info/specialized-firms-info.component';
 import { SpecializedFirmsComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/specialized-firms/specialized-firms.component';
-
+import { ActionModalConstructionComponent } from './shared/action-modal-construction/action-modal-construction.component';
 
 @NgModule({
     imports: [
@@ -56,8 +56,7 @@ import { SpecializedFirmsComponent } from './registractionCompliance/view-reg-co
         MonitoringRoutingModule,
         NzButtonModule,
         NzIconModule,
-        
-
+       
     ],
     declarations: [
         OnsiteFacilitiesandManagementComponent,
@@ -101,7 +100,7 @@ import { SpecializedFirmsComponent } from './registractionCompliance/view-reg-co
         SpecializedFirmsInfoComponent,
         SfPermanentEmployeesComponent,
         SfMonitoringTeamComponent,
-        
+        ActionModalConstructionComponent,
         ],
     providers:[]
 })

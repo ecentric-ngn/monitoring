@@ -4,6 +4,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
+import { AuthServiceService } from 'src/app/auth.service';
 declare var bootstrap: any;
 
 @Component({
@@ -13,17 +14,23 @@ declare var bootstrap: any;
 })
 export class ViewRegCompliancelistComponent {
 
+    filteredData: any[] = [];
+    displayedData: any[] = [];
+    currentPage: number = 1;
+    itemsPerPage: number = 10;
+
     searchQuery: any;
     set_limit: number[] = [10, 15, 25, 100];
     formData: any = {};
     tableData: any = [];
     bsModal: any;
-
+    loading: boolean = false;
     selectedIds: number[] = [];
     private isFetching = false;
     private autoRefreshInterval: any;
 
     firmType: string = '';
+    selectedFirmType: string = '';
 
     selectedAction: any = {
         actionType: '',
@@ -39,24 +46,37 @@ export class ViewRegCompliancelistComponent {
 
     reinstateData: any = null;
     reinstateModal: any = null;
+    constructionFirmModal: any = null;
+    searchTerm: string = '';
+    statusFilter: string = 'All';
+    username: string = '';
+
+    contractorClasses = ['S-Small', 'M-Medium', 'L-Large', 'All'];
+
+    Dzongkhags = ['Shrek', 'Thimphu', 'Paro', 'Wangdue', 'Punakha', 'Trashigang',
+        'Trashiyangtse', 'Bumthang', 'Gasa', 'Haa', 'Lhuentse',
+        'Mongar', 'Pemagatshel', 'Samdrup Jongkhar', 'Samtse', 'Sarpang',
+        'Zhemgang', 'Chhukha', 'Dagana', 'Tsirang', 'Trongsa'];
+
+    today: string = new Date().toISOString().substring(0, 10);
 
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
-        private router: Router
+        private router: Router,
+        private authService: AuthServiceService
     ) { }
-
-    searchTerm: string = '';
-    statusFilter: string = 'All';
 
     ngOnInit() {
         this.fetchComplianceDetails();
+
+        this.username = this.authService.getUsername() || 'NA';
 
         // Auto-refresh every 60 seconds (60000 ms)
         this.autoRefreshInterval = setInterval(() => {
             this.fetchComplianceDetails();
             console.log('Auto-refreshed compliance data');
-        }, 60000); // 60 seconds
+        }, 60000);
     }
 
     ngOnDestroy() {
@@ -64,6 +84,86 @@ export class ViewRegCompliancelistComponent {
             clearInterval(this.autoRefreshInterval);
         }
     }
+
+    sendMassMail() {
+        this.loading = true;
+        this.formData.deadline = this.calculatedDeadline;
+        this.service.sendMassEmail(this.formData).subscribe({
+            next: (response) => {
+                this.loading = false;
+                this.handleSuccess(response);
+                this.resetForm();
+                this.closeFirmModal();
+                this.showSuccessNotification();
+            },
+            error: (error) => this.handleError(error)
+        });
+    }
+
+    closeFirmModal() {
+        if (this.constructionFirmModal) {
+            this.constructionFirmModal.hide();
+        } else {
+            const modalEl = document.getElementById('constructionFirmModal');
+            if (modalEl) {
+                modalEl.classList.remove('show');
+                modalEl.style.display = 'none';
+                document.body.classList.remove('modal-open');
+                const backdrops = document.querySelectorAll('.modal-backdrop');
+                backdrops.forEach(el => el.remove());
+            }
+        }
+    }
+
+    private resetForm() {
+        this.dateData = {};
+        this.formData = {};
+    }
+
+    private showSuccessNotification() {
+        Swal.fire({
+            title: 'Success!',
+            text: 'The mass email has been sent successfully to the designated recipients.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            willClose: () => {
+                // Cleanup before closing
+                document.body.classList.remove('swal2-shown');
+                document.body.style.overflow = '';
+            }
+        }).then(() => {
+            // Force cleanup
+            const backdrops = document.querySelectorAll('.swal2-backdrop, .modal-backdrop');
+            backdrops.forEach(el => el.remove());
+            document.body.classList.remove('modal-open', 'swal2-no-backdrop');
+            document.body.style.paddingRight = '';
+        });
+    }
+    private handleSuccess(response: any) {
+        console.log('Email sent successfully:', response);
+    }
+
+    private handleError(error: any) {
+        console.error('Error sending email:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Failed to send mass email. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+        });
+    }
+
+    dateData: any = {};
+
+    get calculatedDeadline() {
+        if (this.dateData.date) {
+            const d = new Date(this.dateData.date);
+            d.setDate(d.getDate() + 7); //7 days deadline
+            return d.toISOString().substring(0, 10);
+        }
+        return '';
+    }
+
     onChangeFirmType(firmType: string) {
         this.firmType = firmType;
 
@@ -92,6 +192,8 @@ export class ViewRegCompliancelistComponent {
         this.service.fetchComplianceData().subscribe(
             (response: any) => {
                 this.tableData = response;
+                this.filteredData = this.tableData;
+                this.updateDisplayedData();
                 console.log('Fetched Data', this.tableData);
                 this.isFetching = false;
             },
@@ -102,17 +204,50 @@ export class ViewRegCompliancelistComponent {
         );
     }
 
-    Searchfilter() { }
+    Searchfilter() {
+        const query = (this.searchQuery || '').toLowerCase();
+        this.filteredData = this.tableData.filter(item =>
+            (item.contractorNo && item.contractorNo.toString().toLowerCase().includes(query)) ||
+            (item.nameOfFirm && item.nameOfFirm.toLowerCase().includes(query)) ||
+            (item.applicationStatus && item.applicationStatus.toLowerCase().includes(query)) ||
+            (item.licenseStatus && item.licenseStatus.toLowerCase().includes(query))
+        );
+        this.currentPage = 1; // Reset to first page on new search
+        this.updateDisplayedData();
+    }
 
-    setLimitValue(value: any) { }
+    updateDisplayedData() {
+        const start = (this.currentPage - 1) * this.itemsPerPage;
+        const end = start + this.itemsPerPage;
+        this.displayedData = this.filteredData.slice(start, end);
+    }
 
-    // In your component class
+    setLimitValue(value: any) {
+        this.itemsPerPage = +value;
+        this.currentPage = 1;
+        this.updateDisplayedData();
+    }
+
+    goToPreviousPage() {
+        if (this.currentPage > 1) {
+            this.currentPage--;
+            this.updateDisplayedData();
+        }
+    }
+
+    goToNextPage() {
+        if (this.currentPage * this.itemsPerPage < this.filteredData.length) {
+            this.currentPage++;
+            this.updateDisplayedData();
+        }
+    }
+
     navigate(data: any) {
         // Only proceed if status is "Submitted"
         if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS'
             || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted OS'
             || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ') {
-            const workId = data.contractorNo; // Using contractorNo as workId
+            const workId = data.contractorNo;
             this.prepareAndNavigate(data, workId);
         }
     }
@@ -170,17 +305,17 @@ export class ViewRegCompliancelistComponent {
     openActionModal(row: any) {
         this.selectedAction = {
             actionType: '',
-            actionDate: '',
+            actionDate: this.today,
             remarks: '',
             newClassification: '',
-            target: row // attach row data if needed
+            target: row
         };
         console.log('Row passed to modal:', row);
 
         const modalEl = document.getElementById('actionModal');
         this.bsModal = new bootstrap.Modal(modalEl, {
-            backdrop: 'static', // Optional: prevents closing on outside click
-            keyboard: false     // Optional: disables ESC key closing
+            backdrop: 'static', 
+            keyboard: false 
         });
         this.bsModal.show();
     }
@@ -237,7 +372,7 @@ export class ViewRegCompliancelistComponent {
         } else if (existingClass === 'M-Medium') {
             return all.filter(opt => opt.value === 'S-Small');
         } else if (existingClass === 'S-Small') {
-            return []; // No downgrade options
+            return []; 
         }
         return [];
     }
@@ -281,7 +416,7 @@ export class ViewRegCompliancelistComponent {
                 firmId: this.selectedAction.target?.contractorId,
                 firmType: "Contractor",
                 downgradeEntries,
-                requestedBy: "Bilana Ghalley"
+                requestedBy: this.authService.getUsername()
             };
 
             this.service.downgradeFirm(payload).subscribe({
@@ -305,12 +440,11 @@ export class ViewRegCompliancelistComponent {
             const payload = {
                 contractorNo: this.selectedAction.target?.contractorNo,
                 // contractorId: this.selectedAction.target?.contractorId, 
-                contractorCancelledBy: "Bilana Ghalley",
+                contractorCancelledBy: this.authService.getUsername(),
                 contractorCancelledDate: this.selectedAction.actionDate,
                 contractorType: "Contractor",
                 suspendDetails: this.selectedAction.remarks,
             };
-            // Call cancel API
             this.service.cancelFirm(payload).subscribe({
                 next: (res) => {
                     Swal.fire('Success', 'Forwarded to Review Committee', 'success');
@@ -324,14 +458,13 @@ export class ViewRegCompliancelistComponent {
             const payload = {
                 firmNo: this.selectedAction.target?.contractorNo,
                 // contractorId: this.selectedAction.target?.contractorId,
-                suspendedBy: "Bilana Ghalley",
+                suspendedBy: this.authService.getUsername(),
                 suspensionDate: this.selectedAction.actionDate
                     ? new Date(this.selectedAction.actionDate).toISOString()
                     : null,
                 firmType: "Contractor",
                 suspendDetails: this.selectedAction.remarks,
             };
-            // Call suspend API
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {
                     Swal.fire('Success', 'Forwarded to Review Committee', 'success');
@@ -385,7 +518,7 @@ export class ViewRegCompliancelistComponent {
 
         const approvePayload = {
             firmType: "Contractor",
-            cdbNos:row
+            cdbNos: row
         };
 
         forkJoin({

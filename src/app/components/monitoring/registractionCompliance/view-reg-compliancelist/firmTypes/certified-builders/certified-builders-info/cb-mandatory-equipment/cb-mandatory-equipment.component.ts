@@ -16,6 +16,7 @@ export class CbMandatoryEquipmentComponent {
   tableData: any;
   tData: any;
   applicationStatus: string = '';
+  isSaving = false;
 
   @Input() id: string = ''
 
@@ -33,7 +34,7 @@ export class CbMandatoryEquipmentComponent {
       resubmitDate: ''
     };
 
-     this.tData = {
+    this.tData = {
       eqFulfilled: '',
       eqResubmitDeadline: '',
       eqRemarks: ''
@@ -56,7 +57,7 @@ export class CbMandatoryEquipmentComponent {
       this.tableData = res.vehicles
       console.log('CB equipments', this.formData);
     })
-    
+
   }
 
 
@@ -76,6 +77,7 @@ export class CbMandatoryEquipmentComponent {
   tableId: any
 
   saveAndNext() {
+    this.isSaving = true;
     const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
     this.tableId = this.id;
 
@@ -102,15 +104,25 @@ export class CbMandatoryEquipmentComponent {
       cbEquipmentReviewDto: eq
     };
     this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       console.log('Emitting cbMonitoring', this.tableId);
 
       this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
-    });
+    },
+      (error) => {
+        this.isSaving = false;
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to save',
+          icon: 'error'
+        });
+      });
   }
 
   notifyContractor() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
 
@@ -121,7 +133,7 @@ export class CbMandatoryEquipmentComponent {
 
     const payload = {
       cbReviewDto: {
-         bctaNo: this.bctaNo,
+        bctaNo: this.bctaNo,
         eqFulfilled: this.tData.fulfillsRequirement,
         eqResubmitDeadline: this.tData.resubmitDate,
         eqRemarks: this.tData.remarks
@@ -131,15 +143,17 @@ export class CbMandatoryEquipmentComponent {
 
     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Requirements Not Met',
           text: 'The firm has been notified to resubmit the form',
           icon: 'warning',
           confirmButtonText: 'OK'
         });
-          this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
+        this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
       },
       error: (error) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Error',
           text: 'Failed to notify firm',
@@ -150,8 +164,9 @@ export class CbMandatoryEquipmentComponent {
   }
 
   update() {
+    this.isSaving = true;
     const payload = {
-      cbReviewDto: { 
+      cbReviewDto: {
         bctaNo: this.bctaNo,
         eqFulfilled: this.tData.fulfillsRequirement,
         eqResubmitDeadline: this.tData.resubmitDate,
@@ -161,6 +176,7 @@ export class CbMandatoryEquipmentComponent {
 
     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -171,6 +187,7 @@ export class CbMandatoryEquipmentComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',

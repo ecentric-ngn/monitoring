@@ -21,7 +21,7 @@ export class ConsultancyMandatoryEquipmentComponent {
   data: any;
   tData: any;
   applicationStatus: string = '';
-  isSaving = false;
+  isSaving = false; 
 
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
@@ -114,7 +114,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
       this.activateTab.emit({ id: this.tableId, tab: 'consultancyMonitoring' });
     },
-    (error) => {
+      (error) => {
         this.isSaving = false;
         Swal.fire({
           title: 'Error',
@@ -122,7 +122,7 @@ export class ConsultancyMandatoryEquipmentComponent {
           icon: 'error'
         });
       }
-  );
+    );
   }
 
   notifyContractor() {
@@ -173,12 +173,12 @@ export class ConsultancyMandatoryEquipmentComponent {
   update() {
     this.isSaving = true;
     const payload = {
-      consultantRegistrationDto: { 
+      consultantRegistrationDto: {
         bctaNo: this.bctaNo,
         eqFulfilled: this.tData.fulfillsRequirement,
         eqResubmitDeadline: this.tData.resubmitDate,
         eqRemarks: this.tData.remarks
-       },
+      },
     };
 
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({

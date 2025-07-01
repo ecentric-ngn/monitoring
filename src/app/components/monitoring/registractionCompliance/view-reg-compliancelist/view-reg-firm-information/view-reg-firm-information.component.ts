@@ -49,6 +49,8 @@ export class ViewRegFirmInformationComponent implements OnInit {
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo();
     }
+
+    this.service.setBctaNo(this.bctaNo);
   }
 
 
