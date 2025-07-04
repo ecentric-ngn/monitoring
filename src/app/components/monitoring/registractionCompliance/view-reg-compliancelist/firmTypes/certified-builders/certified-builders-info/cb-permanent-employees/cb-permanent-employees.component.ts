@@ -9,12 +9,14 @@ import Swal from 'sweetalert2';
   styleUrls: ['./cb-permanent-employees.component.scss']
 })
 export class CbPermanentEmployeesComponent {
-formData: any = {};
+  formData: any = {};
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
   bctaNo: any;
   tableData: any
   @Input() id: string = '';
   applicationStatus: string = '';
+  tData: any;
+  isSaving = false;
 
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
@@ -25,6 +27,11 @@ formData: any = {};
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.certifiedBuilderNo;
     this.applicationStatus = WorkDetail.data.applicationStatus;
+    this.tData = {
+      hrFulfilled: '',
+      hrResubmitDeadline: '',
+      hrRemarks: ''
+    };
 
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo()
@@ -37,7 +44,7 @@ formData: any = {};
       console.log('employee', this.formData);
     })
   }
-  
+
   fetchTdsHcPension() {
   }
 
@@ -77,18 +84,20 @@ formData: any = {};
     window.URL.revokeObjectURL(url);
   }
 
-   update() {
+  update() {
+    this.isSaving = true;
     const payload = {
-      cbReviewDto: { bctaNo: this.bctaNo },
-      cbEmployeeReviewDto: [{
-        hrFulfilled: this.formData.hrFulfilled,
-        resubmitDeadline: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.remarksNo,
-      }]
+      cbReviewDto: {
+        bctaNo: this.bctaNo,
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarks
+      }
     };
-  
+
     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -99,6 +108,7 @@ formData: any = {};
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',
@@ -110,39 +120,8 @@ formData: any = {};
   }
 
   tableId: any
-
-  saveAndForward() {
-    const table = this.service.setData(this.id, 'tableId', 'office-signage');
-    this.tableId = this.id;
-    const hr = this.tableData.map((item: any) => ({
-      cidNo: item.cId,
-      fullName: item.name,
-      gender: item.sex,
-      nationality: item.countryName,
-      qualification: item.qualification,
-      // joiningDate:  item.joiningDate, encountered an issue with date format
-      joiningDate: "2024-01-01",
-      paySlip: item.paySlipFileName,
-      hrFulfilled: this.formData.hrFulfilled,
-      resubmitDeadline: this.formData.resubmitDate,
-      deadlineRemarks: this.formData.remarksNo,
-      remarks: this.formData.remarksYes,
-      psremarks: ""
-    }));
-    const payload = {
-      cbReviewDto: {
-        id: this.tableId,
-      },
-      cbEmployeeReviewDto: hr
-    };
-    this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
-      console.log('res', res);
-      //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
-      this.activateTab.emit({ id: this.tableId, tab: 'cbEquipment' });
-    });
-  }
-
   saveAndNext() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
     const hr = this.tableData.map((item: any) => ({
@@ -151,25 +130,34 @@ formData: any = {};
       gender: item.sex,
       nationality: item.countryName,
       qualification: item.qualification,
-      // joiningDate:  item.joiningDate, encountered an issue with date format
-      joiningDate: "2024-01-01",
-      paySlip: item.paySlipFileName,
-      hrFulfilled: this.formData.hrFulfilled,
-      resubmitDeadline: this.formData.resubmitDate,
-      deadlineRemarks: this.formData.remarksNo,
-      remarks: this.formData.remarksYes,
-      psremarks: ""
+      joiningDate: (item.joiningDate && !isNaN(new Date(item.joiningDate).getTime()))
+        ? new Date(item.joiningDate).toISOString().split('T')[0]
+        : ''
     }));
     const payload = {
       cbReviewDto: {
-        id: this.tableId,
+        bctaNo: this.bctaNo,
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarks
       },
       cbEmployeeReviewDto: hr
     };
     this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       this.activateTab.emit({ id: this.tableId, tab: 'cbEquipment' });
-    });
+    },
+      (err) => {
+        this.isSaving = false;
+
+        Swal.fire({
+          icon: 'error',
+          title: 'Error!',
+          text: err?.error?.message || 'Something went wrong. Please try again.',
+          confirmButtonText: 'OK'
+        });
+      });
   }
 }

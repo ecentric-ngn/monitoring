@@ -10,11 +10,19 @@ import Swal from 'sweetalert2';
 })
 export class OfficeSignageAndDocComponent implements OnInit {
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
+
+
   formData: any;
   bctaNo: any;
   data: any;
   id: any;
   applicationStatus: string = '';
+  isSaving = false;
+
+  // showActionModal = false;
+  // selectedAction: any = {};
+  // downgradeList: any[] = [];
+  // today: string = new Date().toISOString().substring(0, 10);
 
   constructor(private service: CommonService, private router: Router) { }
 
@@ -48,7 +56,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
       console.error('WorkDetail data not available');
       return;
     }
-    
+
 
     this.data = WorkDetail.data;
     this.bctaNo = this.data.contractorNo;
@@ -160,6 +168,8 @@ export class OfficeSignageAndDocComponent implements OnInit {
   }
 
   update() {
+
+    this.isSaving = true;
     const payload = {
       registrationReview: {
         bctaNo: this.data.contractorNo || null,
@@ -176,6 +186,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
 
     this.service.saveOfficeSignageAndDoc(payload).subscribe(
       (response: any) => {
+        this.isSaving = false;
         try {
           const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
           this.id = parsedResponse.registrationReview?.id;
@@ -194,6 +205,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
         }
       },
       (error) => {
+        this.isSaving = false;
         console.error('Error saving data:', error);
         Swal.fire('Error', 'Failed to save office signage and documents review.', 'error');
       }
@@ -201,6 +213,9 @@ export class OfficeSignageAndDocComponent implements OnInit {
   }
 
   saveAndNext() {
+
+    this.isSaving = true;
+
     if (this.formData.signboardReview === 'No' && !this.formData.signboardResubmitDate) {
       alert("Please provide resubmit date for office signboard.");
       return;
@@ -243,6 +258,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
 
     this.service.saveOfficeSignageAndDoc(payload).subscribe(
       (response: any) => {
+        this.isSaving = false;
         try {
           const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
           this.id = parsedResponse.registrationReview?.id;
@@ -252,9 +268,31 @@ export class OfficeSignageAndDocComponent implements OnInit {
         }
       },
       (error) => {
+        this.isSaving = false;
         console.error('Error saving data:', error);
       }
     );
   }
+
+
+  // openActionModal() {
+  //   // Set up selectedAction and other data as needed
+  //   this.selectedAction = {
+  //     actionType: '',
+  //     actionDate: this.today,
+  //     remarks: '',
+  //     // ...other fields...
+  //   };
+  //   this.showActionModal = true;
+  // }
+
+  // onActionModalClose() {
+  //   this.showActionModal = false;
+  // }
+
+  // onActionModalSubmit(result: any) {
+  //   // Handle the result from the modal (e.g., save, update, etc.)
+  //   this.showActionModal = false;
+  // }
 
 }

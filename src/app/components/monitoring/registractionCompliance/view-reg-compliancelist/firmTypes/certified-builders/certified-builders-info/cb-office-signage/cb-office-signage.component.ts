@@ -14,6 +14,7 @@ export class CbOfficeSignageComponent {
   bctaNo: any;
   data: any;
   applicationStatus: string = '';
+  isSaving = false;
 
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
@@ -128,13 +129,14 @@ export class CbOfficeSignageComponent {
     }
   
     update() {
+      this.isSaving = true;
       const payload = {
         cbReviewDto: {
           bctaNo: this.data.certifiedBuilderNo || null,
-          officeSignboard: this.formData.officeSignboardPath || null,
-          signageResubmitDeadline: this.formData.signboardResubmitDate || null,
-          osreview: this.formData.signboardReview || null,
-          osremarks: this.formData.signboardRemarks || null,
+          location: this.formData.officeLocation || null,
+          locationReview: this.formData.reviewLocation || null,
+          locationResubmitDeadline: this.formData.resubmitDate || null,
+          locationRemarks: this.formData.resubmitRemarks || null,
           filingSystem: this.formData.properFillingPath || null,
           fsreview: this.formData.filingReview || null,
           fsremarks: this.formData.filingRemarks || null,
@@ -144,6 +146,7 @@ export class CbOfficeSignageComponent {
   
       this.service.saveOfficeSignageAndDocCB(payload).subscribe(
         (response: any) => {
+          this.isSaving = false;
           try {
             const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
             this.id = parsedResponse.cbReviewDto?.id;
@@ -161,7 +164,9 @@ export class CbOfficeSignageComponent {
             Swal.fire('Error', 'An unexpected error occurred while parsing the response.', 'error');
           }
         },
+        
         (error) => {
+          this.isSaving = false;
           console.error('Error saving data:', error);
           Swal.fire('Error', 'Failed to save office signage and documents review.', 'error');
         }
@@ -170,6 +175,7 @@ export class CbOfficeSignageComponent {
 
   id: any;
   saveAndNext() {
+    this.isSaving = true;
     const payload = {
       cbReviewDto: {
         bctaNo: this.data.certifiedBuilderNo,
@@ -178,26 +184,39 @@ export class CbOfficeSignageComponent {
         email: this.formData.emailAddress,
         location: this.formData.officeLocation,
         locationReview: this.formData.reviewLocation,
-        lastDateResubmit: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.resubmitRemarks,
+        locationResubmitDeadline: this.formData.resubmitDate,
+        locationRemarks: this.formData.resubmitRemarks,
         filingSystem: this.formData.properFillingPath,
         ohsHandbook: this.formData.ohsHandBook,
         ohsReview: this.formData.ohsReview,
-        remarks: this.formData.generalRemarks,
+        ohsRemarks: this.formData.generalRemarks,
         fsresubmitDeadline: this.formData.fsresubmitDeadline,
         fsreview: this.formData.filingReview,
         fsremarks: this.formData.fsRemarks,
+        reviewDate: this.formData.reviewDate,
+        hrFulfilled: "",
+        hrResubmitDeadline: "",
+        hrRemarks: "",
+        eqFulfilled: "",
+        eqResubmitDeadline: "",
+        eqRemarks: ""
       }
 
     }
     this.service.saveOfficeSignageAndDocCB(payload).subscribe((response: any) => {
+      this.isSaving = false;
       const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
       this.id = parsedResponse.cbReviewDto.id
       // this.service.setData(this.id, 'tableId', 'yourRouteValueHere');
       console.log('this.id', this.id);
       //  this.id = res.registrationReview.id
       this.activateTab.emit({ id: this.id, tab: 'cbEmployee' });
-    })
+    },
+  (error) => {
+        this.isSaving = false;
+         console.error('Error saving data:', error);
+         Swal.fire('Error', 'Failed to save office signage and documents review.', 'error');
+      })
 
     // this.router.navigate(['permanent-employee']);
   }

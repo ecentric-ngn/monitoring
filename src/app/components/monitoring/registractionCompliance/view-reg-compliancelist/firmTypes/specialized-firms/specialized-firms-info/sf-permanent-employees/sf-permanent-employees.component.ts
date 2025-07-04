@@ -14,6 +14,8 @@ export class SfPermanentEmployeesComponent {
   bctaNo: any;
   tableData: any;
   applicationStatus: string = '';
+  tData: any;
+  isSaving = false;
 
   @Input() id: string = '';
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
@@ -25,6 +27,21 @@ export class SfPermanentEmployeesComponent {
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.specializedFirmNo;
     this.applicationStatus = WorkDetail.data.applicationStatus;
+    this.tData = {
+      hrFulfilled: '',
+      hrResubmitDeadline: '',
+      hrRemarks: ''
+    };
+
+    this.service.setBctaNo(this.bctaNo);
+
+    this.service.firmInfo$.subscribe(info => {
+      if (info) {
+        this.formData.firmName = info.firmName;
+        this.formData.mobileNo = info.mobileNo;
+        this.formData.email = info.email;
+      }
+    });
 
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo()
@@ -77,14 +94,19 @@ export class SfPermanentEmployeesComponent {
   }
 
   update() {
+    this.isSaving = true;
     const payload = {
-        hrFulfilled: this.formData.hrFulfilled,
-        resubmitDeadline: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.remarksNo,
+      sfReviewDto: {
+        bctaNo: this.bctaNo,
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarks,
+      }
     };
-  
+
     this.service.saveOfficeSignageAndDocSF(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -95,12 +117,14 @@ export class SfPermanentEmployeesComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',
           text: err?.error?.message || 'Something went wrong. Please try again.',
           confirmButtonText: 'OK'
         });
+        this.router.navigate(['monitoring/specialized']);
       }
     });
   }
@@ -108,29 +132,31 @@ export class SfPermanentEmployeesComponent {
   tableId: any
 
   saveAndNext() {
-    // Get the first employee or create a default object
-    const firstEmployee = this.tableData?.[0] || {};
+    this.isSaving = true;
+    const sfReviewEmployeeDto = (this.tableData || []).map((item: any) => ({
+      nationality: item?.countryName || 'string',
+      qualification: item?.qualification || 'string',
+      joiningDate: item?.joiningDate ? this.formatDate(item.joiningDate) : '2025-06-26',
+    }));
 
-    // Create single object payload
+    const sfReviewDto = {
+      bctaNo: this.bctaNo || 'string',
+      firmName: this.formData?.firmName || 'string',
+      contactNo: this.formData?.mobileNo || 'string',
+      email: this.formData?.email || 'string',
+      hrFulfilled: this.tData?.hrFulfilled || 'string',
+      hrResubmitDeadline: this.tData?.resubmitDate,
+      hrRemarks: this.tData?.remarks || 'string'
+    };
+
     const payload = {
-      firmName: firstEmployee?.name || 'string',
-      nationality: firstEmployee?.countryName || 'string',
-      qualification: firstEmployee?.qualification || 'string',
-      joiningDate: firstEmployee?.joiningDate ? this.formatDate(firstEmployee.joiningDate) : '2025-06-14',
-      paySlip: firstEmployee?.paySlipFileName || 'string',
-      fulfillsHrRequirements: this.formData?.hrFulfilled ? 'Yes' : 'No',
-      lastDateToResubmit: this.formData?.resubmitDate || '2025-06-14',
-      resubmissionRemarks: this.formData?.remarksNo || 'string',
-      finalRemarks: this.formData?.remarksYes || 'string',
-      psremarks: "string"
+      sfReviewDto,
+      sfReviewEmployeeDto
     };
 
     this.service.saveOfficeSignageAndDocSF(payload).subscribe({
       next: (res: any) => {
-        console.log('API response:', res);
-        // Debug: log typeof res and its keys
-        console.log('typeof res:', typeof res, 'res keys:', res && Object.keys(res));
-        // Defensive: handle stringified JSON
+        this.isSaving = false;
         let emittedId = '';
         if (typeof res === 'string') {
           try {
@@ -148,8 +174,8 @@ export class SfPermanentEmployeesComponent {
         });
       },
       error: (err) => {
-        console.error('API error:', err);
-        // Handle error (show message, etc.)
+        this.isSaving = false;
+        console.error('Error Saving!', err);
       }
     });
   }

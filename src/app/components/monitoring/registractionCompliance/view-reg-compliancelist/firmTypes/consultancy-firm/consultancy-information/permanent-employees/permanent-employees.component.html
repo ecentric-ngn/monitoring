@@ -50,7 +50,7 @@
             <div class="col-md-4">
                 <label class="form-label">Does the firm fulfill the required Human Resources?<span
                         class="text-danger">*</span></label>
-                <select class="form-select form-control-sm" [(ngModel)]="formData.hrFulfilled" name="hrFulfilled"
+                <select class="form-select form-control-sm" [(ngModel)]="tData.hrFulfilled" name="hrFulfilled"
                     required>
                     <option value="">-- Select --</option>
                     <option value="Yes">Yes</option>
@@ -59,36 +59,36 @@
             </div>
 
             <!-- Conditional fields when HR not fulfilled -->
-            <ng-container *ngIf="formData.hrFulfilled === 'No'">
+            <ng-container *ngIf="tData.hrFulfilled === 'No'">
                 <div class="col-md-4">
                     <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
-                    <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.resubmitDate"
+                    <input type="date" class="form-control form-control-sm" [(ngModel)]="tData.resubmitDate"
                         name="resubmitDate" required />
                 </div>
                 <div class="col-md-8">
                     <label class="form-label">Remarks<span class="text-danger">*</span></label>
-                    <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="formData.remarksNo"
-                        name="remarksNo" required></textarea>
+                    <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="tData.remarks"
+                        name="remarks" required></textarea>
                 </div>
             </ng-container>
 
             <!-- Remarks when HR is fulfilled -->
-            <ng-container *ngIf="formData.hrFulfilled === 'Yes'">
+            <ng-container *ngIf="tData.hrFulfilled === 'Yes'">
                 <div class="col-md-12">
                     <label class="form-label">Remarks</label>
-                    <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="formData.remarksYes"
-                        name="remarksYes"></textarea>
+                    <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="tData.remarks"
+                        name="remarks"></textarea>
                 </div>
             </ng-container>
 
             <!-- Buttons -->
             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3" *ngIf="applicationStatus !== 'Resubmitted HR'" >
-                <button *ngIf="formData.hrFulfilled === 'No'" type="button" class="btn btn-success"
+                <button *ngIf="tData.hrFulfilled === 'No'" type="button" class="btn btn-success"
                     (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                         {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
                 </button>
-                <button *ngIf="formData.hrFulfilled === 'Yes'" type="button" class="btn btn-success"
+                <button *ngIf="tData.hrFulfilled === 'Yes'" type="button" class="btn btn-success"
                     (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                         {{ isSaving ? 'Saving...' : 'Save and Next' }}

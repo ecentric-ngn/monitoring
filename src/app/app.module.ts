@@ -34,7 +34,6 @@ import { OtherConstructionMonitoringComponent } from './components/monitoring/ot
 import { ViewRegCompliancelistComponent } from './components/monitoring/registractionCompliance/view-reg-compliancelist/view-reg-compliancelist.component';
 import { ConsultencyFirmDetailsComponent } from './components/monitoring/reviewCommitteDashboard/consultency-firm-details/consultency-firm-details.component';
 import { SpecilizedFirmDetailsComponent } from './components/monitoring/reviewCommitteDashboard/specilized-firm-details/specilized-firm-details.component';
-
 import { CertifiedFirmDetailsComponent } from './components/monitoring/reviewCommitteDashboard/certified-firm-details/certified-firm-details.component';
 import { ViewConultencyDetailsComponent } from './components/monitoring/reviewCommitteDashboard/view-registration-compliance-details/view-conultency-details/view-conultency-details.component';
 import { ViewSpecializeDetailsComponent } from './components/monitoring/reviewCommitteDashboard/view-registration-compliance-details/view-specialize-details/view-specialize-details.component';
@@ -60,7 +59,6 @@ import { ViewCertifiedDetailsComponent } from './components/monitoring/reviewCom
     ViewConultencyDetailsComponent,
     ViewSpecializeDetailsComponent,
     ViewCertifiedDetailsComponent
-
   ],
   imports: [
     HttpClientModule,

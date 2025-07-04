@@ -9,9 +9,16 @@ import { BehaviorSubject, catchError, map, Observable, throwError } from "rxjs";
 })
 export class CommonService {
   storage: any;
-  // In your CommonService
+
   private bctaNoSource = new BehaviorSubject<string | null>(null);
   bctaNo$ = this.bctaNoSource.asObservable();
+
+  private firmInfoSource = new BehaviorSubject<any>(null);
+  firmInfo$ = this.firmInfoSource.asObservable();
+
+  setFirmInfo(info: { firmName: string, mobileNo: string, email: string }) {
+    this.firmInfoSource.next(info);
+  }
 
   setBctaNo(bctaNo: string) {
     this.bctaNoSource.next(bctaNo);

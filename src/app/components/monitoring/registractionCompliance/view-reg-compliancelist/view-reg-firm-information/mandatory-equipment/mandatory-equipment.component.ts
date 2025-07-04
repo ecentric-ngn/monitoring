@@ -12,7 +12,7 @@ import Swal from 'sweetalert2';
 export class MandatoryEquipmentComponent {
   formData: any = {};
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
-  
+
   firmType: any
   bctaNo: any
   tableData: any
@@ -20,6 +20,7 @@ export class MandatoryEquipmentComponent {
   data: any;
   tData: any;
   applicationStatus: string = '';
+  isSaving = false;
 
   constructor(private service: CommonService, private router: Router) { }
 
@@ -83,6 +84,7 @@ export class MandatoryEquipmentComponent {
 
   tableId: any
   saveAndNext() {
+    this.isSaving = true;
     const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
     this.tableId = this.id;
     const eq = this.tableData.map((item: any) => ({
@@ -106,13 +108,24 @@ export class MandatoryEquipmentComponent {
       equipmentReviews: eq
     };
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
-    });
+    },
+      (error) => {
+        this.isSaving = false;
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to save',
+          icon: 'error'
+        });
+      }
+    );
   }
 
   notifyContractor() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
 
@@ -139,6 +152,7 @@ export class MandatoryEquipmentComponent {
 
     this.service.saveOfficeSignageAndDoc(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Requirements Not Met',
           text: 'The contractor has been notified to resubmit the form',
@@ -149,6 +163,7 @@ export class MandatoryEquipmentComponent {
         this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
       },
       error: (error) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Error',
           text: 'Failed to notify contractor',
@@ -159,6 +174,7 @@ export class MandatoryEquipmentComponent {
   }
 
   update() {
+    this.isSaving = true;
     const payload = {
       registrationReview: {
         bctaNo: this.bctaNo,
@@ -170,6 +186,7 @@ export class MandatoryEquipmentComponent {
 
     this.service.saveOfficeSignageAndDoc(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -180,6 +197,7 @@ export class MandatoryEquipmentComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',

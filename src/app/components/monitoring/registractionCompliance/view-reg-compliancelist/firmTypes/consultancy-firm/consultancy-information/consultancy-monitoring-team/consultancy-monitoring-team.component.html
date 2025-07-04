@@ -12,9 +12,9 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let team of teamList; let i = index">
-              <td class="text-center">{{team.full_name}}</td>
-              <td class="text-center">{{team.designation}}</td>
+            <tr>
+              <td class="text-center">{{ username }}</td>
+              <td class="text-center">BCTA Official</td>
             </tr>
           </tbody>
         </table>
@@ -33,10 +33,11 @@
         </div>
       </div>
 
-      <!-- Save & Forward Button -->
+      <!-- Save Button -->
       <div class="d-flex justify-content-end mt-4">
-        <button type="submit" class="btn btn-success" [disabled]="monitoringForm.invalid">
-          Save & Forward
+        <button type="submit" class="btn btn-success" [disabled]="monitoringForm.invalid || isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+          Save
         </button>
       </div>
     </div>

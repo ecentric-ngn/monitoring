@@ -13,18 +13,15 @@ export class ConsultancyMandatoryEquipmentComponent {
 
   };
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
-  equipmentMasterList = [
-    { id: 'eq1', name: 'Excavator' },
-    { id: 'eq2', name: 'Bulldozer' },
-    { id: 'eq3', name: 'Concrete Mixer' }
-  ];
+
   firmType: any
   bctaNo: any
   tableData: any[] = [];
   @Input() id: string = ''
   data: any;
+  tData: any;
   applicationStatus: string = '';
-  isSaving = false;
+  isSaving = false; 
 
   constructor(@Inject(CommonService) private service: CommonService, private router: Router) { }
 
@@ -54,9 +51,18 @@ export class ConsultancyMandatoryEquipmentComponent {
     this.data = WorkDetail.data;
     console.log('WorkDetail', WorkDetail);
     console.log('bctaNo', this.bctaNo);
+
+    this.tData = {
+      eqFulfilled: '',
+      eqResubmitDeadline: '',
+      eqRemarks: ''
+    }
+
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo();
     }
+
+    this.service.setBctaNo(this.bctaNo);
   }
 
   fetchDataBasedOnBctaNo() {
@@ -86,20 +92,17 @@ export class ConsultancyMandatoryEquipmentComponent {
 
     const eq = this.tableData.map((item: any) => ({
       "equipmentType": item.equipmentName,
-      "requiredEquipment": "string",
-      "categoryOfService": "string",
-      "equipmentDeployed": "string",
-      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
-      "resubmitDeadline": this.formData.resubmitDate,
-      "deadlineRemarks": this.formData.resubmitRemarks,
-      "vehicleType": item.vehicleType,
-      "remarks": this.formData.finalRemarks,
-      "edremarks": "string"
+      "requiredEquipment": item.vehicleType,
+      "categoryOfService": null,
+      "equipmentDeployed": null,
     }));
 
     const payload = {
       consultantRegistrationDto: {
-        id: this.tableId,
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
       },
       consultantEquipmentDto: eq
     };
@@ -111,7 +114,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
       this.activateTab.emit({ id: this.tableId, tab: 'consultancyMonitoring' });
     },
-    (error) => {
+      (error) => {
         this.isSaving = false;
         Swal.fire({
           title: 'Error',
@@ -119,7 +122,7 @@ export class ConsultancyMandatoryEquipmentComponent {
           icon: 'error'
         });
       }
-  );
+    );
   }
 
   notifyContractor() {
@@ -129,20 +132,17 @@ export class ConsultancyMandatoryEquipmentComponent {
 
     const eq = this.tableData.map((item: any) => ({
       "equipmentType": item.equipmentName,
-      "requiredEquipment": "string",
-      "categoryOfService": "string",
-      "equipmentDeployed": "string",
-      "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
-      "resubmitDeadline": this.formData.resubmitDate,
-      "deadlineRemarks": this.formData.resubmitRemarks,
-      "vehicleType": item.vehicleType,
-      "remarks": this.formData.finalRemarks,
-      "edremarks": "string"
+      "requiredEquipment": item.vehicleType,
+      "categoryOfService": null,
+      "equipmentDeployed": null,
     }));
 
     const payload = {
       consultantRegistrationDto: {
-        id: this.tableId,
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
       },
       consultantEquipmentDto: eq
     };
@@ -156,7 +156,8 @@ export class ConsultancyMandatoryEquipmentComponent {
           icon: 'warning',
           confirmButtonText: 'OK'
         });
-        this.router.navigate(['monitoring/consultancy']);
+        // this.router.navigate(['monitoring/consultancy']);
+        this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
       },
       error: (error) => {
         this.isSaving = false;
@@ -172,12 +173,12 @@ export class ConsultancyMandatoryEquipmentComponent {
   update() {
     this.isSaving = true;
     const payload = {
-      consultantRegistrationDto: { bctaNo: this.bctaNo },
-      consultantEquipmentDto: [{
-        mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
-        resubmitDeadline: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.resubmitRemarks
-      }]
+      consultantRegistrationDto: {
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
+      },
     };
 
     this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe({

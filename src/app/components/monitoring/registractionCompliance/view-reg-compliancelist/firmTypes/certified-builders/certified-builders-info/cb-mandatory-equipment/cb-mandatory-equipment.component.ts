@@ -14,7 +14,9 @@ export class CbMandatoryEquipmentComponent {
   firmType: any;
   bctaNo: any;
   tableData: any;
+  tData: any;
   applicationStatus: string = '';
+  isSaving = false;
 
   @Input() id: string = ''
 
@@ -31,13 +33,20 @@ export class CbMandatoryEquipmentComponent {
       resubmitRemarks: '',
       resubmitDate: ''
     };
-    // Set the id from input
+
+    this.tData = {
+      eqFulfilled: '',
+      eqResubmitDeadline: '',
+      eqRemarks: ''
+    }
 
     this.id = this.id
     const WorkDetail = this.service.getData('BctaNo');
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.certifiedBuilderNo;
     this.applicationStatus = WorkDetail.data.applicationStatus;
+    this.service.setBctaNo(this.bctaNo);
+
     if (this.bctaNo) {
       this.fetchDataBasedOnBctaNo()
     }
@@ -48,6 +57,7 @@ export class CbMandatoryEquipmentComponent {
       this.tableData = res.vehicles
       console.log('CB equipments', this.formData);
     })
+
   }
 
 
@@ -67,16 +77,13 @@ export class CbMandatoryEquipmentComponent {
   tableId: any
 
   saveAndNext() {
+    this.isSaving = true;
     const table = this.service.setData(this.tableId, 'tableId', 'office-signage');
     this.tableId = this.id;
 
     const eq = this.tableData.map((item: any) => ({
-      "equipmentDescription": "string",
-      "requiredEquipment": "string",
-      "requiredEquipmentFulfilled": this.formData.fulfillsRequirement,
-      "resubmitDeadline": this.formData.resubmitDate,
-      "deadlineRemarks": this.formData.resubmitRemarks,
-      "remarks": this.formData.finalRemarks,
+      "equipmentDescription": null,
+      "requiredEquipment": null,
 
       //  "isRegistered": item.equipmentType,
       // "vehicleType": item.vehicleType,
@@ -89,50 +96,64 @@ export class CbMandatoryEquipmentComponent {
 
     const payload = {
       cbReviewDto: {
-        id: this.tableId,
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
       },
       cbEquipmentReviewDto: eq
     };
     this.service.saveOfficeSignageAndDocCB(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       console.log('Emitting cbMonitoring', this.tableId);
 
       this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
-    });
+    },
+      (error) => {
+        this.isSaving = false;
+        Swal.fire({
+          title: 'Error',
+          text: 'Failed to save',
+          icon: 'error'
+        });
+      });
   }
 
   notifyContractor() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
 
     const eq = this.tableData.map((item: any) => ({
-      "equipmentDescription": "string",
-      "requiredEquipment": "string",
-      "requiredEquipmentFulfilled": this.formData.fulfillsRequirement,
-      "resubmitDeadline": this.formData.resubmitDate,
-      "deadlineRemarks": this.formData.resubmitRemarks,
-      "remarks": this.formData.finalRemarks,
+      "equipmentDescription": null,
+      "requiredEquipment": null
     }));
 
     const payload = {
       cbReviewDto: {
-        id: this.tableId,
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
       },
       cbEquipmentReviewDto: eq
     };
 
     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Requirements Not Met',
           text: 'The firm has been notified to resubmit the form',
           icon: 'warning',
           confirmButtonText: 'OK'
         });
-        this.router.navigate(['monitoring/cerified-builders']);
+        this.activateTab.emit({ id: this.tableId, tab: 'cbMonitoring' });
       },
       error: (error) => {
+        this.isSaving = false;
         Swal.fire({
           title: 'Error',
           text: 'Failed to notify firm',
@@ -143,17 +164,19 @@ export class CbMandatoryEquipmentComponent {
   }
 
   update() {
+    this.isSaving = true;
     const payload = {
-      cbReviewDto: { bctaNo: this.bctaNo },
-      cbEquipmentReviewDto: [{
-        mandatoryEquipmentFulfilled: this.formData.fulfillsRequirement,
-        resubmitDeadline: this.formData.resubmitDate,
-        resubmitRemarks: this.formData.resubmitRemarks
-      }]
+      cbReviewDto: {
+        bctaNo: this.bctaNo,
+        eqFulfilled: this.tData.fulfillsRequirement,
+        eqResubmitDeadline: this.tData.resubmitDate,
+        eqRemarks: this.tData.remarks
+      }
     };
 
     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -164,6 +187,7 @@ export class CbMandatoryEquipmentComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',

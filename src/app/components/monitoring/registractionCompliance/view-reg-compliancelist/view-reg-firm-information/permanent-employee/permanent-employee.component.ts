@@ -17,6 +17,7 @@ export class PermanentEmployeeComponent {
   data: any;
   tData: any;
   applicationStatus: string = '';
+  isSaving = false;
 
   constructor(private service: CommonService, private router: Router) { }
 
@@ -34,8 +35,8 @@ export class PermanentEmployeeComponent {
     this.data = WorkDetail.data;
     this.tData = { 
        hrFulfilled: '',
-       resubmitDate: '',
-       remarksNo: ''
+       hrResubmitDeadline: '',
+       hrRemarks: ''
     };
 
     console.log('WorkDetail', WorkDetail);
@@ -95,6 +96,7 @@ export class PermanentEmployeeComponent {
   tableId: any
 
   saveAndNext() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
     this.tableId = this.id;
     const hr = this.tableData.map((item: any) => ({
@@ -103,8 +105,9 @@ export class PermanentEmployeeComponent {
       gender: item.sex,
       nationality: item.countryName,
       qualification: item.qualification,
-      // joiningDate:  item.joiningDate, encountered an issue with date format
-      joiningDate: "2024-01-01",
+      joiningDate: (item.joiningDate && !isNaN(new Date(item.joiningDate).getTime()))
+        ? new Date(item.joiningDate).toISOString().split('T')[0]
+        : '',
       tradeField: item.tradeName,
       paySlip: item.paySlipFileName,
       remarks: this.formData.remarksYes,
@@ -124,6 +127,7 @@ export class PermanentEmployeeComponent {
     };
     
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
+       this.isSaving = false;
       console.log('res', res);
       //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
       this.activateTab.emit({ id: this.tableId, tab: 'equipment' });
@@ -131,6 +135,7 @@ export class PermanentEmployeeComponent {
   }
 
   saveAndForward() {
+    this.isSaving = true;
     const table = this.service.setData(this.id, 'tableId', 'office-signage');
 
     this.tableId = this.id;
@@ -159,23 +164,26 @@ export class PermanentEmployeeComponent {
 
     };
     this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
+      this.isSaving = false;
       console.log('res', res);
       this.activateTab.emit({ id: this.tableId, tab: 'equipment' });
     });
   }
 
   update() {
+    this.isSaving = true;
     const payload = {
       registrationReview: { 
         bctaNo: this.bctaNo,
-        hrFulfilled: this.formData.hrFulfilled,
-        hrResubmitDeadline: this.formData.resubmitDate,
-        hrRemarks: this.formData.remarksNo
+        hrFulfilled: this.tData.hrFulfilled,
+        hrResubmitDeadline: this.tData.resubmitDate,
+        hrRemarks: this.tData.remarksNo
        }
     };
 
     this.service.saveOfficeSignageAndDoc(payload).subscribe({
       next: (res: any) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'success',
           title: 'Updated successfully!',
@@ -186,6 +194,7 @@ export class PermanentEmployeeComponent {
         });
       },
       error: (err) => {
+        this.isSaving = false;
         Swal.fire({
           icon: 'error',
           title: 'Update failed!',

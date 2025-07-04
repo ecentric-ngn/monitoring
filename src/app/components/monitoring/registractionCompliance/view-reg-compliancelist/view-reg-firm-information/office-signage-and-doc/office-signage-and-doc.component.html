@@ -130,15 +130,20 @@
 
       <!-- Update button: Show when status is NOT Submitted -->
       <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
-        <button type="submit" class="btn btn-primary save-next-btn" (click)="update()">
-          Update
+        <button type="submit" class="btn btn-primary me-2" (click)="update()" [disabled]="isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isSaving ? 'Saving...' : 'Update' }}
+        </button>
+        <button class="btn btn-danger" (click)="openActionModal()">
+          Action
         </button>
       </div>
 
       <!-- Save & Next button: Show only when status is Submitted -->
       <div class="col-12 text-end mt-3" *ngIf="applicationStatus === 'Submitted'">
-        <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()">
-          Save & Next
+        <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()" [disabled]="isSaving">
+          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+          {{ isSaving ? 'Saving...' : 'Save & Next' }}
         </button>
       </div>
 
@@ -146,3 +151,13 @@
   </div>
 
 </div>
+
+<!-- Action Modal -->
+ <!-- <app-action-modal-construction
+  [selectedAction]="selectedAction"
+  [downgradeList]="downgradeList"
+  [today]="today"
+  (close)="onActionModalClose()"
+  (submit)="onActionModalSubmit($event)"
+  [visible]="showActionModal">
+</app-action-modal-construction> -->
