@@ -249,14 +249,17 @@ export class ReviewAndSubmitComponent {
     }
 
     // Helper to split comma-separated file paths, and handle null/empty
-    splitFilePaths(paths: string | null): string[] {
-        if (!paths) return [];
-        // Split by comma, trim whitespace
-        return paths
-            .split(',')
-            .map((p) => p.trim())
-            .filter((p) => p.length > 0);
-    }
+  splitFilePaths(paths: string | null): string[] {
+    if (!paths) return [];
+    
+    // Split by comma, trim whitespace, and filter
+    const result = paths
+        .split(',')
+        .map(p => p.trim())
+        .filter(p => p.length > 0 && p !== 'NO_PATH');
+    
+    return result.length > 0 ? result : [];
+}
 
     // Extract file name from full path
     getFileName(filePath: string): string {

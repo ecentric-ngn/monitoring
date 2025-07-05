@@ -629,7 +629,6 @@ private saveDraftPayload() {
 }
 
 private sendPayload(finalPayload: any) {
-    debugger
     this.service.saveAsDraft(finalPayload).subscribe({
         next: (response: any) => {
             if (this.tableId) {

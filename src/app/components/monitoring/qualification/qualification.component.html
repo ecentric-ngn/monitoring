@@ -24,7 +24,7 @@
         </label>
         <div class="d-flex">
           <input type="text" name="bctaRegistrationNo" class="form-control me-2 form-control-sm"
-            [(ngModel)]="formData.bctaRegistrationNo" required #bctaRegistrationNo="ngModel" />
+            [(ngModel)]="formData.bctaRegistrationNo" required #bctaRegistrationNo="ngModel" [disabled]="appNoStatus === 'REJECTED'"/>
           <button type="button" class="btn btn-primary" (click)="FetchBCTARegDetails()" [disabled]="appNoStatus === 'REJECTED'">
             {{ isFetching ? 'Fetching...' : 'Fetch' }}
           </button>

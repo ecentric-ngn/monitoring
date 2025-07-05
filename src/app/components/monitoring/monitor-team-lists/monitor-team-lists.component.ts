@@ -227,7 +227,7 @@ saveMonitorTeamList(form: NgForm) {
 
   // Merge both arrays, filter out any empty ones
   const payload = [...existingTeam, ...newTeam].filter(item =>
-    item.cidNo && item.fullName && item.mobileNo && item.email
+    item.cidNo && item.fullName && item.mobileNo && item.email && item.id
   );
 
   if (payload.length === 0) {

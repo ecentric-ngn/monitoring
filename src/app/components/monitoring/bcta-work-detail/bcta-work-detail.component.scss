@@ -24,7 +24,11 @@
 .non-clickable {
   pointer-events: none !important;
 }
-
+.overflow-auto {
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
 
 .step-tab.active {
   color: #0d6efd !important;

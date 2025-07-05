@@ -93,7 +93,7 @@
                         <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                         <div *ngIf="data.licenseStatus === 'Suspended'">
                             <button class="btn btn-danger btn-sm"
-                                (click)="getReinstateApplication(data.contractorNo)">View</button>
+                                (click)="getReinstateApplication(data.contractorNo)" data-bs-toggle="modal" data-bs-target="#reinstateModal">View</button>
                         </div>
                     </td>
 
@@ -337,12 +337,18 @@
                     <div class="row g-3 m-2">
                         <div class="col-md-6">
                             <label class="form-label">Dzongkhag</label>
-                            <select class="form-select form-control-sm" name="dzongkhag"
+                            <!-- <select class="form-select form-control-sm" name="dzongkhag"
                                 [(ngModel)]="formData.dzongkhagName">
                                 <option [value]="">-- Select --</option>
                                 <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">{{ dzongkhag }}
                                 </option>
-                            </select>
+                            </select> -->
+                             <select class="form-select font-size-16"  [(ngModel)]="formData.name" name="name" id="dzongkhag">
+                            <option>--select--</option>
+                            <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.name">
+                            {{ dzongkhag.name }}
+                            </option>
+                        </select>
                         </div>
                     </div>
 
