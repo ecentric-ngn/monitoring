@@ -44,6 +44,7 @@ export class BctaWorkDetailComponent {
   workInformationdata: any;
   prevOwnerTableId: string;
   Previousdata: any;
+  contractorPrevId: any;
 constructor(private router: Router,private service:CommonService) {
  
 }
@@ -106,7 +107,7 @@ getList() {
 );
 }
 currentFormIndex = 0;
-
+ownerData: any={}
 goBackward(tableId:any) {
   if (this.showReviewSubmitForm) {
     this.showReviewSubmitForm = false;
@@ -245,7 +246,8 @@ goBackward(tableId:any) {
   } else if (this.showonsiteForm) {
     this.showonsiteForm = false;
     this.showonWorkInformationForm = true;
-    this.prevOwnerTableId = this.tableId;
+    this.prevOwnerTableId = tableId;
+     this.ownerData =  this.workInformationdata
     console.log('prevOwnerTableId', this.prevOwnerTableId);
     this.addworkinformationTab.nativeElement.classList.add('active');
     this.onsiteTab.nativeElement.classList.remove('active');
@@ -653,7 +655,9 @@ saveOwnerInformationData(event: { workType: any,ownerId: any ,data:any}) {
   this.onSiteCheckTabEnabled=true
   this.workType = event.workType;	
   this.workInformationdata = event.data.data;
+   this.contractorPrevId = event.data.contractorId;
   this.ownerId = event.ownerId;	
+  debugger
   console.log('data', this.workInformationdata);
   
   // Access the native element safely and click it

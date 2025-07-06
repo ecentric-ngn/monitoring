@@ -492,23 +492,21 @@ export class ViewRegCompliancelistComponent {
     }
 
     getReinstateApplication(firmId: string) {
-        debugger
         if (!firmId) {
             console.error('Firm ID is missing.');
             return;
         }
-
         this.service.getReinstateApplication(firmId).subscribe({
             next: (data) => {
                 this.reinstateData = data[0];
-                // setTimeout(() => {
-                //     const modalEl = document.getElementById('reinstateModal');
-                //     this.reinstateModal = new bootstrap.Modal(modalEl, {
-                //         backdrop: 'static',
-                //         keyboard: false
-                //     });
-                //     this.reinstateModal.show();
-                // }, 0);
+                 setTimeout(() => {
+                const modalEl = document.getElementById('reinstateModal');
+                    this.reinstateModal = new bootstrap.Modal(modalEl, {
+                        backdrop: 'static',
+                        keyboard: false
+                     });
+                    this.reinstateModal.show();
+                 }, 0);
             },
             error: (err) => {
                 console.error('Error fetching reinstate data:', err);

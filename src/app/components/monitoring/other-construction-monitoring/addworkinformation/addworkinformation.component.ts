@@ -19,29 +19,33 @@ export class AddworkinformationComponent {
     ownerId: any;
     appNoStatus: any;
     otherWorkType: any;
+    @Input() contractorPrevId: any;
     constructor(private service: CommonService, private router: Router) {}
     @Input() prevOwnerTableId: any;
     PocuringAgencyList: any = [];
     tableData: any = [];
     contractorId: any;
     data: any;
-    ngOnInit(): void {
-        // this.getPocuringAgency();
-        this.getDzongkhagList();
-        const WorkDetail = this.service.getData('BctaNo');
-        this.data = WorkDetail;
-        this.prevOwnerTableId =
-        this.prevOwnerTableId || WorkDetail.data.work_information_id;
-        this.appNoStatus = WorkDetail.data.applicationStatus;
-        this.prevOwnerTableId = this.prevOwnerTableId;
-        console.log('prevOwnerTableId', this.prevOwnerTableId);
-        if (this.prevOwnerTableId) {
-            this.getDatabasedOnOwnerId();
-        }
-        this.contractorId = WorkDetail.newContractorId;
-        this.workType = this.workType;
-        console.log('WorkDetailinaddinformation', WorkDetail);
-    }
+ ngOnInit(): void {
+  // this.getPocuringAgency(); // Uncomment if needed
+  this.getDzongkhagList();
+  this.contractorPrevId = this.contractorPrevId ?? null;
+  debugger
+  const WorkDetail = this.service.getData('BctaNo');
+  this.data = WorkDetail ?? null;
+  const workData = WorkDetail?.data ?? {};
+  this.prevOwnerTableId = this.prevOwnerTableId || (workData.work_information_id ?? null);
+  this.appNoStatus = workData.applicationStatus ?? null;
+  console.log('prevOwnerTableId', this.prevOwnerTableId);
+  if (this.prevOwnerTableId) {
+    this.getDatabasedOnOwnerId();
+  }
+  this.contractorId = WorkDetail?.newContractorId ?? null;
+  debugger
+  this.workType = this.workType; // seems unnecessary unless you're trying to update it dynamically
+  console.log('WorkDetailinaddinformation', WorkDetail);
+}
+
 
      
     showFormDetails:boolean=false
@@ -96,6 +100,7 @@ export class AddworkinformationComponent {
                 condition: '=',
             },
         ];
+        debugger
         this.service.fetchDetails(payload, 1, 1, 'work_with_contractor_view').subscribe(
                 (response: any) => {
                     const data = response.data[0];
@@ -150,7 +155,7 @@ export class AddworkinformationComponent {
             startDate: this.formData.startDate,
             proposedCompletionDate: this.formData.proposedCompletionDate,
             client: this.formData.client,
-            contractorId: this.contractorId,
+            contractorId: this.contractorId || this.contractorPrevId,
             workType: this.otherWorkType
         };
 
@@ -160,7 +165,10 @@ export class AddworkinformationComponent {
             this.saveOwnerInformationData.emit({
                 workType: this.workType,
                 ownerId: this.ownerId,
-                data: this.data,
+                   data: {
+                ...this.data,
+                contractorId: this.contractorId
+    },
             });
             this.router.navigate([
                 'monitoring/onsite-facilitiesand-management',

@@ -30,16 +30,17 @@ export class ContractorPresentDuringSiteMonitoringComponent {
         tableId: any;
         data: any;
     }>();
-    dataList: FormData[] = [];
+      @Input() prevTableId: any;
+    @Input() data: any;
+    @Input() inspectionType: any;
+    // inspectionType='OTHERS';
     @Output() previousClicked = new EventEmitter<{ tableId: any }>();
     fileAndRemark: any;
-    @Input() prevTableId: any;
-    @Input() data: any;
-    appNoStatus: any;
-    @Input() inspectionType: any;
+      dataList: FormData[] = [];
       showMessage: any;
         showValidateMessage: any;
          isOtpValid = false;
+          appNoStatus:any={}
     constructor(
         private service: CommonService,
         private router: Router,
@@ -205,35 +206,36 @@ getCidDetails(formData): void {
     }
   );
 }
-    saveAndNext(form: NgForm): void {
-        // Skip validation if inspectionType is 'OTHERS'
-        if (this.inspectionType !== 'OTHERS' && form.invalid) {
-            Object.keys(form.controls).forEach((field) => {
-                const control = form.controls[field];
-                control.markAsTouched({ onlySelf: true });
-            });
-            return;
-        }
+  saveAndNext(form: NgForm): void {
+  // Skip validation if inspectionType is 'OTHERS'
+  if (this.inspectionType !== 'OTHERS' && form.invalid) {
+    Object.keys(form.controls).forEach((field) => {
+      const control = form.controls[field];
+      control.markAsTouched({ onlySelf: true });
+    });
+    return;
+  }
 
-        const payload = {
-            id: parseInt(this.tableId, 10),
-            contractorCidNo: this.formData.cidNo,
-            contractorFullName: this.formData.fullName,
-            contractorMobileNo: this.formData.mobileNo,
-        };
+  const payload = {
+    id: parseInt(this.tableId, 10),
+    contractorCidNo: this.formData.cidNo,
+    contractorFullName: this.formData.fullName,
+    contractorMobileNo: this.formData.mobileNo,
+  };
 
-        this.service.saveAsDraft(payload).subscribe(
-            (response: any) => {
-                this.createNotification();
-                this.contractorPresentData.emit({
-                    tableId: this.tableId,
-                    data: this.data,
-                });
-                this.router.navigate(['monitoring/adding-site-engineer']);
-            },
-            (error: any) => {}
-        );
-    }
+  this.service.saveAsDraft(payload).subscribe(
+    (response: any) => {
+      this.createNotification();
+      this.contractorPresentData.emit({
+        tableId: this.tableId,
+        data: this.data,
+      });
+      this.router.navigate(['monitoring/adding-site-engineer']);
+    },
+    (error: any) => {}
+  );
+}
+
 
     opt: any
  onOtpChange(row: any) {

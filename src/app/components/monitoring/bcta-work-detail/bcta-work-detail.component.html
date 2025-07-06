@@ -312,7 +312,7 @@
     </div>
     <div class="mt-3">
       <app-addworkinformation *ngIf="showonWorkInformationForm" [prevOwnerTableId]="prevOwnerTableId"
-        [tableId]="tableId" [data]="data" [workType]="workType" [inspectionType]="inspectionType"
+        [tableId]="tableId" [data]="data" [workType]="workType" [inspectionType]="inspectionType" [contractorPrevId]="contractorPrevId"
         (saveOwnerInformationData)="saveOwnerInformationData($event)" (previousClicked)="goBackward($event)">
       </app-addworkinformation>
     </div>
