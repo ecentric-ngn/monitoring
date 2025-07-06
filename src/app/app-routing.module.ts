@@ -19,7 +19,7 @@ import { ViewRegistrationComplianceDetailsComponent } from './components/monitor
         RouterModule.forRoot([
             {
                 path: '', component: AppLayoutComponent,
-                // canActivate: [AuthGuard],
+                 canActivate: [AuthGuard],
                 children: [
                     { path: '', component: DashboardComponent, pathMatch: 'full' },
                     { path: 'contractor', loadChildren: () => import('./components/contractor/contractor.module').then(m => m.ContractorModule) },

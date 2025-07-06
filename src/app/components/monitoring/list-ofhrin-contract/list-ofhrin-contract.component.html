@@ -213,7 +213,7 @@
                 [(ngModel)]="formData.replacementDesignation" (ngModelChange)="onDesignationChange($event)" required
                 #replacementDesignation="ngModel">
                 <option value="">---SELECT---</option>
-                <option *ngFor="let desig of designationList" [value]="desig.id">{{ desig.name }}</option>
+                <option *ngFor="let desig of designationList" [value]="desig.name">{{ desig.name }}</option>
               </select>
               <div *ngIf="replacementDesignation.invalid && replacementDesignation.touched" class="text-danger">
                 Designation required.
@@ -227,7 +227,7 @@
                 [(ngModel)]="formData.qualification" (ngModelChange)="onQualificationChange($event)" required
                 #qualification="ngModel">
                 <option value="">--select--</option>
-                <option *ngFor="let q of qualificationList" [value]="q.id">{{ q.name }}</option>
+                <option *ngFor="let q of qualificationList" [value]="q.name">{{ q.name }}</option>
               </select>
               <div *ngIf="qualification.invalid && qualification.touched" class="text-danger">
                 Qualification required.

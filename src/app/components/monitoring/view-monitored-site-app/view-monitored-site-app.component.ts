@@ -320,7 +320,7 @@ export class ViewMonitoredSiteAppComponent {
      */
     createNotification(): void {
         this.notification
-            .success('Success', 'The data has been saved successfully')
+            .success('Success', 'The application has been forwarded to the reviewer successfully')
             .onClick.subscribe(() => {
                 console.log('notification clicked!');
             });

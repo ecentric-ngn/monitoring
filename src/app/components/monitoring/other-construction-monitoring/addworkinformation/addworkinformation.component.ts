@@ -30,7 +30,7 @@ export class AddworkinformationComponent {
   // this.getPocuringAgency(); // Uncomment if needed
   this.getDzongkhagList();
   this.contractorPrevId = this.contractorPrevId ?? null;
-  debugger
+  
   const WorkDetail = this.service.getData('BctaNo');
   this.data = WorkDetail ?? null;
   const workData = WorkDetail?.data ?? {};
@@ -41,7 +41,7 @@ export class AddworkinformationComponent {
     this.getDatabasedOnOwnerId();
   }
   this.contractorId = WorkDetail?.newContractorId ?? null;
-  debugger
+  
   this.workType = this.workType; // seems unnecessary unless you're trying to update it dynamically
   console.log('WorkDetailinaddinformation', WorkDetail);
 }
@@ -100,7 +100,7 @@ export class AddworkinformationComponent {
                 condition: '=',
             },
         ];
-        debugger
+        
         this.service.fetchDetails(payload, 1, 1, 'work_with_contractor_view').subscribe(
                 (response: any) => {
                     const data = response.data[0];
@@ -133,7 +133,7 @@ export class AddworkinformationComponent {
         }
 
         // If status is REJECTED, don't construct payload or call API
-        if (this.appNoStatus === 'REJECTED') {
+        if (this.appNoStatus === 'REJECTED' || this.contractorPrevId) {
             this.saveOwnerInformationData.emit({
                 workType: this.workType,
                 ownerId: this.prevOwnerTableId,
@@ -155,7 +155,7 @@ export class AddworkinformationComponent {
             startDate: this.formData.startDate,
             proposedCompletionDate: this.formData.proposedCompletionDate,
             client: this.formData.client,
-            contractorId: this.contractorId || this.contractorPrevId,
+            contractorId: this.contractorId,
             workType: this.otherWorkType
         };
 

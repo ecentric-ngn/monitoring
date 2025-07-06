@@ -51,7 +51,6 @@ export class CertifiedSkilledWorkerComponent {
         this.tableId = this.tableId;
         this.data = this.data;
         this.inspectionType = this.inspectionType;
-        console.log('certified-skilled-worker......', this.inspectionType);
     }
 
     carpenters: any[] = [{ level: '', number: '' }];
@@ -67,7 +66,7 @@ export class CertifiedSkilledWorkerComponent {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value: 100, // Make sure this ID matches your actual checklist
+                value: this.prevTableId, // Make sure this ID matches your actual checklist
                 operator: 'AND',
                 condition: '=',
             },

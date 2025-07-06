@@ -55,6 +55,7 @@ export class OtherConstructionMonitoringComponent {
         this.displayMessage = '';
     }
     saveCrpsDetails(form: NgForm) {
+        
         if (form.invalid) {
             Object.keys(form.controls).forEach((field) => {
                 const control = form.controls[field];
@@ -63,17 +64,16 @@ export class OtherConstructionMonitoringComponent {
             return;
         }
         const contractorDetails = {
-            bctaregNumber: this.formData.contractorNo,
-            ownerName: this.formData.ownerDetails,
-            specializedFirmName: this.formData.nameOfFirm,
-            specializedClass: this.formData.workClassification,
-            address: this.formData.establishmentAddress,
-            mobileNumber: this.formData.mobileNo,
-            email: this.formData.email,
+            bctaregNumber: this.formData.contractorNo || '',
+            ownerName: this.formData.ownerDetails || this.formData.ClientOwnerName,
+            specializedFirmName: this.formData.nameOfFirm || '',
+            specializedClass: this.formData.workClassification || '',
+            address: this.formData.establishmentAddress || this.formData.clientCurrentAddress,
+            mobileNumber: this.formData.mobileNo || this.formData.clientMobileNo,
+            email: this.formData.email || this.formData.clientEmailAddress,
         };
-        this.service
-            .saveNewContractorInformationData(contractorDetails)
-            .subscribe(
+        
+        this.service.saveNewContractorInformationData(contractorDetails).subscribe(
                 (response: any) => {
                     // Success handler
                     const idMatch = response.match(/\d+/); // extract digits from string
