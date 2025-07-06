@@ -13,7 +13,8 @@ export class ViewSubmittedReportListComponent {
     loading: boolean = true;
     @ViewChild('closebutton') closebutton: any;
     @ViewChild('closeRejectButton') closeRejectButton: any;
-    pageSize: number = 100;
+    @ViewChild('closeReviewButton') closeReviewButton: any;
+    pageSize: number = 10;
     set_limit: number[] = [10, 15, 25, 100];
     pageNo: number = 1;
     dzongkhagList: any = [];
@@ -123,17 +124,30 @@ EndorseApplicationNo(type: string): void {
         this.service.saveReviewedData(payload).subscribe(
             (response: any) => {
                 console.log('Data saved successfully:', response);
-                  this.createNotification('The data has been reviewed successfully');
+                this.closeReviewButton.nativeElement.click();
+                  this.createNotificationS('success');
+                     this.FetchWorkBaseOnDzoId();
+                    this.searchBasedOnBCTANo(this.formData.BCTANo);
                 // Delay navigation by 2 seconds (2000 milliseconds)
-                setTimeout(() => {
-                    this.router.navigate(['SubmittedReport']);
-                }, 2000);
+                // setTimeout(() => {
+                //     this.router.navigate(['SubmittedReport']);
+                // }, 2000);
             },
             (error) => {
                 console.error('Error saving data:', error);
             }
         );
     }
+    
+   createNotificationS(type: string): void {
+    if (type.toLowerCase() === 'success') {
+        const message = 'The application has been reviewed successfully';
+        this.notification.success('Success', message).onClick.subscribe(() => {
+            console.log('notification clicked!');
+        });
+    }
+}
+
     createNotification(type: string): void {
         const message =
             type.toLowerCase() === 'reject'

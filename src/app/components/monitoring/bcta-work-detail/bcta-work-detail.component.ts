@@ -62,14 +62,13 @@ ngOnInit() {
   }else{
   this.getList()
   }
-
 }
 
 getContractorDetails() {
   const payload: any = [
     {
       field: 'contractorNo',
-      value: this.bctaNo,
+      value: this.bctaNo ? this.bctaNo : '',
       operator: 'AND',
       condition: '=',
     },
@@ -657,7 +656,7 @@ saveOwnerInformationData(event: { workType: any,ownerId: any ,data:any}) {
   this.workInformationdata = event.data.data;
    this.contractorPrevId = event.data.contractorId;
   this.ownerId = event.ownerId;	
-  debugger
+  
   console.log('data', this.workInformationdata);
   
   // Access the native element safely and click it

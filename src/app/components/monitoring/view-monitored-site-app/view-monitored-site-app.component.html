@@ -113,10 +113,16 @@
     </table>
     <div class="justify-content-end d-flex"
       *ngIf="tableData && tableData?.length > 0 && selectedChecklistIds.length > 0">
-      <button *ngIf="selectedChecklistIds.length > 0" (click)="forwardApplication()" class="btn btn-success  pointer-event">
+        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to forward the application?'"
+                (nzOnConfirm)="forwardApplication()">
+                <button *ngIf="selectedChecklistIds.length > 0"  class="btn btn-success pi pi-angle-right h-100  pointer-event">
+                    Forward to Review
+                </button>
+            </a>
+      <!-- <button *ngIf="selectedChecklistIds.length > 0" (click)="forwardApplication()" class="btn btn-success  pointer-event">
         <span class="text-white">Forward to Review</span>
         <i class="pi pi-forward text-white ms-2"></i>
-      </button>
+      </button> -->
     </div>
   </div>
 </div>
@@ -150,7 +156,8 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background-color: #495f8a">
-        <h5 class="modal-title text-white" id="exampleModalLabel">Record of Monitoring observations actions taken by the
+        <h5 class="modal-title text-white" id="exampleModalLabel">Record of Monitoring observations actions  taken by the
+ВСТА
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>

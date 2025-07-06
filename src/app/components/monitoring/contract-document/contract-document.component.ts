@@ -43,7 +43,7 @@ export class ContractDocumentComponent {
     this.prevTableId = this.prevTableId 
     if (this.appNoStatus=== 'REJECTED') {
         this.prevTableId = this.tableId;
-        debugger
+        
         } else {
             this.prevTableId = this.prevTableId
         }

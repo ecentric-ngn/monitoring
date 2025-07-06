@@ -139,10 +139,10 @@
         <div class="col-md-4">
           <label class="form-label">Email Address:</label>
           <input type="email" class="form-control form-control-sm" [(ngModel)]="formData.email"
-            placeholder="Enter email" name="email" required email #email="ngModel">
-          <div *ngIf="email.errors && email.touched" class="text-danger font-size-12">
+            placeholder="Enter email" name="email">
+          <div class="text-danger font-size-12">
             <!-- <div *ngIf="email.errors.required">Please enter email</div> -->
-            <div *ngIf="email.errors.email">Please enter a valid email (must contain @)</div>
+            <!-- <div *ngIf="email.errors.email">Please enter a valid email (must contain @)</div> -->
           </div>
         </div>
 

@@ -66,31 +66,34 @@ export class ListOFHRinContractComponent {
     ) {}
 
     ngOnInit() {
-         this.getDatabasedOnChecklistId();
+        
         this.inspectionType = this.inspectionType;
         this.appNoStatus = this.data?.applicationStatus ?? null;
         if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         }
-        if (this.prevTableId) {
-            this.getDatabasedOnChecklistId();
-        }
-        const userDetailsString = sessionStorage.getItem('userDetails');
-        if (userDetailsString) {
-            const userDetails = JSON.parse(userDetailsString);
-            this.userName = userDetails.username;
-        }
-        switch (this.inspectionType) {
-            case 'PUBLIC':
-                this.getHrListsBasedOnBctaNoEgpTenderId();
-                break;
-            case 'PRIVATE':
-                this.getPrivateHrLists();
-                break;
-            case 'OTHERS':
-                this.getHrListsFromCRPS();
-                break;
-        }
+    if (this.prevTableId) {
+    this.getDatabasedOnChecklistId();
+} else {
+    const userDetailsString = sessionStorage.getItem('userDetails');
+    if (userDetailsString) {
+        const userDetails = JSON.parse(userDetailsString);
+        this.userName = userDetails.username;
+    }
+
+    switch (this.inspectionType) {
+        case 'PUBLIC':
+            this.getHrListsBasedOnBctaNoEgpTenderId();
+            break;
+        case 'PRIVATE':
+            this.getPrivateHrLists();
+            break;
+        case 'OTHERS':
+            this.getHrListsFromCRPS();
+            break;
+    }
+}
+
         this.getdeginationList();
         this.getQualificationList();
     }
@@ -99,7 +102,7 @@ export class ListOFHRinContractComponent {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value: 178,
+                value: this.prevTableId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -429,6 +432,7 @@ export class ListOFHRinContractComponent {
         this.showReplacementIndex =
             this.showReplacementIndex === index ? null : index;
     }
+
     onDesignationChange(selectedId: string) {
         const selected = this.designationList.find((d) => d.id === selectedId);
         this.formData.replacementDesignationName = selected
@@ -484,8 +488,8 @@ export class ListOFHRinContractComponent {
                 this.TableData[existingDataIndex].replacementInfo = {
                     name: this.formData.replacementName,
                     cidNo: this.formData.cidNo,
-                    designation: this.formData.replacementDesignationName,
-                    qualification: this.formData.qualificationName,
+                    designation: this.formData.replacementDesignation,
+                    qualification: this.formData.qualification,
                 };
             }
 
