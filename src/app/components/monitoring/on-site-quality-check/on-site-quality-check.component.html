@@ -8,8 +8,8 @@
         <div class="col-md-4 mb-3">
           <label class="form-label">Building Components:<span class="text-danger font-size-12"> *</span></label>
           <input type="text" name="buildingComponents{{i}}" class="form-control form-control-sm"
-            [(ngModel)]="section.buildingComponents" required #buildingComponents="ngModel" [disabled]="appNoStatus === 'REJECTED'" id="buildingComponents"
-            placeholder="Enter Building Components" />
+            [(ngModel)]="section.buildingComponents" required #buildingComponents="ngModel"
+            [disabled]="appNoStatus === 'REJECTED'" id="buildingComponents" placeholder="Enter Building Components" />
           <div *ngIf="buildingComponents.invalid && buildingComponents.touched" class="text-danger font-size-12">
             Please enter Building Components
           </div>
@@ -28,8 +28,8 @@
         <div class="col-md-4 mb-3">
           <label class="form-label">Concrete Age:<span class="text-danger font-size-12"> *</span></label>
           <input type="text" name="concreteAge{{i}}" class="form-control form-control-sm"
-            [(ngModel)]="section.concreteAge" id="concreteAge" name="concreteAge" required #concreteAge="ngModel" [disabled]="appNoStatus === 'REJECTED'"
-            placeholder="Enter Concrete Age" />
+            [(ngModel)]="section.concreteAge" id="concreteAge" name="concreteAge" required #concreteAge="ngModel"
+            [disabled]="appNoStatus === 'REJECTED'" placeholder="Enter Concrete Age" />
           <div *ngIf="concreteAge.invalid && concreteAge.touched" class="text-danger font-size-12">
             Please enter Concrete Age
           </div>
@@ -74,26 +74,34 @@
             </div>
           </div>
         </div>
-        <div class="col-md-4" *ngIf="formSections[0]?.filePaths?.length > 0">
-          <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
-          <div class="flex-wrap align-items-center gap-2 flex-column">
-            <div *ngFor="let filePath of formSections[0].filePaths; let i = index"
-              class="d-flex align-items-center gap-2 mb-1">
-              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
-                <i class="bi bi-eye me-1"></i> View Doc
-              </button>
-              <button class="btn btn-outline-danger btn-sm" (click)="deleteFile(0, i)">
-                <i class="bi bi-trash me-1"></i> Delete
-              </button>
-            </div>
-          </div>
-        </div>
+     <div class="col-md-4">
+  <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
+
+  <!-- Show files if available -->
+  <div *ngIf="formSections[0]?.filePaths?.length > 0" class="flex-wrap align-items-center gap-2 flex-column">
+    <div *ngFor="let filePath of formSections[0].filePaths; let i = index"
+      class="d-flex align-items-center gap-2 mb-1">
+      <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+        <i class="bi bi-eye me-1"></i> View Doc
+      </button>
+      <button class="btn btn-outline-danger btn-sm" (click)="deleteFile(0, i)">
+        <i class="bi bi-trash me-1"></i> Delete
+      </button>
+    </div>
+  </div>
+
+  <!-- Show message if no file uploaded -->
+  <div *ngIf="formSections[0]?.filePaths?.length === 0">
+    <span class="text-muted">No file uploaded</span>
+  </div>
+</div>
+
 
 
         <div class="col-md-4 mb-3">
-          <label class="form-label">Remarks:</label>
+          <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
           <textarea class="form-control form-control-sm" name="remarks{{i}}" required [(ngModel)]="section.remarks"
-            #remarks  placeholder="Enter remarks"></textarea>
+            #remarks placeholder="Enter remarks"></textarea>
           <div *ngIf="remarks.invalid && remarks.touched" class="text-danger font-size-12">
             Please enter remarks.
           </div>
@@ -117,7 +125,8 @@
   </div>
 
   <div class="justify-content-end d-flex">
-    <button  *ngIf="appNoStatus !== 'REJECTED'" class="btn mr-1 text-white prev-btn" type="submit" (click)="onPreviousClick()" type="submit">Prev</button>
+    <button *ngIf="appNoStatus !== 'REJECTED'" class="btn mr-1 text-white prev-btn" type="submit"
+      (click)="onPreviousClick()" type="submit">Prev</button>
     <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
   </div>
 </form>

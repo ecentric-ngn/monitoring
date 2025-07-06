@@ -65,9 +65,15 @@ export class OnSiteQualityCheckComponent {
      this.service.fetchDetails(payload, 1, 100, 'oq_confirmation_view').subscribe(
         (response: any) => {
             const data = response.data;
-            this.formSections = data.map((item: any) => {
-            const filePaths = item.file_path? item.file_path.split(',').map((path: string) => path.trim()) : [];
-            console.log('filePaths', filePaths);
+          this.formSections = data.map((item: any) => {
+            // Split and remove all 'NO_PATH' entries
+            let filePaths = item.file_path
+                ? item.file_path
+                    .split(',')
+                    .map((path: string) => path.trim())
+                    .filter((path: string) => path !== 'NO_PATH')
+                : [];
+
             return {
                 id: item.id,
                 checklistId: item.checklist_id,
@@ -79,6 +85,7 @@ export class OnSiteQualityCheckComponent {
                 filePaths: filePaths
             };
             });
+
 
             // ✅ Add this console to check the results
             console.log('Fetched formSections with file paths:', this.formSections);

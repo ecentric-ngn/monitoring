@@ -195,7 +195,8 @@ export class OnsiteFacilitiesandManagementComponent {
         );
     }
     onPreviousClick() {
-     this.previousClicked.emit(this.ownerId);
+     this.previousClicked.emit(this.ownerId,);
+       const WorkDetail = this.service.setData(this.data,'BctaNo','monitoring/WorkDetail');
         this.router.navigate(['/monitoring/addworkinformation']);
     }
 

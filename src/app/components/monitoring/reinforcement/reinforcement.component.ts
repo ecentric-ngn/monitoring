@@ -67,12 +67,14 @@ export class ReinforcementComponent {
         this.service.fetchDetails(payload, 1, 10, 'reinforcement_view').subscribe(
                 (response: any) => {
                     const data = response.data;
-                    this.formEntries = data.map((item: any) => {
-                        const filePaths = item.file_path
-                            ? item.file_path
-                                  .split(',')
-                                  .map((path: string) => path.trim())
-                            : [];
+                      this.formEntries = data.map((item: any) => {
+                    // Split and remove all 'NO_PATH' entries
+                    let filePaths = item.file_path
+                        ? item.file_path
+                            .split(',')
+                            .map((path: string) => path.trim())
+                            .filter((path: string) => path !== 'NO_PATH')
+                        : [];
                         return {
                             id: item.id,
                             rebarNumber: item.rebar_quantity_design,

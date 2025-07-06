@@ -17,9 +17,9 @@
             <div
               class="col-3"
               *ngFor="let item of totalCounts;let i=index">
-                <div  class="btn w-100 shadow-7"  [ngClass]="{'btn-info': i === 0, 'btn-orange': i === 1, 'btn-success': i === 2, 'btn-warning': i === 3, 'btn-danger': i === 4, 'btn-primary': i === 5, 'btn-purple': i === 6, 'btn-dark': i === 7}">
+                <div  class="btn w-100 shadow-7"  [ngClass]="{'btn-info': i === 0, 'btn-danger': i === 1, 'btn-success': i === 2, 'btn-warning': i === 3, 'btn-orange': i === 4, 'btn-primary': i === 5, 'btn-purple': i === 6, 'btn-dark': i === 7}">
                     <p class="mb-2 ">
-                        <b>Total {{ item.name }}</b>
+                        <b>Total {{ item.applicationStatus }} Application</b>
                     </p>
                     <h5 class="mb-0 text-white">
                         {{ item.stats }}

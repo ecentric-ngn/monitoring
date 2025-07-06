@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutService } from '../../service/app.layout.service';
-import { ContractorService } from '../../service/contractor.service';
 import * as CryptoJS from 'crypto-js';
 import { environment } from  '../../../environments/environment.prod';
+import { CommonService } from '../../service/common.service';
 
 @Component({
   templateUrl: './dashboard.component.html',
@@ -19,7 +19,7 @@ export class DashboardComponent {
   constructor(
     public layoutService: LayoutService,
     private route: ActivatedRoute,
-   private service:ContractorService,
+    private service: CommonService,
   ) {}
 
   ngOnInit() {
@@ -49,13 +49,12 @@ export class DashboardComponent {
     }
   }
     getTotalCountList() {
-      const contractor = {
-        viewName: 'stats',
-        pageSize: this.pageSize,
-        pageNo: this.pageNo,
-        condition: [],
-      };
-      this.service.getContractorDetails(contractor).subscribe(
+      const contractor = []
+        // viewName: 'stats',
+        // pageSize: this.pageSize,
+        // pageNo: this.pageNo,
+        // condition: [],
+      this.service.fetchDetails(contractor, this.pageNo, this.pageSize, 'view_stats').subscribe(
         (response: any) => {
           this.loading = false;
           this.totalCounts = response.data;

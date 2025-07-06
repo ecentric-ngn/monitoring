@@ -50,18 +50,23 @@
           <span class="font-size-12"> {{ formData.onsiteremarks }}</span>
         </div>
       </div>
-      <div class="row col-md-12">
-        <div *ngIf="onsiteFiles.length > 0" class="mb-3 p-3 d-flex align-items-center">
-          <label class="form-label me-3 mb-0">Onsite Files:</label>
-          <div class="d-flex flex-wrap align-items-center gap-2">
-            <div *ngFor="let filePath of onsiteFiles">
-              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
-                <i class="">view doc</i>
-              </button>
-            </div>
-          </div>
+<div class="row col-md-12">
+  <div class="mb-3 p-3 d-flex align-items-center">
+    <label class="form-label me-3 mb-0">Contract Documents:</label>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <ng-container *ngIf="contractDocFiles.length > 0; else noFiles">
+        <div *ngFor="let filePath of contractDocFiles">
+          <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+            <i class="">view doc</i>
+          </button>
         </div>
-      </div>
+      </ng-container>
+      <ng-template #noFiles>
+        <span class="text-muted">No file uploaded</span>
+      </ng-template>
+    </div>
+  </div>
+</div>
 
     </div>
   </form>
@@ -190,16 +195,23 @@
           {{ formData.financial_progress }}
         </span>
       </div>
-      <div class="col-md-4 d-flex">
-        <div *ngIf="workProgressFiles.length > 0" class="mb-3">
-          <label class="form-label ">Work Progress Files:</label>
-          <div *ngFor="let filePath of workProgressFiles" class="mb-1">
-            <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
-              <i class="bi bi-eye me-1"></i> view doc
-            </button>
-          </div>
+     <div class="row col-md-12">
+  <div class="mb-3 p-3 d-flex align-items-center">
+    <label class="form-label me-3 mb-0">Work Progress Files:</label>
+    <div class="d-flex flex-wrap align-items-center gap-2">
+      <ng-container *ngIf="workProgressFiles.length > 0; else noFiles">
+        <div *ngFor="let filePath of workProgressFiles">
+          <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+            <i class="">view doc</i>
+          </button>
         </div>
-      </div>
+      </ng-container>
+      <ng-template #noFiles>
+        <span class="text-muted">No file uploaded</span>
+      </ng-template>
+    </div>
+  </div>
+</div>
       <div class="row">
         <div class="col-md-4 d-flex">
           <label class="form-label me-2 font-size-12">Remarks:</label>

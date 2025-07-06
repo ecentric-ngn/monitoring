@@ -66,6 +66,7 @@ export class ListOFHRinContractComponent {
     ) {}
 
     ngOnInit() {
+         this.getDatabasedOnChecklistId();
         this.inspectionType = this.inspectionType;
         this.appNoStatus = this.data?.applicationStatus ?? null;
         if (this.appNoStatus === 'REJECTED') {
@@ -98,7 +99,7 @@ export class ListOFHRinContractComponent {
         const payload: any = [
             {
                 field: 'checklist_id',
-                value: this.prevTableId,
+                value: 178,
                 operator: 'AND',
                 condition: '=',
             },
@@ -125,6 +126,7 @@ export class ListOFHRinContractComponent {
                             //     qualification: item.replaced_qualification
                             // } : null
                         };
+                        
                     });
                 },
                 (error) => {
@@ -574,7 +576,7 @@ private saveDraftPayload() {
             const replacedHR = this.replacedHRList.find(
                 (replacement) => replacement.id === hrId
             );
-            const status = replacedHR?.status;
+            const status = replacedHR?.status || item.status;
             return !status; // if status is null, undefined, or empty
         })
     ) {
@@ -595,7 +597,7 @@ private saveDraftPayload() {
             designation: item.designation,
             qualification: item.qualification,
             cidNo: item.cidNo,
-            status: replacedHR?.status,
+            status: replacedHR?.status || item.status,
         };
         
         if (
@@ -627,9 +629,7 @@ private saveDraftPayload() {
 
     this.sendPayload(finalPayload);
 }
-
 private sendPayload(finalPayload: any) {
-    debugger
     this.service.saveAsDraft(finalPayload).subscribe({
         next: (response: any) => {
             if (this.tableId) {

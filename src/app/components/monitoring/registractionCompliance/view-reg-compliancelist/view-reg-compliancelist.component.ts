@@ -4,7 +4,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
-import { AuthServiceService } from 'src/app/auth.service';
+import { AuthServiceService } from '../../../../auth.service';
 declare var bootstrap: any;
 
 @Component({
@@ -50,16 +50,9 @@ export class ViewRegCompliancelistComponent {
     searchTerm: string = '';
     statusFilter: string = 'All';
     username: string = '';
-
     contractorClasses = ['S-Small', 'M-Medium', 'L-Large', 'All'];
-
-    Dzongkhags = ['Shrek', 'Thimphu', 'Paro', 'Wangdue', 'Punakha', 'Trashigang',
-        'Trashiyangtse', 'Bumthang', 'Gasa', 'Haa', 'Lhuentse',
-        'Mongar', 'Pemagatshel', 'Samdrup Jongkhar', 'Samtse', 'Sarpang',
-        'Zhemgang', 'Chhukha', 'Dagana', 'Tsirang', 'Trongsa'];
-
     today: string = new Date().toISOString().substring(0, 10);
-
+    dzongkhagList: any[] = [];
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
@@ -69,9 +62,8 @@ export class ViewRegCompliancelistComponent {
 
     ngOnInit() {
         this.fetchComplianceDetails();
-
+        this.getDzongkhagList();
         this.username = this.authService.getUsername() || 'NA';
-
         // Auto-refresh every 60 seconds (60000 ms)
         this.autoRefreshInterval = setInterval(() => {
             this.fetchComplianceDetails();
@@ -79,6 +71,28 @@ export class ViewRegCompliancelistComponent {
         }, 60000);
     }
 
+
+      getDzongkhagList() {
+        const dzongkhag = {
+            viewName: 'dzongkhagList',
+            pageSize: 20,
+            pageNo: 1,
+            condition: [],
+        };
+
+        this.service.fetchAuditData(dzongkhag).subscribe(
+            (response: any) => {
+                this.loading = false;
+                this.dzongkhagList = response.data;
+                console.log('responseDzongkag', response);
+            },
+            // Error handler
+            (error) => {
+                this.loading = false; // Set loading to false as an error occurred
+                console.error('Error fetching contractor details:', error); // Log the error
+            }
+        );
+    }
     ngOnDestroy() {
         if (this.autoRefreshInterval) {
             clearInterval(this.autoRefreshInterval);
@@ -482,19 +496,17 @@ export class ViewRegCompliancelistComponent {
             console.error('Firm ID is missing.');
             return;
         }
-
         this.service.getReinstateApplication(firmId).subscribe({
             next: (data) => {
                 this.reinstateData = data[0];
-
-                setTimeout(() => {
-                    const modalEl = document.getElementById('reinstateModal');
+                 setTimeout(() => {
+                const modalEl = document.getElementById('reinstateModal');
                     this.reinstateModal = new bootstrap.Modal(modalEl, {
                         backdrop: 'static',
                         keyboard: false
-                    });
+                     });
                     this.reinstateModal.show();
-                }, 0);
+                 }, 0);
             },
             error: (err) => {
                 console.error('Error fetching reinstate data:', err);

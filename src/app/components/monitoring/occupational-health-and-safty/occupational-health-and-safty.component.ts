@@ -126,13 +126,23 @@ export class OccupationalHealthAndSaftyComponent {
                 (this.formData.earPlug = data.ear_plugs_used),
                 (this.formData.safetyGloves = data.safety_gloves_used);
                   // ✅ Extract file paths if available
-               if (data.file_path) {
-               this.formData.filePathList = data.file_path
-                .split(',')
-                .map(path => path.trim());
-                console.log('this.formData.filePathList', this.formData.filePathList);
-            }
-            },
+                if (data.file_path) {
+            this.formData.filePathList = data.file_path
+            .split(',')
+            .map(path => path.trim());
+
+            this.formData.fileIdList = data.file_id
+            .split(',')
+            .map(id => id.trim());
+
+            // 🔽 Add this line: Check if all paths are 'NO_PATH'
+            this.formData.allPathsNoFile = this.formData.filePathList.every(path => path === 'NO_PATH');
+
+            console.log('filePathList', this.formData.filePathList);
+            console.log('fileIdList', this.formData.fileIdList);
+            console.log('allPathsNoFile', this.formData.allPathsNoFile);
+        }
+        },
             // Error handler
             (error) => {
                 console.error('Error fetching contractor details:', error); // Log the error
@@ -298,7 +308,6 @@ export class OccupationalHealthAndSaftyComponent {
             safetyGlovesUsed: this.formData.safetyGloves,
             earPlugsUsed: this.formData.earPlug,                                        
      };
-     debugger
       this.service.saveAsDraft(payload).subscribe({
         next: (response: any) => {
           const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;

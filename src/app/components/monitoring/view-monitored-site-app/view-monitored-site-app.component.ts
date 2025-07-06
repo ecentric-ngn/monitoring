@@ -230,6 +230,7 @@ export class ViewMonitoredSiteAppComponent {
     selectedChecklistIds: string[] = [];
     formDisabled: boolean = false;
     onCheckboxChange(data: any): void {
+         this.formDisabled = true
         if (data.rightSelected) {
             // Add to list if not already there
             if (!this.selectedChecklistIds.includes(data.checklist_id)) {
@@ -237,6 +238,7 @@ export class ViewMonitoredSiteAppComponent {
                 this.formDisabled = true
             }
         } else {
+             this.formDisabled = true
             // Remove from list if unchecked
             this.selectedChecklistIds = this.selectedChecklistIds.filter(
                 (id) => id !== data.checklist_id

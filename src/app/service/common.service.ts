@@ -79,6 +79,9 @@ export class CommonService {
   createAuditMemo(payload) {
     return this.http.post<any>(`${api_url}/createAuditMemo`, payload)
   }
+  
+  
+
   // fetch audit data from view
   fetchAuditData(payload) {
     return this.http.post<any>(`${api_url}/view`, payload);

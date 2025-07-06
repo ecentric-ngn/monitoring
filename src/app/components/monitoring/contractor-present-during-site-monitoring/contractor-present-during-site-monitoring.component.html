@@ -90,9 +90,15 @@
   <div class="justify-content-end d-flex mt-6">
     <button *ngIf="appNoStatus !== 'REJECTED'" class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()"
       type="submit">Prev</button>
-    <button class="btn text-white save-next-btn" [disabled]="!(appNoStatus === 'REJECTED' || isOtpValid)"
+    <!-- <button class="btn text-white save-next-btn" [disabled]="!(appNoStatus === 'REJECTED' || isOtpValid)"
       (click)="saveAndNext(form)" type="submit">
       Save & Next
-    </button>
+    </button> -->
+    <button class="btn text-white save-next-btn"
+  [disabled]="!((appNoStatus === 'REJECTED' || isOtpValid) || inspectionType === 'OTHERS')"
+  (click)="saveAndNext(form)" type="submit">
+  Save & Next
+</button>
+
   </div>
 </div>
