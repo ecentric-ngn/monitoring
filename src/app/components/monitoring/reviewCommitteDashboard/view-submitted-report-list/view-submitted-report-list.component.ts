@@ -170,7 +170,7 @@ EndorseApplicationNo(type: string): void {
     getDzongkhagList() {
         const dzongkhag = {
             viewName: 'dzongkhagList',
-            pageSize: this.pageSize,
+            pageSize: 20,
             pageNo: this.pageNo,
             condition: [],
         };
@@ -264,6 +264,7 @@ FetchWorkBaseOnDzoId(searchQuery?: string) {
     this.service.fetchDetails(payload, this.pageNo, this.pageSize, this.viewName).subscribe(
         (response: any) => {
                this.tenderList = response.data;
+            this.showTable = true;
             this.total_records = response.totalCount;
             this.totalPages = Math.ceil(this.total_records / this.pageSize);
         },

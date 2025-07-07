@@ -18,6 +18,7 @@ export class ViewRegFirmInformationComponent implements OnInit {
   ngOnInit(): void {
 
     const status = this.applicationStatus;
+    this.applicationStatus = status;
 
     if (status === 'Resubmitted OS') {
       this.activeTabId = 'office';

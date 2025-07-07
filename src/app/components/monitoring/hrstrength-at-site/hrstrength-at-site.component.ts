@@ -95,7 +95,7 @@ export class HRStrengthAtSiteComponent {
             .uploadFiles(
                staticFile,
                 this.formData.remarks,
-                this.formType,
+                '14',
                 this.userName
             )
             .subscribe((fileId: string) => {

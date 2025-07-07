@@ -370,7 +370,6 @@ export class ReviewAndSubmitComponent {
         );
         }
 
-
         extractFileName(filePath: string): string {
             return (
                 filePath.split('/').pop() ||

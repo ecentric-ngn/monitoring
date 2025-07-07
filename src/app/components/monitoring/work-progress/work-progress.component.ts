@@ -152,11 +152,12 @@ export class WorkProgressComponent {
                 const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
                 uploadObservables.push(upload$);
             }
-        } else {
-            // Push a dummy observable for empty file upload (e.g., null file)
-            const upload$ = this.service.uploadFiles(null, this.formData.remarks, this.formType, this.userName);
-            uploadObservables.push(upload$);
-        }
+        }  else {
+        // Send dummy file instead of null
+        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
+        uploadObservables.push(upload$);
+       }
         forkJoin(uploadObservables).subscribe({
             next: (fileIds: any[]) => {
                 for (const id of fileIds) {

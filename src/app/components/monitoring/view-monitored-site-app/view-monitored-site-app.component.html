@@ -157,7 +157,7 @@
     <div class="modal-content">
       <div class="modal-header" style="background-color: #495f8a">
         <h5 class="modal-title text-white" id="exampleModalLabel">Record of Monitoring observations actions  taken by the
-ВСТА
+           ВСТА
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -284,7 +284,7 @@
                     <label class="form-label">Email address:<span
                         class="text-danger h-11rem font-size-12">*</span></label>
                     <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.email"
-                      placeholder="Auto" name="email" required #email="ngModel" [disabled]="isFormDataLoaded">
+                      placeholder="Auto" name="email" required #email="ngModel">
                     <div *ngIf="email.invalid && email.touched" class="text-danger font-size-12">
                       Please enter Email Address
                     </div>

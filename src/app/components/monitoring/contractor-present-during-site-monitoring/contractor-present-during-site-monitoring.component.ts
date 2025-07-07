@@ -62,37 +62,39 @@ export class ContractorPresentDuringSiteMonitoringComponent {
             this.getDatabasedOnChecklistId();
         }
     }
-    getDatabasedOnChecklistId() {
-        const payload: any = [
-            {
-                field: 'checklist_id',
-                value: this.prevTableId,
-                operator: 'AND',
-                condition: '=',
+   getDatabasedOnChecklistId() {
+    const payload: any = [
+        {
+            field: 'checklist_id',
+            value: this.prevTableId,
+            operator: 'AND',
+            condition: '=',
+        },
+    ];
+
+    this.service
+        .fetchDetails(payload, 1, 100, 'comprehensive_checklist_view') // increase limit if needed
+        .subscribe({
+            next: (response: any) => {
+                const contractors = response.data;
+                this.dataList = []; // clear existing if needed
+                contractors.forEach((data: any) => {
+                    this.dataList.push({
+                        cidNo: data.contractor_cid_no,
+                        fullName: data.contractor_full_name,
+                        mobileNo: data.contractor_mobile_no,
+                        otp: '',
+                        showOtpInput: false,
+                        errorMessages: {},
+                    });
+                });
             },
-        ];
-        this.service
-            .fetchDetails(payload, 1, 2, 'comprehensive_checklist_view')
-            .subscribe(
-                (response: any) => {
-                    const data = response.data[0];
-                    this.formData.cidNo = data.contractor_cid_no;
-                    this.formData.fullName = data.contractor_full_name;
-                    this.formData.mobileNo = data.contractor_mobile_no;
-                    const parsedFileResponse =
-                        typeof response === 'string'
-                            ? JSON.parse(response)
-                            : typeof response.data[0].files === 'string'
-                            ? JSON.parse(response.data[0].files)
-                            : response.data[0].files;
-                    this.fileAndRemark = parsedFileResponse;
-                },
-                // Error handler
-                (error) => {
-                    console.error('Error fetching contractor details:', error); // Log the error
-                }
-            );
-    }
+            error: (error) => {
+                console.error('Error fetching contractor details:', error);
+            },
+        });
+}
+
     isLoading = false;
   
 
