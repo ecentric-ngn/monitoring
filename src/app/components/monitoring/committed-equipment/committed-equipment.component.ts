@@ -49,35 +49,31 @@ export class CommittedEquipmentComponent {
     ) {}
 
 ngOnInit() {
-    this.FetchEquipmentMasterData(); // Always fetch master data
-    this.appStatus = this.data?.applicationStatus ?? null;
-    this.inspectionType = this.inspectionType ?? null;
-    const userDetailsString = sessionStorage.getItem('userDetails');
-    if (userDetailsString) {
-        const userDetails = JSON.parse(userDetailsString);
-        this.userName = userDetails.username;
-    }
-    if (this.appStatus === 'REJECTED') {
-        this.prevTableId = this.tableId;
-        this.getDatabasedOnChecklistId(); // In REJECTED case, only load previous data
-        return;
-    }
-    // If appStatus is null but prevTableId exists, still load previous data
-    if (this.prevTableId) {
-        this.getDatabasedOnChecklistId();
-    }
-    // Load equipment lists based on inspection type
-    if (this.inspectionType === 'PUBLIC') {
-        this.getEqListsBasedOnBctaNoEgpTenderId();
-    } else if (this.inspectionType === 'PRIVATE') {
-        this.getPrivateEqLists();
-    } else if (this.inspectionType === 'OTHERS') {
-        this.getOtherWorkEqLists();
-    }
+  this.FetchEquipmentMasterData(); // Always fetch master data
+  this.appStatus = this.data?.applicationStatus ?? null;
+  this.inspectionType = this.inspectionType ?? null;
+
+  const userDetailsString = sessionStorage.getItem('userDetails');
+  if (userDetailsString) {
+    const userDetails = JSON.parse(userDetailsString);
+    this.userName = userDetails.username;
+  }
+
+  if (this.appStatus === 'REJECTED') {
+    this.prevTableId = this.tableId;
+    this.getDatabasedOnChecklistId(); // Load previous data for REJECTED
+    return;
+  }
+
+  if (this.prevTableId) {
+    this.getDatabasedOnChecklistId(); // Load previous data if prevTableId exists
+  } else {
+    // If no previous data, load equipment lists based on inspection type
+    this.loadEquipmentListBasedOnInspectionType();
+  }
 }
 
-
-   getDatabasedOnChecklistId() {
+getDatabasedOnChecklistId() {
   const payload: any = [
     {
       field: 'checklist_id',
@@ -90,20 +86,20 @@ ngOnInit() {
   this.service.fetchDetails(payload, 1, 100, 'committed_equipment_view').subscribe(
     (response: any) => {
       const data = response.data;
+
+      if (!data || data.length === 0) {
+        // Only if data is empty, fetch based on inspection type
+        this.loadEquipmentListBasedOnInspectionType();
+        return;
+      }
+
       this.TableData = data.map((item: any) => {
         const isReplaced = item.status === 'REPLACED';
         return {
           id: item.committed_equipment_id,
-          name: item.equipment_name || 'N/A', // fallback if name is missing
+          name: item.equipment_name || 'N/A',
           registrationNo: item.registration_number,
           status: item.status,
-        //   replacedWithInfo: isReplaced
-        //     ? {
-        //         registrationNo: item.replaced_registration_number,
-        //         vehicleType: item.replaced_vehicle_type,
-        //         remarks: item.replacement_remarks,
-        //       }
-           // : null,
         };
       });
     },
@@ -111,6 +107,16 @@ ngOnInit() {
       console.error('Error fetching contractor details:', error);
     }
   );
+}
+
+loadEquipmentListBasedOnInspectionType() {
+  if (this.inspectionType === 'PUBLIC') {
+    this.getEqListsBasedOnBctaNoEgpTenderId();
+  } else if (this.inspectionType === 'PRIVATE') {
+    this.getPrivateEqLists();
+  } else if (this.inspectionType === 'OTHERS') {
+    this.getOtherWorkEqLists();
+  }
 }
 
 
