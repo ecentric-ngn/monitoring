@@ -134,7 +134,7 @@
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
           {{ isSaving ? 'Saving...' : 'Update' }}
         </button>
-        <button class="btn btn-danger" (click)="openActionModal()">
+        <button class="btn btn-success" (click)="openActionModal()">
           Action
         </button>
       </div>
@@ -145,15 +145,40 @@
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
           {{ isSaving ? 'Saving...' : 'Save & Next' }}
         </button>
-      </div>
 
+      </div>
+      <div class="col-12 mt-3">
+        <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
+          <!-- <span class="badge"
+      [ngClass]="{
+        'badge-secondary': applicationStatus == 'Not Submitted',
+        'badge-warning': applicationStatus == 'In Process' || applicationStatus == 'Pending',
+        'badge-success': applicationStatus == 'Verified',
+        'badge-primary': applicationStatus == 'Submitted' || applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted PFS'
+                        || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS',
+        'badge-info': applicationStatus == 'Ready for Review'
+      }">
+      
+    </span> -->
+
+          <!-- <button class="btn btn-primary btn-sm" (click)="openActionModal(data)">
+      Action
+    </button> -->
+
+          <div *ngIf="data.licenseStatus === 'Suspended'">
+            <button class="btn btn-danger btn-sm" (click)="getReinstateApplication(data.contractorNo)"
+              data-bs-toggle="modal" data-bs-target="#reinstateModal">
+              View
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
-
 </div>
 
 <!-- Action Modal -->
- <!-- <app-action-modal-construction
+<!-- <app-action-modal-construction
   [selectedAction]="selectedAction"
   [downgradeList]="downgradeList"
   [today]="today"
@@ -161,3 +186,118 @@
   (submit)="onActionModalSubmit($event)"
   [visible]="showActionModal">
 </app-action-modal-construction> -->
+
+
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form #actionForm="ngForm">
+        <div class="modal-header">
+          <h5 class="modal-title" id="actionModalLabel">Take Action</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Action Type<span class="text-danger">*</span></label>
+              <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType" required
+                (change)="onActionTypeChange()">
+                <option value="">-- Select --</option>
+                <!-- <option value="cancel">Cancel</option> -->
+                <option value="downgrade">Downgrade</option>
+                <option value="suspend">Suspend</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Action Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate" name="actionDate"
+                [disabled]="true" required />
+            </div>
+
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Remarks<span class="text-danger">*</span></label>
+            <textarea rows="3" class="form-control" [(ngModel)]="selectedAction.remarks" name="remarks"
+              required></textarea>
+          </div>
+
+          <!-- Downgrade Table -->
+          <div *ngIf="selectedAction.actionType === 'downgrade'" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Work Category</th>
+                  <th>Existing Class</th>
+                  <th>New Class</th>
+                </tr>
+              </thead>
+              <tbody>
+                <!-- <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                                    <td>{{ downgrade.workCategory }}</td>
+                                    <td>{{ downgrade.existingClass }}</td>
+                                    <td>
+                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
+                                            [name]="'newClass_' + downgrade.workCategory" required>
+                                            <option value="">-- Select --</option>
+                                            <option *ngFor="let option of getClassOptions(downgrade.existingClass)"
+                                                [value]="option.value">
+                                                {{ option.label }}
+                                            </option>
+                                        </select>
+                                    </td>
+                                </tr> -->
+
+                <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                  <td>{{ downgrade.workCategory }}</td>
+                  <td>{{ downgrade.existingClass }}</td>
+
+                  <td *ngIf="downgrade.existingClass === 'L-Large'">
+                    <select class="form-select" [(ngModel)]="downgrade.newClass"
+                      [name]="'newClass_' + downgrade.workCategory" required>
+                      <option value="">-- Select --</option>
+                      <option value="M-Medium">M-Medium</option>
+                      <option value="S-Small">S-Small</option>
+                    </select>
+                  </td>
+
+                  <td *ngIf="downgrade.existingClass === 'M-Medium'">
+                    <select class="form-select" [(ngModel)]="downgrade.newClass"
+                      [name]="'newClass_' + downgrade.workCategory" required>
+                      <option value="">-- Select --</option>
+                      <option value="S-Small">S-Small</option>
+                    </select>
+                  </td>
+
+                  <td *ngIf="downgrade.existingClass === 'S-Small'">
+                    <select class="form-select" [(ngModel)]="downgrade.newClass"
+                      [name]="'newClass_' + downgrade.workCategory" required>
+                      <option value="">-- Select --</option>
+                      <option value="S-Small">S-Small</option>
+                    </select>
+                  </td>
+
+                  <td
+                    *ngIf="downgrade.existingClass !== 'L-Large' && downgrade.existingClass !== 'M-Medium' && downgrade.existingClass !== 'S-Small'">
+                    <select class="form-select" [(ngModel)]="downgrade.newClass"
+                      [name]="'newClass_' + downgrade.workCategory" required>
+                      <option value="">-- Select --</option>
+                    </select>
+                  </td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" (click)="closeModal()" data-bs-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

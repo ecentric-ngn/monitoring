@@ -254,27 +254,31 @@ export class OnsiteFacilitiesandManagementComponent {
     /**
      * Uploads the selected file to the server and updates the file ID upon success.
      */
+ // Create a static dummy file
 
-  saveAndNext(form: NgForm) {
+saveAndNext(form: NgForm) {
     if (form.invalid) {
         Object.keys(form.controls).forEach((field) => {
             const control = form.controls[field];
             control.markAsTouched({ onlySelf: true });
         });
-        return; // Stop execution if form is invalid
+        return;
     }
-    // Always call uploadFiles, even if no files are selected
+
     const uploadObservables = [];
     if (this.selectedFiles && this.selectedFiles.length > 0) {
         for (const file of this.selectedFiles) {
             const upload$ = this.service.uploadFiles(file, this.formData.meetingRemarks, this.formType, this.userName);
             uploadObservables.push(upload$);
         }
-    } else {
-        // Push a dummy observable for empty file upload (e.g., null file)
-        const upload$ = this.service.uploadFiles(null, this.formData.meetingRemarks, this.formType, this.userName);
+    } 
+    else {
+        // Send dummy file instead of null
+        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.meetingRemarks, this.formType, this.userName);
         uploadObservables.push(upload$);
     }
+
     forkJoin(uploadObservables).subscribe({
         next: (fileIds: any[]) => {
             for (const id of fileIds) {
@@ -291,6 +295,7 @@ export class OnsiteFacilitiesandManagementComponent {
         },
     });
 }
+
 
     private saveDraftPayload() {
     const payload: any = {

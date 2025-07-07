@@ -8,6 +8,7 @@
 </div>
 <div class="card container-fluid" *ngIf="!loading">
     <p class="font-bold font-size-18"><strong>List of New sites</strong></p>
+   
     <form>
         <div class=" border p-3">
             <div class="row align-items-end">
@@ -48,6 +49,7 @@
         </div>
     </form>
     <div class="row" *ngIf="showTable">
+     
         <div class="col d-flex pl-4">
             <p class="text-gray-600">Items Per Page</p>
             <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
@@ -55,9 +57,9 @@
                 <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
             </select>
         </div>
-        <div class="col d-flex justify-content-end">
+        <div class="col-4 d-flex justify-content-end">
             <p class="text-gray-600 m-2">Search By : </p>
-            <input type="text" placeholder="Application No" class="form-control form-control-sm col-md-4" id="search "
+            <input type="text" placeholder="Application No, BCTA No or Status" class="form-control form-control-sm col-md-4" id="search "
                 [(ngModel)]="searchQuery" (input)="Searchfilter()" />
         </div>
     </div>
@@ -83,7 +85,9 @@
                 </tr>
             </thead>
             <tbody>
-
+                <tr *ngIf="tenderList?.length === 0">
+                    <td colspan="15" class="text-center">No data found</td>
+                </tr>
                 <tr *ngFor="let tender of tenderList; let i = index">
                     <td class="p-1 text-center">{{ i + 1 }}</td>
                     <td class="text-bold text-center text-nowrap ">{{ tender.application_number }}</td>

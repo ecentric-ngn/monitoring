@@ -323,26 +323,10 @@
                                 [(ngModel)]="formData.deadline" readonly name="deadline">
                         </div>
 
-                        <div class="col-md-6">
-                            <label class="form-label">Contractor Class</label>
-                            <select class="form-select form-control-sm" name="contractorClass"
-                                [(ngModel)]="formData.workClassification" multiple style="height: 60px;">
-                                <option value="" selected>-- Select --</option>
-                                <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
-                            </select>
-                        </div>
-                    </div>
 
-                    <!-- Row 3: Dzongkhag -->
-                    <div class="row g-3 m-2">
-                        <div class="col-md-6">
+                         <div class="col-md-6">
                             <label class="form-label">Dzongkhag</label>
-                            <!-- <select class="form-select form-control-sm" name="dzongkhag"
-                                [(ngModel)]="formData.dzongkhagName">
-                                <option [value]="">-- Select --</option>
-                                <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">{{ dzongkhag }}
-                                </option>
-                            </select> -->
+                            
                              <select class="form-select font-size-16"  [(ngModel)]="formData.name" name="name" id="dzongkhag">
                             <option>--select--</option>
                             <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.name">
@@ -350,6 +334,19 @@
                             </option>
                         </select>
                         </div>
+                        <!-- <div class="col-md-6">
+                            <label class="form-label">Contractor Class</label>
+                            <select class="form-select form-control-sm" name="contractorClass"
+                                [(ngModel)]="formData.workClassification" multiple style="height: 60px;">
+                                <option value="" selected>-- Select --</option>
+                                <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
+                            </select>
+                        </div> -->
+                    </div>
+
+                    <!-- Row 3: Dzongkhag -->
+                    <div class="row g-3 m-2">
+                       
                     </div>
 
                 </form>

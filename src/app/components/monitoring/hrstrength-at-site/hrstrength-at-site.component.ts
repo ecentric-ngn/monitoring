@@ -77,6 +77,7 @@ export class HRStrengthAtSiteComponent {
             );
     }
     formType: '14';
+    
     saveAndNext(form: NgForm): void {
         // Uncomment this block if you want form validation
 
@@ -87,12 +88,14 @@ export class HRStrengthAtSiteComponent {
             });
             return;
         }
-
+ // Create a static dummy file
+    const fileContent = new Blob(['This is a static file content'], { type: 'text/plain' });
+    const staticFile = new File([fileContent], 'staticFile.txt', { type: 'text/plain' });
         this.service
             .uploadFiles(
-                this.formData.uploadFile,
+               staticFile,
                 this.formData.remarks,
-                this.formType,
+                '14',
                 this.userName
             )
             .subscribe((fileId: string) => {
@@ -100,7 +103,7 @@ export class HRStrengthAtSiteComponent {
                 if (match) {
                     this.fileId = match[0];
                 } else {
-                    this.formData.uploadFile = null;
+                    this.formData.uploadFile = 'NoFileUploaded';
                     return;
                 }
 

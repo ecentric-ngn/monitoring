@@ -48,37 +48,35 @@ export class CommittedEquipmentComponent {
         private notification: NzNotificationService
     ) {}
 
-    ngOnInit() {
-         this.inspectionType = this.inspectionType;
-        console.log('inspectionType', this.inspectionType);
-        this.FetchEquipmentMasterData();
-        this.prevTableId = this.prevTableId
-        this.tableId = this.tableId
-        this.appStatus = this.data?.applicationStatus ?? null;
-        if (this.appStatus === 'REJECTED') {
-            this.prevTableId = this.tableId;
-        }
-        if (this.prevTableId) {
-            this.getDatabasedOnChecklistId();
-        }
-        this.tableId = this.tableId;
-        this.data = this.data;
-        this.inspectionType = this.inspectionType;
-        if (this.inspectionType == 'PUBLIC') {
-            this.getEqListsBasedOnBctaNoEgpTenderId();
-        } else if (this.inspectionType == 'PRIVATE') {
-            this.getPrivateEqLists();
-        } else if (this.inspectionType == 'OTHERS') {
-            this.getOtherWorkEqLists();
-        } else {
-        }
-        this.FetchEquipmentMasterData();
-        const userDetailsString = sessionStorage.getItem('userDetails');
-        if (userDetailsString) {
-            const userDetails = JSON.parse(userDetailsString);
-            this.userName = userDetails.username;
-        }
+ngOnInit() {
+    this.FetchEquipmentMasterData(); // Always fetch master data
+    this.appStatus = this.data?.applicationStatus ?? null;
+    this.inspectionType = this.inspectionType ?? null;
+    const userDetailsString = sessionStorage.getItem('userDetails');
+    if (userDetailsString) {
+        const userDetails = JSON.parse(userDetailsString);
+        this.userName = userDetails.username;
     }
+    if (this.appStatus === 'REJECTED') {
+        this.prevTableId = this.tableId;
+        this.getDatabasedOnChecklistId(); // In REJECTED case, only load previous data
+        return;
+    }
+    // If appStatus is null but prevTableId exists, still load previous data
+    if (this.prevTableId) {
+        this.getDatabasedOnChecklistId();
+    }
+    // Load equipment lists based on inspection type
+    if (this.inspectionType === 'PUBLIC') {
+        this.getEqListsBasedOnBctaNoEgpTenderId();
+    } else if (this.inspectionType === 'PRIVATE') {
+        this.getPrivateEqLists();
+    } else if (this.inspectionType === 'OTHERS') {
+        this.getOtherWorkEqLists();
+    }
+}
+
+
    getDatabasedOnChecklistId() {
   const payload: any = [
     {
@@ -340,17 +338,19 @@ export class CommittedEquipmentComponent {
      */
     showSuccessMessage: string = '';
     showErrorMessage: string = '';
- getVehicleDetails() 
- {this.service.getVehicleDetails(this.registrationNo, this.VehicleType).subscribe(
+ getVehicleDetails() {
+  this.showErrorMessage = '';
+  this.VehicleDetails = '';
+  this.service.getVehicleDetails(this.registrationNo, this.VehicleType).subscribe(
             (response: any) => {
                 const data = response.vehicleDetail;
                 this.VehicleDetails = data;
+                console.log('VehicleDetails', this.VehicleDetails);
                 if (this.type !== 'Replaced') {
                     this.formData.registrationNo = response.vehicleDetail.vehicleNumber;
                     this.formData.vehicleType = response.vehicleDetail.vehicleTypeName;
                 } else if(response.vehicleDetail.vehicleRegistrationDetailsId ===0) {
                     this.showErrorMessage = 'No details found for this RegNo in BCTA';
-                    debugger
                     console.warn('No details found for this RegNo in BCTA');
                 }else{
                   this.showErrorMessage = ''; // Clear error if successful
@@ -623,11 +623,12 @@ resetForm() {
             const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
             uploadObservables.push(upload$);
         }
-    } else {
-        // Push a dummy observable for empty file upload (e.g., null file)
-        const upload$ = this.service.uploadFiles(null, this.formData.remarks, this.formType, this.userName);
+    }  else {
+        // Send dummy file instead of null
+        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
         uploadObservables.push(upload$);
-    }
+       }
     forkJoin(uploadObservables).subscribe({
         next: (fileIds: any[]) => {
             for (const id of fileIds) {

@@ -65,21 +65,65 @@ export class ListOFHRinContractComponent {
         private notification: NzNotificationService
     ) {}
 
-    ngOnInit() {
-        
-        this.inspectionType = this.inspectionType;
-        this.appNoStatus = this.data?.applicationStatus ?? null;
-        if (this.appNoStatus === 'REJECTED') {
-            this.prevTableId = this.tableId;
-        }
-    if (this.prevTableId) {
-    this.getDatabasedOnChecklistId();
-} else {
-    const userDetailsString = sessionStorage.getItem('userDetails');
+   ngOnInit() {
+      const userDetailsString = sessionStorage.getItem('userDetails');
     if (userDetailsString) {
         const userDetails = JSON.parse(userDetailsString);
         this.userName = userDetails.username;
     }
+    this.appNoStatus = this.data?.applicationStatus ?? null;
+    if (this.appNoStatus === 'REJECTED') {
+        this.prevTableId = this.tableId;
+    }
+    if (this.prevTableId) {
+        this.getDatabasedOnChecklistId(); // Try to load using prevTableId
+    } else {
+        this.initializeBasedOnInspectionType(); // fallback immediately if no prevTableId
+    }
+    this.getdeginationList();
+    this.getQualificationList();
+}
+
+   getDatabasedOnChecklistId() {
+    const payload: any = [
+        {
+            field: 'checklist_id',
+            value: this.prevTableId,
+            operator: 'AND',
+            condition: '=',
+        },
+    ];
+
+    this.service
+        .fetchDetails(payload, 1, 100, 'human_resources_view')
+        .subscribe(
+            (response: any) => {
+                const data = response.data;
+
+                if (Array.isArray(data) && data.length > 0) {
+                    this.TableData = data.map((item: any) => ({
+                        id: item.human_resource_id,
+                        name: item.full_name,
+                        cidNo: item.cid_no,
+                        designation: item.designation,
+                        qualification: item.qualification,
+                        status: item.status,
+                        hrId: item.human_resource_id,
+                    }));
+                } else {
+                    // Empty response, fallback to inspectionType
+                    this.initializeBasedOnInspectionType();
+                }
+            },
+            (error) => {
+                console.error('Error fetching human resource details:', error);
+                // On error also fallback
+                this.initializeBasedOnInspectionType();
+            }
+        );
+}
+initializeBasedOnInspectionType() {
+ 
 
     switch (this.inspectionType) {
         case 'PUBLIC':
@@ -91,55 +135,11 @@ export class ListOFHRinContractComponent {
         case 'OTHERS':
             this.getHrListsFromCRPS();
             break;
+        default:
+            console.warn('Unknown inspection type:', this.inspectionType);
     }
 }
 
-        this.getdeginationList();
-        this.getQualificationList();
-    }
-
-    getDatabasedOnChecklistId() {
-        const payload: any = [
-            {
-                field: 'checklist_id',
-                value: this.prevTableId,
-                operator: 'AND',
-                condition: '=',
-            },
-        ];
-
-        this.service
-            .fetchDetails(payload, 1, 100, 'human_resources_view')
-            .subscribe(
-                (response: any) => {
-                    const data = response.data;
-                    this.TableData = data.map((item: any) => {
-                        return {
-                            id: item.human_resource_id,
-                            name: item.full_name,
-                            cidNo: item.cid_no,
-                            designation: item.designation,
-                            qualification: item.qualification,
-                            status: item.status,
-                            hrId: item.human_resource_id,
-                            // replacementInfo: item.status === 'REPLACED' ? {
-                            //     name: item.replaced_full_name,
-                            //     cidNo: item.cid_no, // if replaced CID is available separately, update this
-                            //     designation: item.replaced_designation,
-                            //     qualification: item.replaced_qualification
-                            // } : null
-                        };
-                        
-                    });
-                },
-                (error) => {
-                    console.error(
-                        'Error fetching human resource details:',
-                        error
-                    );
-                }
-            );
-    }
 
     getHrListsFromCRPS() {
         const contractorhR = {
@@ -539,11 +539,12 @@ export class ListOFHRinContractComponent {
             const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
             uploadObservables.push(upload$);
         }
-    } else {
-        // Push a dummy observable for empty file upload (e.g., null file)
-        const upload$ = this.service.uploadFiles(null, this.formData.remarks, this.formType, this.userName);
+    }  else {
+        // Send dummy file instead of null
+        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
         uploadObservables.push(upload$);
-    }
+       }
     forkJoin(uploadObservables).subscribe({
         next: (fileIds: any[]) => {
             for (const id of fileIds) {

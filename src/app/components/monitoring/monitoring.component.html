@@ -1,32 +1,30 @@
 <div class="card container-fluid">
   <p class="font-size-18"><strong>List of New sites</strong></p>
 
-    <label class="form-label"><strong>Please select work type<span class="text-danger">*</span></strong></label>
-    <div>
-      <label>
-        <input type="radio" name="workType" id="private" (click)="onClick('PRIVATE')"
-          [(ngModel)]="formData.workType" value="private" required />
-        Private Work
-      </label>
-      &nbsp;&nbsp;
-      <label>
-        <input type="radio" name="workType" id="public" (click)="onClick('PUBLIC')"
-          [(ngModel)]="formData.workType" value="public" required />
-        Public Work
-      </label>
-      &nbsp;&nbsp;
-      <label>
-        <input type="radio" name="other" id="other" (click)="onClick('OTHERS')" [(ngModel)]="formData.workType"
-          value="other" required />
-        Other Construction Work
-      </label>
-    </div>
-
-
-
-
-
+  <label class="form-label"><strong>Please select work type<span class="text-danger">*</span></strong></label>
+  <div>
+    <label>
+      <input type="radio" name="workType" id="private" (click)="onClick('PRIVATE')" [(ngModel)]="formData.workType"
+        value="private" required />
+      Private Work
+    </label>
+    &nbsp;&nbsp;
+    <label>
+      <input type="radio" name="workType" id="public" (click)="onClick('PUBLIC')" [(ngModel)]="formData.workType"
+        value="public" required />
+      Public Work
+    </label>
+    &nbsp;&nbsp;
+    <label>
+      <input type="radio" name="other" id="other" (click)="onClick('OTHERS')" [(ngModel)]="formData.workType"
+        value="other" required />
+      Other Construction Work
+    </label>
+  </div>
   <form *ngIf="showPrivateWork">
+    <span class="text-warning font-size-12">
+      <i>Note: Filter by Dzongkhag alone, or by both Procuring Agency and BCTA Registration No.</i>
+    </span>
     <!-- <form> -->
     <div class=" border p-3">
       <div class="row align-items-end">
@@ -65,6 +63,9 @@
   </form>
 
   <form *ngIf="showPublicWork">
+    <span class="text-warning font-size-12">
+      <i>Note: Filter by Dzongkhag alone, or by both Procuring Agency and BCTA Registration No.</i>
+    </span>
     <!-- <form> -->
     <div class=" border p-3">
       <div class="row align-items-end">
@@ -154,10 +155,10 @@
         <tr *ngFor="let tender of privateTenderList; let i = index">
           <td class="p-1 text-center">{{i + 1}}</td>
           <td class="text-center">
-            <a  class="font-bold text-primary sl_no" (click)="navigate(tender)">
+            <a class="font-bold text-primary sl_no" (click)="navigate(tender)">
               {{ tender.BCTANo }}
             </a>
-          
+
           </td>
 
           <td class="text-center pointer">{{ tender.referenceNo}} </td>
