@@ -11,43 +11,50 @@ export class ConsultancyInformationComponent implements OnInit {
   bctaNo: any;
   applicationStatus: string = '';
   activeTabId: string = '';
+WorkDetail: any={};
+licenseStatus: string = '';
+  constructor( private service: CommonService) { }
 
-  constructor(@Inject(CommonService) private service: CommonService) { }
-
-  ngOnInit(): void {
-
-    const status = this.applicationStatus;
-
-    if (status === 'Resubmitted OS') {
-      this.activeTabId = 'office';
-    } else if (status === 'Resubmitted PFS') {
-      this.activeTabId = 'office';
-    } else if (status === 'Resubmitted HR') {
-      this.activeTabId = 'employee';
-    } else if (status === 'Resubmitted EQ') {
-      this.activeTabId = 'equipment';
-    } else if (status === 'Resubmitted OS and PFS') {
-      this.activeTabId = 'office';
-    }
-    
-    const WorkDetail = this.service.getData('BctaNo');
-
-    if (!WorkDetail || !WorkDetail.data) {
-      console.error('WorkDetail or WorkDetail.data is undefined');
-      return;
-    }
-
-    this.applicationStatus = WorkDetail.data.applicationStatus;
-    this.formData.firmType = WorkDetail.data;
-    this.bctaNo = WorkDetail.data.consultantNo;
-
-    console.log('WorkDetail', WorkDetail);
-    console.log('bctaNo', this.bctaNo);
-
-    if (this.bctaNo) {
-      this.fetchDataBasedOnBctaNo();
-    }
+ngOnInit() {
+  const WorkDetail = this.service.getData('BctaNo');
+  if (!WorkDetail || !WorkDetail.data) {
+    console.error('WorkDetail or WorkDetail.data is undefined');
+    return;
   }
+
+  this.WorkDetail = WorkDetail;
+  this.licenseStatus = WorkDetail.data.licenseStatus;
+  this.applicationStatus = WorkDetail.data.applicationStatus;
+  this.formData.firmType = WorkDetail.data;
+  this.bctaNo = WorkDetail.data.consultantNo;
+
+  console.log('WorkDetail', WorkDetail);
+  console.log('bctaNo', this.bctaNo);
+  console.log('licenseStatus', this.licenseStatus);
+  console.log('applicationStatus', this.applicationStatus);
+
+  // Set activeTabId based on applicationStatus only if license is not suspended
+  if (this.licenseStatus !== 'Suspended') {
+    const status = this.applicationStatus;
+    if (status === 'Resubmitted OS' || status === 'Resubmitted PFS' || status === 'Resubmitted OS and PFS') {
+      this.activeTabId = 'consultancyOffice';
+    } else if (status === 'Resubmitted HR') {
+      this.activeTabId = 'consultancyEmployee';
+    } else if (status === 'Resubmitted EQ') {
+      this.activeTabId = 'consultancyEquipment';
+    } else {
+      this.activeTabId = 'consultancyOffice';  // default tab
+    }
+  } else {
+    // licenseStatus is 'Suspended', default active tab
+    this.activeTabId = 'consultancyOffice';
+  }
+
+  if (this.bctaNo) {
+    this.fetchDataBasedOnBctaNo();
+  }
+}
+
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {

@@ -224,17 +224,17 @@ export class ApplicationDetailsComponent {
     
     return result.length > 0 ? result : [];
 }
-
     // Extract file name from full path
     getFileName(filePath: string): string {
         if (!filePath) return '';
         const parts = filePath.split(/[/\\]/);
         return parts[parts.length - 1];
     }
-
-
-    goBack() {
-          this.router.navigate(['SubmittedReport']);
+       goBack() {
+        const WorkDetail = {
+            data: this.data,
+        };
+        this.service.setData(WorkDetail, 'appData', 'SubmittedReport');
     }
     getSiteMonitoringTeamList() {
         const payload: any = [
@@ -347,15 +347,6 @@ export class ApplicationDetailsComponent {
         });
     }
 }
-/*************  ✨ Windsurf Command ⭐  *************/
-    /**
-     * Extracts the file name from the given file path.
-     * If the file path contains a '/' or '\\', the method splits the path by the separator and returns the last item in the array.
-     * If the file path does not contain a '/' or '\\', the method returns the file path as the file name.
-     * @param filePath The file path to extract the file name from.
-     * @returns The file name extracted from the file path.
-     */
-/*******  0e981138-bffc-4239-bfe6-da8b5862cc8a  *******/
     extractFileName(filePath: string): string {
         return (
             filePath.split('/').pop() ||

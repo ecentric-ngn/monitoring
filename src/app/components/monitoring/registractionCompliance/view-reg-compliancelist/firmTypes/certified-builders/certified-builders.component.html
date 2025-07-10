@@ -45,7 +45,7 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
-                    <th>Select</th>
+                  
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
@@ -53,17 +53,15 @@
                     <th>License Status</th>
                     <th>Verified By</th>
                     <th>Action</th>
+                      <th>Select</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let data of displayedData" class="table-row">
-                    <td>
-                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
-                            [value]="data.certifiedBuilderNo" (change)="onCheckboxChange($event, data.id)">
-                    </td>
+                   
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
                         [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' "
+                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
                         (click)="navigate(data)">
                         {{ data.certifiedBuilderNo }}
                     </td>
@@ -75,7 +73,7 @@
                             'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Pending',
                             'badge-success': data.applicationStatus== 'Verified',
                             'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                                            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS',
+                                            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
                             'badge-info': data.applicationStatus== 'Ready for Review'
                             }">
                             {{ data.applicationStatus }}
@@ -88,13 +86,16 @@
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
-
                     <td>
                         <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                         <div *ngIf="data.licenseStatus === 'Suspended'">
-                            <button class="btn btn-danger btn-sm"
-                                (click)="getReinstateApplication(data.certifiedBuilderNo)">View</button>
+                            <!-- <button class="btn btn-danger btn-sm"
+                                (click)="getReinstateApplication(certifiedBuilderNo)" data-bs-toggle="modal" data-bs-target="#reinstateModal">View</button> -->
                         </div>
+                    </td>
+                     <td>
+                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
+                            [value]="data.certifiedBuilderNo" (change)="onCheckboxChange($event, data.id)">
                     </td>
                 </tr>
 
@@ -128,10 +129,10 @@
 <!--Mass Mail Modal -->
 <div class="modal fade" id="certifiedBuildersModal" tabindex="-1" aria-labelledby="certifiedBuildersModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="certifiedBuildersModalLabel">Certified Builders Form</h5>
+            <div class="modal-header" style="background-color:  #495f8a ">
+                <h5 class="modal-title text-white" id="certifiedBuildersModalLabel">Certified Builders Form</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 
@@ -203,50 +204,14 @@
 </div>
 
 <!-- Reinstate Application Modal -->
-<div class="modal fade" id="reinstateModal" tabindex="-1" aria-labelledby="reinstateModalLabel">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reinstateModalLabel">Reinstate Application Details</h5>
-                <button type="button" class="btn-close" (click)="closeReinstateModal()" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div *ngIf="reinstateData">
-                    <div class="mb-3">
-                        <label class="form-label">Document:</label>
-                        <button class="btn btn-sm btn-outline-primary"
-                            (click)="downloadFile(reinstateData.document_path)">View doc</button>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Reason:</label>
-                        <input type="text" class="form-control" [value]="reinstateData.justification" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Submission Date:</label>
-                        <input type="text" class="form-control" [value]="reinstateData.submission_date" readonly>
-                    </div>
-                </div>
-                <div *ngIf="!reinstateData">
-                    <span class="text-muted">No data available.</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger btn" (click)="reinstate(reinstateData.firm_id)">Reinstate</button>
-
-                <button type="button" class="btn btn-secondary" (click)="closeReinstateModal()"
-                    data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
 
 <!-- Action Modal -->
 <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form #actionForm="ngForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="actionModalLabel">Take Action</h5>
+                <div class="modal-header" style="background-color:  #495f8a ">
+                    <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>
 

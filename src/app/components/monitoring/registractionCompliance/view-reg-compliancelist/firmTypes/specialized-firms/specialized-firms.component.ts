@@ -5,7 +5,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
 declare var bootstrap: any;
-import { AuthServiceService } from 'src/app/auth.service';
+import { AuthServiceService } from '../../../../../../auth.service';
 
 @Component({
     selector: 'app-specialized-firms',
@@ -18,20 +18,13 @@ export class SpecializedFirmsComponent {
     displayedData: any[] = [];
     currentPage: number = 1;
     itemsPerPage: number = 10;
-
     searchQuery: any;
     set_limit: number[] = [10, 15, 25, 100];
     formData: any = {};
     tableData: any = [];
-
     bsModal: any;
-
     selectedIds: number[] = [];
-    private isFetching = false;
-    private autoRefreshInterval: any;
-
     firmType: string = '';
-
     selectedAction: any = {
         actionType: '',
         actionDate: '',
@@ -174,9 +167,9 @@ export class SpecializedFirmsComponent {
         this.service.fetchComplianceDataSpecializedFirms().subscribe(
             (response: any) => {
                 this.tableData = response;
+                console.log('tableData................',this.tableData);
                 this.filteredData = this.tableData;
                 this.updateDisplayedData();
-                console.log('Fetched Data', this.tableData);
             },
             (error) => {
                 console.error('Error fetching compliance data:', error);
@@ -225,9 +218,9 @@ export class SpecializedFirmsComponent {
     // In your component class
     navigate(data: any) {
         // Only proceed if status is "Submitted"
-        if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS'
+        if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS' 
             || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted OS'
-            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ') {
+            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || data.applicationStatus === 'Suspension Resubmission') {
             const workId = data.specializedFirmNo;
             this.prepareAndNavigate(data, workId);
         }

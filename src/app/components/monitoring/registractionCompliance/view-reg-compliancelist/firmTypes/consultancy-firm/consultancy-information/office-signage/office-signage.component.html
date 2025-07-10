@@ -5,7 +5,8 @@
       <div class="col-md-4 mb-3">
         <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
         <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation"
-          name="officeLocation" placeholder="Auto" required #officeLocation="ngModel" readonly />
+          name="officeLocation" placeholder="Auto" required #officeLocation="ngModel"
+          [readonly]="licenseStatus !== 'Suspended'" />
         <div *ngIf="officeLocation.invalid && officeLocation.touched" class="text-danger font-size-12">
           Location is required
         </div>
@@ -17,7 +18,8 @@
       <div class="col-md-6 mb-3">
         <label class="form-label">Office signboard:<span class="text-danger font-size-12">*</span></label>
         <button *ngIf="formData.officeSignboardPath" class="btn btn-sm btn-outline-primary"
-          [disabled]="!isFieldEditable('officeSignboard')" (click)="downloadFile(formData.officeSignboardPath)">
+          [disabled]="licenseStatus !== 'Suspended' && !isFieldEditable('officeSignboard')"
+          (click)="downloadFile(formData.officeSignboardPath)">
           View doc
         </button>
       </div>
@@ -26,8 +28,8 @@
       <div class="col-md-6 mb-3">
         <label class="form-label">Review (Office signboard):<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.signboardReview" name="signboardReview"
-          [disabled]="!isFieldEditable('signboardReview')" required #signboardReview="ngModel"
-          (change)="onReviewChange()">
+          required #signboardReview="ngModel" (change)="onReviewChange()"
+          [disabled]="licenseStatus !== 'Suspended' && !isFieldEditable('signboardReview')">
           <option value="">-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
@@ -37,11 +39,11 @@
         </div>
       </div>
 
-      <!-- If Review is No: Show Resubmit Date and Remarks -->
+      <!-- Resubmit date and remarks if "No" -->
       <div class="col-md-6 mb-3" *ngIf="formData.signboardReview === 'No'">
         <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
         <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.resubmitDate" name="resubmitDate"
-          required #resubmitDate="ngModel" />
+          required #resubmitDate="ngModel" [disabled]="licenseStatus !== 'Suspended'">
         <div *ngIf="resubmitDate?.invalid && resubmitDate?.touched" class="text-danger font-size-12">
           Please provide a date
         </div>
@@ -50,7 +52,7 @@
       <div class="col-md-12 mb-3" *ngIf="formData.signboardReview === 'No'">
         <label class="form-label">Remarks:</label>
         <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.signboardRemarks"
-          name="signboardRemarks" #signboardRemarks="ngModel"></textarea>
+          name="signboardRemarks" #signboardRemarks="ngModel" [readonly]="licenseStatus !== 'Suspended'"></textarea>
       </div>
     </div>
 
@@ -59,7 +61,8 @@
       <div class="col-md-6">
         <label class="form-label">Proper filing system:<span class="text-danger font-size-12">*</span></label>
         <button *ngIf="formData.properFillingPath" class="btn btn-sm btn-outline-primary"
-          [disabled]="!isFieldEditable('filingSystem')" (click)="downloadFile(formData.properFillingPath)">
+          [disabled]="licenseStatus !== 'Suspended' && !isFieldEditable('filingSystem')"
+          (click)="downloadFile(formData.properFillingPath)">
           View doc
         </button>
       </div>
@@ -68,7 +71,7 @@
       <div class="col-md-6 mb-3">
         <label class="form-label">Review:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.filingReview" name="filingReview" required
-          #filingReview="ngModel" [disabled]="!isFieldEditable('filingReview')">
+          #filingReview="ngModel" [disabled]="licenseStatus !== 'Suspended' && !isFieldEditable('filingReview')">
           <option value="">-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
@@ -82,7 +85,7 @@
       <div class="col-md-6 mb-3" *ngIf="formData.filingReview === 'No'">
         <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
         <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.filingResubmitDate"
-          name="filingResubmitDate" required #filingResubmitDate="ngModel">
+          name="filingResubmitDate" required #filingResubmitDate="ngModel" [disabled]="licenseStatus !== 'Suspended'">
         <div *ngIf="filingResubmitDate?.invalid && filingResubmitDate?.touched" class="text-danger font-size-12">
           Please provide a resubmission date
         </div>
@@ -91,21 +94,20 @@
       <div class="col-md-12 mb-3" *ngIf="formData.filingReview === 'No'">
         <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
         <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.filingRemarks"
-          name="filingRemarks" required #filingRemarks="ngModel"></textarea>
+          name="filingRemarks" required #filingRemarks="ngModel" [readonly]="licenseStatus !== 'Suspended'"></textarea>
         <div *ngIf="filingRemarks?.invalid && filingRemarks?.touched" class="text-danger font-size-12">
           Remarks are required
         </div>
       </div>
 
-      <!-- Update button: Show when status is NOT Submitted -->
-      <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
+      <!-- Update or Save & Next -->
+      <!-- <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
         <button type="submit" class="btn btn-primary" (click)="update()" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
           {{ isSaving ? 'Saving...' : 'Update' }}
         </button>
-      </div>
+      </div> -->
 
-      <!-- Save & Next button: Show only when status is Submitted -->
       <div class="col-12 text-end mt-3" *ngIf="applicationStatus === 'Submitted'">
         <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
@@ -113,6 +115,112 @@
         </button>
       </div>
 
+      <div class="row mt-3">
+        <div class="col-md-12 d-flex justify-content-end gap-2">
+
+          <!-- Save and Forward / Save and Next -->
+          <ng-container *ngIf="applicationStatus !== 'Resubmitted HR'">
+            <button *ngIf="formData.hrFulfilled === 'No'" type="button" class="btn btn-success" (click)="saveAndNext()"
+              [disabled]="isSaving">
+              <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
+            </button>
+
+            <button *ngIf="applicationStatus.hrFulfilled === 'Yes'" type="button" class="btn btn-success" (click)="saveAndNext()"
+              [disabled]="isSaving">
+              <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+              {{ isSaving ? 'Saving...' : 'Save and Next' }}
+            </button>
+          </ng-container>
+
+          <!-- Update Button -->
+          <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
+            (click)="update()" [disabled]="isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+            {{ isSaving ? 'Saving...' : 'Update' }}
+          </button>
+          <!-- Action Button -->
+          <button type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop">
+            Action
+          </button>
+          <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+            (nzOnConfirm)="reinstate(bctaNo)">
+            <button class="btn btn-danger h-100">
+              Reinstate
+            </button>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="modal fade" id="staticBackdrop" tabindex="-1" aria-labelledby="actionModalLabel">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form #actionForm="ngForm">
+        <div class="modal-header" style="background-color:  #495f8a ">
+          <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Action Type<span class="text-danger">*</span></label>
+              <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType" required
+                (change)="onActionTypeChange()">
+                <option value="">-- Select --</option>
+                <option value="cancel">Cancel</option>
+                <option value="suspend">Suspend</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Action Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate" name="actionDate"
+                [disabled]="true" required />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Remarks<span class="text-danger">*</span></label>
+            <textarea rows="3" class="form-control" [(ngModel)]="selectedAction.remarks" name="remarks"
+              required></textarea>
+          </div>
+
+          <!-- Downgrade Table -->
+          <div *ngIf="selectedAction.actionType === 'cancel'" class="table-responsive">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Work Category</th>
+                  <th>New Class</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                  <td>{{ downgrade.workCategory }}</td>
+                  <td>
+                    <div *ngFor="let cls of downgrade.classifications">
+                      <label [class.text-muted]="!cls.checked">
+                        <input type="checkbox" [(ngModel)]="cls.checked"
+                          [name]="'checked_' + downgrade.workCategory + '_' + cls.id" />
+                        {{ cls.name }}
+                      </label>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" (click)="closeModal()" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
+        </div>
+      </form>
     </div>
   </div>
 </div>

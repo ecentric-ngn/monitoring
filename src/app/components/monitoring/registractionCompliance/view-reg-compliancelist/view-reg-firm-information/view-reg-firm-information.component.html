@@ -43,17 +43,16 @@
             <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
                     <button class="nav-link border" [class.active]="activeTabId === 'office'" id="office-tab"
-                        (click)="setActiveTab('office')"
-                        [disabled]="applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ' "
-                        type="button" role="tab">
+                        (click)="setActiveTab('office')" [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ')" type="button" role="tab">
                         Office Signage & Documents
                     </button>
+
                 </li>
 
                 <li class="nav-item" role="presentation">
                     <button (click)="specializedFirmForm()" class="nav-link border"
                         [class.active]="activeTabId === 'employee'" id="employee-tab" (click)="setActiveTab('employee')"
-                        [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
                         type="button" role="tab">
                         {{ formData?.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent
                         Employees' }}
@@ -64,7 +63,7 @@
                     <button (click)="equipmentForm()" class="nav-link border"
                         [class.active]="activeTabId === 'equipment'" id="equipment-tab"
                         (click)="setActiveTab('equipment')"
-                        [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
                         type="button" role="tab">
                         Mandatory Equipment
                     </button>
@@ -72,10 +71,10 @@
 
                 <li class="nav-item" role="presentation">
                     <button (click)="monitoringTeam()" class="nav-link border"
-                        [class.active]="activeTabId === 'monitoring'" class="nav-link border"
                         [class.active]="activeTabId === 'monitoring'" id="monitoring-tab"
-                        [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
-                        (click)="setActiveTab('monitoring')" type="button" role="tab">
+                        (click)="setActiveTab('monitoring')"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
+                        type="button" role="tab">
                         Monitoring Team Users
                     </button>
                 </li>
@@ -86,7 +85,7 @@
 
 </div>
 
-<div class="tab-content">
+<!-- <div class="tab-content">
     <div class="tab-pane fade" [class.show]="activeTabId === 'office'" [class.active]="activeTabId === 'office'"
         id="office" role="tabpanel" aria-labelledby="office-tab" *ngIf="formData?.firmType !== 'specializedFirm'">
         <p><app-office-signage-and-doc (activateTab)="onActivateTab($event)"></app-office-signage-and-doc></p>
@@ -106,4 +105,40 @@
         id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
         <p><app-monitoring-team-users [id]="id"></app-monitoring-team-users></p>
     </div>
+</div> -->
+
+<!-- Office Tab -->
+<div class="tab-pane fade"
+     *ngIf="activeTabId === 'office'"
+     [class.show]="true"
+     [class.active]="true"
+     id="office" role="tabpanel" aria-labelledby="office-tab">
+  <p><app-office-signage-and-doc (activateTab)="onActivateTab($event)"></app-office-signage-and-doc></p>
+</div>
+
+<!-- Employee Tab -->
+<div class="tab-pane fade"
+     *ngIf="activeTabId === 'employee'"
+     [class.show]="true"
+     [class.active]="true"
+     id="employee" role="tabpanel" aria-labelledby="employee-tab">
+  <p><app-permanent-employee (activateTab)="onActivateTab($event)" [id]="id"></app-permanent-employee></p>
+</div>
+
+<!-- Equipment Tab -->
+<div class="tab-pane fade"
+     *ngIf="activeTabId === 'equipment'"
+     [class.show]="true"
+     [class.active]="true"
+     id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
+  <p><app-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-mandatory-equipment></p>
+</div>
+
+<!-- Monitoring Tab -->
+<div class="tab-pane fade"
+     *ngIf="activeTabId === 'monitoring'"
+     [class.show]="true"
+     [class.active]="true"
+     id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
+  <p><app-monitoring-team-users [id]="id"></app-monitoring-team-users></p>
 </div>

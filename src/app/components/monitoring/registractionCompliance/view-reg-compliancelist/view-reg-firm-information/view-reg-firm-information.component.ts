@@ -12,47 +12,52 @@ export class ViewRegFirmInformationComponent implements OnInit {
   bctaNo: any;
   applicationStatus: string = '';
   activeTabId: string = '';
-
+WorkDetail: any = {};
+licenseStatus: string = '';
   constructor(private service: CommonService) { }
 
-  ngOnInit(): void {
+ngOnInit(): void {
+  const WorkDetail = this.service.getData('BctaNo');
+  if (!WorkDetail || !WorkDetail.data) {
+    console.error('WorkDetail or WorkDetail.data is undefined');
+    return;
+  }
 
-    const status = this.applicationStatus;
-    this.applicationStatus = status;
+  this.WorkDetail = WorkDetail.data;
+  this.licenseStatus = WorkDetail.data.licenseStatus;
+  this.applicationStatus = WorkDetail.data.applicationStatus;
 
-    if (status === 'Resubmitted OS') {
-      this.activeTabId = 'office';
-    } else if (status === 'Resubmitted PFS') {
+  console.log("WorkDetail in view:", WorkDetail);
+  console.log("application Status:", this.applicationStatus);
+  console.log("licenseStatus:", this.licenseStatus);
+
+  // Set activeTabId depending on applicationStatus
+  const status = this.applicationStatus;
+  if (this.licenseStatus === 'Suspended') {
+    // Show all tabs enabled, so no change to activeTabId needed here
+    this.activeTabId = this.activeTabId || 'office';  // default to office if undefined
+  } else {
+    // Existing logic when not suspended
+    if (status === 'Resubmitted OS' || status === 'Resubmitted PFS' || status === 'Resubmitted OS and PFS') {
       this.activeTabId = 'office';
     } else if (status === 'Resubmitted HR') {
       this.activeTabId = 'employee';
     } else if (status === 'Resubmitted EQ') {
       this.activeTabId = 'equipment';
-    } else if (status === 'Resubmitted OS and PFS') {
-      this.activeTabId = 'office';
     }
-
-    const WorkDetail = this.service.getData('BctaNo');
-
-    if (!WorkDetail || !WorkDetail.data) {
-      console.error('WorkDetail or WorkDetail.data is undefined');
-      return;
-    }
-    this.applicationStatus = WorkDetail.data.applicationStatus;
-    console.log("application Status:", this.applicationStatus);
-
-    this.formData.firmType = WorkDetail.data;
-    this.bctaNo = WorkDetail.data.contractorNo;
-
-    console.log('WorkDetail', WorkDetail);
-    console.log('bctaNo', this.bctaNo);
-
-    if (this.bctaNo) {
-      this.fetchDataBasedOnBctaNo();
-    }
-
-    this.service.setBctaNo(this.bctaNo);
   }
+
+  this.formData.firmType = WorkDetail.data;
+  this.bctaNo = WorkDetail.data.contractorNo;
+
+  console.log('bctaNo', this.bctaNo);
+
+  if (this.bctaNo) {
+    this.fetchDataBasedOnBctaNo();
+  }
+
+  this.service.setBctaNo(this.bctaNo);
+}
 
 
   fetchDataBasedOnBctaNo() {

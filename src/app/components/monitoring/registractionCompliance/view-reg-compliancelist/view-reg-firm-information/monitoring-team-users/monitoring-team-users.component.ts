@@ -2,7 +2,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { CommonService } from '../../../../../../service/common.service';
 import Swal from 'sweetalert2';
 import { Router } from '@angular/router';
-import { AuthServiceService } from 'src/app/auth.service';
+import { AuthServiceService } from '../../../../../../auth.service';
 
 @Component({
   selector: 'app-monitoring-team-users',

@@ -37,6 +37,11 @@ export class ViewSubmittedReportListComponent {
     ngOnInit() {
         this.getDzongkhagList();
         this.getPocuringAgency();
+         const data = this.service.getData('appData');
+         this.preDzoId = data?.data?.dzongkhagId ?? null;
+         if(this.preDzoId) {
+            this.onDzongkhagChange(this.preDzoId);
+         }
         const userDetailsString = sessionStorage.getItem('userDetails');
         if (userDetailsString) {
             const userDetails = JSON.parse(userDetailsString);
@@ -220,7 +225,11 @@ onDzongkhagChange(id: number) {
         this.FetchWorkBaseOnDzoId();
     }
  viewName = 'submittedApp_view';
+ preDzoId: any={} ;
 FetchWorkBaseOnDzoId(searchQuery?: string) {
+    
+//  const data = this.service.getData('appData');
+// this.preDzoId = data?.dzongkhagId ?? null;
   const payload: any = [];
   if (searchQuery) {
     payload.push({
@@ -233,12 +242,13 @@ FetchWorkBaseOnDzoId(searchQuery?: string) {
     payload.push(
   {
     field: "dzongkhagId",
-    value: this.dzongkhagId,
+    value: this.dzongkhagId || this.preDzoId,
     condition: "=",
     operator: "AND"
   },
 )
   }
+  
   this.service.fetchDetails(payload, this.pageNo, this.pageSize, this.viewName).subscribe(
     (response: any) => {
       this.tenderList = response.data;

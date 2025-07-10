@@ -4,41 +4,14 @@
   </div>
 
   <!-- Tabs -->
-  <div class="row mb-4">
-    <div class="col">
-      <button class="btn btn-outline-primary mr-2" (click)="activeTab = 'suspend'" (click)="getReportList()"
-        [class.active]="activeTab === 'suspend'">
-        Suspend
-      </button>
-      <button class="btn btn-outline-primary mr-2" (click)="activeTab = 'cancel'" (click)="getCancelList()"
-        [class.active]="activeTab === 'cancel'">
-        Cancel
-      </button>
-      <button class="btn btn-outline-primary" (click)="activeTab = 'downgrade'" (click)="getDownGradeList()"
-        [class.active]="activeTab === 'downgrade'">
-        Downgrade
-      </button>
-      <!-- <div class="dropdown">
-  <button class="btn btn-secondary dropdown-toggle" 
-          type="button" 
-          data-toggle="dropdown"
-          aria-haspopup="true" 
-          aria-expanded="false">
-      {{selectedFilter || 'Filter by Type'}}
-  </button>
-  <div class="dropdown-menu">
-    <a class="dropdown-item" (click)="filterByType('contractor')">Contractor</a>
-    <a class="dropdown-item" (click)="filterByType('consultancy')">Consultancy</a>
-    <a class="dropdown-item" (click)="filterByType('specialized-firm')">Specialized Firm</a>
-    <a class="dropdown-item" (click)="filterByType('certified-builder')">Certified Builder</a>
-    <div class="dropdown-divider"></div>
-    <a class="dropdown-item" (click)="filterByType('')">Show All</a>
+   <span class="text-warning ml-3">Note:<i>Filter base on license status</i></span>
+  <div class="col-md-4">
+    <select class="form-select" (change)="onTabChange($event)" [value]="activeTab">
+      <option value="suspend">Suspend</option>
+      <option value="cancel">Cancel</option>
+      <option value="downgrade">Downgrade</option>
+    </select>
   </div>
-</div> -->
-    </div>
-  </div>
-
-
   <!-- Suspend Tab -->
   <div *ngIf="activeTab === 'suspend'">
     <!-- Suspend Table -->
@@ -58,9 +31,9 @@
         <tbody>
           <tr *ngFor="let action of tableData">
             <td>
-            
-                {{ action.contractorNo || '-' }}
-          
+
+              {{ action.contractorNo || '-' }}
+
             </td>
             <td>{{ action.type }}</td>
             <td>{{ action.details }}</td>
@@ -81,28 +54,26 @@
         </tbody>
       </table>
     </div>
-
     <!-- Loading Spinner -->
     <div *ngIf="isLoading" class="text-center py-3">
       <i class="fa fa-spinner fa-spin"></i> Loading...
     </div>
-
     <!-- Remarks Section -->
-    <div class="m-3">
+    <!-- <div class="m-3">
       <div class="col-md-12 mb-3">
         <label class="form-label me-2 font-size-12">Remarks:</label>
         <input type="text" class="form-control" placeholder="Remarks" name="remarks" [(ngModel)]="formData.remarks"
           style="height: 50px; width: 300px;">
       </div>
-    </div>
+    </div> -->
 
-    <div class="d-flex justify-content-end m-3">
-      <button type="button" class="btn btn-danger" (click)="endorse()" [disabled]="selectedIds.length === 0">
-        Suspend
-      </button>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
+    (click)="activeAction='suspend'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Endorse Suspend App
+  </button>
     </div>
   </div>
-
   <!-- Cancel Tab -->
   <div *ngIf="activeTab === 'cancel'">
     <!-- Cancel Table -->
@@ -152,10 +123,11 @@
     </div>
 
     <!-- Cancel Button -->
-    <div class="d-flex justify-content-end m-3">
-      <button class="btn btn-danger" (click)="cancel()" [disabled]="selectedIds.length === 0">
-        Cancel
-      </button>
+    <div class="d-flex justify-content-end">
+       <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
+    (click)="activeAction='cancel'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Endorse Cancellation AppNo
+  </button>
     </div>
   </div>
 
@@ -180,9 +152,9 @@
           <tbody>
             <tr *ngFor="let item of filteredApplications">
               <td class="align-middle" style="border-right: 1px solid #dee2e6;">
-              
-                  {{ item.contractorNo|| '-' }}
-              
+
+                {{ item.contractorNo|| '-' }}
+
               </td>
               <!-- <td class="align-middle text-truncate" style="border-right: 1px solid #dee2e6;">{{ item.contractorNo }} </td> -->
               <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.type }}</td>
@@ -216,10 +188,33 @@
       </div>
 
       <!-- Downgrade Button -->
-      <div class="d-flex justify-content-end m-3">
-        <button class="btn btn-danger" (click)="DownGrade()" [disabled]="selectedIds.length === 0">
-          Downgrade
-        </button>
+      <div class="d-flex justify-content-end">
+        <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
+    (click)="activeAction='downgrade'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Endorse Downgrade AppNo
+  </button>
       </div>
     </div>
   </div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header" style="background-color: #495f8a">
+        <h5 class="modal-title text-white" id="exampleModalLabel">{{ modalTitle }}</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <label class="form-label font-size-12">Remarks:<span class="text-danger">*</span></label>
+          <textarea class="form-control" placeholder="Remarks" name="remarks" [(ngModel)]="formData.remarks" rows="4">
+          </textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" #closeRemarkButton class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitAction()">Save</button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonService } from 'src/app/service/common.service';
+import { CommonService } from '../../../../../../../service/common.service';
 
 @Component({
   selector: 'app-certified-builders-info',
@@ -11,12 +11,13 @@ formData: any = {};
   bctaNo: any;
   applicationStatus: string = '';
   activeTabId: string = '';
+  licenseStatus: any;
   constructor(@Inject(CommonService) private service: CommonService) { }
 
   ngOnInit(): void {
 
     const status = this.applicationStatus;
-
+     
     if (status === 'Resubmitted OS') {
       this.activeTabId = 'office';
     } else if (status === 'Resubmitted PFS') {
@@ -30,6 +31,7 @@ formData: any = {};
     }
 
     const WorkDetail = this.service.getData('BctaNo');
+    this.licenseStatus = WorkDetail.data.licenseStatus;
 
     if (!WorkDetail || !WorkDetail.data) {
       console.error('WorkDetail or WorkDetail.data is undefined');

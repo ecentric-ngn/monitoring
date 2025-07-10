@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonService } from '../../../../service/common.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -61,7 +61,9 @@ activeTab = 'suspend';
     currentFilter: string = '';
     filteredTableData: any[] = [];
     originalTableData: any[] = []; // Initialize with your table data
- 
+  userId: any;
+  userName: any;
+ @ViewChild('closeRemarkButton') closeRemarkButton: any
 
   constructor(
     private service: CommonService,
@@ -71,8 +73,32 @@ activeTab = 'suspend';
 
   ngOnInit(): void {
     this.getReportList();
+    const userDetailsString = sessionStorage.getItem('userDetails');
+    if (userDetailsString) {
+        try {
+        const userDetails = JSON.parse(userDetailsString);
+        this.userId = userDetails.userId;
+        this.userName = userDetails.username;
+        } catch (e) {
+        console.error('Error parsing userDetails from sessionStorage', e);
+        }
+    }
   }
 
+onTabChange(event: any) {
+    this.activeTab = event.target.value;
+    switch (this.activeTab) {
+        case 'suspend':
+            this.getReportList();
+            break;
+        case 'cancel':
+            this.getCancelList();
+            break;
+        case 'downgrade':
+            this.getDownGradeList();
+            break;
+    }
+}
 
   
   getReportList(searchQuery?: string) {
@@ -237,6 +263,7 @@ endorse(): void {
           this.selectedIds = [];
           this.selectedContractorNumbers = [];
           this.isLoading = false;
+       this.closeRemarkButton.nativeElement.click();
 
           Swal.fire({
             icon: 'success',
@@ -451,6 +478,7 @@ DownGrade(): void {
       this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
        this.getDownGradeList();
       this.selectedIds = [];
+       this.closeRemarkButton.nativeElement.click();
       Swal.fire('Success', 'Operation completed', 'success');
     },
     error: (error) => {
@@ -503,31 +531,53 @@ getCancelList(searchQuery?: string) {
     }
   );
 }
+activeAction: 'cancel' | 'downgrade' | 'suspend' | null = null;
+get modalTitle(): string {
+  switch (this.activeAction) {
+    case 'cancel': return 'Cancellation Remarks';
+    case 'downgrade': return 'Downgrade Remarks';
+    case 'suspend': return 'Suspend Remarks';
+    default: return '';
+  }
+}
+submitAction() {
+  if (!this.formData.remarks?.trim()) {
+    alert('Remarks are required!');
+    return;
+  }
 
-cancel(): void {
+  switch (this.activeAction) {
+    case 'cancel':
+      this.cancelAppNo();
+      break;
+    case 'downgrade':
+      this.DownGrade();
+      break;
+    case 'suspend':
+      this.endorse();
+      break;
+  }
+}
+
+cancelAppNo(): void {
   if (this.selectedIds.length === 0) return;
-
   // Validate IDs
   const nonNumericIds = this.selectedIds.filter(id => isNaN(Number(id)));
   if (nonNumericIds.length > 0) {
     Swal.fire('Error', `Invalid IDs: ${nonNumericIds.join(', ')}`, 'error');
     return;
   }
-
   this.isLoading = true;
-
   // First payload for cancellation (Monitoring System)
   const cancelPayload = {
     cancellationIds: this.selectedIds,
-    reviewedBy: "dechen dorji"
+    reviewedBy: this.userId 
   };
-
   // Second payload for the other system (adjust according to your needs)
   const otherSystemPayload = {
     cdbNos: this.selectedContractorNumbers.map(item => item.toString()),
     firmType: this.firmTypesssss
   };
-
   // First API call - Cancel in Monitoring System
   this.service.CancelApplications(cancelPayload).subscribe({
     next: (cancelResponse: string) => {
@@ -540,6 +590,7 @@ cancel(): void {
           this.selectedIds = [];
           this.selectedContractorNumbers = [];
           this.isLoading = false;
+          this.closeRemarkButton.nativeElement.click();
 
           Swal.fire({
             icon: 'success',

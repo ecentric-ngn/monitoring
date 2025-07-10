@@ -5,7 +5,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
 declare var bootstrap: any;
-import { AuthServiceService } from 'src/app/auth.service';
+import { AuthServiceService } from '../../../../../../auth.service';
 
 @Component({
     selector: 'app-certified-builders',
@@ -223,7 +223,7 @@ export class CertifiedBuildersComponent {
     navigate(data: any) {
         if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS'
             || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted OS'
-            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ') {
+            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || data.applicationStatus === 'Suspension Resubmission') {
             const workId = data.certifiedBuilderNo;
             this.prepareAndNavigate(data, workId);
         }

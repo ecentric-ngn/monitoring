@@ -35,7 +35,7 @@
 
                         <td>{{data.designationName }}</td>
                         <td class="text-center bg-white">
-                            <button type="button" class="btn btn-outline-info btn-sm" (click)="fetchTdsHcPension()">
+                            <button type="button" class="btn btn-outline-info btn-sm">
                                 Fetch TDS/HC/Pension
                             </button>
                         </td>
@@ -47,8 +47,7 @@
             <div class="col-md-4">
                 <label class="form-label">Does the firm fulfill the required Human Resources?<span
                         class="text-danger">*</span></label>
-                <select class="form-select form-control-sm" [(ngModel)]="tData.hrFulfilled" name="hrFulfilled"
-                    required>
+                <select class="form-select form-control-sm" [(ngModel)]="tData.hrFulfilled" name="hrFulfilled" required>
                     <option value="">-- Select --</option>
                     <option value="Yes">Yes</option>
                     <option value="No">No</option>
@@ -81,26 +80,109 @@
             </ng-container>
 
             <!-- Buttons -->
-            <div class="col-md-12 d-flex justify-content-end gap-2 mt-3" *ngIf="applicationStatus !== 'Resubmitted HR'" >
-                <button *ngIf="tData.hrFulfilled === 'No'" type="button" class="btn btn-success"
-                    (click)="saveAndNext()" [disabled]="isSaving">
+            <div class="col-md-12 d-flex justify-content-end gap-2 mt-3 flex-wrap">
+                <!-- Save and Forward / Save and Next -->
+                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'No'" type="button"
+                    class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                        {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
+                    {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
                 </button>
-                <button *ngIf="tData.hrFulfilled === 'Yes'" type="button" class="btn btn-success"
-                    (click)="saveAndNext()" [disabled]="isSaving">
-                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                        {{ isSaving ? 'Saving...' : 'Save and Next' }}
-                </button>
-            </div>
 
-             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
+                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'Yes'" type="button"
+                    class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
+                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ isSaving ? 'Saving...' : 'Save and Next' }}
+                </button>
+
+                <!-- Update Button for Resubmitted HR -->
                 <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
                     (click)="update()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Update' }}
                 </button>
+
+                <!-- Action Button -->
+                <button class="btn btn-primary" (click)="openActionModal(tData)">
+                    Action
+                </button>
+
+                <!-- Reinstate Button -->
+                <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+                    (nzOnConfirm)="reinstate(bctaNo)">
+                    <button class="btn btn-danger h-100" *ngIf="licenseStatus === 'Suspended'">
+                        Reinstate
+                    </button>
+                </a>
             </div>
         </div>
     </form>
+</div>
+
+
+<!-- Action Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form #actionForm="ngForm">
+                <div class="modal-header" style="background-color:  #495f8a ">
+                    <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
+                    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">Action Type<span class="text-danger">*</span></label>
+                            <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType"
+                                required (change)="onActionTypeChange()">
+                                <option value="">-- Select --</option>
+                                <option value="cancel">Cancel</option>
+                                <option value="downgrade">Downgrade</option>
+                                <option value="suspend">Suspend</option>
+                            </select>
+                        </div>
+                         <div class="col-md-6 mb-3">
+                            <label class="form-label">Action Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
+                                name="actionDate" [disabled]="true" required />
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Remarks<span class="text-danger">*</span></label>
+                        <textarea rows="3" class="form-control" [(ngModel)]="selectedAction.remarks" name="remarks"
+                            required></textarea>
+                    </div>
+
+                    <!-- Downgrade Table -->
+                    <div *ngIf="selectedAction.actionType === 'downgrade'" class="table-responsive">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th>Work Category</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                                    <td>
+                                        <label [class.text-muted]="!downgrade.checked">
+                                            <input type="checkbox" [(ngModel)]="downgrade.checked"
+                                                [name]="'checked_' + downgrade.workCategoryId"
+                                                [disabled]="!downgrade.checked" />
+                                            {{ downgrade.workCategory }}
+                                        </label>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-danger" (click)="closeModal()"
+                        data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
+                </div>
+            </form>
+        </div>
+    </div>
 </div>
