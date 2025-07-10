@@ -28,9 +28,9 @@
                         <td>{{data.joiningDate }}</td>
                         <td>{{data.tradeName }}</td>
                         <td class="text-center bg-white">
-                            <a *ngIf="data.paySlipFilePath" (click)="downloadFile(data.paySlipFilePath)"
-                                class="btn btn-primary" style="cursor: pointer;">
-                                <i class="pi pi-download text-blue-600"></i>
+                            <a *ngIf="data.paySlipFilePath" (click)="downloadFile(data.paySlipFilePath)" class="btn"
+                                style="cursor: pointer;">
+                                <i class="pi pi-download"></i>
                             </a>
                         </td>
                         <td>{{data.designationName }}</td>
@@ -81,53 +81,42 @@
             </ng-container>
 
             <!-- Buttons -->
-            <div class="col-md-12 d-flex justify-content-end gap-2 mt-3" *ngIf="applicationStatus !== 'Resubmitted HR'">
-                <button *ngIf="tData.hrFulfilled === 'No'" type="button" class="btn btn-success"
-                    (click)="saveAndForward()" [disabled]="isSaving">
+            <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 flex-wrap mt-3">
+                <!-- Save and Forward -->
+                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'No'" type="button"
+                    class="btn btn-success" (click)="saveAndForward()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
                 </button>
-                <button *ngIf="tData.hrFulfilled === 'Yes'" type="button" class="btn btn-success"
-                    (click)="saveAndNext()" [disabled]="isSaving">
+
+                <!-- Save and Next -->
+                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'Yes'" type="button"
+                    class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Save and Next' }}
                 </button>
-            </div>
 
-            <!-- <div class="col-md-12 d-flex justify-content-end gap-2 mt-3">
-                <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
-                    (click)="update()" [disabled]="isSaving">
-                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                    {{ isSaving ? 'Saving...' : 'Update' }}
-                </button>
-            </div>
-             -->
-            <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap mt-3">
+                <!-- Update -->
                 <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
                     (click)="update()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Update' }}
                 </button>
 
-                <button type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
+                <!-- Action -->
+                <button *ngIf="licenseStatus === 'Active'" type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
                     data-bs-target="#staticBackdrop">
                     Action
                 </button>
-            </div>
 
-        </div>
-        <!-- <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
-            <button type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-            Action
+                 <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="licenseStatus === 'Suspended'">
+            <button class="btn btn-danger h-100">
+              Reinstate
             </button>
-                <div *ngIf="data.licenseStatus === 'Suspended'">
-                <button class="btn btn-danger btn-sm"
-                    (click)="getReinstateApplication(data.contractorNo)"
-                    data-bs-toggle="modal" data-bs-target="#reinstateModal">
-                    View
-                </button>
-                </div>
-        </div> -->
+          </a>
+            </div>
+        </div>
     </form>
 
 </div>
@@ -138,8 +127,8 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form #actionForm="ngForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="staticBackdropLabel">Take Action</h5>
+               <div class="modal-header" style="background-color: #495f8a">
+                    <h5 class="modal-title text-white" id="staticBackdropLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>
 
@@ -157,9 +146,9 @@
                         </div>
 
                         <div class="col-md-6 mb-3">
-                        <label class="form-label">Action Date <span class="text-danger">*</span></label>
-                        <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate" name="actionDate"
-                            [disabled]="true" required />
+                            <label class="form-label">Action Date <span class="text-danger">*</span></label>
+                            <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
+                                name="actionDate" [disabled]="true" required />
                         </div>
                     </div>
 

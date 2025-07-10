@@ -6,13 +6,14 @@
       <thead>
         <tr>
           <th>Is Equipment Registered</th>
-          <th>Vehicle Type*</th>
-          <th>Registration No*</th>
+          <th>Vehicle Type</th>
+          <th>Registration No</th>
           <th>Owner Name</th>
           <th>Owner CID</th>
           <!-- <th>Remarks</th> -->
-          <th>Equipment Type*</th>
+          <th>Equipment Type</th>
           <th>Remarks</th>
+          <th>Document</th>
           <th>Action</th>
         </tr>
       </thead>
@@ -27,6 +28,11 @@
             <td>{{ data.cid}}</td>
             <td> 'N/A' </td>
             <td>{{ data.chassisNumber }}</td>
+            <td class="text-center bg-white">
+              <a *ngIf="data.filePath" (click)="downloadFile(data.filePath)" class="btn" style="cursor: pointer;">
+                <i class="pi pi-download"></i>
+              </a>
+            </td>
             <td>
               <button class="btn btn-info btn-sm">Verify</button>
             </td>
@@ -91,30 +97,43 @@
       </div>
 
       <!-- Buttons -->
-      <div class="d-flex justify-content-end mt-4" *ngIf="applicationStatus !== 'Resubmitted EQ'">
-        <button type="submit" class="btn btn-success me-2" (click)="notifyContractor()"
-          *ngIf="tData.fulfillsRequirement === 'No'" [disabled]="isSaving">
+      <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap mt-4">
+        <!-- Save & Forward -->
+        <button type="submit" class="btn btn-success" (click)="notifyContractor()"
+          *ngIf="applicationStatus !== 'Resubmitted EQ' && tData.fulfillsRequirement === 'No'" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Forward
         </button>
-        <button (click)="saveAndNext()" type="submit" class="btn btn-primary"
-          *ngIf="tData.fulfillsRequirement === 'Yes'" [disabled]="isSaving">
+
+        <!-- Save & Next -->
+        <button type="submit" class="btn btn-success" (click)="saveAndNext()"
+          *ngIf="applicationStatus !== 'Resubmitted EQ' && tData.fulfillsRequirement === 'Yes'" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Next
         </button>
-      </div>
 
-      <div class="d-flex justify-content-end mt-4">
-        <button type="submit" class="btn btn-success me-2" (click)="update()"
-          *ngIf="applicationStatus === 'Resubmitted EQ'" [disabled]="isSaving">
+        <!-- Update -->
+        <button type="submit" class="btn btn-success" (click)="update()" *ngIf="applicationStatus === 'Resubmitted EQ'"
+          [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Update
         </button>
+
+        <!-- Action -->
         <button type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
           data-bs-target="#staticBackdrops">
           Action
         </button>
+
+        <!-- Reinstate -->
+        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="licenseStatus === 'Suspended'">
+            <button class="btn btn-danger h-100">
+              Reinstate
+            </button>
+          </a>
       </div>
+
     </form>
   </div>
 </div>
@@ -123,8 +142,8 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <form #actionForm="ngForm">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Take Action</h5>
+       <div class="modal-header" style="background-color: #495f8a">
+          <h5 class="modal-title text-white" id="staticBackdropLabel">Take Action</h5>
           <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
         </div>
 
@@ -228,6 +247,42 @@
           <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="reinstateModal" tabindex="-1" aria-labelledby="reinstateModalLabel">
+  <div class="modal-dialog modal-md modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="reinstateModalLabel">Reinstate Application Details</h5>
+        <button type="button" class="btn-close" (click)="closeReinstateModal()" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div *ngIf="reinstateData">
+          <div class="mb-3">
+            <label class="form-label">Document:</label>
+            <button class="btn btn-sm btn-outline-primary" (click)="downloadFile(reinstateData.document_path)">View
+              doc</button>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Reason:</label>
+            <input type="text" class="form-control" [value]="reinstateData.justification" readonly>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Submission Date:</label>
+            <input type="text" class="form-control" [value]="reinstateData.submission_date" readonly>
+          </div>
+        </div>
+        <div *ngIf="!reinstateData">
+          <span class="text-muted">No data available.</span>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeReinstateModal()"
+          data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-danger btn" (click)="reinstate(reinstateData.firm_id)">Reinstate</button>
+      </div>
     </div>
   </div>
 </div>

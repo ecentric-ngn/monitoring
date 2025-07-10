@@ -45,7 +45,7 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
-                    <th>Select</th>
+
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
@@ -53,16 +53,14 @@
                     <th>License Status</th>
                     <th>Verified By</th>
                     <th>Action</th>
+                    <th>Select</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let data of displayedData" class="table-row">
-                    <td>
-                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
-                            [value]="data.specializedFirmNo" (change)="onCheckboxChange($event, data.id)">
-                    </td>
+
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'"
+                        [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Suspension Resubmission'"
                         (click)="navigate(data)">
                         {{ data.specializedFirmNo }}
                     </td>
@@ -73,7 +71,7 @@
                             'badge-secondary': data.applicationStatus== 'Not Submitted',
                             'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus === 'Pending',
                             'badge-success': data.applicationStatus== 'Verified',
-                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'
+                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'|| data.applicationStatus === 'Suspension Resubmission'
                             }">
                             {{ data.applicationStatus }}
                         </span>
@@ -88,10 +86,15 @@
                     <td>
                         <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                         <div *ngIf="data.licenseStatus === 'Suspended'">
-                            <button class="btn btn-danger btn-sm"
-                                (click)="getReinstateApplication(data.specializedFirmNo)">View</button>
+                            <!-- <button class="btn btn-danger btn-sm"
+                                (click)="getReinstateApplication(data.specializedFirmNo)">View</button> -->
                         </div>
                     </td>
+                    <td>
+                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
+                            [value]="data.specializedFirmNo" (change)="onCheckboxChange($event, data.id)">
+                    </td>
+
                 </tr>
                 <tr *ngIf="filteredData.length === 0">
                     <td colspan="10" class="text-center text-muted">No results found for your search.</td>
@@ -123,10 +126,10 @@
 <!--Mass Mail Modal -->
 <div class="modal fade" id="specializedFirmsModal" tabindex="-1" aria-labelledby="specializedFirmsModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="specializedFirmsModalLabel">Specialized Firms Form</h5>
+            <div class="modal-header" style="background-color:  #495f8a ">
+                <h5 class="modal-title text-white" id="specializedFirmsModalLabel">Specialized Firms Form</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
 

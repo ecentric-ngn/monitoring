@@ -4,6 +4,7 @@ import { AuthServiceService } from '../../../../../../auth.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 declare var bootstrap: any;
 @Component({
   selector: 'app-office-signage-and-doc',
@@ -12,19 +13,13 @@ declare var bootstrap: any;
 })
 export class OfficeSignageAndDocComponent implements OnInit {
   @Output() activateTab = new EventEmitter<{ id: string, tab: string }>();
-
-
   formData: any;
   bctaNo: any;
   data: any;
   id: any;
   applicationStatus: string = '';
   isSaving = false;
-
-  // showActionModal = false;
-  // selectedAction: any = {};
-  // downgradeList: any[] = [];
-  // today: string = new Date().toISOString().substring(0, 10);
+  showErrorMessage: any;
 
   constructor(private service: CommonService, private router: Router, private authService: AuthServiceService) { }
 
@@ -67,7 +62,12 @@ export class OfficeSignageAndDocComponent implements OnInit {
     };
         bsModal: any;
      today: string = new Date().toISOString().substring(0, 10);
+    /**
+     * Opens the action modal to select an action type and set the action date
+     * @param row The row data of the item to be processed
+     */
     openActionModal(row: any) {
+        // Reset the selected action fields
         this.selectedAction = {
             actionType: '',
             actionDate: this.today,
@@ -77,6 +77,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
         };
         console.log('Row passed to modal:', row);
 
+        // Get the modal element and show it
         const modalEl = document.getElementById('actionModal');
         this.bsModal = new bootstrap.Modal(modalEl, {
             backdrop: 'static', 
@@ -91,43 +92,57 @@ export class OfficeSignageAndDocComponent implements OnInit {
     }
    downgradeList: any[] = [];
     workClassificationList: any[] = [];
+      /**
+       * Called when the action type changes
+       * If the action type is 'downgrade', fetches the work categories and existing classifications
+       * for the selected contractor/consultant and populates the downgrade list
+       */
       onActionTypeChange() {
-            if (this.selectedAction.actionType === 'downgrade') {
-                const firmId = this.WorkDetail.data.contractorId;
-                const firmType = 'contractor';
-                console.log("firmId:", firmId);
-                if (!firmId) {
-                    console.error('firmId is undefined. Check if the selected row has contractorId or consultantNo.');
-                    return;
-                }
-                forkJoin({
-                    categoryData: this.service.getWorkCategory('contractor'),
-                    existingClassData: this.service.getClassification(firmType, firmId)
-                }).subscribe({
-                    next: ({ categoryData, existingClassData }) => {
-                        const workCategories = categoryData.workCategory;
-                        this.workClassificationList = categoryData.workClassification;
-                        const classificationMap = existingClassData.reduce((acc: any, item: any) => {
-                            acc[item.workCategory] = item.existingWorkClassification;
-                            return acc;
-                        }, {});
-                        this.downgradeList = workCategories.map((category: any) => ({
-                            workCategory: category.workCategory,
-                            workCategoryId: category.id,
-                            existingClass: classificationMap[category.workCategory] || 'Unknown',
-                            newClass: ''
-                        }));
-                    },
-                    error: (err) => {
-                        console.error('Error fetching downgrade data:', err);
-                    }
-                });
-            } else {
-                this.downgradeList = [];
-            }
-        }
+          if (this.selectedAction.actionType === 'downgrade') {
+              const firmId = this.WorkDetail.data.contractorId;
+              const firmType = 'contractor';
+              console.log("firmId:", firmId);
+              if (!firmId) {
+                  console.error('firmId is undefined. Check if the selected row has contractorId or consultantNo.');
+                  return;
+              }
+              forkJoin({
+                  // Get the work categories for the selected contractor/consultant type
+                  categoryData: this.service.getWorkCategory(firmType),
+                  // Get the existing classifications for the selected contractor/consultant
+                  existingClassData: this.service.getClassification(firmType, firmId)
+              }).subscribe({
+                  next: ({ categoryData, existingClassData }) => {
+                      const workCategories = categoryData.workCategory;
+                      this.workClassificationList = categoryData.workClassification;
+                      // Build a map: workCategory -> existing classification
+                      const classificationMap = existingClassData.reduce((acc: any, item: any) => {
+                          acc[item.workCategory] = item.existingWorkClassification;
+                          return acc;
+                      }, {});
+                      // Populate the downgrade list with the work categories and existing/new classifications
+                      this.downgradeList = workCategories.map((category: any) => ({
+                          workCategory: category.workCategory,
+                          workCategoryId: category.id,
+                          existingClass: classificationMap[category.workCategory] || 'Unknown',
+                          newClass: ''
+                      }));
+                  },
+                  error: (err) => {
+                      console.error('Error fetching downgrade data:', err);
+                  }
+              });
+          } else {
+              // Reset the downgrade list if the action type is not 'downgrade'
+              this.downgradeList = [];
+          }
+      }
 
         
+            /**
+             * Submit action for downgrade, suspend or cancel
+             * Validates the input, constructs the payload and calls the respective API
+             */
             submitAction() {
                 if (!this.selectedAction.actionType || !this.selectedAction.actionDate || !this.selectedAction.remarks) {
                     alert("All required fields must be filled.");
@@ -160,6 +175,11 @@ export class OfficeSignageAndDocComponent implements OnInit {
                         requestedBy: this.authService.getUsername()
                     };
         
+                    /**
+                     * Call downgrade API
+                     * Success: Forwarded to Review Committee
+                     * Error: Something went wrong while forwarding.
+                     */
                     this.service.downgradeFirm(payload).subscribe({
                         next: (res: string) => {
                             if (res && res.toLowerCase().includes('downgrade request submitted')) {
@@ -186,6 +206,11 @@ export class OfficeSignageAndDocComponent implements OnInit {
                         contractorType: "Contractor",
                         suspendDetails: this.selectedAction.remarks,
                     };
+                    /**
+                     * Call cancel API
+                     * Success: Forwarded to Review Committee
+                     * Error: Failed to cancel contractor
+                     */
                     this.service.cancelFirm(payload).subscribe({
                         next: (res) => {
                             Swal.fire('Success', 'Forwarded to Review Committee', 'success');
@@ -206,6 +231,11 @@ export class OfficeSignageAndDocComponent implements OnInit {
                         firmType: "Contractor",
                         suspendDetails: this.selectedAction.remarks,
                     };
+                    /**
+                     * Call suspend API
+                     * Success: Forwarded to Review Committee
+                     * Error: Failed to suspend contractor
+                     */
                     this.service.suspendFirm(payload).subscribe({
                         next: (res) => {
                             Swal.fire('Success', 'Forwarded to Review Committee', 'success');
@@ -218,32 +248,34 @@ export class OfficeSignageAndDocComponent implements OnInit {
                 }
             }
 
-            WorkDetail: any = {};
+  WorkDetail: any = {};
+  licenseStatus: string = '';          
   loadWorkDetail() {
     const WorkDetail = this.service.getData('BctaNo');
     this.WorkDetail = WorkDetail;
-    console.log('Retrieved WorkDetail:', WorkDetail);
-    if (!WorkDetail?.data) {
-      console.error('WorkDetail data not available');
-      return;
-    }
-
-
-    this.data = WorkDetail.data;
-    this.bctaNo = this.data.contractorNo;
+    this.licenseStatus = WorkDetail.data.licenseStatus;
     this.applicationStatus = WorkDetail.data.applicationStatus;
-    console.log("application Status:", this.applicationStatus);
-
-    if (this.bctaNo) {
-      this.fetchDataBasedOnBctaNo();
-    }
+    this.bctaNo = WorkDetail.data.contractorNo;
+    // if (!WorkDetail?.data) {
+    //   console.error('WorkDetail data not available');
+    //   return;
+    // }
+     if(this.applicationStatus === 'Suspension Resubmission' && this.WorkDetail.data.contractorNo){
+      this.fetchSuspendDataBasedOnBctaNo();
+       
+     }else if(this.WorkDetail.data.contractorNo && this.applicationStatus !== 'Suspension Resubmission'){
+        this.fetchDataBasedOnBctaNo();
+     }else{
+        console.log('no data found:', WorkDetail);
+     }
+    this.data = WorkDetail.data;
+    //
+    this.applicationStatus = WorkDetail.data.applicationStatus;
   }
-
   fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe(
+    this.service.getDatabasedOnBctaNo(this.WorkDetail.data.contractorNo).subscribe(
       (res: any) => {
         if (res?.complianceEntities?.length) {
-          // Merge API response with initialized formData
           this.formData = { ...this.formData, ...res.complianceEntities[0] };
         }
       },
@@ -253,6 +285,20 @@ export class OfficeSignageAndDocComponent implements OnInit {
     );
   }
 
+  fetchSuspendDataBasedOnBctaNo() {
+    this.bctaNo = this.WorkDetail.data.contractorNo;
+    console.log('fetchSuspendDataBasedOnBctaNo',this.WorkDetail.data.contractorNo);
+    this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+      (res: any) => {
+        if (res?.complianceEntities?.length) {
+          this.formData = { ...this.formData, ...res.complianceEntities[0] };
+        }
+      },
+      (error) => {
+        console.error('Error fetching data:', error);
+      }
+    );
+  }
   onReviewChange() {
     if (!this.formData) return;
 
@@ -274,42 +320,114 @@ export class OfficeSignageAndDocComponent implements OnInit {
     };
   }
 
-  downloadFile(filePath: string) {
-    this.service.downloadFileFirm(filePath).subscribe({
-      next: (response) => {
-        this.handleFileDownload(response);
-      },
-      error: (error) => {
-        console.error('Download failed:', error);
-        // Handle error (show toast/message to user)
-      }
-    });
-  }
+downloadFile(filePath: string): void {
+    this.service.downloadFileFirm(filePath).subscribe(
+        (response: HttpResponse<Blob>) => {
+            const binaryData = [response.body];
+            const mimeType = response.body?.type || 'application/octet-stream';
+            const blob = new Blob(binaryData, { type: mimeType });
+            const blobUrl = window.URL.createObjectURL(blob);
 
-  private handleFileDownload(response: any) {
-    // Extract filename from content-disposition header if available
-    let filename = 'document.pdf'; // default filename
-    const contentDisposition = response.headers.get('content-disposition');
+            const fileName = this.extractFileName(filePath);
+            const isImage = mimeType.startsWith('image/'); // Check if the file is an image
 
-    if (contentDisposition) {
-      const filenameMatch = contentDisposition.match(/filename="?(.+)"?/);
-      if (filenameMatch && filenameMatch.length > 1) {
-        filename = filenameMatch[1];
-      }
-    }
+            const newWindow = window.open('', '_blank', 'width=800,height=600');
+            if (newWindow) {
+                newWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>File Preview</title>
+                        </head>
+                        <body style="margin:0; text-align: center;">
+                            <div style="padding:10px;">
+                                <a href="${blobUrl}" download="${fileName}" style="font-size:16px; color:blue;" target="_blank">⬇ Download File</a>
+                            </div>
+                            ${isImage
+                                ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
+                                : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`}
+                        </body>
+                    </html>
+                `);
 
-    // Create download link
-    const blob = new Blob([response.body], { type: response.headers.get('content-type') });
-    const url = window.URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
-  }
+                // Delay the revoke to give browser time to load
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(blobUrl);
+                }, 10000);
+            } else {
+                console.error('Failed to open the new window');
+            }
+        },
+        (error: HttpErrorResponse) => {
+            if (error.status === 404) {
+                console.error('File not found', error);
+                this.showErrorMessage();
+            }
+        }
+    );
+}
 
+
+
+extractFileName(filePath: string): string {
+    return (
+        filePath.split('/').pop() ||
+        filePath.split('\\').pop() ||
+        'downloaded-file'
+    );
+}
+
+     // Perform reinstatement + approval
+     reinstate(row: any) {
+      debugger
+         const payload = {
+             firmNo: this.bctaNo,
+             firmType: 'contractor',
+             licenseStatus: 'Active',
+            applicationStatus: 'Reinstated',
+         };
+ 
+         const approvePayload = {
+             firmType: 'Contractor',
+             cdbNos: row,
+         };
+ 
+         forkJoin({
+             reinstate: this.service.reinstateLicense(payload),
+           approve: this.service.approveReinstatement(approvePayload),
+         }).subscribe({
+             next: ({ reinstate }) => {
+                 if (
+                     reinstate &&
+                     reinstate
+                         .toLowerCase()
+                         .includes('license status updated to active')
+                 ) {
+                     Swal.fire(
+                         'Success',
+                         'License Reinstated and Approved Successfully',
+                         'success'
+                     );
+                 } else {
+                     Swal.fire(
+                         'Warning',
+                         'Unexpected response from server.',
+                         'warning'
+                     );
+                 }
+                 this.closeModal();
+                 this.router.navigate(['/monitoring/construction']);
+             },
+             error: (err) => {
+                 console.error('Reinstatement error:', err);
+                 Swal.fire(
+                     'Success',
+                     'License Reinstated and Approved Successfully',
+                     'success'
+                 );
+                 this.closeModal();
+             },
+         });
+     }
   isOfficeSignboardEnabled(): boolean {
     return ['Resubmitted OS', 'Resubmitted OS and PFS', 'Submitted'].includes(this.applicationStatus);
   }
@@ -322,21 +440,26 @@ export class OfficeSignageAndDocComponent implements OnInit {
     return this.applicationStatus === 'Submitted';
   }
 
-  isFieldEditable(field: string): boolean {
-    switch (field) {
-      case 'officeSignboard':
-      case 'signboardReview':
-        return this.isOfficeSignboardEnabled();
-      case 'filingSystem':
-      case 'filingReview':
-        return this.isFilingSystemEnabled();
-      case 'ohs':
-      case 'ohsReview':
-        return this.isOhsEnabled();
-      default:
-        return false;
-    }
+isFieldEditable(field: string): boolean {
+  if (this.applicationStatus === 'Suspension Resubmission') {
+    return true;
   }
+
+  switch (field) {
+    case 'officeSignboard':
+    case 'signboardReview':
+      return this.isOfficeSignboardEnabled();
+    case 'filingSystem':
+    case 'filingReview':
+      return this.isFilingSystemEnabled();
+    case 'ohs':
+    case 'ohsReview':
+      return this.isOhsEnabled();
+    default:
+      return false;
+  }
+}
+
 
   update() {
 

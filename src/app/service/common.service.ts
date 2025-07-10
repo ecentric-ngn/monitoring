@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from "@angular/common/http";
 import { Injectable } from "@angular/core";
-import { Agency_api_url, api_url, api_url_Monitoring, api_url_Monitoring_siteEngineer, fileUpload_api, fileUpload_api_url_Monitoring, g2c_url, otp_api_url, userManagmentAPI, web_service_url } from "../app.const/const";
+import { Agency_api_url, api_url, api_url_Monitoring, api_url_Monitoring_siteEngineer, fileUpload_api, fileUpload_api_url_Monitoring, g2c_url, g2c_url_Suspended, otp_api_url, userManagmentAPI, web_service_url } from "../app.const/const";
 import { NavigationExtras, Router } from "@angular/router";
 import { BehaviorSubject, catchError, map, Observable, throwError } from "rxjs";
 
@@ -403,11 +403,15 @@ export class CommonService {
     return this.http.get(`${g2c_url}/compliance/full/${bctaNo}`);
   }
 
+   getSuspendedDatabasedOnBctaNo(bctaNo: any) {
+    return this.http.get(`${g2c_url_Suspended}/compliance/fullSuspension/${bctaNo}`);
+  }
+
   // download file
   downloadFileFirm(filePath: string): Observable<any> {
     const params = new HttpParams().set('path', filePath);
 
-    return this.http.get(`${g2c_url}/compliance/download`, {
+    return this.http.get(`${g2c_url_Suspended}/compliance/download`, {
       params: params,
       responseType: 'blob',
       observe: 'response'

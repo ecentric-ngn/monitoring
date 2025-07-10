@@ -20,65 +20,86 @@
                 <label class="form-label me-2 font-size-12">Email Address:</label>
                 <span class="font-size-12">{{formData?.emailAddress || 'N/A'}}</span>
             </div>
-            </div>
+        </div>
 
-            <div class="container-fluid">
-                <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link border" [class.active]="activeTabId === 'cbOffice'" id="office-tab"
-                            (click)="setActiveTab('cbOffice')" [disabled]="applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ'"
-                            type="button" role="tab">
-                            Office Signage & Document
-                        </button>
-                    </li>
+        <div class="container-fluid">
+            <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link border" [class.active]="activeTabId === 'cbOffice'" id="office-tab"
+                        (click)="setActiveTab('cbOffice')"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ')"
+                        type="button" role="tab">
+                        Office Signage & Document
+                    </button>
 
-                    <li class="nav-item" role="presentation">
-                        <button  (click)="specializedFirmForm()"  class="nav-link border" [class.active]="activeTabId === 'cbEmployee'" id="employee-tab"
-                            (click)="setActiveTab('cbEmployee')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
-                            type="button" role="tab">
-                            {{ formData?.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent Employees' }}
-                        </button>
-                    </li>
+                </li>
 
-                    <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
-                        <button (click)="equipmentForm()"  class="nav-link border" [class.active]="activeTabId === 'cbEquipment'" id="equipment-tab"
-                            (click)="setActiveTab('cbEquipment')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
-                            type="button" role="tab">
-                            Mandatory Equipment
-                        </button>
-                    </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link border" [class.active]="activeTabId === 'cbEmployee'" id="employee-tab"
+                        (click)="setActiveTab('cbEmployee')" [disabled]="licenseStatus !== 'Suspended' && 
+                            (applicationStatus === 'Resubmitted OS' || 
+                            applicationStatus === 'Resubmitted EQ' || 
+                            applicationStatus === 'Resubmitted PFS' || 
+                            applicationStatus === 'Resubmitted OS and PFS')" type="button" role="tab">
+                        Permanent Employees'
+                    </button>
 
-                    <li class="nav-item" role="presentation">
-                        <button (click)="monitoringTeam()" class="nav-link border" [class.active]="activeTabId === 'cbMonitoring'" class="nav-link border" [class.active]="activeTabId === 'consuMonitoring'"
-                            id="monitoring-tab" (click)="setActiveTab('cbMonitoring')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
-                            type="button" role="tab">
-                            Monitoring Team Users
-                        </button>
-                    </li>
-                </ul>
+                </li>
 
-            </div>
+                <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
+                    <button *ngIf="formData?.firmType !== 'specializedFirm'" class="nav-link border"
+                        [class.active]="activeTabId === 'cbEquipment'" id="equipment-tab"
+                        (click)="setActiveTab('cbEquipment')" [disabled]="licenseStatus !== 'Suspended' && 
+                            (applicationStatus === 'Resubmitted OS' || 
+                            applicationStatus === 'Resubmitted HR' || 
+                            applicationStatus === 'Resubmitted PFS' || 
+                            applicationStatus === 'Resubmitted OS and PFS')" type="button" role="tab">
+                        Mandatory Equipment
+                    </button>
+
+                </li>
+
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link border" [class.active]="activeTabId === 'cbMonitoring'" id="monitoring-tab"
+                        (click)="setActiveTab('cbMonitoring')" [disabled]="licenseStatus !== 'Suspended' && 
+                            (applicationStatus === 'Resubmitted OS' || 
+                            applicationStatus === 'Resubmitted EQ' || 
+                            applicationStatus === 'Resubmitted HR' || 
+                            applicationStatus === 'Resubmitted PFS' || 
+                            applicationStatus === 'Resubmitted OS and PFS')" type="button" role="tab">
+                        Monitoring Team Users
+                    </button>
+
+                </li>
+            </ul>
+
+        </div>
     </form>
 
 </div>
 
 <div class="tab-content">
     <div class="tab-pane fade" [class.show]="activeTabId === 'cbOffice'" [class.active]="activeTabId === 'cbOffice'"
-        id="office" role="tabpanel" aria-labelledby="office-tab" *ngIf="formData?.firmType !== 'specializedFirm'">
+        id="office" role="tabpanel" aria-labelledby="office-tab"
+        *ngIf="activeTabId === 'cbOffice' && formData?.firmType !== 'specializedFirm'">
         <p><app-cb-office-signage (activateTab)="onActivateTab($event)"></app-cb-office-signage></p>
     </div>
 
     <div class="tab-pane fade" [class.show]="activeTabId === 'cbEmployee'" [class.active]="activeTabId === 'cbEmployee'"
-        id="employee" role="tabpanel" aria-labelledby="employee-tab">
+        id="employee" role="tabpanel" aria-labelledby="employee-tab" *ngIf="activeTabId === 'cbEmployee'">
         <p><app-cb-permanent-employees (activateTab)="onActivateTab($event)" [id]="id"></app-cb-permanent-employees></p>
     </div>
 
-    <div class="tab-pane fade" [class.show]="activeTabId === 'cbEquipment'" [class.active]="activeTabId === 'cbEquipment'"
-        id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
-       <p><app-cb-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-cb-mandatory-equipment></p>
+    <div class="tab-pane fade" [class.show]="activeTabId === 'cbEquipment'"
+        [class.active]="activeTabId === 'cbEquipment'" id="equipment" role="tabpanel" aria-labelledby="equipment-tab"
+        *ngIf="activeTabId === 'cbEquipment'">
+        <p><app-cb-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-cb-mandatory-equipment></p>
     </div>
 
-    <div  class="tab-pane fade" [class.show]="activeTabId === 'cbMonitoring'" [class.active]="activeTabId === 'cbMonitoring'"
-        id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
+    <div class="tab-pane fade" [class.show]="activeTabId === 'cbMonitoring'"
+        [class.active]="activeTabId === 'cbMonitoring'" id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab"
+        *ngIf="activeTabId === 'cbMonitoring'">
         <p><app-cb-monitoring-team [id]="id"></app-cb-monitoring-team></p>
     </div>
+
+</div>

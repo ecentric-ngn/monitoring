@@ -1,6 +1,6 @@
 <div class="card container-fluid">
     <p class="m-3 font-bold font-size-18"><strong>Registered Consultancy Firm's Information</strong></p>
-
+    <!-- {{licenseStatus}} -->
     <form>
         <div class="row m-3">
             <div class="col-md-4 mb-3">
@@ -29,65 +29,89 @@
                     <span *ngSwitchDefault>N/A</span>
                 </span>
             </div>
-            </div>
+        </div>
 
-            <div class="container-fluid">
-                <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link border" [class.active]="activeTabId === 'consultancyOffice'" id="office-tab"
-                            (click)="setActiveTab('consultancyOffice')" [disabled]="applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ'" type="button" role="tab">
-                            Office Signage & Document
-                        </button>
-                    </li>
+        <div class="container-fluid">
+            <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link border" [class.active]="activeTabId === 'consultancyOffice'" id="office-tab"
+                        (click)="setActiveTab('consultancyOffice')" [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ')" type="button" role="tab">
+                        Office Signage & Document
+                    </button>
 
-                    <li class="nav-item" role="presentation">
-                        <button  (click)="specializedFirmForm()"  class="nav-link border" [class.active]="activeTabId === 'consultancyEmployee'" id="employee-tab"
-                            (click)="setActiveTab('consultancyEmployee')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
-                            type="button" role="tab">
-                            {{ formData?.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent Employees' }}
-                        </button>
-                    </li>
+                </li>
 
-                    <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
-                        <button (click)="equipmentForm()"  class="nav-link border" [class.active]="activeTabId === 'consultancyEquipment'" id="equipment-tab"
-                            (click)="setActiveTab('consultancyEquipment')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
-                            type="button" role="tab">
-                            Mandatory Equipment
-                        </button>
-                    </li>
+                <li class="nav-item" role="presentation">
+                    <button (click)="specializedFirmForm()" class="nav-link border"
+                        [class.active]="activeTabId === 'consultancyEmployee'" id="employee-tab"
+                        (click)="setActiveTab('consultancyEmployee')"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
+                        type="button" role="tab">
+                        {{ formData?.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent
+                        Employees' }}
+                    </button>
+                </li>
 
-                    <li class="nav-item" role="presentation">
-                        <button (click)="monitoringTeam()" class="nav-link border" [class.active]="activeTabId === 'consultancyMonitoring'" class="nav-link border" [class.active]="activeTabId === 'consultancyMonitoring'"
-                            id="monitoring-tab" (click)="setActiveTab('consultancyMonitoring')" [disabled]="applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS'"
-                            type="button" role="tab">
-                            Monitoring Team Users
-                        </button>
-                    </li>
-                </ul>
+                <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
+                    <button *ngIf="formData?.firmType !== 'specializedFirm'" (click)="equipmentForm()"
+                        class="nav-link border" [class.active]="activeTabId === 'consultancyEquipment'"
+                        id="equipment-tab" (click)="setActiveTab('consultancyEquipment')"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
+                        type="button" role="tab">
+                        Mandatory Equipment
+                    </button>
+                </li>
 
-            </div>
+                <li class="nav-item" role="presentation">
+                    <button (click)="monitoringTeam()" class="nav-link border"
+                        [class.active]="activeTabId === 'consultancyMonitoring'" id="monitoring-tab"
+                        (click)="setActiveTab('consultancyMonitoring')"
+                        [disabled]=" licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
+                        type="button" role="tab">
+                        Monitoring Team Users
+                    </button>
+                </li>
+            </ul>
+
+        </div>
     </form>
 
 </div>
 
 <div class="tab-content">
-    <div class="tab-pane fade" [class.show]="activeTabId === 'consultancyOffice'" [class.active]="activeTabId === 'consultancyOffice'"
-        id="office" role="tabpanel" aria-labelledby="office-tab" *ngIf="formData?.firmType !== 'specializedFirm'">
-        <p><app-office-signage (activateTab)="onActivateTab($event)"></app-office-signage></p>
+    <div class="tab-pane fade"
+        [class.show]="activeTabId === 'consultancyOffice'"
+        [class.active]="activeTabId === 'consultancyOffice'"
+        id="office" role="tabpanel" aria-labelledby="office-tab">
+        <ng-container *ngIf="activeTabId === 'consultancyOffice'">
+            <app-office-signage (activateTab)="onActivateTab($event)"></app-office-signage>
+        </ng-container>
     </div>
 
-    <div class="tab-pane fade" [class.show]="activeTabId === 'consultancyEmployee'" [class.active]="activeTabId === 'consultancyEmployee'"
+    <div class="tab-pane fade"
+        [class.show]="activeTabId === 'consultancyEmployee'"
+        [class.active]="activeTabId === 'consultancyEmployee'"
         id="employee" role="tabpanel" aria-labelledby="employee-tab">
-        <p><app-permanent-employees (activateTab)="onActivateTab($event)" [id]="id"></app-permanent-employees></p>
+        <ng-container *ngIf="activeTabId === 'consultancyEmployee'">
+            <app-permanent-employees (activateTab)="onActivateTab($event)" [id]="id"></app-permanent-employees>
+        </ng-container>
     </div>
 
-    <div class="tab-pane fade" [class.show]="activeTabId === 'consultancyEquipment'" [class.active]="activeTabId === 'consultancyEquipment'"
+    <div class="tab-pane fade"
+        [class.show]="activeTabId === 'consultancyEquipment'"
+        [class.active]="activeTabId === 'consultancyEquipment'"
         id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
-       <p><app-consultancy-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-consultancy-mandatory-equipment></p>
+        <ng-container *ngIf="activeTabId === 'consultancyEquipment'">
+            <app-consultancy-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-consultancy-mandatory-equipment>
+        </ng-container>
     </div>
 
-    <div  class="tab-pane fade" [class.show]="activeTabId === 'consultancyMonitoring'" [class.active]="activeTabId === 'consultancyMonitoring'"
+    <div class="tab-pane fade"
+        [class.show]="activeTabId === 'consultancyMonitoring'"
+        [class.active]="activeTabId === 'consultancyMonitoring'"
         id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
-        <p><app-consultancy-monitoring-team [id]="id"></app-consultancy-monitoring-team></p>
+        <ng-container *ngIf="activeTabId === 'consultancyMonitoring'">
+            <app-consultancy-monitoring-team [id]="id"></app-consultancy-monitoring-team>
+        </ng-container>
     </div>
 </div>

@@ -44,7 +44,6 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
-                    <th>Select</th>
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
@@ -52,17 +51,15 @@
                     <th>License Status</th>
                     <th>Verified By</th>
                     <th>Action</th>
+                    <th>Select</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let data of displayedData" class="table-row">
-                    <td>
-                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
-                            [value]="data.consultantNo" (change)="onCheckboxChange($event, data.id)">
-                    </td>
+                   
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
                         [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' "
+                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS'|| data.applicationStatus === 'Suspension Resubmission' "
                         (click)="navigate(data)">
                         {{ data.consultantNo }}
                     </td>
@@ -73,7 +70,7 @@
                             'badge-secondary': data.applicationStatus== 'Not Submitted',
                             'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Pending',
                             'badge-success': data.applicationStatus== 'Verified',
-                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
+                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS' || data.applicationStatus === 'Suspension Resubmission'
                                             || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS',
                             'badge-info': data.applicationStatus== 'Ready for Review'
                             }">
@@ -88,11 +85,15 @@
                     </td>
 
                     <td>
-                        <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
-                        <div *ngIf="data.licenseStatus === 'Suspended'">
+                        <button type="button" *ngIf="data.licenseStatus !== 'Suspended'" class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
+                        <!-- <div *ngIf="data.licenseStatus === 'Suspended'">
                             <button class="btn btn-danger btn-sm"
                                 (click)="getReinstateApplication(data.consultantNo)">View</button>
-                        </div>
+                        </div> -->
+                    </td>
+                     <td>
+                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
+                            [value]="data.consultantNo" (change)="onCheckboxChange($event, data.id)">
                     </td>
 
                 </tr>
@@ -127,16 +128,14 @@
 <!--Mass Mail Modal -->
 <div class="modal fade" id="consultancyFirmModal" tabindex="-1" aria-labelledby="consultancyFirmModalLabel"
     aria-hidden="true">
-    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="consultancyFirmModalLabel">Consultancy Firm Form</h5>
+            <div class="modal-header" style="background-color:  #495f8a ">
+                <h5 class="modal-title text-white" id="consultancyFirmModalLabel">Consultancy Firm Form</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
             <div class="modal-body">
                 <form #consultancyForm="ngForm">
-
                     <!-- Row 1: Date & Deadline -->
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -205,7 +204,7 @@
 </div>
 
 <!-- Reinstate Application Modal -->
-<div class="modal fade" id="reinstateModal" tabindex="-1" aria-labelledby="reinstateModalLabel">
+<!-- <div class="modal fade" id="reinstateModal" tabindex="-1" aria-labelledby="reinstateModalLabel">
     <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -240,15 +239,15 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Action Modal -->
 <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form #actionForm="ngForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="actionModalLabel">Take Action</h5>
+                 <div class="modal-header" style="background-color:  #495f8a ">
+                    <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>
 

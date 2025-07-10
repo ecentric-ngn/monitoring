@@ -117,20 +117,77 @@
     </div>
 
     <!-- Update button: Show when status is NOT Submitted -->
-    <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
-      <button type="submit" class="btn btn-primary" (click)="update()" [disabled]="isSaving">
+    <div class="col-12 d-flex justify-content-end align-items-center gap-2 mt-3">
+      <!-- Update button: Show when status is not 'Submitted' -->
+      <button type="submit" class="btn btn-success" *ngIf="applicationStatus !== 'Submitted'" (click)="update()"
+        [disabled]="isSaving">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
         {{ isSaving ? 'Saving...' : 'Update' }}
       </button>
-    </div>
 
-    <!-- Save & Next button: Show only when status is Submitted -->
-    <div class="col-12 text-end mt-3" *ngIf="applicationStatus === 'Submitted'">
-      <button type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()" [disabled]="isSaving">
+      <!-- Save & Next button: Show only when status is 'Submitted' -->
+      <button type="submit" class="btn btn-primary" *ngIf="applicationStatus === 'Submitted'" (click)="saveAndNext()"
+        [disabled]="isSaving">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
         {{ isSaving ? 'Saving...' : 'Save & Next' }}
       </button>
+
+      <!-- Action button -->
+      <button class="btn btn-primary" (click)="openActionModal(applicationStatus)">Action</button>
+
+      <!-- Reinstate button: Show only when license is suspended -->
+      <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+        (nzOnConfirm)="reinstate(bctaNo)">
+        <button class="btn btn-danger h-100" *ngIf="licenseStatus === 'Suspended'">
+          Reinstate
+        </button>
+      </a>
     </div>
 
+  </div>
+</div>
+
+
+<!-- Action Modal -->
+<div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form #actionForm="ngForm">
+        <div class="modal-header" style="background-color:#495f8a ">
+          <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
+          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row">
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Action Type<span class="text-danger">*</span></label>
+              <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType" required
+                (change)="onActionTypeChange()">
+                <option value="">-- Select --</option>
+                <option value="cancel">Cancel</option>
+                <option value="suspend">Suspend</option>
+              </select>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label class="form-label">Action Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate" name="actionDate"
+                [disabled]="true" required />
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Remarks<span class="text-danger">*</span></label>
+            <textarea rows="3" class="form-control" [(ngModel)]="selectedAction.remarks" name="remarks"
+              required></textarea>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-danger" (click)="closeModal()" data-bs-dismiss="modal">Cancel</button>
+          <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

@@ -1,5 +1,5 @@
 import { Component, Inject } from '@angular/core';
-import { CommonService } from 'src/app/service/common.service';
+import { CommonService } from '../../../../../../../service/common.service';
 
 @Component({
   selector: 'app-specialized-firms-info',
@@ -11,17 +11,17 @@ export class SpecializedFirmsInfoComponent {
   bctaNo: any;
   applicationStatus: string = '';
   activeTabId: string = 'sfemployee';
+  licenseStatus: any;
 
-  constructor(@Inject(CommonService) private service: CommonService) { }
+  constructor(private service: CommonService) { }
 
   ngOnInit(): void {
     const WorkDetail = this.service.getData('BctaNo');
-
+    this.licenseStatus = WorkDetail.data.licenseStatus;
     if (!WorkDetail || !WorkDetail.data) {
       console.error('WorkDetail or WorkDetail.data is undefined');
       return;
     }
-
     this.applicationStatus = WorkDetail.data.applicationStatus;
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.specializedFirmNo;

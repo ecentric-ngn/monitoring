@@ -45,7 +45,8 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
-                    <th>Select</th>
+                  
+                    <th>Sl No.</th>
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
@@ -53,17 +54,15 @@
                     <th>License Status</th>
                     <th>Verified By</th>
                     <th>Action</th>
+                      <th>Select</th>
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let data of displayedData" class="table-row">
-                    <td>
-                        <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
-                            [value]="data.contractorNo" (change)="onCheckboxChange($event, data.id)">
-                    </td>
+                <tr *ngFor="let data of displayedData; let i = index" class="table-row">
+                     <td>{{ i+1 }}</td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' "
+                        [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS' || data.applicationStatus === 'Suspension Approved'
+                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
                         (click)="navigate(data)">
                         {{ data.contractorNo }}
                     </td>
@@ -73,9 +72,9 @@
                         <span class="badge" [ngClass]="{
                             'badge-secondary': data.applicationStatus== 'Not Submitted',
                             'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Pending',
-                            'badge-success': data.applicationStatus== 'Verified',
+                            'badge-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved',
                             'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                                            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS',
+                                            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
                             'badge-info': data.applicationStatus== 'Ready for Review'
                             }">
                             {{ data.applicationStatus }}
@@ -90,11 +89,15 @@
                     </td>
 
                     <td>
-                        <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
-                        <div *ngIf="data.licenseStatus === 'Suspended'">
-                            <button class="btn btn-danger btn-sm"
-                                (click)="getReinstateApplication(data.contractorNo)" data-bs-toggle="modal" data-bs-target="#reinstateModal">View</button>
-                        </div>
+                        <button *ngIf="data.licenseStatus !== 'Suspended'" class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
+                        <!-- <div *ngIf="data.licenseStatus === 'Suspended'"> -->
+                            <!-- <button class="btn btn-danger btn-sm"
+                                (click)="getReinstateApplication(data.contractorNo)" data-bs-toggle="modal" data-bs-target="#reinstateModal">View</button> -->
+                        <!-- </div> -->
+                    </td>
+                     <td>
+                        <input type="checkbox" [disabled]="data.applicationStatus === 'Reinstated' || data.applicationStatus === 'Not Submitted' || data.applicationStatus === 'Resubmitted EQ' || data.applicationStatus === 'Suspension Approved' ||  data.applicationStatus === 'Pending'"
+                            [value]="data.contractorNo" (change)="onCheckboxChange($event, data.id)">
                     </td>
 
                 </tr>
@@ -128,7 +131,7 @@
 </div>
 
 <!-- Reinstate Application Modal -->
-<div class="modal fade" id="reinstateModal" tabindex="-1" aria-labelledby="reinstateModalLabel">
+<!-- <div class="modal fade" id="reinstateModal" tabindex="-1" aria-labelledby="reinstateModalLabel">
     <div class="modal-dialog modal-md modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
@@ -163,15 +166,15 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 <!-- Action Modal -->
 <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form #actionForm="ngForm">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="actionModalLabel">Take Action</h5>
+               <div class="modal-header" style="background-color: #495f8a">
+                    <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>
 
@@ -179,7 +182,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Type<span class="text-danger">*</span></label>
-                            <select class="form-select" [(ngModel)]="selectedAction.actionType" name="actionType"
+                            <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType"
                                 required (change)="onActionTypeChange()">
                                 <option value="">-- Select --</option>
                                 <!-- <option value="cancel">Cancel</option> -->
@@ -190,7 +193,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Date<span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" [(ngModel)]="selectedAction.actionDate"
+                            <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
                                 name="actionDate" [disabled]="true" required [value]="today">
                         </div>
                     </div>
@@ -285,14 +288,12 @@
     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="constructionFirmModalLabel">Construction Firm Form</h5>
+           <div class="modal-header" style="background-color: #495f8a">
+                <h5 class="modal-title text-white" id="constructionFirmModalLabel">Construction Firm Form</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
-
             <div class="modal-body">
                 <form #firmForm="ngForm">
-
                     <!-- Row 1: Date & Subject -->
                     <div class="row g-3 m-2">
                         <div class="col-md-6">
@@ -322,9 +323,20 @@
                             <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
                                 [(ngModel)]="formData.deadline" readonly name="deadline">
                         </div>
+                      
+                        <div class="col-md-6">
+                            <label class="form-label">Contractor Class</label>
+                            <select class="form-select form-control-sm" name="contractorClass"
+                                [(ngModel)]="formData.workClassification" multiple style="height: 60px;">
+                                <option value="" selected>-- Select --</option>
+                                <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
+                            </select>
+                        </div>
+                    </div>
 
-
-                         <div class="col-md-6">
+                    <!-- Row 3: Dzongkhag -->
+                    <div class="row g-3 m-2">
+                          <div class="col-md-6">
                             <label class="form-label">Dzongkhag</label>
                             
                              <select class="form-select font-size-16"  [(ngModel)]="formData.name" name="name" id="dzongkhag">
@@ -334,19 +346,6 @@
                             </option>
                         </select>
                         </div>
-                        <!-- <div class="col-md-6">
-                            <label class="form-label">Contractor Class</label>
-                            <select class="form-select form-control-sm" name="contractorClass"
-                                [(ngModel)]="formData.workClassification" multiple style="height: 60px;">
-                                <option value="" selected>-- Select --</option>
-                                <option *ngFor="let cls of contractorClasses" [value]="cls">{{ cls }}</option>
-                            </select>
-                        </div> -->
-                    </div>
-
-                    <!-- Row 3: Dzongkhag -->
-                    <div class="row g-3 m-2">
-                       
                     </div>
 
                 </form>

@@ -260,7 +260,7 @@ export class ViewRegCompliancelistComponent {
         // Only proceed if status is "Submitted"
         if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS'
             || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted OS'
-            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ') {
+            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || data.applicationStatus === 'Suspension Resubmission' || data.applicationStatus === 'Suspension Approved') {
             const workId = data.contractorNo;
             this.prepareAndNavigate(data, workId);
         }
