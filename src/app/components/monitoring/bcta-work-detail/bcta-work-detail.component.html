@@ -36,25 +36,24 @@
   <div class="container-fluid mt-3">
     <div class="overflow-auto">
       <ul class="nav nav-tabs flex-nowrap d-flex" id="userTabs" role="tablist" style="white-space: nowrap;">
-        <li class="nav-item flex-shrink-0" role="presentation" *ngIf="workType === 'OTHERS'"
-          [ngClass]="{ 'active': workType === 'OTHERS' }">
+        <!-- Add Work Information Tab (only when workType is 'OTHERS') -->
+        <li class="nav-item flex-shrink-0" role="presentation" *ngIf="workType === 'OTHERS'">
           <button #addworkinformationTab (click)="DisplayonWorkInformationForm()"
-            class="border nav-link step-tab rounded-0 active" id="Onsite-tab" data-bs-toggle="tab"
-            data-bs-target="#addworkinformationTab" type="button" role="tab" aria-controls="addworkinformationTab"
-            aria-selected="true">
+            class="border nav-link step-tab rounded-0 active" id="addworkinformationTab" data-bs-toggle="tab"
+            data-bs-target="#addworkinformationTabContent" type="button" role="tab"
+            aria-controls="addworkinformationTabContent" aria-selected="true">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 0 }">
               <i class="pi pi-plus"></i>
-              <!-- <ng-container *ngIf="highestCompletedStep >= 0">✓</ng-container> -->
             </span>
             <b class="text-black step-label font-size-14">Add Work Information</b>
           </button>
         </li>
-        <!-- Onsite Tab -->
+        <!-- Onsite Facilities and Management -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #onsiteTab 
-            (click)="onSiteCheckTabEnabled ? DisplayonsiteForm() : $event.preventDefault()"
-           class="border nav-link step-tab rounded-0" [ngClass]="{ 'active': workType !== 'OTHERS','non-clickable': workType !== 'OTHERS'}" id="Onsite-tab" data-bs-toggle="tab" data-bs-target="#onsiteTab" type="button" role="tab"
-            aria-controls="onsiteTab" aria-selected="true"  [disabled]="!onSiteCheckTabEnabled">
+          <button #onsiteTab (click)="DisplayonsiteForm()" class="border nav-link step-tab rounded-0"
+            [ngClass]="{ 'active': workType !== 'OTHERS' }" id="onsiteTab" data-bs-toggle="tab"
+            data-bs-target="#onsiteTabContent" type="button" role="tab" aria-controls="onsiteTabContent"
+            aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 1 }">
               {{ highestCompletedStep >= 1 ? '✓' : '1' }}
             </span>
@@ -62,14 +61,11 @@
           </button>
         </li>
 
-        <!-- Contractor Document Tab -->
+        <!-- Contract Document at Site -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #contractorDocTab
-            (click)="contractorDocTabEnabled ? DisplayContractorDocForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': contractorDocTabEnabled,'non-clickable': contractorDocTabEnabled}"
-            id="ContractorDoc-tab" data-bs-toggle="tab" data-bs-target="#ContractorDoc" type="button" role="tab"
-            aria-controls="ContractorDoc" aria-selected="false" [disabled]="!contractorDocTabEnabled">
+          <button #contractorDocTab (click)="DisplayContractorDocForm()" class="border nav-link step-tab rounded-0"
+            id="contractorDocTab" data-bs-toggle="tab" data-bs-target="#contractorDocTabContent" type="button"
+            role="tab" aria-controls="contractorDocTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 2 }">
               {{ highestCompletedStep >= 2 ? '✓' : '2' }}
             </span>
@@ -77,14 +73,11 @@
           </button>
         </li>
 
-
+        <!-- Work Progress -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #workProgressTab
-            (click)="workProgressTabEnabled ? DisplayWorkProgressForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': workProgressTabEnabled,'non-clickable': workProgressTabEnabled}"
-            id="Work-Progress-tab" data-bs-toggle="tab" data-bs-target="#Work-Progress-tab" type="button" role="tab"
-            aria-controls="Work-Progress-tab" aria-selected="false" [disabled]="!workProgressTabEnabled">
+          <button #workProgressTab (click)="DisplayWorkProgressForm()" class="border nav-link step-tab rounded-0"
+            id="workProgressTab" data-bs-toggle="tab" data-bs-target="#workProgressTabContent" type="button" role="tab"
+            aria-controls="workProgressTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 3 }">
               {{ highestCompletedStep >= 3 ? '✓' : '3' }}
             </span>
@@ -92,27 +85,12 @@
           </button>
         </li>
 
-        <!-- Qualification of Subcontractors Tab -->
+        <!-- Qualification of Subcontractors -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <!-- <button #qualificationofSubcontractorsTab
-            (click)="qualificationofSubcontractorsTabEnabled ? DisplayQualificationForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': qualificationofSubcontractorsTabEnabled,'non-clickable': qualificationofSubcontractorsTabEnabled}"
-            id="qualification-work-tab" data-bs-toggle="tab" data-bs-target="#qualification-tab" type="button"
-            role="tab" aria-controls="qualification-tab" aria-selected="false"
-            [disabled]="!qualificationofSubcontractorsTabEnabled">
-            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 4 }">
-              {{ highestCompletedStep >= 4 ? '✓' : '4' }}
-            </span>
-            <b class="text-black step-label font-size-14">Qualification of Subcontractors</b>
-          </button> -->
-            <button #qualificationofSubcontractorsTab
-            (click)="DisplayQualificationForm()"
-            class="border nav-link step-tab rounded-0"
-            
-            id="qualification-work-tab" data-bs-toggle="tab" data-bs-target="#qualification-tab" type="button"
-            role="tab" aria-controls="qualification-tab" aria-selected="false"
-           >
+          <button #qualificationofSubcontractorsTab (click)="DisplayQualificationForm()"
+            class="border nav-link step-tab rounded-0" id="qualificationofSubcontractorsTab" data-bs-toggle="tab"
+            data-bs-target="#qualificationTabContent" type="button" role="tab" aria-controls="qualificationTabContent"
+            aria-selected="false">
             <span class="step-badge">
               {{ highestCompletedStep >= 4 ? '✓' : '4' }}
             </span>
@@ -120,39 +98,25 @@
           </button>
         </li>
 
-        <!-- Work Task Quantity Tab -->
+        <!-- Work Task Quantity -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #workTaskQuantityTab
-            (click)="workTaskQuantityTabEnabled ? DisplayWorkTaskQuantityForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': workTaskQuantityTabEnabled,'non-clickable': workTaskQuantityTabEnabled}"
-            id="Work-Task-tab" data-bs-toggle="tab" data-bs-target="#Work-Task" type="button" role="tab"
-            aria-controls="Work-Task" aria-selected="false" [disabled]="!workTaskQuantityTabEnabled">
+          <button #workTaskQuantityTab (click)="DisplayWorkTaskQuantityForm()"
+            class="border nav-link step-tab rounded-0" id="workTaskQuantityTab" data-bs-toggle="tab"
+            data-bs-target="#workTaskQuantityTabContent" type="button" role="tab"
+            aria-controls="workTaskQuantityTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 5 }">
               {{ highestCompletedStep >= 5 ? '✓' : '5' }}
             </span>
-            <b class="text-black step-label font-size-14">Work Task quality</b>
+            <b class="text-black step-label font-size-14">Work Task Quality</b>
           </button>
         </li>
 
-        <!-- On Site Quality Check Tab -->
+        <!-- Onsite Quality Check -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <!-- <button #onSiteQualityCheckTab
-            (click)="onSiteQualityCheckTabEnabled ? DisplayOnSiteQualityCheck() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': onSiteQualityCheckTabEnabled,'non-clickable': onSiteQualityCheckTabEnabled}"
-            id="quality-check-tab" data-bs-toggle="tab" data-bs-target="#quality-check" type="button" role="tab"
-            aria-controls="quality-check" aria-selected="false" [disabled]="!onSiteQualityCheckTabEnabled">
-            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 6 }">
-              {{ highestCompletedStep >= 6 ? '✓' : '6' }}
-            </span>
-            <b class="text-black step-label font-size-14">Onsite Quality Check per design specs</b>
-          </button> -->
-            <button #onSiteQualityCheckTab
-            (click)="onSiteQualityCheckTabEnabled ? DisplayOnSiteQualityCheck() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            id="quality-check-tab" data-bs-toggle="tab" data-bs-target="#quality-check" type="button" role="tab"
-            aria-controls="quality-check" aria-selected="false">
+          <button #onSiteQualityCheckTab (click)="DisplayOnSiteQualityCheck()"
+            class="border nav-link step-tab rounded-0" id="onSiteQualityCheckTab" data-bs-toggle="tab"
+            data-bs-target="#onSiteQualityCheckTabContent" type="button" role="tab"
+            aria-controls="onSiteQualityCheckTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 6 }">
               {{ highestCompletedStep >= 6 ? '✓' : '6' }}
             </span>
@@ -160,30 +124,24 @@
           </button>
         </li>
 
-        <!-- Reinforcement Tab -->
+        <!-- Reinforcement -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #reinforcementTab
-            (click)="reinforcementTabEnabled ? DisplayReinforcementForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': reinforcementTabEnabled,'non-clickable': reinforcementTabEnabled}"
-            id="Reinforcement-tab" data-bs-toggle="tab" data-bs-target="#Reinforcement" type="button" role="tab"
-            aria-controls="Reinforcement" aria-selected="false" [disabled]="!reinforcementTabEnabled">
+          <button #reinforcementTab (click)="DisplayReinforcementForm()" class="border nav-link step-tab rounded-0"
+            id="reinforcementTab" data-bs-toggle="tab" data-bs-target="#reinforcementTabContent" type="button"
+            role="tab" aria-controls="reinforcementTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 7 }">
               {{ highestCompletedStep >= 7 ? '✓' : '7' }}
             </span>
-            <b class="text-black step-label font-size-14">Reinforcement(using Profometer)</b>
+            <b class="text-black step-label font-size-14">Reinforcement (using Profometer)</b>
           </button>
         </li>
 
-        <!-- Occupational Health and Safety Tab -->
+        <!-- Occupational Health and Safety -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #occupationalHealthAndSaftyTab
-            (click)="occupationalHealthAndSaftyTabEnabled ? DisplayOccupationalHealthAndSaftyForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': occupationalHealthAndSaftyTabEnabled,'non-clickable': occupationalHealthAndSaftyTabEnabled}"
-            id="Occupational-Health-tab" data-bs-toggle="tab" data-bs-target="#Occupational-Health" type="button"
-            role="tab" aria-controls="Occupational-Health" aria-selected="false"
-            [disabled]="!occupationalHealthAndSaftyTabEnabled">
+          <button #occupationalHealthAndSaftyTab (click)="DisplayOccupationalHealthAndSaftyForm()"
+            class="border nav-link step-tab rounded-0" id="occupationalHealthAndSaftyTab" data-bs-toggle="tab"
+            data-bs-target="#occupationalHealthAndSaftyTabContent" type="button" role="tab"
+            aria-controls="occupationalHealthAndSaftyTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 8 }">
               {{ highestCompletedStep >= 8 ? '✓' : '8' }}
             </span>
@@ -191,129 +149,114 @@
           </button>
         </li>
 
-
+        <!-- Human Resources in Contract -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #humanResourceTab
-            (click)="humanResourceTabEnabled ? DisplayHumanResourceForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': humanResourceTabEnabled,'non-clickable': humanResourceTabEnabled}"
-            id="humanResourceTab-tab" data-bs-toggle="tab" data-bs-target="#humanResourceTab" type="button" role="tab"
-            aria-controls="humanResourceTab" aria-selected="false" [disabled]="!humanResourceTabEnabled">
+          <button #humanResourceTab (click)="DisplayHumanResourceForm()" class="border nav-link step-tab rounded-0"
+            id="humanResourceTab" data-bs-toggle="tab" data-bs-target="#humanResourceTabContent" type="button"
+            role="tab" aria-controls="humanResourceTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 9 }">
               {{ highestCompletedStep >= 9 ? '✓' : '9' }}
             </span>
             <b class="text-black step-label font-size-14">Human Resources in Contract</b>
           </button>
+        </li>
 
+        <!-- Certified Skilled Worker -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #certifiedSkilledWorkerTab
-            (click)="certifiedSkilledWorkerTabEnabled ? DisplayCertifiedSkilledWorkerForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': certifiedSkilledWorkerTabEnabled,'non-clickable': certifiedSkilledWorkerTabEnabled}"
-            id="certifiedSkilledWorkerTab" data-bs-toggle="tab" data-bs-target="#SkilledWorker" type="button" role="tab"
-            aria-controls="certifiedSkilledWorkerTab" aria-selected="false"
-            [disabled]="!certifiedSkilledWorkerTabEnabled">
+          <button #certifiedSkilledWorkerTab (click)="DisplayCertifiedSkilledWorkerForm()"
+            class="border nav-link step-tab rounded-0" id="certifiedSkilledWorkerTab" data-bs-toggle="tab"
+            data-bs-target="#certifiedSkilledWorkerTabContent" type="button" role="tab"
+            aria-controls="certifiedSkilledWorkerTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 10 }">
               {{ highestCompletedStep >= 10 ? '✓' : '10' }}
             </span>
-            <b class="text-black step-label font-size-14">Certified Skilled worker deployed at Site</b>
+            <b class="text-black step-label font-size-14">Certified Skilled Worker at Site</b>
           </button>
         </li>
 
+        <!-- Committed Equipment -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #committedEquipmentTab
-            (click)="committedEquipmentTabEnabled ? DisplayCommittedEquipment() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': committedEquipmentTabEnabled,'non-clickable': committedEquipmentTabEnabled}"
-            id="equipment-tab" data-bs-toggle="tab" data-bs-target="#equipment" type="button" role="tab"
-            aria-controls="equipment" aria-selected="false" [disabled]="!committedEquipmentTabEnabled">
-            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >=  11 }">
+          <button #committedEquipmentTab (click)="DisplayCommittedEquipment()"
+            class="border nav-link step-tab rounded-0" id="committedEquipmentTab" data-bs-toggle="tab"
+            data-bs-target="#committedEquipmentTabContent" type="button" role="tab"
+            aria-controls="committedEquipmentTabContent" aria-selected="false">
+            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 11 }">
               {{ highestCompletedStep >= 11 ? '✓' : '11' }}
             </span>
-            <b class="text-black step-label font-size-14">List of committed Equipment</b>
+            <b class="text-black step-label font-size-14">List of Committed Equipment</b>
           </button>
-          <!-- <button #committedEquipmentTab
-            (click)="DisplayCommittedEquipment() "
-            class="border nav-link step-tab rounded-0" id="equipment-tab" data-bs-toggle="tab"
-            data-bs-target="#equipment" type="button" role="tab" aria-controls="equipment" aria-selected="false">
-            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >=  11 }">
-              {{ highestCompletedStep >= 11 ? '✓' : '11' }}
-            </span>
-            <b class="text-black step-label font-size-14">List of committed Equipment</b>
-          </button> -->
         </li>
+
+        <!-- HR Strength at Site -->
         <li class="nav-item flex-shrink-0" role="presentation">
-          <button #hrstrengthAtSiteTab
-            (click)="hrstrengthAtSiteTabEnabled ? DisplayHRStrengthAtSite() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': hrstrengthAtSiteTabEnabled,'non-clickable': hrstrengthAtSiteTabEnabled}"
-            id="eqatSite-tab" data-bs-toggle="tab" data-bs-target="#eqatSite" type="button" role="tab"
-            aria-controls="eqatSite" aria-selected="false" [disabled]="!hrstrengthAtSiteTabEnabled">
+          <button #hrstrengthAtSiteTab (click)="DisplayHRStrengthAtSite()" class="border nav-link step-tab rounded-0"
+            id="hrstrengthAtSiteTab" data-bs-toggle="tab" data-bs-target="#hrstrengthAtSiteTabContent" type="button"
+            role="tab" aria-controls="hrstrengthAtSiteTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 12 }">
               {{ highestCompletedStep >= 12 ? '✓' : '12' }}
             </span>
-            <b class="text-black step-label font-size-14">Human Resources strength at site</b>
-          </button>
-        </li>
-        <li class="nav-item flex-shrink-0" role="presentation">
-          <button #contractorPresentDuringSiteMonitoringTab
-            (click)="contractorPresentDuringSiteMonitoringTabEnabled ? DisplayContractorPresentDuringSiteMonitoring() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': contractorPresentDuringSiteMonitoringTabEnabled,'non-clickable': contractorPresentDuringSiteMonitoringTabEnabled}"
-            id="equipment-tab" data-bs-toggle="tab" data-bs-target="#contractorPresentDuringSiteMonitoringTab"
-            type="button" role="tab" aria-controls="contractorPresentDuringSiteMonitoringTab" aria-selected="false"
-            [disabled]="!contractorPresentDuringSiteMonitoringTabEnabled">
-            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 13 }">
-              {{ highestCompletedStep >= 13 ? '✓' : '13' }}
-            </span>
-            <b class="text-black step-label font-size-14">Contractor/Representative present during site monitoring</b>
-          </button>
-        </li>
-        <li class="nav-item flex-shrink-0" role="presentation">
-          <button #addingSiteEngineerTab
-            (click)="addingSiteEngineerTabEnabled ? DisplayAddingSiteEngineer() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': addingSiteEngineerTabEnabled,'non-clickable': addingSiteEngineerTabEnabled}"
-            id="addingSiteEngineerTab-tab" data-bs-toggle="tab" data-bs-target="#addingSiteEngineerTab" type="button"
-            role="tab" aria-controls="addingSiteEngineerTab" aria-selected="false"
-            [disabled]="!addingSiteEngineerTabEnabled">
-            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 14 }">
-              {{ highestCompletedStep >= 14 ? '✓' : '14' }}
-            </span>
-            <b class="text-black step-label font-size-14">Add name of client engineers present during the site
-              monitoring</b>
-          </button>
-        </li>
-        <li class="nav-item flex-shrink-0" role="presentation">
-          <button #monitoringTab (click)="monitoringTabEnabled ? showMonitorTeamListsForm() : $event.preventDefault()"
-            class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': monitoringTabEnabled,'non-clickable': monitoringTabEnabled}" id="monitoring-tab"
-            data-bs-toggle="tab" data-bs-target="#monitoring" type="button" role="tab" aria-controls="monitoring"
-            aria-selected="false" [disabled]="!monitoringTabEnabled">
-            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 15 }">
-              {{ highestCompletedStep >= 15 ? '✓' : '15' }}
-            </span>
-            <b class="text-black step-label font-size-14">Monitoring team names, BCTA officials</b>
+            <b class="text-black step-label font-size-14">Human Resource Strength at Site</b>
           </button>
         </li>
 
+        <!-- Contractor Present During Site Monitoring -->
+        <li class="nav-item flex-shrink-0" role="presentation">
+          <button #contractorPresentDuringSiteMonitoringTab (click)="DisplayContractorPresentDuringSiteMonitoring()"
+            class="border nav-link step-tab rounded-0" id="contractorPresentDuringSiteMonitoringTab"
+            data-bs-toggle="tab" data-bs-target="#contractorPresentDuringSiteMonitoringTabContent" type="button"
+            role="tab" aria-controls="contractorPresentDuringSiteMonitoringTabContent" aria-selected="false">
+            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 13 }">
+              {{ highestCompletedStep >= 13 ? '✓' : '13' }}
+            </span>
+            <b class="text-black step-label font-size-14">Contractor Present During Site Monitoring</b>
+          </button>
+        </li>
+
+        <!-- Add Site Engineer -->
+        <li class="nav-item flex-shrink-0" role="presentation">
+          <button #addingSiteEngineerTab (click)="DisplayAddingSiteEngineer()"
+            class="border nav-link step-tab rounded-0" id="addingSiteEngineerTab" data-bs-toggle="tab"
+            data-bs-target="#addingSiteEngineerTabContent" type="button" role="tab"
+            aria-controls="addingSiteEngineerTabContent" aria-selected="false">
+            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 14 }">
+              {{ highestCompletedStep >= 14 ? '✓' : '14' }}
+            </span>
+            <b class="text-black step-label font-size-14">Client Engineers During Monitoring</b>
+          </button>
+        </li>
+
+        <!-- Monitoring Team -->
+        <li class="nav-item flex-shrink-0" role="presentation">
+          <button #monitoringTab (click)="showMonitorTeamListsForm()" class="border nav-link step-tab rounded-0"
+            id="monitoringTab" data-bs-toggle="tab" data-bs-target="#monitoringTabContent" type="button" role="tab"
+            aria-controls="monitoringTabContent" aria-selected="false">
+            <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 15 }">
+              {{ highestCompletedStep >= 15 ? '✓' : '15' }}
+            </span>
+            <b class="text-black step-label font-size-14">Monitoring Team (BCTA)</b>
+          </button>
+        </li>
+
+        <!-- Review & Submit -->
         <li class="nav-item flex-shrink-0" role="presentation">
           <button #reviewSubmitTab (click)="DisplayReviewSubmitForm()" class="border nav-link step-tab rounded-0"
-            [ngClass]="{'active': reviewSubmitTabEnabled,'non-clickable': reviewSubmitTabEnabled}"
-            id="reviewSubmitTab-tab" data-bs-toggle="tab" data-bs-target="#reviewSubmitTab" type="button" role="tab"
-            aria-controls="reviewSubmitTab" aria-selected="false" [disabled]="!reviewSubmitTabEnabled">
+            id="reviewSubmitTab" data-bs-toggle="tab" data-bs-target="#reviewSubmitTabContent" type="button" role="tab"
+            aria-controls="reviewSubmitTabContent" aria-selected="false">
             <span class="step-badge" [ngClass]="{ 'tick-class': highestCompletedStep >= 16 }">
               {{ highestCompletedStep >= 16 ? '✓' : '16' }}
             </span>
             <b class="text-black step-label font-size-14">Review & Submit</b>
           </button>
         </li>
+
       </ul>
     </div>
+
     <div class="mt-3">
       <app-addworkinformation *ngIf="showonWorkInformationForm" [prevOwnerTableId]="prevOwnerTableId"
-        [tableId]="tableId" [data]="data" [workType]="workType" [inspectionType]="inspectionType" [contractorPrevId]="contractorPrevId"
-        (saveOwnerInformationData)="saveOwnerInformationData($event)" (previousClicked)="goBackward($event)">
+        [tableId]="tableId" [data]="data" [workType]="workType" [inspectionType]="inspectionType"
+        [contractorPrevId]="contractorPrevId" (saveOwnerInformationData)="saveOwnerInformationData($event)"
+        (previousClicked)="goBackward($event)">
       </app-addworkinformation>
     </div>
     <div class="mt-3">

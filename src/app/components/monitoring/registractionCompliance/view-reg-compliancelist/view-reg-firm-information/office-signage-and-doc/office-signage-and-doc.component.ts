@@ -378,7 +378,7 @@ extractFileName(filePath: string): string {
 
      // Perform reinstatement + approval
      reinstate(row: any) {
-      debugger
+      
          const payload = {
              firmNo: this.bctaNo,
              firmType: 'contractor',

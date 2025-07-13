@@ -52,6 +52,7 @@ export class OfficeSignageComponent {
         this.date();
         const WorkDetail = this.service.getData('BctaNo');
         this.licenseStatus = WorkDetail.data.licenseStatus;
+        
         if (!WorkDetail || !WorkDetail.data) {
             return;
         }
@@ -59,7 +60,7 @@ export class OfficeSignageComponent {
         this.data = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
         this.applicationStatus = WorkDetail.data.applicationStatus;
-        if ( this.applicationStatus === 'Suspension Resubmission' && this.bctaNo) {
+        if (this.applicationStatus === 'Suspension Resubmission' && this.bctaNo) {
             this.fetchSuspendDataBasedOnBctaNo();
         } else {
              this.fetchDataBasedOnBctaNo();
@@ -90,6 +91,7 @@ export class OfficeSignageComponent {
 
     onReviewChange() {
         if (this.formData.signboardReview === 'No') {
+            debugger
             // Initialize resubmit fields when 'No' is selected
             this.formData.resubmitDate = null;
             this.formData.signboardRemarks = '';
@@ -97,6 +99,7 @@ export class OfficeSignageComponent {
     }
 
     fetchDataBasedOnBctaNo() {
+        debugger
         this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
             // Merge API response with initialized formData
             this.formData = {

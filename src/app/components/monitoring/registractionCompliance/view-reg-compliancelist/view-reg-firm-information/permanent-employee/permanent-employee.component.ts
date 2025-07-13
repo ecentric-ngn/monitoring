@@ -22,7 +22,7 @@ declare var bootstrap: any; // Bootstrap modal library
 })
 export class PermanentEmployeeComponent {
     formData: any = {}; // Holds form input data
-    @Output() activateTab = new EventEmitter<{ id: string; tab: string }>(); // Emits event to switch tab
+    @Output() activateTab = new EventEmitter<{ id: string; data:string; tab: string }>(); // Emits event to switch tab
     bctaNo: any; // Contractor registration number
     tableData: any = []; // Table data for employees
     @Input() id: string = ''; // Receives input ID from parent
@@ -53,7 +53,7 @@ export class PermanentEmployeeComponent {
         // Fetch Work Detail from service
         const WorkDetail = this.service.getData('BctaNo');
         this.WorkDetail = WorkDetail;
-
+         
         if (!WorkDetail || !WorkDetail.data) {
             console.error('WorkDetail or WorkDetail.data is undefined');
             return;
@@ -456,7 +456,7 @@ export class PermanentEmployeeComponent {
 
         this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
             this.isSaving = false;
-            this.activateTab.emit({ id: this.tableId, tab: 'equipment' });
+            this.activateTab.emit({ id: this.tableId, data: this.WorkDetail,  tab: 'equipment' });
         });
     }
 
@@ -491,7 +491,7 @@ export class PermanentEmployeeComponent {
 
         this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
             this.isSaving = false;
-            this.activateTab.emit({ id: this.tableId, tab: 'equipment' });
+            this.activateTab.emit({id: this.tableId,data: this.WorkDetail, tab: 'equipment' });
         });
     }
 

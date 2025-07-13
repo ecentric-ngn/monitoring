@@ -67,28 +67,35 @@
                     <td>{{ data.nameOfFirm }}</td>
                     <td>{{ data.sentDate }}</td>
                     <td>
-                        <span class="badge" [ngClass]="{
-                            'badge-secondary': data.applicationStatus== 'Not Submitted',
-                            'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus === 'Pending',
-                            'badge-success': data.applicationStatus== 'Verified',
-                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'|| data.applicationStatus === 'Suspension Resubmission'
+                        <span class="text-bold" [ngClass]="{
+                            'text-secondary': data.applicationStatus== 'Not Submitted',
+                            'text-warning': data.applicationStatus== 'In Process' || data.applicationStatus === 'Suspension Request'|| data.applicationStatus === 'Cancel Request',
+                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Suspension Approved' ,
+                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'|| data.applicationStatus === 'Suspension Resubmission'
                             }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
-                    <td>{{ data.licenseStatus }}</td>
-
+                    <!-- <td>{{ data.licenseStatus }}</td> -->
+                     <td>
+                     <span class="text-bold" [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'badge-primary': data.licenseStatus== 'Active'}">
+                            {{ data.licenseStatus }}
+                        </span>
+                        </td>
                     <td>
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
 
-                    <td>
+                    <!-- <td>
                         <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                         <div *ngIf="data.licenseStatus === 'Suspended'">
-                            <!-- <button class="btn btn-danger btn-sm"
-                                (click)="getReinstateApplication(data.specializedFirmNo)">View</button> -->
+                          
                         </div>
+                    </td> -->
+                      <td>
+                        <button *ngIf="data.licenseStatus !== 'Suspended' && data.applicationStatus !== 'Not Submitted' && data.applicationStatus !== 'Forwarded TO RC' && data.applicationStatus !== 'Suspension Request' && data.applicationStatus !== 'Suspension Resubmission' && data.applicationStatus !== 'Cancel Request'" class="btn btn-primary btn-sm me-2 mb-1"
+                            (click)="openActionModal(data)">Action</button>
                     </td>
                     <td>
                         <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
@@ -203,44 +210,6 @@
     </div>
 </div>
 
-<!-- Reinstate Application Modal -->
-<div class="modal fade" id="reinstateModal" tabindex="-1" aria-labelledby="reinstateModalLabel">
-    <div class="modal-dialog modal-md modal-dialog-centered">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="reinstateModalLabel">Reinstate Application Details</h5>
-                <button type="button" class="btn-close" (click)="closeReinstateModal()" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div *ngIf="reinstateData">
-                    <div class="mb-3">
-                        <label class="form-label">Document:</label>
-                        <button class="btn btn-sm btn-outline-primary"
-                            (click)="downloadFile(reinstateData.document_path)">View doc</button>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Reason:</label>
-                        <input type="text" class="form-control" [value]="reinstateData.justification" readonly>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Submission Date:</label>
-                        <input type="text" class="form-control" [value]="reinstateData.submission_date" readonly>
-                    </div>
-                </div>
-                <div *ngIf="!reinstateData">
-                    <span class="text-muted">No data available.</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-danger btn" (click)="reinstate(reinstateData.firm_id)">Reinstate</button>
-
-                <button type="button" class="btn btn-secondary" (click)="closeReinstateModal()"
-                    data-bs-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <!-- Action Modal -->
 <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
     <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -255,18 +224,18 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Type<span class="text-danger">*</span></label>
-                            <select class="form-select" [(ngModel)]="selectedAction.actionType" name="actionType"
+                            <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType"
                                 required (change)="onActionTypeChange()">
                                 <option value="">-- Select --</option>
                                 <option value="cancel">Cancel</option>
-                                <option value="downgrade">Downgrade</option>
+                                <!-- <option value="downgrade">Downgrade</option> -->
                                 <option value="suspend">Suspend</option>
                             </select>
                         </div>
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Date<span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" [(ngModel)]="selectedAction.actionDate"
+                            <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
                                 name="actionDate" [disabled]="true" required [value]="today">
                         </div>
                     </div>
@@ -278,7 +247,7 @@
                     </div>
 
                     <!-- Downgrade Table -->
-                    <div *ngIf="selectedAction.actionType === 'downgrade'" class="table-responsive">
+                    <div *ngIf="selectedAction.actionType === 'cancel'" class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>

@@ -49,6 +49,8 @@ export class OnsiteFacilitiesandManagementComponent {
     ) {}
 
     ngOnInit() {
+        
+        console.log('onsitedata');
     // Get user details from session storage safely
     const userDetailsString = sessionStorage.getItem('userDetails');
     if (userDetailsString) {

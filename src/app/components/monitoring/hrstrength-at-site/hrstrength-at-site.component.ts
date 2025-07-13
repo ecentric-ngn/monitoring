@@ -25,7 +25,7 @@ export class HRStrengthAtSiteComponent {
     @Input() data: any;
     @Input() inspectionType: any;
     
-    appNoStatus: any;
+    appNoStatus: any ={};
     constructor(
         private service: CommonService,
         private router: Router,
@@ -36,7 +36,8 @@ export class HRStrengthAtSiteComponent {
         this.inspectionType = this.inspectionType;
         this.tableId = this.tableId;
         this.prevTableId = this.prevTableId;
-        this.appNoStatus = this.data?.applicationStatus ?? null;
+          this.appNoStatus = this.data?.applicationStatus ?? null;
+
          if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {
@@ -77,7 +78,7 @@ export class HRStrengthAtSiteComponent {
             );
     }
     formType: '14';
-    
+    remarks: any
     saveAndNext(form: NgForm): void {
         // Uncomment this block if you want form validation
 
@@ -91,13 +92,11 @@ export class HRStrengthAtSiteComponent {
  // Create a static dummy file
     const fileContent = new Blob(['This is a static file content'], { type: 'text/plain' });
     const staticFile = new File([fileContent], 'staticFile.txt', { type: 'text/plain' });
-        this.service
-            .uploadFiles(
-               staticFile,
-                this.formData.remarks,
-                '14',
-                this.userName
-            )
+    const payload={
+        remarks: this.formData.remarks
+    }
+    this.remarks = payload
+    this.service.uploadFiles(staticFile,this.formData.remarks,'14',this.userName )
             .subscribe((fileId: string) => {
                 const match = fileId.match(/[0-9a-fA-F\-]{36}/);
                 if (match) {

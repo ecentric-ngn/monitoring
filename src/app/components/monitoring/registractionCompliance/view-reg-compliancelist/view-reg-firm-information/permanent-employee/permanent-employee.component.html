@@ -110,7 +110,7 @@
                 </button>
 
                  <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="licenseStatus === 'Suspended'">
+            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
             <button class="btn btn-danger h-100">
               Reinstate
             </button>

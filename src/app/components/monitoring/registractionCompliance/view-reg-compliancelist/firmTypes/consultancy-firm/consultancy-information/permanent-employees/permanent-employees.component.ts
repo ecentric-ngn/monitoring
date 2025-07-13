@@ -22,6 +22,7 @@ export class PermanentEmployeesComponent {
     tData: any;
     isSaving = false;
     showErrorMessage: any;
+    licenseStatus: any;
     constructor(
         private service: CommonService,
         private router: Router,
@@ -45,6 +46,7 @@ export class PermanentEmployeesComponent {
         const WorkDetail = this.service.getData('BctaNo');
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
+        this.licenseStatus = WorkDetail.data.licenseStatus;
         this.applicationStatus = WorkDetail.data.applicationStatus;
         this.tData = {
             hrFulfilled: '',
@@ -196,32 +198,46 @@ export class PermanentEmployeesComponent {
                 }
 
                 this.downgradeList = workCategories
-                    .map((category: any) => {
-                        const prefix = this.getPrefix(category.workCategory);
-                        const categoryKey = String(category.workCategory).trim();
+                        .map((category: any) => {
+                            const prefix = this.getPrefix(
+                                category.workCategory
+                            );
+                            const categoryKey = String(
+                                category.workCategory
+                            ).trim();
 
-                        const matchedClassifications = workClassifications
-                            .filter((cls: any) =>
-                                cls.type === 'consultant' &&
-                                cls.workClassification.startsWith(prefix) &&
-                                existingMap[categoryKey]?.has(String(cls.id).trim())
-                            )
-                            .map((cls: any) => ({
-                                id: cls.id,
-                                name: cls.workClassification,
-                                checked: true,
-                                preChecked: true,
-                            }));
+                            const possibleClassifications = workClassifications
+                                .filter(
+                                    (cls: any) =>
+                                        cls.type === 'consultant' &&
+                                        cls.workClassification.startsWith(
+                                            prefix
+                                        ) &&
+                                        existingMap[categoryKey] &&
+                                        existingMap[categoryKey].has(
+                                            String(cls.id).trim()
+                                        )
+                                )
+                                .map((cls: any) => ({
+                                    id: cls.id,
+                                    name: cls.workClassification,
+                                    checked: true,
+                                    preChecked: true,
+                                }));
 
-                        return {
-                            workCategory: category.workCategory,
-                            workCategoryId: category.id,
-                            classifications: matchedClassifications,
-                        };
-                    })
-                    // Only include if there is at least one matched classification
-                    .filter(item => item.classifications.length > 0);
-            },
+                            // Return null if no classification matches
+                            if (possibleClassifications.length === 0) {
+                                return null;
+                            }
+
+                            return {
+                                workCategory: category.workCategory,
+                                workCategoryId: category.id,
+                                classifications: possibleClassifications,
+                            };
+                        })
+                        .filter((item: any) => item !== null); // Remove nulls
+                },
             error: (err) => {
                 console.error('Error fetching downgrade data:', err);
             },
@@ -326,31 +342,7 @@ export class PermanentEmployeesComponent {
 }
 
 
-    getReinstateApplication(bctaNo: string) {
-        if (!bctaNo) {
-            console.error('Firm ID is missing.');
-            return;
-        }
-
-        this.service.getReinstateApplication(bctaNo).subscribe({
-            next: (data) => {
-                this.reinstateData = data[0];
-                setTimeout(() => {
-                    const modalEl = document.getElementById('reinstateModal');
-                    this.reinstateModal = new bootstrap.Modal(modalEl, {
-                        backdrop: 'static',
-                        keyboard: false,
-                    });
-                    this.reinstateModal.show();
-                }, 0);
-            },
-            error: (err) => {
-                console.error('Error fetching reinstate data:', err);
-                this.reinstateData = null;
-            },
-        });
-    }
-
+ 
     reinstate(row: any) {
         const payload = {
             firmNo: row,

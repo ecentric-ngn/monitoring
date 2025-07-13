@@ -97,9 +97,39 @@ onTabChange(event: any) {
         case 'downgrade':
             this.getDownGradeList();
             break;
+             case 'active':
+            this.getActiveList();
+            break;
     }
 }
-
+getActiveList() {
+    this.isLoading = true;
+    this.service.fetchActiveLicenseList().subscribe(
+      (response: any[]) => {
+        this.tableData = response;
+        this.isLoading = false;
+        // this.tableData = response.map(item => ({
+        //   id: Number(item.id) || 0,
+        //   contractorNo: item.firmId || '', // Map bctaNo to contractorNo
+        //   type: this.formatType(item.firmType), // Map firmType to type
+        //   rawFirmType: item.firmType, // Store the original firmType
+        //   actionType: this.formatActionType(''), // You might need to adjust this
+        //   details: item.details || '-',
+        //   initiatedBy: item.initiatedBy || '-',
+        //   initiatedDate: item.initiatedDate,
+        //   status: item.status || 'PENDING',
+        //   selected: false
+        // }));
+        // this.filteredApplications = [...this.tableData];
+        // this.totalCount = this.tableData.length;
+        // this.isLoading = false;
+      },
+      (error) => {
+        this.isLoading = false;
+        this.notification.error('Error', 'Failed to load action items');
+      }
+    );
+  }
   
   getReportList(searchQuery?: string) {
     this.isLoading = true;
@@ -241,15 +271,15 @@ endorse(): void {
   // First payload for the endorsement (Monitoring System)
   const endorsePayload = {
     suspensionIds: this.selectedIds,
-    reviewedBy: "dechen dorji"
+    reviewedBy: this.userId,
+    status:this.activeAction
   };
-
   // Second payload for the suspension (G2C System)
   const suspendPayload = {
    cdbNos: this.selectedContractorNumbers.map(item => item.toString()), 
     firmType: this.firmTypesssss
   };
-
+debugger
   // First API call - Endorse in Monitoring System
   this.service.endorseApplications(endorsePayload).subscribe({
     next: (endorseResponse: string) => {
@@ -531,21 +561,26 @@ getCancelList(searchQuery?: string) {
     }
   );
 }
-activeAction: 'cancel' | 'downgrade' | 'suspend' | null = null;
+activeAction: 'cancel' | 'downgrade' | 'Suspended' | 'rejected' | null = null;
 get modalTitle(): string {
   switch (this.activeAction) {
-    case 'cancel': return 'Cancellation Remarks';
-    case 'downgrade': return 'Downgrade Remarks';
-    case 'suspend': return 'Suspend Remarks';
-    default: return '';
+    case 'cancel':
+      return 'Cancellation Remarks';
+    case 'downgrade':
+      return 'Downgrade Remarks';
+    case 'Suspended':
+    case 'rejected':
+      return 'Suspend Remarks';
+    default:
+      return '';
   }
 }
+
 submitAction() {
   if (!this.formData.remarks?.trim()) {
     alert('Remarks are required!');
     return;
   }
-
   switch (this.activeAction) {
     case 'cancel':
       this.cancelAppNo();
@@ -553,11 +588,13 @@ submitAction() {
     case 'downgrade':
       this.DownGrade();
       break;
-    case 'suspend':
+    case 'Suspended':
+    case 'rejected':
       this.endorse();
       break;
   }
 }
+
 
 cancelAppNo(): void {
   if (this.selectedIds.length === 0) return;
@@ -576,7 +613,7 @@ cancelAppNo(): void {
   // Second payload for the other system (adjust according to your needs)
   const otherSystemPayload = {
     cdbNos: this.selectedContractorNumbers.map(item => item.toString()),
-    firmType: this.firmTypesssss
+    firmType: this.firmType
   };
   // First API call - Cancel in Monitoring System
   this.service.CancelApplications(cancelPayload).subscribe({
