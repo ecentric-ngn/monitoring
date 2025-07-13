@@ -19,7 +19,7 @@ export class MandatoryEquipmentComponent {
     bctaNo: any;
     tableData: any = [];
     @Input() id: string = '';
-    data: any;
+    @Input() data: any = {};
     tData: any=[]=[];
     applicationStatus: string = '';
     isSaving = false;
@@ -34,6 +34,8 @@ export class MandatoryEquipmentComponent {
     ) {}
 
     ngOnInit() {
+        this.data = this.data.data;
+        
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
@@ -66,28 +68,28 @@ export class MandatoryEquipmentComponent {
         this.applicationStatus = WorkDetail.data.applicationStatus;
         this.data = WorkDetail.data;
         this.WorkDetail = WorkDetail;
-          this.licenseStatus = WorkDetail.data.licenseStatus;
+        
+          this.licenseStatus = this.data.licenseStatus;
         if (
-            this.bctaNo &&
-            this.applicationStatus !== 'Suspension Resubmission'
+            this.data.contractorNo && this.data.applicationStatus !== 'Suspension Resubmission'
         ) {
             this.fetchDataBasedOnBctaNo();
         } else {
             this.fetchSuspendDataBasedOnBctaNo();
         }
 
-        this.service.setBctaNo(this.bctaNo);
+        //this.service.setBctaNo(this.bctaNo);
     }
 
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNo(this.data.contractorNo).subscribe((res: any) => {
             this.tableData = res.vehicles;
             console.log('contractor equipment', this.formData);
         });
     }
 
     fetchSuspendDataBasedOnBctaNo() {
-        this.bctaNo = this.WorkDetail.data.contractorNo;
+        this.bctaNo = this.data.contractorNo ;
         this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
             (res: any) => {
                 this.tableData = res.vehicles;
@@ -113,7 +115,7 @@ export class MandatoryEquipmentComponent {
     workClassificationList: any[] = [];
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'downgrade') {
-            const firmId = this.WorkDetail.data.contractorId;
+            const firmId = this.data.contractorId;
             const firmType = 'contractor';
             console.log('firmId:', firmId);
             if (!firmId) {
@@ -366,7 +368,6 @@ export class MandatoryEquipmentComponent {
             'office-signage'
         );
         this.tableId = this.id;
-        debugger
         const eq = this.tableData.map((item: any) => ({
             isRegistered: item.equipmentType,
             vehicleType: item.vehicleType,
@@ -379,10 +380,11 @@ export class MandatoryEquipmentComponent {
         }));
         const payload = {
             registrationReview: {
-                bctaNo: this.bctaNo,
+                bctaNo: this.data.contractorNo,
                 eqFulfilled: this.tData.fulfillsRequirement,
                 eqResubmitDeadline: this.tData.resubmitDate,
                 eqRemarks: this.tData.resubmitRemarks,
+                // id:this.tableId 
             },
             equipmentReviews: eq,
         };

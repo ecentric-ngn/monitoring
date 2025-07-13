@@ -24,13 +24,8 @@ export class MonitoringTeamUsersComponent implements OnInit {
     private authService: AuthServiceService) { }
 
   ngOnInit() {
-
     this.username = this.authService.getUsername() || 'NA';
-    
-    console.log("Monitor table id:", this.id);
-
     this.id = this.id;
-
     this.service.bctaNo$.subscribe(bctaNo => {
         this.bctaNo = bctaNo;
     });
@@ -54,7 +49,6 @@ export class MonitoringTeamUsersComponent implements OnInit {
         reviewDate: this.formData.reviewDate
       }
     };
-
     this.service.saveOfficeSignageAndDoc(payload).subscribe(
       (res: any) => {
         this.isSaving = false;

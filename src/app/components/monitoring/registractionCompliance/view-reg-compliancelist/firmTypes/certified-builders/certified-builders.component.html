@@ -68,19 +68,23 @@
                     <td>{{ data.nameOfFirm }}</td>
                     <td>{{ data.sentDate }}</td>
                     <td>
-                        <span class="badge" [ngClass]="{
-                           'badge-secondary': data.applicationStatus== 'Not Submitted',
-                            'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Pending',
-                            'badge-success': data.applicationStatus== 'Verified',
-                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
+                        <span class="text-bold" [ngClass]="{
+                           'text-secondary': data.applicationStatus== 'Not Submitted',
+                            'text-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Cancel Request',
+                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved',
+                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
                                             || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
-                            'badge-info': data.applicationStatus== 'Ready for Review'
+                            'text-info': data.applicationStatus== 'Ready for Review'
                             }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
 
-                    <td>{{ data.licenseStatus }}</td>
+                    <td>
+                     <span class="text-bold" [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'text-primary': data.licenseStatus== 'Active'}">
+                            {{ data.licenseStatus }}
+                        </span>
+                        </td>
 
                     <td>
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>

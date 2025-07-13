@@ -44,6 +44,7 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
+                    <th>Sl No.</th>
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
@@ -55,42 +56,47 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let data of displayedData" class="table-row">
-                   
+                <tr *ngFor="let data of displayedData;let i = index" class="table-row">
+                   <td>{{ i+1 }}</td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
                         [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS'|| data.applicationStatus === 'Suspension Resubmission' "
+                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS'|| data.applicationStatus === 'Suspension Resubmission' || data.applicationStatus === 'Suspension Approved'"
                         (click)="navigate(data)">
                         {{ data.consultantNo }}
                     </td>
                     <td>{{ data.nameOfFirm }}</td>
                     <td>{{ data.sentDate }}</td>
                     <td>
-                        <span class="badge" [ngClass]="{
-                            'badge-secondary': data.applicationStatus== 'Not Submitted',
-                            'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Pending',
-                            'badge-success': data.applicationStatus== 'Verified',
-                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS' || data.applicationStatus === 'Suspension Resubmission'
+                        <span class="text-bold" [ngClass]="{
+                            'text-secondary': data.applicationStatus== 'Not Submitted',
+                            'text-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Suspension Request' || data.applicationStatus === 'Cancel Request',
+                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus =='Suspension Approved',
+                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS' || data.applicationStatus === 'Suspension Resubmission'
                                             || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS',
-                            'badge-info': data.applicationStatus== 'Ready for Review'
+                            'text-info': data.applicationStatus== 'Ready for Review'
                             }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
-                    <td>{{ data.licenseStatus }}</td>
-
+                    <!-- <td>{{ data.licenseStatus }}</td> -->
+                        <td>
+                     <span class="text-bold " [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'badge-primary': data.licenseStatus== 'Active'}">
+                            {{ data.licenseStatus }}
+                        </span>
+                        </td>
                     <td>
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
 
-                    <td>
-                        <button type="button" *ngIf="data.licenseStatus !== 'Suspended'" class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
+                         <td>
+                        <button *ngIf="data.licenseStatus !== 'Suspended' && data.applicationStatus !== 'Not Submitted' && data.applicationStatus !== 'Forwarded TO RC' && data.applicationStatus !== 'Suspension Request' && data.applicationStatus !== 'Suspension Resubmission' && data.applicationStatus !== 'Cancel Request' && data.applicationStatus !== 'Downgrade Request'" class="btn btn-primary btn-sm me-2 mb-1"
+                            (click)="openActionModal(data)">Action</button>
+                    </td>
                         <!-- <div *ngIf="data.licenseStatus === 'Suspended'">
                             <button class="btn btn-danger btn-sm"
                                 (click)="getReinstateApplication(data.consultantNo)">View</button>
                         </div> -->
-                    </td>
                      <td>
                         <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
                             [value]="data.consultantNo" (change)="onCheckboxChange($event, data.id)">
@@ -118,6 +124,9 @@
             </ul>
         </nav>
 
+        <!-- <div class="text-end" *ngIf="selectedIds.length !== 0">
+            <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>
+        </div> -->
         <div class="text-end" *ngIf="selectedIds.length !== 0">
             <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>
         </div>
@@ -166,11 +175,13 @@
                             </div>
                         </div>
 
-                        <div class="col-md-6">
+                         <div class="col-md-6">
                             <label class="form-label">Dzongkhag</label>
-                            <select class="form-select" [(ngModel)]="formData.dzongkhagName" name="dzongkhagName">
-                                <option value="">-- Select Dzongkhag --</option>
-                                <option *ngFor="let dzongkhag of Dzongkhags" [value]="dzongkhag">{{ dzongkhag }}
+                            <select class="form-select font-size-16" [(ngModel)]="formData.name" name="name"
+                                id="dzongkhag">
+                                <option>--select--</option>
+                                <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.name">
+                                    {{ dzongkhag.name }}
                                 </option>
                             </select>
                         </div>
@@ -255,7 +266,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Type<span class="text-danger">*</span></label>
-                            <select class="form-select" [(ngModel)]="selectedAction.actionType" name="actionType"
+                            <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType"
                                 required (change)="onActionTypeChange()">
                                 <option value="">-- Select --</option>
                                 <option value="cancel">Cancel</option>
@@ -265,7 +276,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Date<span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" [(ngModel)]="selectedAction.actionDate"
+                            <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
                                 name="actionDate" [disabled]="true" required [value]="today">
                         </div>
                     </div>
@@ -312,8 +323,8 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="closeModal()"
-                        data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-danger" (click)="closeModal()"
+                        data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
                 </div>
             </form>

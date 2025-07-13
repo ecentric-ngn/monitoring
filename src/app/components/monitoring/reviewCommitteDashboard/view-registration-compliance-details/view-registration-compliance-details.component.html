@@ -7,13 +7,14 @@
    <span class="text-warning ml-3">Note:<i>Filter base on license status</i></span>
   <div class="col-md-4">
     <select class="form-select" (change)="onTabChange($event)" [value]="activeTab">
+      <option value="active">Active</option>
       <option value="suspend">Suspend</option>
       <option value="cancel">Cancel</option>
       <option value="downgrade">Downgrade</option>
     </select>
   </div>
   <!-- Suspend Tab -->
-  <div *ngIf="activeTab === 'suspend'">
+  <div *ngIf="activeTab === 'active'">
     <!-- Suspend Table -->
     <div class="table-responsive m-3">
       <table class="table table-bordered table-sm">
@@ -37,8 +38,72 @@
             </td>
             <td>{{ action.type }}</td>
             <td>{{ action.details }}</td>
+            <td>{{ action.subject }}</td>
+            <td>{{ action.sentDate | date: 'mediumDate' }}</td>
+            <td>
+              <span [ngClass]="getStatusClass(action.status)">
+                {{ action.applicationStatus }}
+              </span>
+            </td>
+            <td class="text-center">
+              <input type="checkbox" [(ngModel)]="action.selected" (change)="onCheckboxChange(action)">
+            </td>
+          </tr>
+          <tr *ngIf="tableData.length === 0 && !isLoading">
+            <td colspan="8" class="text-center text-muted">No actions found</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <!-- Loading Spinner -->
+    <div *ngIf="isLoading" class="text-center py-3">
+      <i class="fa fa-spinner fa-spin"></i> Loading...
+    </div>
+    <!-- Remarks Section -->
+    <!-- <div class="m-3">
+      <div class="col-md-12 mb-3">
+        <label class="form-label me-2 font-size-12">Remarks:</label>
+        <input type="text" class="form-control" placeholder="Remarks" name="remarks" [(ngModel)]="formData.remarks"
+          style="height: 50px; width: 300px;">
+      </div>
+    </div> -->
+
+   <div class="d-flex justify-content-end">
+  <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0"
+    (click)="activeAction='Suspended'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Endorse
+  </button>
+  <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
+    (click)="activeAction='rejected'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Reject
+  </button>
+</div>
+
+  </div>
+    <div *ngIf="activeTab === 'suspend'">
+    <!-- Suspend Table -->
+    <div class="table-responsive m-3">
+      <table class="table table-bordered table-sm">
+        <thead class="thead-dark">
+          <tr>
+            <th>Contractor No</th>
+            <th>Type</th>
+            <th>Details</th>
+            <th>Initiated By</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let action of tableData">
+            <td>
+              {{ action.contractorNo || '-' }}
+            </td>
+            <td>{{ action.type }}</td>
+            <td>{{ action.details }}</td>
             <td>{{ action.initiatedBy }}</td>
-            <td>{{ action.initiatedDate | date: 'mediumDate' }}</td>
+            <td>{{ action.createdOn}}</td>
             <td>
               <span [ngClass]="getStatusClass(action.status)">
                 {{ action.status }}
@@ -68,9 +133,13 @@
     </div> -->
 
     <div class="d-flex justify-content-end">
-      <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
-    (click)="activeAction='suspend'" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Endorse Suspend App
+      <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0"
+    (click)="activeAction='Suspended'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Endorse
+  </button>
+  <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
+    (click)="activeAction='rejected'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+    Reject
   </button>
     </div>
   </div>

@@ -508,6 +508,11 @@ export class CommonService {
     return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/classification/review-actions/suspensions`);
 
   }
+
+   fetchActiveLicenseList() {
+    return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/classification/review-actions/active`);
+
+  }
   endorseApplications(payload: { suspensionIds: number[], reviewedBy: string }): Observable<string> {
     return this.http.post(
       `${api_url_Monitoring_siteEngineer}/classification/endorse-suspensions`,

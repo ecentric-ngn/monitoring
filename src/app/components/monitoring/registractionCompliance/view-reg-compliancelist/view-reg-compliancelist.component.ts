@@ -75,7 +75,7 @@ export class ViewRegCompliancelistComponent {
       getDzongkhagList() {
         const dzongkhag = {
             viewName: 'dzongkhagList',
-            pageSize: 20,
+            pageSize: 21,
             pageNo: 1,
             condition: [],
         };
@@ -428,6 +428,7 @@ export class ViewRegCompliancelistComponent {
 
             const payload = {
                 firmId: this.selectedAction.target?.contractorId,
+                bctaNo:this.selectedAction.target?.contractorNo,
                 firmType: "Contractor",
                 downgradeEntries,
                 requestedBy: this.authService.getUsername()

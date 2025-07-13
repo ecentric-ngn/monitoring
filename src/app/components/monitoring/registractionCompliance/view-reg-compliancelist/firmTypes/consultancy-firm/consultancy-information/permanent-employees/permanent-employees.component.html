@@ -109,8 +109,8 @@
                     </button>
 
                     <!-- Action Button -->
-                    <button type="button" class="btn btn-primary"  data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrops">
+                    <button  type="button" class="btn btn-primary"  data-bs-toggle="modal"
+                        data-bs-target="#staticBackdrops" *ngIf="licenseStatus === 'Active' && applicationStatus === 'Suspension Resubmission'">
                         Action
                     </button>
                     <!-- Reinstate Button -->
@@ -119,7 +119,7 @@
                         Reinstate
                     </button> -->
                     <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-                        (nzOnConfirm)="reinstate(bctaNo)">
+                        (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
                         <button class="btn btn-danger h-100">
                             Reinstate
                         </button>

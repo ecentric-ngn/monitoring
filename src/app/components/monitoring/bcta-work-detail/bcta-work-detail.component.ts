@@ -45,6 +45,7 @@ export class BctaWorkDetailComponent {
   prevOwnerTableId: string;
   Previousdata: any;
   contractorPrevId: any;
+  
 constructor(private router: Router,private service:CommonService) {
  
 }
@@ -257,9 +258,49 @@ goBackward(tableId:any) {
   }
 }
 
+moveToStep(step: number): void {
+  const tabMap: { [key: number]: ElementRef<HTMLButtonElement> } = {
+    0: this.addworkinformationTab,
+    1: this.onsiteTab,
+    2: this.contractorDocTab,
+    3: this.workProgressTab,
+    4: this.qualificationofSubcontractorsTab,
+    5: this.workTaskQuantityTab,
+    6: this.onSiteQualityCheckTab,
+    7: this.reinforcementTab,
+    8: this.occupationalHealthAndSaftyTab,
+    9: this.humanResourceTab,
+    10: this.certifiedSkilledWorkerTab,
+    11: this.committedEquipmentTab,
+    12: this.hrstrengthAtSiteTab,
+    13: this.contractorPresentDuringSiteMonitoringTab,
+    14: this.addingSiteEngineerTab,
+    15: this.monitoringTab,
+    16: this.reviewSubmitTab
+  };
+
+  console.log('Requested to move to step:', step);
+
+  const tabButton = tabMap[step];
+
+  if (tabButton && tabButton.nativeElement) {
+    console.log('Tab button found:', tabButton.nativeElement.id);
+    tabButton.nativeElement.click();
+    tabButton.nativeElement.scrollIntoView({ behavior: 'smooth', inline: 'center' }); // optional smooth scroll
+    this.highestCompletedStep = step;
+    console.log('Moved to step:', step, '| Tab:', tabButton.nativeElement.id);
+  } else {
+    console.warn('Tab button not found for step:', step);
+  }
+}
+
+
 
 showonsiteForm:boolean=true;
 DisplayonsiteForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showonsiteForm=true;
   this.showonWorkInformationForm=false;
   this.showContractorDocForm=false;
@@ -274,7 +315,7 @@ DisplayonsiteForm(){
   this.showCertifiedSkilledWorkerForm=false;
   this.showHumanResourceForm=false;
   this.showMonitorForm=false;
-    this.showReviewSubmitForm=false;
+  this.showReviewSubmitForm=false;
   this.showHRStrengthAtSite=false;
   this.showCommittedEquipment=false;
   this.showContractorPresentDuringSiteMonitoring=false;
@@ -282,6 +323,9 @@ DisplayonsiteForm(){
 }
 showContractorDocForm:boolean=false;
 DisplayContractorDocForm(){
+    this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showonsiteForm=false;  
   this.showRecordOfMonitoringObservation=false;
     this.showonWorkInformationForm=false;
@@ -304,8 +348,11 @@ DisplayContractorDocForm(){
 }
 showWorkProgressForm:boolean=false;
 DisplayWorkProgressForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showWorkProgressForm=true;
-    this.showonWorkInformationForm=false;
+  this.showonWorkInformationForm=false;
   this.showRecordOfMonitoringObservation=false;
   this.showQualificationForm=false;
   this.showRecordOfMonitoringObservation=false;
@@ -328,6 +375,9 @@ DisplayWorkProgressForm(){
 }
 showonWorkInformationForm:boolean=false;
 DisplayonWorkInformationForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showonWorkInformationForm=true;
   this.showQualificationForm=false;
   this.showWorkProgressForm=false; 
@@ -351,6 +401,9 @@ DisplayonWorkInformationForm(){
 }
 showQualificationForm:boolean=false;
 DisplayQualificationForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showQualificationForm=true;
   this.showonWorkInformationForm=false;
   this.showWorkProgressForm=false; 
@@ -374,7 +427,10 @@ DisplayQualificationForm(){
 }
 showWorkTaskQuantityForm:boolean=false;
 DisplayWorkTaskQuantityForm(){
-    this.showonWorkInformationForm=false;
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
+  this.showonWorkInformationForm=false;
   this.showWorkTaskQuantityForm=true;
   this.showQualificationForm=false;
   this.showRecordOfMonitoringObservation=false;
@@ -397,6 +453,9 @@ DisplayWorkTaskQuantityForm(){
 }
 showOnSiteQualityCheck:boolean=false;
 DisplayOnSiteQualityCheck(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showonWorkInformationForm=false;
   this.showOnSiteQualityCheck=true;
   this.showComplianceChecklist=false;
@@ -420,6 +479,9 @@ DisplayOnSiteQualityCheck(){
 }
 showReinforcementForm:boolean=false;
 DisplayReinforcementForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
     this.showonWorkInformationForm=false;
   this.showReinforcementForm=true;
   this.showOnSiteQualityCheck=false;
@@ -442,6 +504,9 @@ DisplayReinforcementForm(){
 }
 showOccupationalHealthAndSaftyForm:boolean=false;
 DisplayOccupationalHealthAndSaftyForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
     this.showonWorkInformationForm=false;
   this.showOccupationalHealthAndSaftyForm=true;
   this.showReinforcementForm=false;
@@ -465,8 +530,11 @@ DisplayOccupationalHealthAndSaftyForm(){
 }
 showHumanResourceForm:boolean=false;
 DisplayHumanResourceForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showHumanResourceForm=true;
-    this.showonWorkInformationForm=false;
+  this.showonWorkInformationForm=false;
   this.showOccupationalHealthAndSaftyForm=false;
   this.showReinforcementForm=false;
   this.showRecordOfMonitoringObservation=false;
@@ -489,8 +557,11 @@ DisplayHumanResourceForm(){
 }
 showCertifiedSkilledWorkerForm:boolean=false;
 DisplayCertifiedSkilledWorkerForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showCertifiedSkilledWorkerForm=true;
-    this.showonWorkInformationForm=false;
+  this.showonWorkInformationForm=false;
   this.showHumanResourceForm=false;
   this.showRecordOfMonitoringObservation=false;
   this.showComplianceChecklist=false;
@@ -511,6 +582,9 @@ DisplayCertifiedSkilledWorkerForm(){
 }
 showCommittedEquipment:boolean=false;
 DisplayCommittedEquipment(){
+    this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
     this.showonWorkInformationForm=false;
   this.showCommittedEquipment=true;
   this.showCertifiedSkilledWorkerForm=false;
@@ -534,6 +608,9 @@ DisplayCommittedEquipment(){
 }
 showHRStrengthAtSite:boolean=false;
 DisplayHRStrengthAtSite(){
+    this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
     this.showonWorkInformationForm=false;
   this.showHRStrengthAtSite=true;
   this.showComplianceChecklist=false;
@@ -556,6 +633,9 @@ DisplayHRStrengthAtSite(){
 }
 showContractorPresentDuringSiteMonitoring:boolean=false;
 DisplayContractorPresentDuringSiteMonitoring(){
+    this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showContractorPresentDuringSiteMonitoring=true;
     this.showonWorkInformationForm=false;
   this.showHRStrengthAtSite=false;
@@ -579,6 +659,9 @@ DisplayContractorPresentDuringSiteMonitoring(){
 }
 showAddingSiteEngineer:boolean=false;
 DisplayAddingSiteEngineer(){
+    this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showRecordOfMonitoringObservation=false;
     this.showonWorkInformationForm=false;
   this.showAddingSiteEngineer=true;
@@ -601,6 +684,9 @@ DisplayAddingSiteEngineer(){
 }
 showMonitorForm:boolean
 showMonitorTeamListsForm(){
+  this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showMonitorForm=true;
     this.showonWorkInformationForm=false;
   this.showRecordOfMonitoringObservation=false;
@@ -625,6 +711,9 @@ showComplianceChecklist:boolean=false;
 showRecordOfMonitoringObservation:boolean=false;
 showReviewSubmitForm:boolean=false;
 DisplayReviewSubmitForm(){
+    this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.showComplianceChecklist=false;
   this.showReviewSubmitForm=true
   this.showRecordOfMonitoringObservation=false;
@@ -649,6 +738,7 @@ contractorDocTabEnabled: boolean = false;
 onSiteCheckTabEnabled:boolean=false
 saveOwnerInformationData(event: { workType: any,ownerId: any ,data:any}) {
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 0);
+    this.moveToStep(0);
   this.showonsiteForm = true;
   this.showonWorkInformationForm = false;
   this.onSiteCheckTabEnabled=true
@@ -673,6 +763,7 @@ reinforcementTabEnabled: boolean = false;
 occupationalHealthAndSaftyTabEnabled: boolean = false;
 
  onDataSaved(event: { tableId: any, data: any,inspectionType:any }) {
+    this.moveToStep(1);
     this.highestCompletedStep = Math.max(this.highestCompletedStep, 1);
     this.tableId = event.tableId;
     this.data = event.data;
@@ -686,6 +777,7 @@ occupationalHealthAndSaftyTabEnabled: boolean = false;
   }
 workProgressTabEnabled: boolean = false;
 onContractorDocSaved(event: { tableId: any, data: any,inspectionType:any}) {
+    this.moveToStep(2);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 2);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -699,6 +791,7 @@ onContractorDocSaved(event: { tableId: any, data: any,inspectionType:any}) {
   }
 
 SavedWorkProgressData(event: { tableId: any, data: any, inspectionType: any }) {
+    this.moveToStep(3);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 3);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -713,6 +806,7 @@ SavedWorkProgressData(event: { tableId: any, data: any, inspectionType: any }) {
 }
 
 SavedQualificationData(event: { tableId: any, data: any, inspectionType: any }) {
+    this.moveToStep(4);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 4);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -727,6 +821,7 @@ SavedQualificationData(event: { tableId: any, data: any, inspectionType: any }) 
 }
 
 SavedWorkTaskQuantityData(event: { tableId: any, data: any, inspectionType: any }) {
+   this.moveToStep(5);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 5);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -740,6 +835,7 @@ SavedWorkTaskQuantityData(event: { tableId: any, data: any, inspectionType: any 
 }
 
 SavedOnSiteQualityCheckData(event: { tableId: any, data: any, inspectionType: any }) {
+  this.moveToStep(6);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 6);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -753,6 +849,7 @@ SavedOnSiteQualityCheckData(event: { tableId: any, data: any, inspectionType: an
 }
 
 SavedReinforcementData(event: { tableId: any, data: any, inspectionType: any }) {
+  this.moveToStep(7);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 7);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -767,6 +864,7 @@ SavedReinforcementData(event: { tableId: any, data: any, inspectionType: any }) 
 
 humanResourceTabEnabled: boolean = false;
 SavedOccupationalHealthAndSaftyData(event: { tableId: any, data: any,inspectionType:any }) {
+   this.moveToStep(8);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 8);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -781,6 +879,7 @@ SavedOccupationalHealthAndSaftyData(event: { tableId: any, data: any,inspectionT
 }
 certifiedSkilledWorkerTabEnabled: boolean = false;
 saveHumanResourceContractData(event: { tableId: any, data: any,inspectionType:any }) {
+   this.moveToStep(9);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 9);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -795,6 +894,7 @@ saveHumanResourceContractData(event: { tableId: any, data: any,inspectionType:an
 }
 committedEquipmentTabEnabled: boolean = false;
 savedCertifiedSkilledWorkerData(event: { tableId: any, data: any,inspectionType:any }) {
+   this.moveToStep(10);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 10);
   this.tableId = event.tableId;
   this.inspectionType = event.inspectionType;
@@ -808,9 +908,13 @@ savedCertifiedSkilledWorkerData(event: { tableId: any, data: any,inspectionType:
 }
 hrstrengthAtSiteTabEnabled: boolean = false;	
 saveCommittedEquipmentData(event: { tableId: any, data: any,inspectionType:any }) {
+   this.moveToStep(11);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 11);
  this.tableId = event.tableId;
   this.data = event.data;
+    this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.inspectionType = event.inspectionType;
   this.showHRStrengthAtSite = true;
   this.hrstrengthAtSiteTabEnabled = true;
@@ -821,8 +925,12 @@ saveCommittedEquipmentData(event: { tableId: any, data: any,inspectionType:any }
 }
 contractorPresentDuringSiteMonitoringTabEnabled: boolean = false;
 humanResourcestrengthsitedata(event: { tableId: any, data: any,inspectionType:any }) {
+   this.moveToStep(12);
   this.tableId = event.tableId;
   this.data = event.data;
+   this.prevTableId = this.tableId;
+  this.inspectionType = this.inspectionType;
+  this.prevOwnerTableId = this.prevOwnerTableId ?? null;
   this.inspectionType = event.inspectionType;
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 12);
   this.showHRStrengthAtSite = false
@@ -834,6 +942,7 @@ humanResourcestrengthsitedata(event: { tableId: any, data: any,inspectionType:an
   }
 addingSiteEngineerTabEnabled: boolean = false;
 contractorPresentData(event: { tableId: any, data: any}) {
+   this.moveToStep(13);
    this.tableId = event.tableId;
   this.data = event.data;
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 13);
@@ -846,6 +955,7 @@ contractorPresentData(event: { tableId: any, data: any}) {
 }
 monitoringTabEnabled: boolean = false;
 siteEngineersData( event: { tableId: any, data: any}) {
+   this.moveToStep(15);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 15);
   this.tableId = event.tableId;
   this.data = event.data;
@@ -856,6 +966,7 @@ siteEngineersData( event: { tableId: any, data: any}) {
 }
 reviewSubmitTabEnabled: boolean = false;
 monitoringData( tableId:any) {
+   this.moveToStep(14);
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 14);
   this.tableId = tableId
   this.showReviewSubmitForm = true;

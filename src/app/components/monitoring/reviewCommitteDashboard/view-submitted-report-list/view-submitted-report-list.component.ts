@@ -94,8 +94,8 @@ EndorseApplicationNo(type: string): void {
             this.createNotification(type);
             this.selectedChecklistIds = [];
             this.FetchWorkBaseOnDzoId();
-            this.searchBasedOnBCTANo(this.formData.BCTANo);
-            this.FetchWorkBaseOnAgencyId(this.formData.agencyId);
+            // this.searchBasedOnBCTANo(this.formData.BCTANo);
+            // this.FetchWorkBaseOnAgencyId(this.formData.agencyId);
             this.closebutton.nativeElement.click();
         }
     );
@@ -112,8 +112,8 @@ EndorseApplicationNo(type: string): void {
                 console.log('response', response);
                 this.createNotification(type);
                 this.FetchWorkBaseOnDzoId(this.formData.dzongkhagId);
-                this.searchBasedOnBCTANo(this.formData.BCTANo);
-                this.FetchWorkBaseOnAgencyId(this.formData.agencyId);
+                // this.searchBasedOnBCTANo(this.formData.BCTANo);
+                // this.FetchWorkBaseOnAgencyId(this.formData.agencyId);
                 this.closeRejectButton.nativeElement.click();
             });
     }

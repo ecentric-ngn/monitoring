@@ -140,7 +140,7 @@
           </button>
 
           <!-- Action button: Show when status is not 'Submitted' -->
-          <button class="btn btn-success" *ngIf="licenseStatus === 'Active'" (click)="openActionModal()">
+          <button class="btn btn-success" *ngIf="licenseStatus === 'Active' && applicationStatus === 'Suspension Resubmission'" (click)="openActionModal()">
             Action
           </button>
 
@@ -153,7 +153,7 @@
 
           <!-- Reinstate button: Show only when license is suspended -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="licenseStatus === 'Suspended'">
+            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
             <button class="btn btn-danger h-100">
               Reinstate
             </button>

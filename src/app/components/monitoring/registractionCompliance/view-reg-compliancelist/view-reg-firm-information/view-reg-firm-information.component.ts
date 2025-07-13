@@ -14,6 +14,7 @@ export class ViewRegFirmInformationComponent implements OnInit {
   activeTabId: string = '';
 WorkDetail: any = {};
 licenseStatus: string = '';
+  data: any;
   constructor(private service: CommonService) { }
 
 ngOnInit(): void {
@@ -26,10 +27,6 @@ ngOnInit(): void {
   this.WorkDetail = WorkDetail.data;
   this.licenseStatus = WorkDetail.data.licenseStatus;
   this.applicationStatus = WorkDetail.data.applicationStatus;
-
-  console.log("WorkDetail in view:", WorkDetail);
-  console.log("application Status:", this.applicationStatus);
-  console.log("licenseStatus:", this.licenseStatus);
 
   // Set activeTabId depending on applicationStatus
   const status = this.applicationStatus;
@@ -75,15 +72,16 @@ ngOnInit(): void {
   }
   type: string = '';
   id: string = '';
-  onActivateTab(event: { id: string, tab: string }) {
+  onActivateTab(event: { id: string,data:string, tab: string }) {
     this.type = event.tab;
     this.id = event.id
-
-    console.log('id', this.id);
+     this.data =event.data;
+     
     if (this.type === 'employee') {
       this.activeTabId = 'employee';
     } else if (this.type === 'equipment') {
       this.activeTabId = 'equipment';
+       this.data =event.data;
     } else if (this.type === 'monitoring') {
       this.activeTabId = 'monitoring';
     } else {
@@ -97,7 +95,11 @@ ngOnInit(): void {
   }
   equipmentForm() {
     this.id = this.id
+    const data = this.WorkDetail
+    this.data = data
     this.activeTabId = 'equipment';
+
+
   }
 
   monitoringTeam() {

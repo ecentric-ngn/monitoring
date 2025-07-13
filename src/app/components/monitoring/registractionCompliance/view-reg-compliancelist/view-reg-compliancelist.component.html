@@ -45,7 +45,7 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
-                  
+
                     <th>Sl No.</th>
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
@@ -54,12 +54,12 @@
                     <th>License Status</th>
                     <th>Verified By</th>
                     <th>Action</th>
-                      <th>Select</th>
+                    <th>Select</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let data of displayedData; let i = index" class="table-row">
-                     <td>{{ i+1 }}</td>
+                    <td>{{ i+1 }}</td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
                         [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS' || data.applicationStatus === 'Suspension Approved'
                         || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
@@ -69,36 +69,42 @@
                     <td>{{ data.nameOfFirm }}</td>
                     <td>{{ data.sentDate }}</td>
                     <td>
-                        <span class="badge" [ngClass]="{
-                            'badge-secondary': data.applicationStatus== 'Not Submitted',
-                            'badge-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Pending',
-                            'badge-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved',
-                            'badge-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
+                        <span class="text-bold" [ngClass]="{
+                            'text-secondary': data.applicationStatus== 'Not Submitted',
+                            'text-warning': data.applicationStatus== 'In Process'  || data.applicationStatus== 'Suspension Request' || data.applicationStatus== 'Cancel Request'|| data.applicationStatus== 'Downgrade Request',
+                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus== 'Forwarded TO RC' ,
+                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
                                             || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
-                            'badge-info': data.applicationStatus== 'Ready for Review'
+                            'text-info': data.applicationStatus== 'Ready for Review'
                             }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
                     <!-- <td>{{ data.category }}</td> -->
-                    <td>{{ data.licenseStatus }}</td>
-
+                    <!-- <td>{{ data.licenseStatus }} -->
+                          <td>
+                     <span class="text-bold" [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'text-primary': data.licenseStatus== 'Active'}">
+                            {{ data.licenseStatus }}
+                        </span>
+                        </td>
                     <td>
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
 
                     <td>
-                        <button *ngIf="data.licenseStatus !== 'Suspended'" class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
-                        <!-- <div *ngIf="data.licenseStatus === 'Suspended'"> -->
-                            <!-- <button class="btn btn-danger btn-sm"
-                                (click)="getReinstateApplication(data.contractorNo)" data-bs-toggle="modal" data-bs-target="#reinstateModal">View</button> -->
-                        <!-- </div> -->
+                        <button *ngIf="data.licenseStatus !== 'Suspended' && data.applicationStatus !== 'Not Submitted' && data.applicationStatus !== 'Forwarded TO RC' && data.applicationStatus !== 'Suspension Request' && data.applicationStatus !== 'Suspension Resubmission' && data.applicationStatus !== 'Cancel Request' && data.applicationStatus !== 'Downgrade Request'" class="btn btn-primary btn-sm me-2 mb-1"
+                            (click)="openActionModal(data)">Action</button>
                     </td>
-                     <td>
+                    <!-- <td>
                         <input type="checkbox" [disabled]="data.applicationStatus === 'Reinstated' || data.applicationStatus === 'Not Submitted' || data.applicationStatus === 'Resubmitted EQ' || data.applicationStatus === 'Suspension Approved' ||  data.applicationStatus === 'Pending'"
                             [value]="data.contractorNo" (change)="onCheckboxChange($event, data.id)">
+                    </td> -->
+                    <td>
+                        <input type="checkbox" [disabled]="!['Verified', 'In Process'].includes(data.applicationStatus)"
+                            [value]="data.contractorNo" (change)="onCheckboxChange($event, data.id)" />
                     </td>
+
 
                 </tr>
 
@@ -173,7 +179,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form #actionForm="ngForm">
-               <div class="modal-header" style="background-color: #495f8a">
+                <div class="modal-header" style="background-color: #495f8a">
                     <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>
@@ -288,7 +294,7 @@
     aria-hidden="true">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-           <div class="modal-header" style="background-color: #495f8a">
+            <div class="modal-header" style="background-color: #495f8a">
                 <h5 class="modal-title text-white" id="constructionFirmModalLabel">Construction Firm Form</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -323,7 +329,7 @@
                             <input type="date" class="form-control form-control-sm" [value]="calculatedDeadline"
                                 [(ngModel)]="formData.deadline" readonly name="deadline">
                         </div>
-                      
+
                         <div class="col-md-6">
                             <label class="form-label">Contractor Class</label>
                             <select class="form-select form-control-sm" name="contractorClass"
@@ -336,15 +342,15 @@
 
                     <!-- Row 3: Dzongkhag -->
                     <div class="row g-3 m-2">
-                          <div class="col-md-6">
+                        <div class="col-md-6">
                             <label class="form-label">Dzongkhag</label>
-                            
-                             <select class="form-select font-size-16"  [(ngModel)]="formData.name" name="name" id="dzongkhag">
-                            <option>--select--</option>
-                            <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.name">
-                            {{ dzongkhag.name }}
-                            </option>
-                        </select>
+                            <select class="form-select font-size-16" [(ngModel)]="formData.name" name="name"
+                                id="dzongkhag">
+                                <option>--select--</option>
+                                <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.name">
+                                    {{ dzongkhag.name }}
+                                </option>
+                            </select>
                         </div>
                     </div>
 

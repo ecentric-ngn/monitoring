@@ -295,7 +295,7 @@ export class SpecializedFirmsComponent {
     }
 
     onActionTypeChange() {
-        if (this.selectedAction.actionType === 'downgrade') {
+        if (this.selectedAction.actionType === 'cancel') {
             const firmId = this.selectedAction.target?.specializedFirmId; // Use the correct property for firmId
             const firmType = 'specializedfirm';
 
@@ -424,32 +424,6 @@ export class SpecializedFirmsComponent {
                 }
             });
         }
-    }
-
-    getReinstateApplication(firmId: string) {
-        if (!firmId) {
-            console.error('Firm ID is missing.');
-            return;
-        }
-
-        this.service.getReinstateApplication(firmId).subscribe({
-            next: (data) => {
-                this.reinstateData = data[0];
-
-                setTimeout(() => {
-                    const modalEl = document.getElementById('reinstateModal');
-                    this.reinstateModal = new bootstrap.Modal(modalEl, {
-                        backdrop: 'static',
-                        keyboard: false
-                    });
-                    this.reinstateModal.show();
-                }, 0);
-            },
-            error: (err) => {
-                console.error('Error fetching reinstate data:', err);
-                this.reinstateData = null;
-            }
-        });
     }
 
     closeReinstateModal() {

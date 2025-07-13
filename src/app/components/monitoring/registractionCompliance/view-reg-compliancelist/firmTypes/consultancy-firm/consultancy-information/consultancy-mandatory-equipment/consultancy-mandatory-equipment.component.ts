@@ -34,6 +34,7 @@ export class ConsultancyMandatoryEquipmentComponent {
         contractorId: '',
         contractorNo: '',
     };
+    licenseStatus: any;
 
     private getPrefix(workCategory: string): string {
         if (workCategory.startsWith('S-')) return 'S';
@@ -49,7 +50,6 @@ export class ConsultancyMandatoryEquipmentComponent {
     ) {}
     WorkDetail: any;
     ngOnInit() {
-        console.log('id', this.id);
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -70,7 +70,6 @@ export class ConsultancyMandatoryEquipmentComponent {
         this.id = this.id;
         const WorkDetail = this.service.getData('BctaNo');
         this.WorkDetail = WorkDetail.data;
-
         if (!WorkDetail || !WorkDetail.data) {
             console.error('WorkDetail or WorkDetail.data is undefined');
             return;
@@ -78,10 +77,8 @@ export class ConsultancyMandatoryEquipmentComponent {
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
         this.applicationStatus = WorkDetail.data.applicationStatus;
+        this.licenseStatus = WorkDetail.data.licenseStatus;
         this.data = WorkDetail.data;
-        console.log('WorkDetail', WorkDetail);
-        console.log('bctaNo', this.bctaNo);
-
         this.tData = {
             eqFulfilled: '',
             eqResubmitDeadline: '',
@@ -89,6 +86,7 @@ export class ConsultancyMandatoryEquipmentComponent {
         };
 
         if (this.bctaNo && this.applicationStatus === 'Suspension Resubmission') {
+            debugger
          this.fetchSuspendDataBasedOnBctaNo();
         } else {
         this.fetchDataBasedOnBctaNo();
@@ -299,7 +297,7 @@ export class ConsultancyMandatoryEquipmentComponent {
                         }
                     }
 
-                    this.downgradeList = workCategories
+                      this.downgradeList = workCategories
                         .map((category: any) => {
                             const prefix = this.getPrefix(
                                 category.workCategory
@@ -308,14 +306,15 @@ export class ConsultancyMandatoryEquipmentComponent {
                                 category.workCategory
                             ).trim();
 
-                            const matchedClassifications = workClassifications
+                            const possibleClassifications = workClassifications
                                 .filter(
                                     (cls: any) =>
                                         cls.type === 'consultant' &&
                                         cls.workClassification.startsWith(
                                             prefix
                                         ) &&
-                                        existingMap[categoryKey]?.has(
+                                        existingMap[categoryKey] &&
+                                        existingMap[categoryKey].has(
                                             String(cls.id).trim()
                                         )
                                 )
@@ -326,14 +325,20 @@ export class ConsultancyMandatoryEquipmentComponent {
                                     preChecked: true,
                                 }));
 
+                            // Return null if no classification matches
+                            if (possibleClassifications.length === 0) {
+                                return null;
+                            }
+
                             return {
                                 workCategory: category.workCategory,
                                 workCategoryId: category.id,
-                                classifications: matchedClassifications,
+/*************  ✨ Windsurf Command 🌟  *************/
+                                classifications: possibleClassifications,
                             };
                         })
-                        // Only include if there is at least one matched classification
-                        .filter((item) => item.classifications.length > 0);
+      
+                        .filter((item: any) => item !== null); // Remove nulls
                 },
                 error: (err) => {
                     console.error('Error fetching downgrade data:', err);
