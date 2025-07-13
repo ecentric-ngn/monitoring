@@ -16,7 +16,7 @@ export const g2c_url_Suspended = "http://172.30.4.159:8180/cdb/public_access";
 //export const g2c_url_Suspended = "http://192.168.123.207:8180/public_access";
 //Pda
 export const CInet_Redirection = "http://ezotin.bcta.gov.bt/cinet";
-export const userManagment_redirection = "http://172.30.4.159";
+export const userManagment_redirection = "http://172.30.4.159/user-management";
 
 
 // // //server
