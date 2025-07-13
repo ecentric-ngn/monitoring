@@ -4,8 +4,6 @@ import { LayoutService } from '../service/app.layout.service'
 import { userManagment_redirection } from '../app.const/const';
 import * as CryptoJS from 'crypto-js';
 import { environment } from  '../../environments/environment.prod';
-import { Location } from '@angular/common';
-
 @Component({
     selector: 'app-topbar',
     templateUrl: './app.topbar.component.html'
@@ -31,7 +29,6 @@ export class AppTopBarComponent {
   constructor(
     public layoutService: LayoutService,
     private route: ActivatedRoute,
-    private location: Location
    
   ) {}
 
@@ -66,9 +63,12 @@ export class AppTopBarComponent {
     const encrypted = CryptoJS.AES.encrypt(userDetails, environment.encryptionKey).toString();
     return encodeURIComponent(encrypted);
   }
-backToPortal() {
-  this.location.back();
-}
+  backToPortal() {
+    const encryptedData = this.getEncryptedUserDetails();
+    if (!encryptedData) return;
+    const url = `${userManagment_redirection}/Portal?data=${encryptedData}`;
+    window.location.href = url;
+  }
   
 }
 
