@@ -6,11 +6,13 @@
         <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
         <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation"
           name="officeLocation" placeholder="Auto" required #officeLocation="ngModel"
-          [readonly]="licenseStatus !== 'Suspended' && licenseStatus !== 'Active'" />
+          [readonly]="licenseStatus !== 'Suspended' && licenseStatus !== 'Active'"
+          [disabled]="applicationStatus === 'Suspension Approved'" />
         <div *ngIf="officeLocation.invalid && officeLocation.touched" class="text-danger font-size-12">
           Location is required
         </div>
       </div>
+
     </div>
 
     <div class="row m-4">
@@ -23,17 +25,19 @@
           View doc
         </button>
       </div>
-
       <!-- Review for Signboard -->
       <div class="col-md-6 mb-3">
         <label class="form-label">Review (Office signboard):<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.signboardReview" name="signboardReview"
-          required #signboardReview="ngModel" (change)="onReviewChange()"
-          [disabled]="licenseStatus !== 'Suspended' && !isFieldEditable('signboardReview') &&  licenseStatus !== 'Active'">
+          required #signboardReview="ngModel" (change)="onReviewChange()" [disabled]="
+          (licenseStatus !== 'Suspended' && !isFieldEditable('signboardReview') && licenseStatus !== 'Active') ||
+          applicationStatus === 'Suspension Approved'
+        ">
           <option value="">-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
         </select>
+
         <div *ngIf="signboardReview.invalid && signboardReview.touched" class="text-danger font-size-12">
           Please select Yes or No
         </div>
@@ -80,42 +84,45 @@
       <div class="col-md-6 mb-3">
         <label class="form-label">Review:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.filingReview" name="filingReview" required
-          #filingReview="ngModel"
-          [disabled]="licenseStatus !== 'Suspended' && !isFieldEditable('filingReview') &&  licenseStatus !== 'Active'">
+          #filingReview="ngModel" [disabled]="
+    (licenseStatus !== 'Suspended' && !isFieldEditable('filingReview') && licenseStatus !== 'Active') || 
+    applicationStatus === 'Suspension Approved'
+  ">
           <option value="">-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
         </select>
+
         <div *ngIf="filingReview.invalid && filingReview.touched" class="text-danger font-size-12">
           Please select Yes or No
         </div>
       </div>
 
       <div class="row d-flex" *ngIf="formData.filingReview === 'No'">
-         <div class="col-md-6 mb-3">
-        <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
-        <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.filingResubmitDate"
-          name="filingResubmitDate" required #filingResubmitDate="ngModel"
-          [disabled]="licenseStatus !== 'Suspended' &&  licenseStatus !== 'Active'">
-        <div *ngIf="filingResubmitDate?.invalid && filingResubmitDate?.touched" class="text-danger font-size-12">
-          Please provide a resubmission date
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
+          <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.filingResubmitDate"
+            name="filingResubmitDate" required #filingResubmitDate="ngModel"
+            [disabled]="licenseStatus !== 'Suspended' &&  licenseStatus !== 'Active'">
+          <div *ngIf="filingResubmitDate?.invalid && filingResubmitDate?.touched" class="text-danger font-size-12">
+            Please provide a resubmission date
+          </div>
         </div>
-      </div>
 
-      <div class="col-md-6 mb-3" >
-        <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
-        <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.filingRemarks"
-          name="filingRemarks" required #filingRemarks="ngModel"
-          [readonly]="licenseStatus !== 'Suspended' &&  licenseStatus !== 'Active'"></textarea>
-        <div *ngIf="filingRemarks?.invalid && filingRemarks?.touched" class="text-danger font-size-12">
-          Remarks are required
+        <div class="col-md-6 mb-3">
+          <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
+          <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.filingRemarks"
+            name="filingRemarks" required #filingRemarks="ngModel"
+            [readonly]="licenseStatus !== 'Suspended' &&  licenseStatus !== 'Active'"></textarea>
+          <div *ngIf="filingRemarks?.invalid && filingRemarks?.touched" class="text-danger font-size-12">
+            Remarks are required
+          </div>
         </div>
-      </div>
       </div>
       <!-- Conditionally shown fields if user selects "No" -->
-     
 
-      
+
+
 
       <!-- Update or Save & Next -->
       <!-- <div class="col-12 text-end mt-3" *ngIf="applicationStatus !== 'Submitted'">
@@ -165,7 +172,12 @@
             Action
           </button> -->
 
-             <button class="btn btn-success" *ngIf="licenseStatus === 'Active' && applicationStatus === 'Suspension Resubmission'"data-bs-toggle="modal"
+          <!-- <button class="btn btn-success"
+            *ngIf="licenseStatus === 'Active' && applicationStatus === 'Suspension Resubmission'" data-bs-toggle="modal"
+            data-bs-target="#staticBackdrop">
+            Action
+          </button> -->
+            <button class="btn btn-primary" *ngIf="licenseStatus === 'Active' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Submitted'" data-bs-toggle="modal"
             data-bs-target="#staticBackdrop">
             Action
           </button>

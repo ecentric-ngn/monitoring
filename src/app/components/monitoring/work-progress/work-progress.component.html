@@ -1,8 +1,8 @@
 
 <form #form="ngForm">
-  <div class="p-3">
+  <div class="p-5">
     <div class="row">
-      <div class="col-md-6 mb-3">
+      <div class="col-md-4 mb-3">
         <label class="form-label">Physical progress:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.physicalprogress" name="physicalprogress"
           required #physicalprogress="ngModel" [disabled]="appNoStatus === 'REJECTED'">
@@ -16,7 +16,7 @@
         </div>
       </div>
 
-      <div class="col-md-6 mb-3">
+      <div class="col-md-4 mb-3">
         <label class="form-label">Financial progress:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.financialprogress" name="financialprogress"
           required #financialprogress="ngModel" [disabled]="appNoStatus === 'REJECTED'">
@@ -29,10 +29,7 @@
           Please select an option for financial progress
         </div>
       </div>
-
-    </div>
-    <div class="row p-3">
-      <div class="col-md-6 mb-3">
+       <div class="col-md-4 mb-3">
         <label class="form-label mb-2">Upload Files</label>
         <div *ngFor="let fileInput of fileInputs; let i = index" class="row g-2 align-items-end mb-2 border rounded">
           <!-- File input -->
@@ -60,8 +57,7 @@
         </div>
       </div>
 
-         <div class="col-md-6" *ngIf="formData.filePathList && formData.filePathList.length > 0">
-         <div class="col-md-4" *ngIf="formData.filePathList && formData.filePathList.length > 0">
+         <div class="" *ngIf="formData.filePathList && formData.filePathList.length > 0">
         <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
         <div class="flex-wrap align-items-center gap-2 flex-column">
           <!-- Show if at least one file is valid -->
@@ -86,8 +82,10 @@
           </ng-template>
         </div>
       </div>
-      </div>
-      <div class="col-md-6 mb-3">
+
+    </div>
+    <div class="row">
+      <div class="col-md-12 mb-3">
         <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
         <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.remarks" name="remarks"
           required #remarks="ngModel"></textarea>

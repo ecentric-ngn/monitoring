@@ -22,6 +22,7 @@ export class HRStrengthAtSiteComponent {
     fileAndRemark: any;
     userName: any;
     @Input() prevTableId: any;
+    @Input() workId: any;
     @Input() data: any;
     @Input() inspectionType: any;
     
@@ -43,7 +44,7 @@ export class HRStrengthAtSiteComponent {
         } else {
             this.prevTableId = this.prevTableId
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
         const userDetailsString = sessionStorage.getItem('userDetails');
@@ -61,6 +62,12 @@ export class HRStrengthAtSiteComponent {
                 operator: 'AND',
                 condition: '=',
             },
+               {
+                field: 'workid',
+                value: this.workId,
+                operator: 'AND',
+                condition: '=',
+        },
         ];
         this.service
             .fetchDetails(payload, 1, 2, 'human_resources_strength')
@@ -96,7 +103,7 @@ export class HRStrengthAtSiteComponent {
         remarks: this.formData.remarks
     }
     this.remarks = payload
-    this.service.uploadFiles(staticFile,this.formData.remarks,'14',this.userName )
+    this.service.uploadFiles(staticFile,this.formData.remarks,'14',this.userName ,this.workId)
             .subscribe((fileId: string) => {
                 const match = fileId.match(/[0-9a-fA-F\-]{36}/);
                 if (match) {
@@ -112,6 +119,7 @@ export class HRStrengthAtSiteComponent {
                     totalNonBhutaneseLabors:
                         this.formData.totalNoOfNumericNonBhutaneseLabors,
                     id: this.tableId,
+                    workID: this.workId,
                 };
 
                 this.service.saveAsDraft(payload).subscribe((response: any) => {

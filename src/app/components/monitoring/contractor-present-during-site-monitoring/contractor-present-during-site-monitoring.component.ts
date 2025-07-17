@@ -26,6 +26,7 @@ export class ContractorPresentDuringSiteMonitoringComponent {
     fileId: string;
     errorMessages: any = {};
     @Input() tableId: any;
+    @Input() workId: any;
     @Output() contractorPresentData = new EventEmitter<{
         tableId: any;
         data: any;
@@ -58,7 +59,7 @@ export class ContractorPresentDuringSiteMonitoringComponent {
         } else {
             this.prevTableId = this.prevTableId;
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
     }
@@ -70,19 +71,25 @@ export class ContractorPresentDuringSiteMonitoringComponent {
             operator: 'AND',
             condition: '=',
         },
+           {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
     ];
 
     this.service
-        .fetchDetails(payload, 1, 100, 'comprehensive_checklist_view') // increase limit if needed
+        .fetchDetails(payload, 1, 100, 'contractorPresentduringmonitoring_view') // increase limit if needed
         .subscribe({
             next: (response: any) => {
                 const contractors = response.data;
                 this.dataList = []; // clear existing if needed
                 contractors.forEach((data: any) => {
                     this.dataList.push({
-                        cidNo: data.contractor_cid_no,
-                        fullName: data.contractor_full_name,
-                        mobileNo: data.contractor_mobile_no,
+                        cidNo: data.cid_no,
+                        fullName: data.full_name,
+                        mobileNo: data.mobile_no,
                         otp: '',
                         showOtpInput: false,
                         errorMessages: {},
@@ -96,7 +103,10 @@ export class ContractorPresentDuringSiteMonitoringComponent {
 }
 
     isLoading = false;
-  
+  get isSaveNextEnabled(): boolean {
+  return (this.appNoStatus === 'REJECTED' || this.isOtpValid) || this.inspectionType === 'OTHERS';
+}
+
 
 otpSent = false;
 otpVerified = false;
@@ -208,7 +218,7 @@ getCidDetails(formData): void {
     }
   );
 }
-  saveAndNext(form: NgForm): void {
+saveAndNext(form: NgForm): void {
   // Skip validation if inspectionType is 'OTHERS'
   if (this.inspectionType !== 'OTHERS' && form.invalid) {
     Object.keys(form.controls).forEach((field) => {
@@ -218,12 +228,17 @@ getCidDetails(formData): void {
     return;
   }
 
-  const payload = {
-    id: parseInt(this.tableId, 10),
-    contractorCidNo: this.formData.cidNo,
-    contractorFullName: this.formData.fullName,
-    contractorMobileNo: this.formData.mobileNo,
-  };
+  // Wrap the dataList array inside a "contractor" object
+const payload = {
+  contractors: this.dataList.map((item) => ({
+    cidNo: item.cidNo,
+    fullName: item.fullName,
+    mobileNo: item.mobileNo
+  })),
+  id: this.prevTableId || this.tableId,
+  workID: this.workId
+};
+
 
   this.service.saveAsDraft(payload).subscribe(
     (response: any) => {
@@ -234,9 +249,12 @@ getCidDetails(formData): void {
       });
       this.router.navigate(['monitoring/adding-site-engineer']);
     },
-    (error: any) => {}
+    (error: any) => {
+      // Handle error here if needed
+    }
   );
 }
+
 
 
     opt: any

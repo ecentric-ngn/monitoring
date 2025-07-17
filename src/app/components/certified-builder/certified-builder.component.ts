@@ -30,6 +30,7 @@ export class CertifiedBuilderComponent {
   shouldShowActionButtons: boolean;
   hideReadOption: boolean;
   fileSizeExceeded: boolean = false;
+  
   maxFileSizeMB: number = 2; // Maximum file size in MB
   maxSizeInBytes: number = this.maxFileSizeMB * 1024 * 1024; // Maximum file size in bytes
   @ViewChild('fileInput') fileInput;

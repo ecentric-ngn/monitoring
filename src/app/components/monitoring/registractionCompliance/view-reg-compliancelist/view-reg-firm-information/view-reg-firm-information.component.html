@@ -1,16 +1,16 @@
-<div class="card container-fluid">
-    <p class="m-3 font-bold font-size-18"><strong>Registered firm
-            Information</strong>
-    <p class="m-3 font-bold font-size-18" [ngClass]="{
-    'text-primary': applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS',
-    'text-success': applicationStatus === 'Resubmitted HR',
-    'text-warning': applicationStatus === 'Resubmitted EQ'
-  }">
-        <strong>{{ applicationStatus }}</strong>
-    </p>
+<div class="container-fluid">
+ <button type="button" class="btn pi pi-arrow-circle-left text-white" (click)="goBack()" style="background: #48546c;">
+    <span class="text-white">Back</span> 
+  </button>
+</div>
 
-    <form>
-        <div class="row m-3">
+<div class="">
+<div class="d-flex justify-content-start align-items-center m-4">
+ 
+  <strong class="font-bold font-size-18">Registered firm Information</strong>
+</div>
+    <form class="m-4">
+        <div class="row m-auto ">
             <div class="col-md-4 mb-3">
                 <label class="form-label me-2 font-size-12">Firm Name:</label>
                 <span class="font-size-12">{{formData?.firmName || 'N/A'}}</span>
@@ -37,9 +37,13 @@
                     <span *ngSwitchDefault>N/A</span>
                 </span>
             </div>
+             <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">Application Status:</label>
+                <span class="font-size-12">{{applicationStatus || 'N/A'}}</span>
+            </div>
         </div>
 
-        <div class="container-fluid">
+        <div class="container-fluid ">
             <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
                     <button class="nav-link border" [class.active]="activeTabId === 'office'" id="office-tab"

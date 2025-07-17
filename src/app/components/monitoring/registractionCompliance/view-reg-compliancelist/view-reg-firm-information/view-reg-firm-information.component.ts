@@ -18,6 +18,7 @@ licenseStatus: string = '';
   constructor(private service: CommonService) { }
 
 ngOnInit(): void {
+    this.activeTabId = 'office';
   const WorkDetail = this.service.getData('BctaNo');
   if (!WorkDetail || !WorkDetail.data) {
     console.error('WorkDetail or WorkDetail.data is undefined');
@@ -56,7 +57,9 @@ ngOnInit(): void {
   this.service.setBctaNo(this.bctaNo);
 }
 
-
+goBack() {
+  window.history.back();
+}
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
       this.formData = res.complianceEntities[0];

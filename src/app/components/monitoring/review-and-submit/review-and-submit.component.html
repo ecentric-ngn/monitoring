@@ -512,7 +512,6 @@
           <th class="text-center p-1">Designation</th>
           <th class="text-center p-1">Qualification</th>
           <th class="text-center p-1">Status</th>
-          <th class="text-center p-1">uploaded Doc</th>
           <!-- <th class="text-center p-1">Action</th> -->
         </tr>
       </thead>
@@ -528,28 +527,24 @@
             <td class="text-center">{{ item.designation }}</td>
             <td class="text-center">{{ item.qualification }}</td>
             <td class="text-center">{{ item.status }}</td>
-            <td class="text-center"><span></span></td>
           </tr>
         </ng-container>
       </tbody>
     </table>
     <div class="row">
-      <div class="col-md-4 d-flex">
-        <label class="form-label me-2 font-size-12">Upload:</label>
-        <div *ngFor="let item of fileAndRemark">
-          <div *ngIf="item.form_type === '10'" class="">
-            <button class="btn btn-outline-primary btn-sm" (click)="viewFile(item.file_path)">
-              <i class="bi bi-eye me-1"></i> view doc Doc
-            </button>
-          </div>
-        </div>
-
-      </div>
-      <div class="col-md-4 d-flex">
+      <div class="col-md-6 d-flex">
+    <label class="form-label me-2 font-size-12">Upload:</label>
+    <div *ngFor="let item of fileAndRemark">
+      <button class="btn btn-outline-primary btn-sm mb-1" (click)="viewFile(item.file_paths)">
+        <i class="bi bi-eye me-1"></i> View Doc
+      </button>
+    </div>
+  </div>
+      <div class="col-md-6 d-flex">
         <label class="form-label me-2 font-size-12">Remarks:</label>
-        <div *ngFor="let item of fileAndRemark">
-          <div *ngIf="item.form_type === '10'" class="">
-            <span class="font-size-12"> {{ item.remarks }}</span>
+        <div>
+          <div  class="">
+            <span class="font-size-12"> {{ this.formData.remarks }}</span>
           </div>
         </div>
       </div>

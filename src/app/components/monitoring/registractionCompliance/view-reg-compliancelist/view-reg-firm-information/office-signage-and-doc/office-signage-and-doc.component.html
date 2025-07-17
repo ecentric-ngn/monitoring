@@ -133,24 +133,24 @@
         <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap">
 
           <!-- Update button: Show when status is not 'Submitted' -->
-          <button type="submit" class="btn btn-primary" *ngIf="applicationStatus !== 'Submitted'" (click)="update()"
+          <button type="submit" class="btn btn-success" *ngIf="applicationStatus !== 'Submitted'" (click)="update()"
             [disabled]="isSaving">
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
             {{ isSaving ? 'Saving...' : 'Update' }}
           </button>
 
-          <!-- Action button: Show when status is not 'Submitted' -->
-          <button class="btn btn-success" *ngIf="licenseStatus === 'Active' && applicationStatus === 'Suspension Resubmission'" (click)="openActionModal()">
-            Action
-          </button>
+        
 
           <!-- Save & Next button: Show only when status is 'Submitted' -->
-          <button type="submit" class="btn btn-primary" *ngIf="applicationStatus === 'Submitted'"
+          <button type="submit" class="btn btn-success" *ngIf="applicationStatus === 'Submitted'"
             (click)="saveAndNext()" [disabled]="isSaving">
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
             {{ isSaving ? 'Saving...' : 'Save & Next' }}
           </button>
-
+  <!-- Action button: Show when status is not 'Submitted' -->
+          <button class="btn btn-primary" *ngIf="licenseStatus === 'Active' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Submitted'" (click)="openActionModal()">
+            Action
+          </button>
           <!-- Reinstate button: Show only when license is suspended -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
             (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
@@ -223,21 +223,6 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
-                                    <td>{{ downgrade.workCategory }}</td>
-                                    <td>{{ downgrade.existingClass }}</td>
-                                    <td>
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                            <option *ngFor="let option of getClassOptions(downgrade.existingClass)"
-                                                [value]="option.value">
-                                                {{ option.label }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                </tr> -->
-
                 <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
                   <td>{{ downgrade.workCategory }}</td>
                   <td>{{ downgrade.existingClass }}</td>

@@ -21,6 +21,7 @@ export class QualificationComponent {
     @Input() inspectionType: any;
     disableField: boolean = false;
     isFetching: boolean = false;
+        @Input() workId: any;
     @Output() SavedQualificationData = new EventEmitter<{
         tableId: any;
         data: any;
@@ -45,6 +46,7 @@ export class QualificationComponent {
         this.data = this.data;
         this.appNoStatus = this.data?.applicationStatus ?? null;
         this.inspectionType = this.inspectionType;
+        this.workId = this.data?.id || null;
         const userDetailsString = sessionStorage.getItem('userDetails');
         this.prevTableId = this.prevTableId || this.tableId;
         if (this.appNoStatus === 'REJECTED') {
@@ -52,7 +54,7 @@ export class QualificationComponent {
         } else {
             this.prevTableId = this.prevTableId;
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
         if (userDetailsString) {
@@ -69,6 +71,12 @@ export class QualificationComponent {
                 operator: 'AND',
                 condition: '=',
             },
+               {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service.fetchDetails(payload, 1, 2, 'qualification_of_subcontractors').subscribe(
                 (response: any) => {
@@ -211,13 +219,13 @@ export class QualificationComponent {
         const uploadObservables = [];
         if (this.selectedFiles && this.selectedFiles.length > 0) {
             for (const file of this.selectedFiles) {
-                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
+                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName,this.workId);
                 uploadObservables.push(upload$);
             }
         }  else {
         // Send dummy file instead of null
         const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName,this.workId);
         uploadObservables.push(upload$);
        }
         forkJoin(uploadObservables).subscribe({
@@ -240,6 +248,7 @@ export class QualificationComponent {
     private saveDraftPayload() {
         const payload = {
             id: this.tableId,
+            workID: this.workId,
             subContractorExists: this.formData.contractorType,
             bctaRegistrationNo: this.formData.bctaRegistrationNo,
             registrationValidUntil: this.formData.expiryDate,
@@ -271,7 +280,7 @@ export class QualificationComponent {
     }
     assignCheckListId() {
         const payload = this.fileId; // this is a valid array of fileIds
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 console.log('File ID assigned successfully:', response);
                 this.createNotification();

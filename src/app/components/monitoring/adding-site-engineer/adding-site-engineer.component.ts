@@ -37,6 +37,7 @@ dataList: FormData[] = [];
   showValidateMessage: any;
   @Input() prevTableId: any;
   @Input() data: any;
+  @Input() workId: any;
   appNoStatus: any;
 constructor(private service:CommonService,private router: Router,private notification: NzNotificationService) { }
 
@@ -50,7 +51,7 @@ ngOnInit() {
         } else {
             this.prevTableId = this.prevTableId
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
      
@@ -62,7 +63,13 @@ ngOnInit() {
                 "value": this.prevTableId,
                 "operator": "AND",
                 "condition": "="
-              }
+              },
+                 {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ]
           this.service.fetchDetails(payload,1,2,'client_site_engineers_view').subscribe(
             (response: any) => {
@@ -114,7 +121,7 @@ getCidDetails(formData): void {
         formData.mobileNo = employeeDetail.MobileNo;
         formData.email = employeeDetail.Email;
       } else {
-        formData.errorMessages.notFound = 'Not Registered in DCRC';
+        formData.errorMessages.notFound = 'Not Registered in RCSC';
       }
       this.isLoading = false;
     },
@@ -169,7 +176,7 @@ saveAndNext(form: NgForm) {
     designation: item.designation,
     email: item.email
   }));
-  this.service.saveSiteEngineerData(payload, this.tableId).subscribe(
+  this.service.saveSiteEngineerData(payload, this.tableId,this.workId).subscribe(
     (response: any) => {
       this.createNotification();
       this.siteEngineersData.emit({

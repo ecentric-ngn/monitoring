@@ -4,7 +4,7 @@
   </div>
 
   <!-- Tabs -->
-   <span class="text-warning ml-3">Note:<i>Filter base on license status</i></span>
+  <span class="text-warning ml-3">Note:<i>Filter base on license status</i></span>
   <div class="col-md-4">
     <select class="form-select" (change)="onTabChange($event)" [value]="activeTab">
       <option value="active">Active</option>
@@ -15,6 +15,20 @@
   </div>
   <!-- Suspend Tab -->
   <div *ngIf="activeTab === 'active'">
+    <div class="row">
+      <div class="col d-flex pl-4">
+        <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+        <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+          style="border-color: #ced4da;">
+          <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+        </select>
+      </div>
+      <div class="col-lg-7 d-flex justify-content-end pr-2">
+        <p class="mr-1 p-1 text-gray-600">Search By : </p>
+        <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
+          id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+      </div>
+    </div>
     <!-- Suspend Table -->
     <div class="table-responsive m-3">
       <table class="table table-bordered table-sm">
@@ -68,24 +82,38 @@
       </div>
     </div> -->
 
-   <div class="d-flex justify-content-end">
-  <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0"
-    (click)="activeAction='Suspended'" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Endorse
-  </button>
-  <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
-    (click)="activeAction='rejected'" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Reject
-  </button>
-</div>
+    <div class="d-flex justify-content-end">
+      <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='Suspended'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Endorse
+      </button>
+      <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Reject
+      </button>
+    </div>
 
   </div>
-    <div *ngIf="activeTab === 'suspend'">
-    <!-- Suspend Table -->
-    <div class="table-responsive m-3">
+  <div *ngIf="activeTab === 'suspend'">
+    <div class="row">
+      <div class="col d-flex pl-4">
+        <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+        <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+          style="border-color: #ced4da;">
+          <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+        </select>
+      </div>
+      <div class="col-lg-7 d-flex justify-content-end pr-2">
+        <p class="mr-1 p-1 text-gray-600">Search By : </p>
+        <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
+          id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+      </div>
+    </div>
+    <div class="ml-2 my--3 table-responsive">
       <table class="table table-bordered table-sm">
         <thead class="thead-dark">
           <tr>
+            <th>SL No.</th>
             <th>Contractor No</th>
             <th>Type</th>
             <th>Details</th>
@@ -96,11 +124,14 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let action of tableData">
+          <tr *ngFor="let action of tableData; let i = index">
             <td>
-              {{ action.contractorNo || '-' }}
+              {{i+1 }}
             </td>
-            <td>{{ action.type }}</td>
+            <td>
+              {{ action.firmId || '-' }}
+            </td>
+            <td>{{ action.firmType }}</td>
             <td>{{ action.details }}</td>
             <td>{{ action.initiatedBy }}</td>
             <td>{{ action.createdOn}}</td>
@@ -110,7 +141,10 @@
               </span>
             </td>
             <td class="text-center">
-              <input type="checkbox" [(ngModel)]="action.selected" (change)="onCheckboxChange(action)">
+              <input type="checkbox" [(ngModel)]="action.selected" [disabled]="isCheckboxDisabled(action)"
+                (change)="onCheckboxChange(action)" />
+
+              <!-- <input type="checkbox" [(ngModel)]="action.selected" (change)="onCheckboxChange(action)"> -->
             </td>
           </tr>
           <tr *ngIf="tableData.length === 0 && !isLoading">
@@ -132,27 +166,41 @@
       </div>
     </div> -->
 
-    <div class="d-flex justify-content-end">
-      <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0"
-    (click)="activeAction='Suspended'" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Endorse
-  </button>
-  <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
-    (click)="activeAction='rejected'" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Reject
-  </button>
+    <div class="d-flex justify-content-end mt-4">
+      <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='Suspended'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Endorse
+      </button>
+      <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Reject
+      </button>
     </div>
   </div>
   <!-- Cancel Tab -->
-  <div *ngIf="activeTab === 'cancel'">
+  <div *ngIf="showCancelTable">
+     <div class="row">
+      <div class="col d-flex pl-4">
+        <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+        <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+          style="border-color: #ced4da;">
+          <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+        </select>
+      </div>
+      <div class="col-lg-7 d-flex justify-content-end pr-2">
+        <p class="mr-1 p-1 text-gray-600">Search By : </p>
+        <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
+          id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+      </div>
+    </div>
     <!-- Cancel Table -->
-    <div class="table-responsive m-3">
+    <div class="table-responsive ml-2 my--3">
       <table class="table table-bordered table-sm">
         <thead class="thead-dark">
           <tr>
+            <th>Sl No.</th>
             <th>Firm No</th>
             <th>Firm Type</th>
-            <th>Action Type</th>
             <th>Details</th>
             <th>Initiated By</th>
             <th>Date</th>
@@ -161,21 +209,25 @@
           </tr>
         </thead>
         <tbody>
-          <tr *ngFor="let app of filteredApplications">
-            <td>{{ app.firmNo || app.contractorNo }}</td>
-            <td>{{ app.firmType || app.type }}</td>
-            <td>{{ app.actionType || 'Cancel' }}</td>
+          <tr *ngFor="let app of filteredApplications; let i = index">
+            <td>{{i+1}}</td>
+            <td>{{ app.firmNo}}</td>
+            <td>{{ app.firmType }}</td>
             <td>{{ app.details }}</td>
             <td>{{ app.initiatedBy }}</td>
             <td>{{ app.initiatedDate | date:'mediumDate' }}</td>
-            <td>
-              <span [ngClass]="getStatusClass(app.status)">
-                {{ app.status }}
-              </span>
-            </td>
+            <td>{{ app.status}}</td>
             <td class="text-center">
               <input type="checkbox" [(ngModel)]="app.selected" (change)="onCheckboxChange(app)">
             </td>
+            <!-- <td>
+              <span [ngClass]="getStatusClass(app.status)">
+                {{ app.status }}
+              </span>
+            </td> -->
+            <!-- <td class="text-center">
+              <input type="checkbox" [(ngModel)]="app.selected" (change)="onCheckboxChange(app)">
+            </td> -->
           </tr>
           <tr *ngIf="filteredApplications.length === 0 && !isLoading">
             <td colspan="8" class="text-center text-muted">No cancellation applications found</td>
@@ -190,20 +242,47 @@
         </tbody>
       </table>
     </div>
-
-    <!-- Cancel Button -->
-    <div class="d-flex justify-content-end">
-       <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
-    (click)="activeAction='cancel'" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Endorse Cancellation AppNo
-  </button>
+ <div class="d-flex justify-content-end mt-3">
+      <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='cancel'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Endorse
+      </button>
+      <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Reject
+      </button>
     </div>
+    <!-- Cancel Button -->
+    <!-- <div class="d-flex justify-content-end">
+      <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='cancel'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Endorse
+      </button>
+      <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Reject
+      </button>
+    </div> -->
   </div>
 
   <!-- Downgrade Tab -->
   <div *ngIf="activeTab === 'downgrade'">
+     <div class="row">
+      <div class="col d-flex pl-4">
+        <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+        <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+          style="border-color: #ced4da;">
+          <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+        </select>
+      </div>
+      <div class="col-lg-7 d-flex justify-content-end pr-2">
+        <p class="mr-1 p-1 text-gray-600">Search By : </p>
+        <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
+          id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+      </div>
+    </div>
     <div class="container-fluid px-0">
-      <div class="table-responsive m-3" style="overflow-x: auto; overflow-y: hidden;">
+      <div class="table-responsive ml-2 my--3" style="overflow-x: auto; overflow-y: hidden;">
         <table class="table table-bordered table-sm"
           style="width: 100%; table-layout: fixed; border-collapse: collapse;">
           <thead class="thead-dark">
@@ -257,33 +336,47 @@
       </div>
 
       <!-- Downgrade Button -->
-      <div class="d-flex justify-content-end">
-        <button class="btn btn-danger" [disabled]="selectedIds.length === 0"
-    (click)="activeAction='downgrade'" data-bs-toggle="modal" data-bs-target="#exampleModal">
-    Endorse Downgrade AppNo
-  </button>
-      </div>
+      <!-- <div class="d-flex justify-content-end">
+        <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='downgrade'"
+          data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Endorse
+        </button>
+        <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
+          data-bs-toggle="modal" data-bs-target="#exampleModal">
+          Reject
+        </button>
+      </div> -->
+       <div class="d-flex justify-content-end mt-5">
+      <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='downgrade'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Endorse
+      </button>
+      <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">
+        Reject
+      </button>
+    </div>
     </div>
   </div>
 
-<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header" style="background-color: #495f8a">
-        <h5 class="modal-title text-white" id="exampleModalLabel">{{ modalTitle }}</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="col-md-12">
-          <label class="form-label font-size-12">Remarks:<span class="text-danger">*</span></label>
-          <textarea class="form-control" placeholder="Remarks" name="remarks" [(ngModel)]="formData.remarks" rows="4">
-          </textarea>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #495f8a">
+          <h5 class="modal-title text-white" id="exampleModalLabel">{{ modalTitle }}</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-      </div>
-      <div class="modal-footer">
-        <button type="button" #closeRemarkButton class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="submitAction()">Save</button>
+        <div class="modal-body">
+          <div class="col-md-12">
+            <label class="form-label font-size-12">Remarks:<span class="text-danger">*</span></label>
+            <textarea class="form-control" placeholder="Remarks" name="remarks" [(ngModel)]="formData.remarks" rows="4">
+          </textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" #closeRemarkButton class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="submitAction()">Save</button>
+        </div>
       </div>
     </div>
   </div>
-</div>

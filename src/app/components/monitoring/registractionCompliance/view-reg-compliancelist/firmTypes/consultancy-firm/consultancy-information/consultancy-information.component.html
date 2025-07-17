@@ -1,5 +1,5 @@
-<div class="card container-fluid">
-    <p class="m-3 font-bold font-size-18"><strong>Registered Consultancy Firm's Information</strong></p>
+<div class="container-fluid">
+    <p class="m-5 font-bold font-size-18"><strong> Firm's Information</strong></p>
     <!-- {{licenseStatus}} -->
     <form>
         <div class="row m-3">
@@ -28,6 +28,10 @@
                     <span *ngSwitchCase="'L'">L - Large</span>
                     <span *ngSwitchDefault>N/A</span>
                 </span>
+            </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">Email Address:</label>
+                <span class="font-size-12">{{applicationStatus || 'N/A'}}</span>
             </div>
         </div>
 

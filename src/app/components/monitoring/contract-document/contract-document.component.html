@@ -1,11 +1,12 @@
 <form #form="ngForm">
   <div class="p-3">
+    <!-- First Row: Basic Information -->
     <div class="row align-items-end">
       <div class="col-md-4 mb-3">
         <label class="form-label">Construction Permit:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.ConstructionPermit" name="ConstructionPermit"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.ConstructionPermit" name="ConstructionPermit"
           required #ConstructionPermit="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -14,11 +15,12 @@
           Please select an ConstructionPermit
         </div>
       </div>
+      
       <div class="col-md-4 mb-3">
         <label class="form-label">Conditions of Contract:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.contractConditions" name="contractConditions"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.contractConditions" name="contractConditions"
           required #contractConditions="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -27,22 +29,307 @@
           Please select an option for Site Office
         </div>
       </div>
-
+      
       <div class="col-md-4 mb-3">
-        <label class="form-label">Work Insurance:<span class="text-danger font-size-12">*</span></label>
-        <input type="text" class="form-control  form-control-sm" [(ngModel)]="formData.workInsurance" placeholder="Auto"
-          name="workInsurance" required #workInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-        <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
-          Please enter Work Insurance
+        <label class="form-label">Insurance Type:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm" [(ngModel)]="formData.InsuranceType" name="InsuranceType" required
+          #InsuranceType="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          <option disabled>-- Select --</option>
+          <option value="RICBL">RICBL</option>
+          <option value="BIL">BIL</option>
+        </select>
+        <div *ngIf="InsuranceType.invalid && InsuranceType.touched" class="text-danger font-size-12">
+          Please select an option InsuranceType
         </div>
       </div>
     </div>
+
+    <!-- Insurance Sections (BIL) -->
+    <div *ngIf="formData.InsuranceType === 'BIL'">
+      <!-- Work Insurance Section -->
+      <div class="row align-items-end">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Policy No for Work Insurance:<span class="text-danger font-size-12">*</span></label>
+          <div class="d-flex">
+            <input type="text" name="policyNo" class="form-control me-2 form-control-sm" [(ngModel)]="formData.policyNo"
+              name="policyNo" required #bctaRegistrationNo="ngModel" (input)="onPolicyNoChange()" />
+            <button type="button" class="btn btn-primary" (click)="onfetchDetails('workInsurance')">
+              {{ isFetching ? 'Fetching...' : 'Fetch' }}
+            </button>
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Work Insurance:<span class="text-danger font-size-12">*</span></label>
+          <textarea class="form-control" [(ngModel)]="formData.workInsurance" placeholder="Enter work Insurance"
+            name="workInsurance" required #workInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'"
+            style="line-height: 1.2; font-size: 0.875rem;" readonly></textarea>
+          <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
+            Please enter Work Insurance
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+          <label class="form-label">Work Insurance Remarks:<span class="text-danger font-size-12">*</span></label>
+          <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.insuranceRemarks" id="remarks"
+            name="insuranceRemarks" required #insuranceRemarks="ngModel"
+            style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <div *ngIf="insuranceRemarks.invalid && insuranceRemarks.touched" class="text-danger font-size-12">
+            Please enter insuranceRemarks.
+          </div>
+        </div>
+      </div>
+      <!-- Policy Details Table -->
+      <div *ngIf="policyDetails && showTable">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th colspan="2" class="text-center">Essential Policy Information</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td width="30%"><strong>Name of the Insured</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Policy Number</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.policy_no }}</td>
+            </tr>
+            <tr>
+              <td><strong>Insurer</strong></td>
+              <td>Your Insurance Company Name</td>
+            </tr>
+            <tr>
+              <td><strong>Type of Insurance</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].product_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Coverage Type</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.cover_type }}</td>
+            </tr>
+            <tr>
+              <td><strong>Coverage Details</strong></td>
+              <td>
+                <div><strong>Material Damage:</strong> {{ policyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
+                <div><strong>Third Party Liability:</strong> {{ policyDetails.insurance_policy_data[0].third_party_liability[0].particular }}</div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Policy Period</strong></td>
+              <td>
+                From {{ policyDetails.insurance_policy_data[0].insurance_validate.project_start_date }}
+                to {{ policyDetails.insurance_policy_data[0].insurance_validate.project_end_date }}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Maintenance Period</strong></td>
+              <td>
+                From {{ policyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date.split(',')[0] }}
+                to {{ policyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date }}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Project Reference</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.nature_of_contract }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Third Party Insurance Section -->
+      <div class="row align-items-end">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Policy No for Third Party Insurance:<span class="text-danger font-size-12">*</span></label>
+          <div class="d-flex">
+            <input type="text" name="policyNo" class="form-control me-2 form-control-sm" [(ngModel)]="formData.thirdPartyInsurancePolicyNo"
+              name="thirdPartyInsurancePolicyNo" required #thirdPartyInsurancePolicyNo="ngModel" (input)="onPolicyNoChange('thirdPartyInsurance')" />
+            <button type="button" class="btn btn-primary" (click)="onfetchDetails('thirdPartyInsurance')">
+              {{ isFetchingThirdPartyPolicyNo ? 'Fetching...' : 'Fetch' }}
+            </button>
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Third Party Insurance:<span class="text-danger font-size-12">*</span></label>
+          <textarea class="form-control" [(ngModel)]="formData.thirdPartyInsurance"
+            placeholder="Enter third party insurance details" name="thirdPartyInsurance" required
+            #thirdPartyInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'"
+            style="line-height: 1.2; font-size: 0.875rem;" readonly></textarea>
+          <div *ngIf="thirdPartyInsurance.invalid && thirdPartyInsurance.touched" class="text-danger font-size-12">
+            Third Party Insurance is required.
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+          <label class="form-label">Third Party Remarks:<span class="text-danger font-size-12">*</span></label>
+          <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.ThirdPartyInsuranceRemarks"
+            id="ThirdPartyInsuranceRemarks" name="ThirdPartyInsuranceRemarks" required
+            #ThirdPartyInsuranceRemarks="ngModel" style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <div *ngIf="ThirdPartyInsuranceRemarks.invalid && ThirdPartyInsuranceRemarks.touched"
+            class="text-danger font-size-12">
+            Please enter ThirdPartyInsuranceRemarks.
+          </div>
+        </div>
+      </div>
+          <!-- Policy Details Table -->
+      <div *ngIf="thirdPartyPolicyDetails && showThirdPartyTable">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th colspan="2" class="text-center">Essential Policy Information</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td width="30%"><strong>Name of the Insured</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Policy Number</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.policy_no }}</td>
+            </tr>
+            <tr>
+              <td><strong>Insurer</strong></td>
+              <td>Your Insurance Company Name</td>
+            </tr>
+            <tr>
+              <td><strong>Type of Insurance</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].product_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Coverage Type</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.cover_type }}</td>
+            </tr>
+            <tr>
+              <td><strong>Coverage Details</strong></td>
+              <td>
+                <div><strong>Material Damage:</strong> {{ policyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
+                <div><strong>Third Party Liability:</strong> {{ policyDetails.insurance_policy_data[0].third_party_liability[0].particular }}</div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Policy Period</strong></td>
+              <td>
+                From {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.project_start_date }}
+                to {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.project_end_date }}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Maintenance Period</strong></td>
+              <td>
+                From {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date.split(',')[0] }}
+                to {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date }}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Project Reference</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.nature_of_contract }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <!-- Workers Insurance Section -->
+      <div class="row align-items-end">
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Policy No for Workers Insurance:<span class="text-danger font-size-12">*</span></label>
+          <div class="d-flex">
+            <input type="text" name="WorkersInsurancePolicyNo" class="form-control me-2 form-control-sm" [(ngModel)]="formData.WorkersInsurancePolicyNo"
+              name="WorkersInsurancePolicyNo" required #WorkersInsurancePolicyNo="ngModel" (input)="onPolicyNoChange('WorkersInsurance')" />
+            <button type="button" class="btn btn-primary" (click)="onfetchDetails('WorkersInsurance')">
+              {{ isFetchingWorkersInsurancePolicyNo ? 'Fetching...' : 'Fetch' }}
+            </button>
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-3">
+          <label class="form-label">Workers Insurance:<span class="text-danger font-size-12">*</span></label>
+          <textarea class="form-control" [(ngModel)]="formData.workersInsurance"
+            placeholder="Enter Workers Insurance details" name="workersInsurance" required
+            #workersInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'"
+            style="line-height: 1.2; font-size: 0.875rem;" readonly></textarea>
+          <div *ngIf="workersInsurance.invalid && workersInsurance.touched" class="text-danger font-size-12">
+            Workers Insurance Insurance is required.
+          </div>
+        </div>
+        
+        <div class="col-md-4 mb-4">
+          <label class="form-label">Workers Insurance Remarks:<span class="text-danger font-size-12">*</span></label>
+          <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.ThirdPartyInsuranceRemarks"
+            id="ThirdPartyInsuranceRemarks" name="ThirdPartyInsuranceRemarks" required
+            #ThirdPartyInsuranceRemarks="ngModel" style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <div *ngIf="ThirdPartyInsuranceRemarks.invalid && ThirdPartyInsuranceRemarks.touched"
+            class="text-danger font-size-12">
+            Please enter ThirdPartyInsuranceRemarks.
+          </div>
+        </div>
+
+        <div *ngIf="WorkersInsurancePolicyDetails && WorkersInsurance">
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th colspan="2" class="text-center">Essential Policy Information</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td width="30%"><strong>Name of the Insured</strong></td>
+              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Policy Number</strong></td>
+              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.policy_no }}</td>
+            </tr>
+            <tr>
+              <td><strong>Insurer</strong></td>
+              <td>Your Insurance Company Name</td>
+            </tr>
+            <tr>
+              <td><strong>Type of Insurance</strong></td>
+              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].product_name }}</td>
+            </tr>
+            <tr>
+              <td><strong>Coverage Type</strong></td>
+              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.cover_type }}</td>
+            </tr>
+            <tr>
+              <td><strong>Coverage Details</strong></td>
+              <td>
+                <div><strong>Material Damage:</strong> {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
+                <div><strong>Third Party Liability:</strong> {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].third_party_liability[0].particular }}</div>
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Policy Period</strong></td>
+              <td>
+                From {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.project_start_date }}
+                to {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.project_end_date }}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Maintenance Period</strong></td>
+              <td>
+                From {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date.split(',')[0] }}
+                to {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date }}
+              </td>
+            </tr>
+            <tr>
+              <td><strong>Project Reference</strong></td>
+              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.nature_of_contract }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      </div>
+    </div>
+
+    <!-- Documentation Section -->
     <div class="row align-items-end">
       <div class="col-md-4 mb-3">
         <label class="form-label">Workers Insurance:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select h-3rem form-control-sm" [(ngModel)]="formData.workInsuranceStatus"
           name="workInsuranceStatus" required #workInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -51,21 +338,12 @@
           Please select an work Insurance
         </div>
       </div>
-
-      <div class="col-md-4 mb-3">
-        <label class="form-label">Third Party Insurance:<span class="text-danger font-size-12">*</span></label>
-        <input type="text" class="form-control " [(ngModel)]="formData.thirdPartyInsurance" placeholder="Auto"
-          name="thirdPartyInsurance" required #thirdPartyInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-        <div *ngIf="thirdPartyInsurance.invalid && thirdPartyInsurance.touched" class="text-danger font-size-12">
-          Please select an option for Third Party Insurance
-        </div>
-      </div>
-
+      
       <div class="col-md-4 mb-3">
         <label class="form-label">Approved Drawings:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.approvedDrawings" name="approvedDrawings"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.approvedDrawings" name="approvedDrawings"
           required #approvedDrawings="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -74,13 +352,12 @@
           Please select an option for Approved Drawings
         </div>
       </div>
-    </div>
-    <div class="row align-items-end">
+      
       <div class="col-md-4 mb-3">
         <label class="form-label">Bill of Quantities:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.billofQuantities" name="billofQuantities"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.billofQuantities" name="billofQuantities"
           required #billofQuantities="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -89,13 +366,16 @@
           Please select an option for Bill of Quantities
         </div>
       </div>
+    </div>
 
+    <!-- Quality Assurance Section -->
+    <div class="row align-items-end">
       <div class="col-md-4 mb-3">
-        <label class="form-label">Materials quality certification:<span
-            class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.materialsQualityCertification"
-          name="materialsQualityCertification" required #materialsQualityCertification="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+        <label class="form-label">Materials quality certification:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm" [(ngModel)]="formData.materialsQualityCertification"
+          name="materialsQualityCertification" required #materialsQualityCertification="ngModel"
+          [disabled]="appNoStatus === 'REJECTED'">
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -105,11 +385,12 @@
           Please select an option for materials Quality Certification
         </div>
       </div>
+      
       <div class="col-md-4 mb-3">
         <label class="form-label">Quality Assurance Plan(QAP):<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.qualityAssurancePlan"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.qualityAssurancePlan"
           name="qualityAssurancePlan" required #qualityAssurancePlan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -118,13 +399,12 @@
           Please select an option for Quality Assurance Plan(QAP)
         </div>
       </div>
-    </div>
-    <div class="row align-items-end">
+      
       <div class="col-md-4 mb-3">
         <label class="form-label">Quality Control Plan:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.qualityControlPlan" name="qualityControlPlan"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.qualityControlPlan" name="qualityControlPlan"
           required #qualityControlPlan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -133,12 +413,17 @@
           Please select an option for Quality Assurance Plan(QAP)
         </div>
       </div>
+    </div>
+
+    <!-- Testing Section -->
+    <div class="row align-items-end">
       <div class="col-md-4 mb-3">
         <label class="form-label">Test conducted as per QAP, Specifications and Industry standards:<span
             class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.TestconductedasperQAP"
-          name="TestconductedasperQAP" required #TestconductedasperQAP="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+        <select class="form-select form-control-sm" [(ngModel)]="formData.TestconductedasperQAP"
+          name="TestconductedasperQAP" required #TestconductedasperQAP="ngModel"
+          [disabled]="appNoStatus === 'REJECTED'">
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -147,11 +432,13 @@
           Please select an option for Test conducted as per QAP, Specifications and Industry standards
         </div>
       </div>
+      
       <div class="col-md-4 mb-3">
         <label class="form-label">Test reports documented:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.testReportsDocumented"
-          name="testReportsDocumented" required #testReportsDocumented="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+        <select class="form-select form-control-sm" [(ngModel)]="formData.testReportsDocumented"
+          name="testReportsDocumented" required #testReportsDocumented="ngModel"
+          [disabled]="appNoStatus === 'REJECTED'">
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -160,14 +447,13 @@
           Please select an option for Test Reports Documented
         </div>
       </div>
-    </div>
-    <div class="row align-items-end">
+      
       <div class="col-md-4 mb-3">
-        <label class="form-label">Hindrance Register maintained:<span
-            class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.HindranceRegisterSelectmaintained"
-          name="HindranceRegisterSelectmaintained" required #HindranceRegisterSelectmaintained="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+        <label class="form-label">Hindrance Register maintained:<span class="text-danger font-size-12">*</span></label>
+        <select class="form-select form-control-sm" [(ngModel)]="formData.HindranceRegisterSelectmaintained"
+          name="HindranceRegisterSelectmaintained" required #HindranceRegisterSelectmaintained="ngModel"
+          [disabled]="appNoStatus === 'REJECTED'">
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -177,11 +463,15 @@
           Please select an option for Test Reports Documented
         </div>
       </div>
+    </div>
+
+    <!-- Management Section -->
+    <div class="row align-items-end">
       <div class="col-md-4 mb-3">
         <label class="form-label">Day work Journal Maintained:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.journalMaintained" name="journalMaintained"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.journalMaintained" name="journalMaintained"
           required #journalMaintained="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -190,11 +480,12 @@
           Please select an option for Day work Journal Maintained
         </div>
       </div>
+      
       <div class="col-md-4 mb-3">
         <label class="form-label">Environment Management Plan:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.envManagementPlan" name="envManagementPlan"
+        <select class="form-select form-control-sm" [(ngModel)]="formData.envManagementPlan" name="envManagementPlan"
           required #envManagementPlan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -203,14 +494,12 @@
           Please select an option for Environment Management Plan
         </div>
       </div>
-    </div>
-
-    <div class="row align-items-end">
+      
       <div class="col-md-4 mb-auto">
         <label class="form-label">Work plan:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm " [(ngModel)]="formData.workplan" name="workplan" required
+        <select class="form-select form-control-sm" [(ngModel)]="formData.workplan" name="workplan" required
           #workplan="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -219,26 +508,25 @@
           Please select an option for workplan
         </div>
       </div>
-      <div class="col-md-4 mb-lg-5">
+    </div>
+
+    <!-- File Upload Section -->
+    <div class="row">
+      <div class="col-md-4 mb-3">
         <label class="form-label mb-2">Upload Files</label>
-        <div *ngFor="let fileInput of fileInputs; let i = index" class="row g-2 align-items-end mb-2 border rounded">
-          <!-- File input -->
+        <div *ngFor="let fileInput of fileInputs; let i = index" class="row ml-0 g-2 align-items-end mb-2 border rounded">
           <div class="col-9">
             <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
-              [class.is-invalid]="fileErrors[i]"/>
+              [class.is-invalid]="fileErrors[i]" />
             <div *ngIf="fileErrors[i]" class="text-danger small mt-1">
               {{ fileErrors[i] }}
             </div>
           </div>
-
-          <!-- Action buttons -->
-          <div class="col-3 d-flex flex-column gap-2 " >
-            <!-- "Add More" for the first row only -->
+          
+          <div class="col-3 d-flex flex-column gap-2">
             <button *ngIf="i === 0" type="button" class="btn btn-outline-primary btn-sm" (click)="addFileInput()">
               <i class="pi pi-plus me-1"></i> More
             </button>
-
-            <!-- "Remove" for all other rows -->
             <button *ngIf="fileInputs.length > 1 && i !== 0" type="button" class="btn btn-outline-danger btn-sm"
               (click)="removeFileInput(i)">
               <i class="pi pi-trash me-1"></i>
@@ -246,11 +534,10 @@
           </div>
         </div>
       </div>
-
+      
       <div class="col-md-4 mb-6" *ngIf="formData.filePathList && formData.filePathList.length > 0">
         <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
         <div class="flex-wrap align-items-center gap-2 flex-column">
-          <!-- Show if at least one file is valid -->
           <ng-container *ngIf="!formData.allPathsNoFile; else noFileTemplate">
             <ng-container *ngFor="let filePath of formData.filePathList; let i = index">
               <div *ngIf="filePath !== 'NO_PATH'" class="d-flex align-items-center gap-2 mb-1">
@@ -266,7 +553,6 @@
               </div>
             </ng-container>
           </ng-container>
-          <!-- Show when all paths are NO_PATH -->
           <ng-template #noFileTemplate>
             <span class="text-muted">No file uploaded</span>
           </ng-template>
@@ -274,8 +560,9 @@
       </div>
     </div>
 
+    <!-- Remarks Section -->
     <div class="row align-items-end">
-      <div class="col-md-12 mt--5">
+      <div class="col-md-12">
         <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
         <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.remarks" id="remarks"
           name="remarks" required #remarks="ngModel"></textarea>
@@ -283,10 +570,13 @@
           Please enter remarks.
         </div>
       </div>
+    </div>
   </div>
-  </div>
+
+  <!-- Form Buttons -->
   <div class="justify-content-end d-flex">
-    <button class="btn mr-1 text-white prev-btn" *ngIf="appNoStatus !== 'REJECTED'" type="submit" (click)="onPreviousClick()" type="submit">Prev</button>
+    <button class="btn mr-1 text-white prev-btn" *ngIf="appNoStatus !== 'REJECTED'" type="submit"
+      (click)="onPreviousClick()" type="submit">Prev</button>
     <button class="btn text-white save-next-btn" (click)="saveAndNext(form)" type="submit">Save & Next</button>
   </div>
 </form>

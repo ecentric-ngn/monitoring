@@ -45,6 +45,7 @@ export class ListOFHRinContractComponent {
     PocuringAgencyList: any;
     dzongkhagList: any;
     designationList: any;
+    @Input() workId: any;
     qualificationList: any;
     @Input() tableId: any;
     @Input() data: any;
@@ -59,48 +60,63 @@ export class ListOFHRinContractComponent {
     }>();
     userName: any;
     appNoStatus: any;
+    fileAndRemark: any = [];
     constructor(
         private service: CommonService,
         private router: Router,
         private notification: NzNotificationService
     ) {}
 
-   ngOnInit() {
-      const userDetailsString = sessionStorage.getItem('userDetails');
-    if (userDetailsString) {
-        const userDetails = JSON.parse(userDetailsString);
-        this.userName = userDetails.username;
+    ngOnInit() {
+        const userDetailsString = sessionStorage.getItem('userDetails');
+        if (userDetailsString) {
+            const userDetails = JSON.parse(userDetailsString);
+            this.userName = userDetails.username;
+        }
+        this.appNoStatus = this.data?.applicationStatus ?? null;
+        this.workId = this.workId ?? null;
+        if (this.appNoStatus === 'REJECTED') {
+            this.prevTableId = this.tableId;
+        }
+        if (this.prevTableId || this.workId) {
+            this.getDatabasedOnChecklistId(); // Try to load using prevTableId
+        } else {
+            this.initializeBasedOnInspectionType(); // fallback immediately if no prevTableId
+        }
+        this.getdeginationList();
+        this.getQualificationList();
     }
-    this.appNoStatus = this.data?.applicationStatus ?? null;
-    if (this.appNoStatus === 'REJECTED') {
-        this.prevTableId = this.tableId;
-    }
-    if (this.prevTableId) {
-        this.getDatabasedOnChecklistId(); // Try to load using prevTableId
-    } else {
-        this.initializeBasedOnInspectionType(); // fallback immediately if no prevTableId
-    }
-    this.getdeginationList();
-    this.getQualificationList();
-}
 
-   getDatabasedOnChecklistId() {
-    const payload: any = [
-        {
-            field: 'checklist_id',
-            value: this.prevTableId,
-            operator: 'AND',
-            condition: '=',
-        },
-    ];
+    getDatabasedOnChecklistId() {
+        const payload: any = [
+            {
+                field: 'checklist_id',
+                value: this.prevTableId,
+                operator: 'AND',
+                condition: '=',
+            },
+            {
+                field: 'workid',
+                value: this.workId,
+                operator: 'AND',
+                condition: '=',
+            },
+        ];
 
-    this.service
-        .fetchDetails(payload, 1, 100, 'human_resources_view')
-        .subscribe(
-            (response: any) => {
-                const data = response.data;
+        this.service
+            .fetchDetails(payload, 1, 100, 'human_resources_view')
+            .subscribe({
+                next: (response: any) => {
+                    const data = response.data;
 
-                if (Array.isArray(data) && data.length > 0) {
+                    // If the response is empty
+                    if (!Array.isArray(data) || data.length === 0) {
+                        this.initializeBasedOnInspectionType();
+                        return;
+                    }
+
+                    // If data exists, proceed
+                    this.formData.remarks = data[0].remarks;
                     this.TableData = data.map((item: any) => ({
                         id: item.human_resource_id,
                         name: item.full_name,
@@ -110,36 +126,55 @@ export class ListOFHRinContractComponent {
                         status: item.status,
                         hrId: item.human_resource_id,
                     }));
-                } else {
-                    // Empty response, fallback to inspectionType
+                    this.TableData.forEach((hr: any) => {
+                        const paths = hr.file_paths
+                            ? hr.file_paths.split(',')
+                            : [];
+
+                        paths.forEach((path: string) => {
+                            const cleanedPath = path.trim();
+                            // Optional: skip local paths
+                            if (!cleanedPath.startsWith('D:/')) {
+                                const entry = {
+                                    file_paths: cleanedPath,
+                                };
+
+                                this.fileAndRemark.push(entry);
+                            } else {
+                                console.log(
+                                    'Skipping local file path:',
+                                    cleanedPath
+                                );
+                            }
+                        });
+                    });
+                },
+                error: (error) => {
+                    console.error(
+                        'Error fetching human resource details:',
+                        error
+                    );
+                    // Fallback in case of error
                     this.initializeBasedOnInspectionType();
-                }
-            },
-            (error) => {
-                console.error('Error fetching human resource details:', error);
-                // On error also fallback
-                this.initializeBasedOnInspectionType();
-            }
-        );
-}
-initializeBasedOnInspectionType() {
- 
-
-    switch (this.inspectionType) {
-        case 'PUBLIC':
-            this.getHrListsBasedOnBctaNoEgpTenderId();
-            break;
-        case 'PRIVATE':
-            this.getPrivateHrLists();
-            break;
-        case 'OTHERS':
-            this.getHrListsFromCRPS();
-            break;
-        default:
-            console.warn('Unknown inspection type:', this.inspectionType);
+                },
+            });
     }
-}
 
+    initializeBasedOnInspectionType() {
+        switch (this.inspectionType) {
+            case 'PUBLIC':
+                this.getHrListsBasedOnBctaNoEgpTenderId();
+                break;
+            case 'PRIVATE':
+                this.getPrivateHrLists();
+                break;
+            case 'OTHERS':
+                this.getHrListsFromCRPS();
+                break;
+            default:
+                console.warn('Unknown inspection type:', this.inspectionType);
+        }
+    }
 
     getHrListsFromCRPS() {
         const contractorhR = {
@@ -387,7 +422,7 @@ initializeBasedOnInspectionType() {
      * Displays error messages if the citizen is not found or if there's a server error.
      * @param cidNo The CID number of the citizen.
      */
-    getCidDetails(cidNo: number,index: number): void {
+    getCidDetails(cidNo: number, index: number): void {
         this.isLoading = true; // Show loading indicator
         this.service.getCitizenDetails(cidNo).subscribe(
             (response: any) => {
@@ -524,136 +559,151 @@ initializeBasedOnInspectionType() {
     onClickStatus(event: any): void {}
     savedData: any[] = [];
     formType = '11';
-  saveAndNext(form: NgForm) {
-    if (form.invalid) {
-        Object.keys(form.controls).forEach((field) => {
-            const control = form.controls[field];
-            control.markAsTouched({ onlySelf: true });
-        });
-        return; // Stop execution if form is invalid
-    }
-    // Always call uploadFiles, even if no files are selected
-    const uploadObservables = [];
-    if (this.selectedFiles && this.selectedFiles.length > 0) {
-        for (const file of this.selectedFiles) {
-            const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
+    saveAndNext(form: NgForm) {
+        if (form.invalid) {
+            Object.keys(form.controls).forEach((field) => {
+                const control = form.controls[field];
+                control.markAsTouched({ onlySelf: true });
+            });
+            return; // Stop execution if form is invalid
+        }
+        // Always call uploadFiles, even if no files are selected
+        const uploadObservables = [];
+        if (this.selectedFiles && this.selectedFiles.length > 0) {
+            for (const file of this.selectedFiles) {
+                const upload$ = this.service.uploadFiles(
+                    file,
+                    this.formData.remarks,
+                    this.formType,
+                    this.userName,
+                    this.workId
+                );
+                uploadObservables.push(upload$);
+            }
+        } else {
+            // Send dummy file instead of null
+            const dummyFile = new File([new Blob()], 'empty.txt', {
+                type: 'text/plain',
+            });
+            const upload$ = this.service.uploadFiles(
+                dummyFile,
+                this.formData.remarks,
+                this.formType,
+                this.userName,
+                this.workId
+            );
             uploadObservables.push(upload$);
         }
-    }  else {
-        // Send dummy file instead of null
-        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
-        uploadObservables.push(upload$);
-       }
-    forkJoin(uploadObservables).subscribe({
-        next: (fileIds: any[]) => {
-            for (const id of fileIds) {
-                const match = id?.match?.(/[0-9a-fA-F\-]{36}/);
-                if (match) {
-                    this.fileId.push(match[0]);
+        forkJoin(uploadObservables).subscribe({
+            next: (fileIds: any[]) => {
+                for (const id of fileIds) {
+                    const match = id?.match?.(/[0-9a-fA-F\-]{36}/);
+                    if (match) {
+                        this.fileId.push(match[0]);
+                    }
                 }
-            }
-            this.saveDraftPayload();
-        },
-        error: (err) => {
-            console.error('Error uploading files:', err);
-            this.fileError = 'File upload failed.';
-        },
-    });
-}
-
-private saveDraftPayload() {
-    // First check if entryList exists and is not empty
-    if (this.entryList && this.entryList.length > 0) {
-        const finalPayload = {
-            humanResources: this.entryList,
-            id: this.tableId
-        };
-        this.sendPayload(finalPayload);
-        return;
+                this.saveDraftPayload();
+            },
+            error: (err) => {
+                console.error('Error uploading files:', err);
+                this.fileError = 'File upload failed.';
+            },
+        });
     }
 
-    // Original logic when entryList is empty
-    if (
-        this.TableData.length > 0 &&
-        this.TableData.some((item) => {
+    private saveDraftPayload() {
+        // First check if entryList exists and is not empty
+        if (this.entryList && this.entryList.length > 0) {
+            const finalPayload = {
+                humanResources: this.entryList,
+                id: this.tableId,
+            };
+            this.sendPayload(finalPayload);
+            return;
+        }
+
+        // Original logic when entryList is empty
+        if (
+            this.TableData.length > 0 &&
+            this.TableData.some((item) => {
+                const hrId = item.id || item.hrId;
+                const replacedHR = this.replacedHRList.find(
+                    (replacement) => replacement.id === hrId
+                );
+                const status = replacedHR?.status || item.status;
+                return !status; // if status is null, undefined, or empty
+            })
+        ) {
+            this.notification.error(
+                'Error',
+                'Please verify all the human resource before processing.'
+            );
+            return;
+        }
+
+        this.savedData = this.TableData.map((item) => {
             const hrId = item.id || item.hrId;
             const replacedHR = this.replacedHRList.find(
                 (replacement) => replacement.id === hrId
             );
-            const status = replacedHR?.status || item.status;
-            return !status; // if status is null, undefined, or empty
-        })
-    ) {
-        this.notification.error(
-            'Error',
-            'Please verify all the human resource before processing.'
-        );
-        return;
-    }
-    
-    this.savedData = this.TableData.map((item) => {
-        const hrId = item.id || item.hrId;
-        const replacedHR = this.replacedHRList.find(
-            (replacement) => replacement.id === hrId
-        );
-        const humanResource: any = {
-            fullName: item.name,
-            designation: item.designation,
-            qualification: item.qualification,
-            cidNo: item.cidNo,
-            status: replacedHR?.status || item.status,
-        };
-        
-        if (
-            replacedHR &&
-            replacedHR.status !== 'NOT_DEPLOYED' &&
-            replacedHR.status !== 'DEPLOYED'
-        ) {
-            humanResource.replacements = [
-                {
-                    cidNo: replacedHR.cidNo,
-                    fullName: replacedHR.replacementName,
-                    designation: replacedHR.replacementDesignation,
-                    qualification: replacedHR.qualification,
-                    meetsRequiredQualification:
-                    replacedHR.meetsRequiredQualification,
-                },
-            ];
-        } else {
-            humanResource.replacements = [];
-        }
+            const humanResource: any = {
+                fullName: item.name,
+                designation: item.designation,
+                qualification: item.qualification,
+                cidNo: item.cidNo,
+                status: replacedHR?.status || item.status,
+            };
 
-        return humanResource;
-    });
-
-    const finalPayload = {
-        humanResources: this.savedData,
-        id: this.tableId,
-    };
-
-    this.sendPayload(finalPayload);
-}
-private sendPayload(finalPayload: any) {
-    this.service.saveAsDraft(finalPayload).subscribe({
-        next: (response: any) => {
-            if (this.tableId) {
-                this.assignCheckListId();
-                this.saveHumanResourceContractData.emit({
-                    tableId: this.tableId,
-                    data: this.data,
-                    inspectionType: this.inspectionType,
-                });
-                this.router.navigate([
-                    'monitoring/certified-skilled-worker',
-                ]);
+            if (
+                replacedHR &&
+                replacedHR.status !== 'NOT_DEPLOYED' &&
+                replacedHR.status !== 'DEPLOYED'
+            ) {
+                humanResource.replacements = [
+                    {
+                        cidNo: replacedHR.cidNo,
+                        fullName: replacedHR.replacementName,
+                        designation: replacedHR.replacementDesignation,
+                        qualification: replacedHR.qualification,
+                        meetsRequiredQualification:
+                            replacedHR.meetsRequiredQualification,
+                    },
+                ];
+            } else {
+                humanResource.replacements = [];
             }
-        },
-        error: (error) => {
-            console.error('Error saving draft:', error);
-        },
-    });
-}
+
+            return humanResource;
+        });
+
+        const finalPayload = {
+            humanResources: this.savedData,
+            id: this.tableId,
+            workID: this.workId,
+        };
+
+        this.sendPayload(finalPayload);
+    }
+    private sendPayload(finalPayload: any) {
+        this.service.saveAsDraft(finalPayload).subscribe({
+            next: (response: any) => {
+                if (this.tableId) {
+                    this.assignCheckListId();
+                    this.saveHumanResourceContractData.emit({
+                        tableId: this.tableId,
+                        data: this.data,
+                        inspectionType: this.inspectionType,
+                    });
+                    this.router.navigate([
+                        'monitoring/certified-skilled-worker',
+                    ]);
+                }
+            },
+            error: (error) => {
+                console.error('Error saving draft:', error);
+            },
+        });
+    }
     // private saveDraftPayload() {
     //     if (
     //         this.TableData.length > 0 &&
@@ -734,15 +784,17 @@ private sendPayload(finalPayload: any) {
 
     assignCheckListId() {
         const payload = this.fileId; // this is a valid array of fileIds
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
-            (response) => {
-                this.createNotification();
-                console.log('File ID assigned successfully:', response);
-            },
-            (error) => {
-                console.error('Error assigning File ID:', error);
-            }
-        );
+        this.service
+            .saveCheckListId(this.tableId, this.workId, payload)
+            .subscribe(
+                (response) => {
+                    this.createNotification();
+                    console.log('File ID assigned successfully:', response);
+                },
+                (error) => {
+                    console.error('Error assigning File ID:', error);
+                }
+            );
     }
     createNotification(): void {
         this.notification
@@ -780,7 +832,7 @@ private sendPayload(finalPayload: any) {
         });
         console.log('entryList...........', this.entryList);
     }
-  
+
     resetNewEntry() {
         this.newEntry = {
             name: '',

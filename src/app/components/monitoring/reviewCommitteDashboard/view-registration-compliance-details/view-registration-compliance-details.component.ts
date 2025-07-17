@@ -48,7 +48,7 @@ export class ViewRegistrationComplianceDetailsComponent implements OnInit {
   totalCount: number = 0;
   searchTerm: string = '';
   statusFilter: string = 'All';
-  filteredApplications: ActionItem[] = [];
+  filteredApplications: any[] = [];
   isLoading: boolean = false;
   selectedApplicationNo: number[] = [];
   selectedIds: number[] = [];
@@ -104,10 +104,12 @@ onTabChange(event: any) {
 }
 getActiveList() {
     this.isLoading = true;
+    this.showCancelTable = false
     this.service.fetchActiveLicenseList().subscribe(
       (response: any[]) => {
         this.tableData = response;
         this.isLoading = false;
+         this.showCancelTable = false
         // this.tableData = response.map(item => ({
         //   id: Number(item.id) || 0,
         //   contractorNo: item.firmId || '', // Map bctaNo to contractorNo
@@ -135,20 +137,21 @@ getActiveList() {
     this.isLoading = true;
     this.service.getDatabasedOnReviewAction().subscribe(
       (response: any[]) => {
-        this.tableData = response.map(item => ({
-          id: Number(item.id) || 0,
-          
-          contractorNo: item.firmId || '', // Map bctaNo to contractorNo
-          type: this.formatType(item.firmType), // Map firmType to type
-          rawFirmType: item.firmType, // Store the original firmType
-          actionType: this.formatActionType(''), // You might need to adjust this
-          details: item.details || '-',
-          initiatedBy: item.initiatedBy || '-',
-          initiatedDate: item.initiatedDate,
-          status: item.status || 'PENDING',
-          isEditing: false,
-          selected: false
-        }));
+        this.tableData = response;
+        this.showCancelTable = false
+        // this.tableData = response.map(item => ({
+        //   id: Number(item.id) || 0,
+        //   contractorNo: item.firmId || '', // Map bctaNo to contractorNo
+        //   type: this.formatType(item.firmType), // Map firmType to type
+        //   rawFirmType: item.firmType, // Store the original firmType
+        //   actionType: this.formatActionType(''), // You might need to adjust this
+        //   details: item.details || '-',
+        //   initiatedBy: item.initiatedBy || '-',
+        //   initiatedDate: item.initiatedDate,
+        //   status: item.status,
+        //   isEditing: false,
+        //   selected: false
+        // }));
         this.filteredApplications = [...this.tableData];
         this.totalCount = this.tableData.length;
         this.isLoading = false;
@@ -211,33 +214,84 @@ getActiveList() {
   }
 
 firmTypesssss:any;
+selectedFirmType: string | null = null;
 
- onCheckboxChange(item: any): void {
-  this.firmTypesssss = item.type;
-  // Initialize arrays if they don't exist (defensive programming)
-  if (!this.selectedIds) this.selectedIds = [];
-  if (!this.selectedContractorNumbers) this.selectedContractorNumbers = [];
 
-  if (item.selected) {
-    // Add to both arrays if not already present
-    
-    if (!this.selectedIds.includes(item.id)) {
-      this.selectedIds.push(item.id);
-    }
-    if (!this.selectedContractorNumbers.includes(item.contractorNo)) {
-      this.selectedContractorNumbers.push(item.contractorNo);
-    }
+onCheckboxChange(changedAction: any): void {
+  // ✅ Your existing logic — unchanged
+  this.firmTypesssss = changedAction.firmType || changedAction.type;
+
+  if (changedAction.selected) {
+    this.selectedIds.push(changedAction.id);
   } else {
-    // Remove from both arrays
-    this.selectedIds = this.selectedIds.filter(id => id !== item.id);
-    this.selectedContractorNumbers = this.selectedContractorNumbers.filter(
-      contractorNo => contractorNo !== item.contractorNo
-    );
+    this.selectedIds = this.selectedIds.filter(id => id !== changedAction.id);
   }
 
-  console.log('Selected IDs:', this.selectedIds);
-  console.log('Selected Contractor Numbers:', this.selectedContractorNumbers);
+  const selectedItems = this.tableData.filter(item => item.selected);
+  this.selectedFirmType = selectedItems.length > 0 ? selectedItems[0].firmType : null;
+
+  // ✅ NEW: Track selected firmIds
+  if (!this.selectedContractorNumbers) {
+    this.selectedContractorNumbers = [];
+  }
+
+  if (changedAction.selected) {
+    if (!this.selectedContractorNumbers.includes(changedAction.firmId || changedAction.id)) {
+      this.selectedContractorNumbers.push(changedAction.firmId || changedAction.id);
+    }
+  } else {
+    this.selectedContractorNumbers = this.selectedContractorNumbers.filter(
+      id => id !== changedAction.firmId || id !== changedAction.id
+    );
+  }
 }
+
+
+
+isCheckboxDisabled(action: any): boolean {
+  // Disable if a firmType is selected and it doesn't match this row's firmType
+  return (
+    this.selectedFirmType !== null &&
+    this.selectedFirmType !== action.firmType &&
+    !action.selected
+  );
+}
+
+
+// isCheckboxDisabled(action: any): boolean {
+//   // Disable if a firmType is selected and this action doesn't match it
+//   return (
+//     this.selectedFirmType !== null &&
+//     this.selectedFirmType !== action.firmType
+//   );
+// }
+
+//  onCheckboxChange(item: any): void {
+//   this.firmTypesssss = item.firmType;
+//   // Initialize arrays if they don't exist (defensive programming)
+//   if (!this.selectedIds) this.selectedIds = [];
+//   if (!this.selectedContractorNumbers) this.selectedContractorNumbers = [];
+
+//   if (item.selected) {
+//     // Add to both arrays if not already present
+    
+//     if (!this.selectedIds.includes(item.id)) {
+//       this.selectedIds.push(item.id);
+//     }
+//     if (!this.selectedContractorNumbers.includes(item.firmId || item.firmNo)) {
+//       this.selectedContractorNumbers.push(item.firmId || item.firmNo);
+//     }
+//   } else {
+//     // Remove from both arrays
+//     this.selectedIds = this.selectedIds.filter(id => id !== item.id);
+//     this.selectedContractorNumbers = this.selectedContractorNumbers.filter(
+//       firmId => firmId !== item.firmId || item.firmNo
+//     );
+//   }
+
+//   console.log('Selected IDs:', this.selectedIds);
+//   console.log('Selected Contractor Numbers:', this.selectedContractorNumbers);
+// }
 
   // Update selectAll function
   selectAll(event: any) {
@@ -279,7 +333,7 @@ endorse(): void {
    cdbNos: this.selectedContractorNumbers.map(item => item.toString()), 
     firmType: this.firmTypesssss
   };
-debugger
+
   // First API call - Endorse in Monitoring System
   this.service.endorseApplications(endorsePayload).subscribe({
     next: (endorseResponse: string) => {
@@ -370,8 +424,18 @@ private handleError(operation: string, error: any): void {
 
 
   Searchfilter() {
-    this.pageNo = 1;
+    if(this.activeAction =='Suspended'){
+      this.endorse();
+    }else if (this.activeAction == 'cancel') {
+      this.cancelAppNo();
+      
+    }else if (this.activeAction == 'downgrade') {
+      this.DownGrade();
+    }else{
+     this.pageNo = 1;
     this.getReportList(this.searchQuery);
+    }
+    
   }
 
   setLimitValue(value: any) {
@@ -479,6 +543,7 @@ getDownGradeList(searchQuery?: string) {
       this.filteredApplications = [...this.tableData];
       this.totalCount = this.tableData.length;
       this.isLoading = false;
+       this.showCancelTable = false
     },
     (error) => {
       this.isLoading = false;
@@ -489,20 +554,17 @@ getDownGradeList(searchQuery?: string) {
 
 DownGrade(): void {
   if (this.selectedIds.length === 0) return;
-
   // Validate IDs
   if (this.selectedIds.some(id => id == null || isNaN(id))) {
     Swal.fire('Error', 'Invalid ID(s) selected', 'error');
     return;
   }
-
   const payload = {
     downgradeIds: this.selectedIds,
-    reviewedBy: "dechen dorji"
+    reviewedBy: this.userId,
+    status: this.activeAction
   };
-
   this.isLoading = true;
-
   this.service.DownGradeApplications(payload).subscribe({
     next: (response) => {
       this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
@@ -518,39 +580,42 @@ DownGrade(): void {
     complete: () => this.isLoading = false
   });
 }
-
+showCancelTable: boolean = false;
 getCancelList(searchQuery?: string) {
   this.isLoading = true;
   this.service.getCancelApplication().subscribe(
-    (response: CancelApplication[]) => {
+    (response: any[]) => {
+      this.tableData=[];
+      this.showCancelTable = true;
       console.log('API Response:', response); // Debugging line
+      this.filteredApplications = response
+      console.log('Filtered Applications:', this.filteredApplications);
+      // this.tableData = response.map(item => ({
+      //   id: item.id,
+      //   firmNo: item.firmNo || '', // Direct access
+      //   firmType: item.firmType || '', // Direct access
+      //   contractorId: item.firmNo || '',
+      //   contractorNo: item.firmNo || '',
+      //   type: this.formatType(item.firmType),
+      //   actionType: 'Cancel',
+      //   details: item.details || '-',
+      //   status: item.status || 'PENDING',
+      //   initiatedBy: item.initiatedBy || '-',
+      //   initiatedDate: item.initiatedDate,
+      //   isEditing: false,
+      //   selected: false
+      // }));
       
-      this.tableData = response.map(item => ({
-        id: item.id,
-        firmNo: item.firmNo || '', // Direct access
-        firmType: item.firmType || '', // Direct access
-        contractorId: item.firmNo || '',
-        contractorNo: item.firmNo || '',
-        type: this.formatType(item.firmType),
-        actionType: 'Cancel',
-        details: item.details || '-',
-        status: item.status || 'PENDING',
-        initiatedBy: item.initiatedBy || '-',
-        initiatedDate: item.initiatedDate,
-        isEditing: false,
-        selected: false
-      }));
-      
-      if (searchQuery) {
-        const query = searchQuery.toLowerCase();
-        this.filteredApplications = this.tableData.filter(app => 
-          (app.firmNo?.toLowerCase().includes(query)) ||
-          (app.firmType?.toLowerCase().includes(query)) ||
-          (app.initiatedBy?.toLowerCase().includes(query))
-        );
-      } else {
-        this.filteredApplications = [...this.tableData];
-      }
+      // if (searchQuery) {
+      //   const query = searchQuery.toLowerCase();
+      //   this.filteredApplications = this.tableData.filter(app => 
+      //     (app.firmNo?.toLowerCase().includes(query)) ||
+      //     (app.firmType?.toLowerCase().includes(query)) ||
+      //     (app.initiatedBy?.toLowerCase().includes(query))
+      //   );
+      // } else {
+      //   this.filteredApplications = [...this.tableData];
+      // }
       
       this.totalCount = this.filteredApplications.length;
       this.isLoading = false;
@@ -583,9 +648,11 @@ submitAction() {
   }
   switch (this.activeAction) {
     case 'cancel':
+    case 'rejected':
       this.cancelAppNo();
       break;
     case 'downgrade':
+    case 'rejected':
       this.DownGrade();
       break;
     case 'Suspended':
@@ -608,12 +675,14 @@ cancelAppNo(): void {
   // First payload for cancellation (Monitoring System)
   const cancelPayload = {
     cancellationIds: this.selectedIds,
-    reviewedBy: this.userId 
+    reviewedBy: this.userId ,
+     status: this.activeAction
   };
   // Second payload for the other system (adjust according to your needs)
   const otherSystemPayload = {
     cdbNos: this.selectedContractorNumbers.map(item => item.toString()),
-    firmType: this.firmType
+    firmType: this.firmTypesssss
+
   };
   // First API call - Cancel in Monitoring System
   this.service.CancelApplications(cancelPayload).subscribe({

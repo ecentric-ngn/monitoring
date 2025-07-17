@@ -16,27 +16,37 @@
                         <th>Pay Slip</th>
                         <th>Remarks</th>
                         <th>Action</th>
+                        <th>Verify</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr *ngFor="let data of tableData">
+                    <tr *ngFor="let data of tableData; let i = index">
                         <td>{{ data.cId }}</td>
-                        <td>{{data.name }}</td>
-                        <td>{{data.sex }}</td>
-                        <td>{{data.countryName }}</td>
-                        <td>{{data.qualification }}</td>
-                        <td>{{data.joiningDate }}</td>
-                        <td>{{data.tradeName }}</td>
+                        <td>{{ data.name }}</td>
+                        <td>{{ data.sex }}</td>
+                        <td>{{ data.countryName }}</td>
+                        <td>{{ data.qualification }}</td>
+                        <td>{{ data.joiningDate }}</td>
+                        <td>{{ data.tradeName }}</td>
                         <td class="text-center bg-white">
                             <a *ngIf="data.paySlipFilePath" (click)="downloadFile(data.paySlipFilePath)" class="btn"
                                 style="cursor: pointer;">
                                 <i class="pi pi-download"></i>
                             </a>
                         </td>
-                        <td>{{data.designationName }}</td>
-                        <td class="text-center bg-white">
+                        <td>{{ data.designationName }}</td>
+
+                        <!-- ✅ This button appears only once and spans all rows -->
+                        <td class="text-center bg-white" *ngIf="i === 0" [attr.rowspan]="tableData.length">
                             <button type="button" class="btn btn-outline-info btn-sm" (click)="fetchTdsHcPension()">
                                 Fetch TDS/HC/Pension
+                            </button>
+                        </td>
+
+                        <td class="text-center bg-white" *ngIf="i === 0" [attr.rowspan]="tableData.length">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal">
+                                Verify
                             </button>
                         </td>
                     </tr>
@@ -104,17 +114,17 @@
                 </button>
 
                 <!-- Action -->
-                <button *ngIf="licenseStatus === 'Active'" type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
-                    data-bs-target="#staticBackdrop">
+                <button *ngIf="licenseStatus === 'Active'" type="button" class="btn btn-primary" (click)="onClick()"
+                    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                     Action
                 </button>
 
-                 <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
-            <button class="btn btn-danger h-100">
-              Reinstate
-            </button>
-          </a>
+                <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+                    (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
+                    <button class="btn btn-danger h-100">
+                        Reinstate
+                    </button>
+                </a>
             </div>
         </div>
     </form>
@@ -127,7 +137,7 @@
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
             <form #actionForm="ngForm">
-               <div class="modal-header" style="background-color: #495f8a">
+                <div class="modal-header" style="background-color: #495f8a">
                     <h5 class="modal-title text-white" id="staticBackdropLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>
@@ -233,6 +243,83 @@
                     <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
                 </div>
             </form>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" [ngClass]="{ 'modal-xl': showTable }">
+        <div class="modal-content  ">
+            <div class="modal-header" style="background-color: #495f8a">
+                <h5 class="modal-title text-white" id="exampleModalLabel">Verify PaySlip</h5>
+                <button type="button" (click)="resetModalData()" class="btn-close" data-bs-dismiss="modal"
+                    aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            TPN No:
+                            <span class="text-danger font-size-12">*</span>
+                        </label>
+                        <div class="col-md-6 d-flex ml--3">
+                            <input type="text" name="tpnNo" class="form-control me-2 form-control-sm h-3rem"
+                                [(ngModel)]="formData.tpnNo" required #bctaRegistrationNo="ngModel"
+                                (input)="clearErrorMessage()" />
+
+                            <button type="button" class="btn btn-primary" (click)="verifyPaySlip()">
+                                {{ isFetching ? 'Fetching...' : 'Fetch' }}
+                            </button>
+                        </div>
+
+                        <div class="text-danger" *ngIf="showErrorMessage">
+                            {{ showErrorMessage }}
+                        </div>
+                        </div>
+
+
+                </form>
+                <div class="table-responsive" *ngIf="showTable">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Sl No.</th>
+                                <th>Business Name</th>
+                                <th>Company TPN</th>
+                                <th>TDS TYPE</th>
+                                <th>F Health contr</th>
+                                <th>MONTH</th>
+                                <th>YEAR</th>
+                                <th>Group TPN</th>
+                                <th>C_cid_no</th>
+                                <th>C_TAX_PAYER_NAME</th>
+                                <th>Return_Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let data of payslipDetails; let i = index">
+                                <td>{{ i + 1 }}</td>
+                                <td>{{ data.business_name }}</td>
+                                <td>{{ data.C_TPN }}</td>
+                                <td>{{ data.TDS_TYPE }}</td>
+                                <td>{{ data.F_Health_contr }}</td>
+                                <td>{{ data.MONTH }}</td>
+                                <td>{{ data.YEAR }}</td>
+                                <td>{{ data.G_TPN }}</td>
+                                <td>{{ data.C_cid_no }}</td>
+                                <td>{{ data.C_TAX_PAYER_NAME }}</td>
+                                <td>{{ data.Return_Status }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer" *ngIf="showTable">
+                <!-- <button type="button" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button> -->
+                <button type="button" class="btn btn-primary" data-bs-dismiss="modal"
+                    (click)="resetModalData()">Close</button>
+            </div>
         </div>
     </div>
 </div>

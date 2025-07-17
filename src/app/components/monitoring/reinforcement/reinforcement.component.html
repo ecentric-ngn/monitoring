@@ -47,33 +47,35 @@
           Concrete Cover</div>
       </div>
 
+      <!-- Upload Files -->
       <div class="col-md-4 mb-3">
         <label class="form-label mb-2">Upload Files</label>
-        <div *ngFor="let fileInput of fileInputs; let i = index" class="row g-2 align-items-end mb-2 border rounded">
+        <div *ngFor="let fileInput of entry.fileInputs ; let j = index"
+          class="row g-2 align-items-end mb-2 border rounded">
           <!-- File input -->
           <div class="col-9">
-            <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
-              [class.is-invalid]="fileErrors[i]" />
-            <div *ngIf="fileErrors[i]" class="text-danger small mt-1">
-              {{ fileErrors[i] }}
+            <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i, j)"
+              [class.is-invalid]="entry.fileErrors[j]" />
+            <div *ngIf="entry.fileErrors[j]" class="text-danger small mt-1">
+              {{ entry.fileErrors[j] }}
             </div>
           </div>
 
           <!-- Action buttons -->
           <div class="col-3 d-flex flex-column gap-2">
-            <!-- "Add More" for the first row only -->
-            <button *ngIf="i === 0" type="button" class="btn btn-outline-primary btn-sm" (click)="addFileInput()">
+            <!-- Add More -->
+            <button *ngIf="j === 0" type="button" class="btn btn-outline-primary btn-sm" (click)="addFileInput(i)">
               <i class="pi pi-plus me-1"></i> More
             </button>
-
-            <!-- "Remove" for all other rows -->
-            <button *ngIf="fileInputs.length > 1 && i !== 0" type="button" class="btn btn-outline-danger btn-sm"
-              (click)="removeFileInput(i)">
+            <!-- Remove -->
+            <button *ngIf="entry.fileInputs.length > 1 && j !== 0" type="button" class="btn btn-outline-danger btn-sm"
+              (click)="removeFileInput(i, j)">
               <i class="pi pi-trash me-1"></i>
             </button>
           </div>
         </div>
       </div>
+
       <div class="col-md-4">
         <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
 
@@ -96,7 +98,7 @@
         </div>
       </div>
 
-      <div class="col-md-4 mb-3">
+      <div class="col-md-12 mb-3">
         <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
         <textarea class="form-control form-control-sm" name="remarks{{i}}" [(ngModel)]="entry.remarks" required #remarks
           placeholder="Enter remarks"></textarea>

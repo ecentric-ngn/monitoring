@@ -425,4 +425,36 @@ export class CbPermanentEmployeesComponent {
             this.downgradeList = [];
         }
     }
+
+            isFetching: boolean = false;
+    payslipDetails: any[] = [];
+    showTable: boolean = false;
+    verifyPaySlip() {
+        this.isFetching = true;
+        this.service.verifyPayslipDetails(this.formData.tpnNo)
+            .subscribe((res: any) => {
+                this.payslipDetails = res.PayerDetails;
+                this.showTable = true;
+                  this.isFetching = false;
+            },
+            (error: HttpErrorResponse) => {
+                if (error.status === 404) {
+                    this.showErrorMessage='No product found with Registration No';
+                }else if (error.status === 500) {
+                    this.showErrorMessage = 'Something went wrong. Please try again.';
+                }
+            }
+        );
+    }
+
+    resetModalData() {
+        this.showTable = false;
+         this.isFetching = false;
+        this.formData.tpnNo = '';
+        this.payslipDetails = [];
+    }
+    clearErrorMessage() {
+        this.showErrorMessage = '';
+        this.isFetching = false;
+    }
 }

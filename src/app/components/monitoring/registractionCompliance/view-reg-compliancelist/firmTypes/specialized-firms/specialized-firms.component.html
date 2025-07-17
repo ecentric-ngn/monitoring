@@ -19,8 +19,13 @@
         </div>
 
         <div class="col-md-8 text-end">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal"
                 data-bs-target="#specializedFirmsModal">
+                Send Mass Notification
+            </button> -->
+             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+                data-bs-target="#specializedFirmsModal">
+                <span class="pi pi-bell"></span>
                 Send Mass Notification
             </button>
         </div>
@@ -34,11 +39,11 @@
                 <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
             </select>
         </div>
-        <div class="col d-flex justify-content-end ">
-            <p class="mr-1 p-1 text-gray-600">Search By : </p>
-            <input type="text" placeholder="BCTA No or Firm Name" class="form-control form-control-sm col-md-4"
-                id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
-        </div>
+        <div class="col-lg-7 d-flex justify-content-end pr-2">
+      <p class="mr-1 p-1 text-gray-600">Search By : </p>
+      <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
+        id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+    </div>
     </div>
 
     <div class="table-responsive text-center ">
@@ -46,6 +51,7 @@
             <thead>
                 <tr>
 
+                    <th>Sl No.</th>
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
@@ -57,8 +63,8 @@
                 </tr>
             </thead>
             <tbody>
-                <tr *ngFor="let data of displayedData" class="table-row">
-
+                <tr *ngFor="let data of tableData; let i = index" class="table-row">
+                    <td>{{i+1}}</td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
                         [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Suspension Resubmission'"
                         (click)="navigate(data)">
@@ -78,7 +84,7 @@
                     </td>
                     <!-- <td>{{ data.licenseStatus }}</td> -->
                      <td>
-                     <span class="text-bold" [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'badge-primary': data.licenseStatus== 'Active'}">
+                     <span class="text-bold" [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'text-primary': data.licenseStatus== 'Active'}">
                             {{ data.licenseStatus }}
                         </span>
                         </td>
@@ -103,7 +109,7 @@
                     </td>
 
                 </tr>
-                <tr *ngIf="filteredData.length === 0">
+                <tr *ngIf="tableData.length === 0">
                     <td colspan="10" class="text-center text-muted">No results found for your search.</td>
                 </tr>
                 <tr *ngIf="tableData.length === 0">
@@ -112,16 +118,30 @@
             </tbody>
         </table>
 
-        <nav *ngIf="filteredData.length > itemsPerPage">
-            <ul class="pagination justify-content-end">
-                <li class="page-item" [class.disabled]="currentPage === 1">
-                    <a class="page-link" (click)="goToPreviousPage()">Previous</a>
-                </li>
-                <li class="page-item" [class.disabled]="currentPage * itemsPerPage >= filteredData.length">
-                    <a class="page-link" (click)="goToNextPage()">Next</a>
-                </li>
-            </ul>
-        </nav>
+           <div *ngIf="tableData" class="justify-content-start mb--3">
+            <div
+                class="d-flex font-bold font-size-12 justify-content-between justify-content-start ml-2 mt-7 font-size-12 font-bold ml-2">
+                <p>{{ calculateOffset() }}</p>
+                <div class="d-flex justify-content-end m-3 mr-0 m-lg--5">
+                    <div *ngIf="tableData" class="Page navigation">
+                        <ul class="pagination pagination-sm mr-2 m--5 ml--1">
+                            <li class="page-item" (click)="goToPreviousPage()">
+                                <a class="page-link pointer">Previous</a>
+                            </li>
+                            <ng-container *ngFor="let page of generatePageArray()">
+                                <li class="page-item" [class.active]="page === pageNo" (click)="goToPage(page)">
+                                    <a class="page-link" *ngIf="page !== -1">{{ page }}</a>
+                                    <span class="page-link ellipsis" *ngIf="page === -1">...</span>
+                                </li>
+                            </ng-container>
+                            <li class="page-item" (click)="goToNextPage()">
+                                <a class="page-link pointer">Next</a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <div class="text-end" *ngIf="selectedIds.length !== 0">
             <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>

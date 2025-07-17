@@ -16,6 +16,7 @@ export class CertifiedSkilledWorkerComponent {
     @Input() tableId: any;
     @Input() data: any;
     @Input() inspectionType: any;
+      @Input() workId: any;
     @Output() savedCertifiedSkilledWorkerData = new EventEmitter<{
         tableId: any;
         data: any;
@@ -45,7 +46,7 @@ export class CertifiedSkilledWorkerComponent {
         } else {
             this.prevTableId = this.prevTableId
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
         this.tableId = this.tableId;
@@ -70,6 +71,12 @@ export class CertifiedSkilledWorkerComponent {
                 operator: 'AND',
                 condition: '=',
             },
+                    {
+                field: 'workid',
+                value: this.workId,
+                operator: 'AND',
+                condition: '=',
+                },
         ];
 
         this.service.fetchDetails(payload, 1, 100, 'csw_view').subscribe(
@@ -88,12 +95,14 @@ export class CertifiedSkilledWorkerComponent {
                 // Populate arrays based on skilled_worker_type
                 data.forEach((item: any) => {
                     const worker = {
+                    
                         level: item.certificates,
                         number: item.number_of_workers,
                     };
                     switch (item.skilled_worker_type) {
                         case 'carpenter':
                             this.carpenters.push({
+                                id: item.id,
                                 carpenterCertification: item.certificates,
                                 carpenterNumber: item.number_of_workers,
                                 
@@ -103,6 +112,7 @@ export class CertifiedSkilledWorkerComponent {
 
                         case 'mason':
                             this.masons.push({
+                                   id: item.id,
                                 masonCertification: item.certificates,
                                 masonNumber: item.number_of_workers,
                                  
@@ -112,6 +122,7 @@ export class CertifiedSkilledWorkerComponent {
 
                         case 'rodBender':
                             this.rodBenders.push({
+                                   id: item.id,
                                 rodBenderCertification: item.certificates,
                                 rodBenderNumber: item.number_of_workers,
                                  
@@ -121,6 +132,7 @@ export class CertifiedSkilledWorkerComponent {
 
                         case 'plumber':
                             this.plumbers.push({
+                                   id: item.id,
                                 plumberLevel: item.certificates,
                                 plumberNumber: item.number_of_workers,
                                  
@@ -130,6 +142,7 @@ export class CertifiedSkilledWorkerComponent {
 
                         case 'electrician':
                             this.electricians.push({
+                                   id: item.id,
                                 electricianLevel: item.certificates,
                                 electricianNumber: item.number_of_workers,
                                  
@@ -139,6 +152,7 @@ export class CertifiedSkilledWorkerComponent {
 
                         case 'steelFabricator':
                             this.steelFabricators.push({
+                                   id: item.id,
                                 steelFabricatorCertification: item.certificates,
                                 steelFabricatorNumber: item.number_of_workers,
                                  
@@ -149,6 +163,7 @@ export class CertifiedSkilledWorkerComponent {
 
                         case 'painter':
                             this.painters.push({
+                                   id: item.id,
                                 painterLevel: item.certificates,
                                 painterNumber: item.number_of_workers,
                                  
@@ -158,6 +173,7 @@ export class CertifiedSkilledWorkerComponent {
 
                         case 'blaster':
                             this.blasters.push({
+                                   id: item.id,
                                 blasterLevel: item.certificates,
                                 blasterNumber: item.number_of_workers,
                                  
@@ -339,7 +355,7 @@ saveAndNext(form: NgForm) {
 
     console.log('payload..............', payload);
     this.service
-        .saveCertifiedSkillWorkerData(payload, this.tableId).subscribe(
+        .saveCertifiedSkillWorkerData(payload, this.tableId, this.workId).subscribe(
             (response: any) => {
                 if (this.tableId) {
                     this.assignCheckListId();
@@ -358,7 +374,7 @@ saveAndNext(form: NgForm) {
 }
     assignCheckListId() {
         const payload = this.fileId; // this is a valid array of fileIds
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 this.createNotification();
                 console.log('File ID assigned successfully:', response);

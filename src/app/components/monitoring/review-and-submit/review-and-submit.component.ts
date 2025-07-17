@@ -18,6 +18,7 @@ export class ReviewAndSubmitComponent {
     monitoringTeam: any[] = [];
     siteEngineers: any[] = [];
     @Input() tableId: any;
+    @Input() workId: any;
     applicationNumber: any;
     @Output() previousClicked = new EventEmitter<{ tableId: any }>();
     reinforcementList: any;
@@ -28,21 +29,32 @@ export class ReviewAndSubmitComponent {
     groupedData: { skilled_worker_type: string; workers: any }[];
     pageNo: number = 1;
     pageSize: number = 100;
-    fileAndRemark: any;
+    fileAndRemark: any = [];
      set_limit: number[] = [10, 15, 25, 100];
     constructor(private service: CommonService, private router: Router) {}
 
     ngOnInit() {
         this.tableId = this.tableId;
-        this.getAllData();
-        this.gethumanResourceList();
-        this.getReinforcementList();
-        this.getOnsiteQuantityList();
-        this.getMonitoringTeamList();
-        this.getSiteMonitoringTeamList();
-        this.getCommitedEquipmentList();
-        this.getSkilledWorkerList();
+        if(this.tableId || this.workId) {
+            this.getAllData();
+            this.gethumanResourceList();
+            this.getReinforcementList();
+            this.getOnsiteQuantityList();
+            this.getMonitoringTeamList();
+            this.getSiteMonitoringTeamList();
+            this.getCommitedEquipmentList();
+            this.getSkilledWorkerList();
+        }
+        // this.getAllData();
+        // this.gethumanResourceList();
+        // this.getReinforcementList();
+        // this.getOnsiteQuantityList();
+        // this.getMonitoringTeamList();
+        // this.getSiteMonitoringTeamList();
+        // this.getCommitedEquipmentList();
+        // this.getSkilledWorkerList();
     }
+    
     showReplacementMap: { [key: number]: boolean } = {};
     showReplacMap: { [key: number]: boolean } = {};
     toggleReplacement(index: number): void {
@@ -61,6 +73,12 @@ export class ReviewAndSubmitComponent {
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service
             .fetchDetails(
@@ -72,8 +90,26 @@ export class ReviewAndSubmitComponent {
             .subscribe(
                 (response: any) => {
                     this.humanResources = response.data;
+                    this.formData.remarks = this.humanResources[0].remarks;
                     console.log('this.formData', this.humanResources);
-                },
+                   this.humanResources.forEach((hr: any) => {
+                    const paths = hr.file_paths ? hr.file_paths.split(',') : [];
+
+                    paths.forEach((path: string) => {
+                        const cleanedPath = path.trim();
+                        // Optional: skip local paths
+                        if (!cleanedPath.startsWith('D:/')) {
+                        const entry = {
+                            file_paths: cleanedPath,
+                        };
+
+                        this.fileAndRemark.push(entry);
+                        } else {
+                        console.log('Skipping local file path:', cleanedPath);
+                        }
+                    });
+                    });
+                                                    },
                 (error) => {
                     console.error('Error fetching contractor details:', error);
                 }
@@ -88,6 +124,12 @@ export class ReviewAndSubmitComponent {
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service
             .fetchDetails(
@@ -114,6 +156,12 @@ export class ReviewAndSubmitComponent {
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service
             .fetchDetails(
@@ -141,6 +189,12 @@ export class ReviewAndSubmitComponent {
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service
             .fetchDetails(
@@ -168,6 +222,12 @@ export class ReviewAndSubmitComponent {
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service
             .fetchDetails(
@@ -179,10 +239,6 @@ export class ReviewAndSubmitComponent {
             .subscribe(
                 (response: any) => {
                     this.committedEquipmentList = response.data;
-                    this.equipmentFiles = this.splitFilePaths(
-                        this.committedEquipmentList[0].eqfile_path
-                    );
-                  
                 },
                 (error) => {
                     console.error('Error fetching contractor details:', error);
@@ -201,10 +257,16 @@ export class ReviewAndSubmitComponent {
         const payload: any = [
             {
                 field: 'checklist_id',
-                  value: this.tableId,
+                value: this.tableId,
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
 
         this.service
@@ -276,6 +338,12 @@ export class ReviewAndSubmitComponent {
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service
             .fetchDetails(
@@ -303,6 +371,12 @@ export class ReviewAndSubmitComponent {
                 operator: 'AND',
                 condition: '=',
             },
+            {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service
             .fetchDetails(payload, this.pageNo, this.pageSize, 'csw_view')
