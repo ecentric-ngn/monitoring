@@ -47,58 +47,61 @@
           </div>
         </div>
 
-        <div class="col-md-4 mb-3">
-          <label class="form-label mb-2">Upload Files</label>
-          <div *ngFor="let fileInput of fileInputs; let i = index" class="row g-2 align-items-end mb-2 border rounded">
-            <!-- File input -->
-            <div class="col-9">
-              <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
-                [class.is-invalid]="fileErrors[i]" />
-              <div *ngIf="fileErrors[i]" class="text-danger small mt-1">
-                {{ fileErrors[i] }}
-              </div>
-            </div>
+           <!-- <div class="col-md-4 mb-3"> -->
+          <!-- <label class="form-label mb-2">Upload Files</label> -->
+<div class="col-md-4 mb-3">
+  <label class="form-label mb-2">Upload Files</label>
+  <div *ngFor="let fileInput of section.fileInputs; let fileIndex = index" class="row g-2 align-items-end mb-2 border rounded">
+    <!-- File input -->
+    <div class="col-9">
+      <input type="file" class="form-control form-control-sm"
+             (change)="onFileSelected($event, i, fileIndex)"
+             [class.is-invalid]="section.fileErrors[fileIndex]" />
+      <div *ngIf="section.fileErrors[fileIndex]" class="text-danger small mt-1">
+        {{ section.fileErrors[fileIndex] }}
+      </div>
+    </div>
 
-            <!-- Action buttons -->
-            <div class="col-3 d-flex flex-column gap-2">
-              <!-- "Add More" for the first row only -->
-              <button *ngIf="i === 0" type="button" class="btn btn-outline-primary btn-sm" (click)="addFileInput()">
-                <i class="pi pi-plus me-1"></i> More
-              </button>
-
-              <!-- "Remove" for all other rows -->
-              <button *ngIf="fileInputs.length > 1 && i !== 0" type="button" class="btn btn-outline-danger btn-sm"
-                (click)="removeFileInput(i)">
-                <i class="pi pi-trash me-1"></i>
-              </button>
-            </div>
-          </div>
-        </div>
-     <div class="col-md-4">
-  <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
-
-  <!-- Show files if available -->
-  <div *ngIf="formSections[0]?.filePaths?.length > 0" class="flex-wrap align-items-center gap-2 flex-column">
-    <div *ngFor="let filePath of formSections[0].filePaths; let i = index"
-      class="d-flex align-items-center gap-2 mb-1">
-      <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
-        <i class="bi bi-eye me-1"></i> View Doc
+    <!-- Action buttons -->
+    <div class="col-3 d-flex flex-column gap-2">
+      <button *ngIf="fileIndex === 0" type="button"
+              class="btn btn-outline-primary btn-sm"
+              (click)="addFileInput(i)">
+        <i class="pi pi-plus me-1"></i> More
       </button>
-      <button class="btn btn-outline-danger btn-sm" (click)="deleteFile(0, i)">
-        <i class="bi bi-trash me-1"></i> Delete
+
+      <button *ngIf="section.fileInputs.length > 1 && fileIndex !== 0" type="button"
+              class="btn btn-outline-danger btn-sm"
+              (click)="removeFileInput(i, fileIndex)">
+        <i class="pi pi-trash me-1"></i>
       </button>
     </div>
-  </div>
-
-  <!-- Show message if no file uploaded -->
-  <div *ngIf="formSections[0]?.filePaths?.length === 0">
-    <span class="text-muted">No file uploaded</span>
   </div>
 </div>
 
 
+        <!-- </div> -->
+        <div class="col-md-4">
+          <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
+          <!-- Show files if available -->
+          <div *ngIf="formSections[0]?.filePaths?.length > 0" class="flex-wrap align-items-center gap-2 flex-column">
+            <div *ngFor="let filePath of formSections[0].filePaths; let i = index"
+              class="d-flex align-items-center gap-2 mb-1">
+              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath)">
+                <i class="bi bi-eye me-1"></i> View Doc
+              </button>
+              <button class="btn btn-outline-danger btn-sm" (click)="deleteFile(0, i)">
+                <i class="bi bi-trash me-1"></i> Delete
+              </button>
+            </div>
+          </div>
 
-        <div class="col-md-4 mb-3">
+          <!-- Show message if no file uploaded -->
+          <div *ngIf="formSections[0]?.filePaths?.length === 0">
+            <span class="text-muted">No file uploaded</span>
+          </div>
+        </div>
+        <div class="col-md-12 mb-3">
           <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
           <textarea class="form-control form-control-sm" name="remarks{{i}}" required [(ngModel)]="section.remarks"
             #remarks placeholder="Enter remarks"></textarea>

@@ -17,17 +17,13 @@ export class ConsultancyFirmComponent {
     displayedData: any[] = [];
     currentPage: number = 1;
     itemsPerPage: number = 10;
-
     searchQuery: any;
     set_limit: number[] = [10, 15, 25, 100];
     formData: any = {};
     tableData: any = [];
     bsModal: any;
-
     selectedIds: number[] = [];
-
     firmType: string = '';
-
     selectedAction: any = {
         actionType: '',
         actionDate: '',
@@ -36,16 +32,15 @@ export class ConsultancyFirmComponent {
         consultantId: '',
         consultantNo: '',
     };
-
     downgradeList: any[] = [];
     workClassificationList: any[] = [];
     loading: boolean = false;
     consultancyFirmModal: any = null;
-    reinstateData: any = null;
-    reinstateModal: any = null;
     username: string = '';
     today: string = new Date().toISOString().substring(0, 10);
     dzongkhagList: any;
+    total_records: any;
+    totalPages: number;
 
     constructor(
         private service: CommonService,
@@ -64,7 +59,7 @@ export class ConsultancyFirmComponent {
         this.username = this.authService.getUsername() || 'NA';
     }
 
-       getDzongkhagList() {
+    getDzongkhagList() {
         const dzongkhag = {
             viewName: 'dzongkhagList',
             pageSize: 21,
@@ -187,19 +182,32 @@ export class ConsultancyFirmComponent {
                 break;
         }
     }
-
+    totalCount: number = 0;
+    pageNo: number = 1;
+    pageSize: number = 10;
     fetchComplianceDetails() {
-        this.service.fetchComplianceDataConsultants().subscribe(
-            (response: any) => {
-                this.tableData = response;
-                this.filteredData = this.tableData;
-                this.updateDisplayedData();
-                console.log('Fetched Data', this.tableData);
-            },
-            (error) => {
-                console.error('Error fetching compliance data:', error);
-            }
-        );
+        const payload: any = [];
+        this.service
+            .fetchDetails(
+                payload,
+                this.pageNo,
+                this.pageSize,
+                'consultant_email_view'
+            )
+            .subscribe(
+                (response: any) => {
+                    this.tableData = response.data;
+                    this.total_records = response.totalCount;
+                    this.totalPages = Math.ceil(
+                        this.total_records / this.pageSize
+                    );
+                    this.totalCount = response.totalCount;
+                },
+                // Error handler
+                (error) => {
+                    console.error('Error fetching contractor details:', error); // Log the error
+                }
+            );
     }
 
     Searchfilter() {
@@ -228,26 +236,6 @@ export class ConsultancyFirmComponent {
         this.displayedData = this.filteredData.slice(start, end);
     }
 
-    setLimitValue(value: any) {
-        this.itemsPerPage = +value;
-        this.currentPage = 1;
-        this.updateDisplayedData();
-    }
-
-    goToPreviousPage() {
-        if (this.currentPage > 1) {
-            this.currentPage--;
-            this.updateDisplayedData();
-        }
-    }
-
-    goToNextPage() {
-        if (this.currentPage * this.itemsPerPage < this.filteredData.length) {
-            this.currentPage++;
-            this.updateDisplayedData();
-        }
-    }
-
     navigate(data: any) {
         // Only proceed if status is "Submitted"
         if (
@@ -259,7 +247,6 @@ export class ConsultancyFirmComponent {
             data.applicationStatus === 'Resubmitted EQ' ||
             data.applicationStatus === 'Suspension Resubmission' ||
             data.applicationStatus === 'Suspension Approved'
-
         ) {
             const workId = data.consultantNo;
             this.prepareAndNavigate(data, workId);
@@ -654,8 +641,7 @@ export class ConsultancyFirmComponent {
                     this.closeModal();
                 },
             });
-        }
-        else if (this.selectedAction.actionType === 'suspend') {
+        } else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
                 firmNo: this.selectedAction.target?.consultantNo,
                 // contractorId: this.selectedAction.target?.contractorId,
@@ -680,38 +666,6 @@ export class ConsultancyFirmComponent {
                     Swal.fire('Error', 'Failed to suspend contractor', 'error');
                 },
             });
-        }
-    }
-
-    getReinstateApplication(firmId: string) {
-        if (!firmId) {
-            console.error('Firm ID is missing.');
-            return;
-        }
-
-        this.service.getReinstateApplication(firmId).subscribe({
-            next: (data) => {
-                this.reinstateData = data[0];
-
-                setTimeout(() => {
-                    const modalEl = document.getElementById('reinstateModal');
-                    this.reinstateModal = new bootstrap.Modal(modalEl, {
-                        backdrop: 'static',
-                        keyboard: false,
-                    });
-                    this.reinstateModal.show();
-                }, 0);
-            },
-            error: (err) => {
-                console.error('Error fetching reinstate data:', err);
-                this.reinstateData = null;
-            },
-        });
-    }
-
-    closeReinstateModal() {
-        if (this.reinstateModal) {
-            this.reinstateModal.hide();
         }
     }
 
@@ -764,5 +718,101 @@ export class ConsultancyFirmComponent {
                 );
             },
         });
+    }
+
+    goToPreviousPage(): void {
+        if (this.pageNo > 1) {
+            this.pageNo--;
+            this.fetchComplianceDetails();
+        }
+    }
+    setLimitValue(value: any) {
+        this.pageSize = parseInt(value);
+        this.pageNo = 1;
+        this.fetchComplianceDetails();
+    }
+    goToNextPage() {
+        ;
+        const totalPages = Math.ceil(this.totalCount / this.pageSize);
+        if (this.pageNo < totalPages) {
+            this.pageNo++;
+            this.fetchComplianceDetails();
+        }
+    }
+    goToPage(pageSize: number) {
+        if (pageSize >= 1 && pageSize <= this.totalPages) {
+            this.pageNo = pageSize;
+            this.fetchComplianceDetails();
+        }
+    }
+    // Method to calculate starting and ending entry numbers
+    calculateOffset(): string {
+        const currentPage = (this.pageNo - 1) * this.pageSize + 1;
+        const limit_value = Math.min(
+            this.pageNo * this.pageSize,
+            this.total_records
+        );
+        return `Showing ${currentPage} to ${limit_value} of ${this.total_records} entries`;
+    }
+    generatePageArray(): number[] {
+        const pageArray: number[] = [];
+
+        // If total_pages is less than or equal to 4, display all pages
+        if (this.totalPages <= 4) {
+            for (let i = 1; i <= this.totalPages; i++) {
+                pageArray.push(i);
+            }
+        } else {
+            // Display the first two and last two pages
+            if (this.pageNo <= 2) {
+                for (let i = 1; i <= 2; i++) {
+                    pageArray.push(i);
+                }
+                pageArray.push(-1); // Placeholder for ellipsis
+                for (let i = this.totalPages - 1; i <= this.totalPages; i++) {
+                    pageArray.push(i);
+                }
+            } else if (this.pageNo >= this.totalPages - 1) {
+                for (let i = 1; i <= 2; i++) {
+                    pageArray.push(i);
+                }
+                pageArray.push(-1); // Placeholder for ellipsis
+                for (let i = this.totalPages - 1; i <= this.totalPages; i++) {
+                    pageArray.push(i);
+                }
+            } else {
+                // Display the current page, previous and next page, and the first and last pages
+                if (this.pageNo === 3) {
+                    for (let i = 1; i <= this.pageNo + 1; i++) {
+                        pageArray.push(i);
+                    }
+                    pageArray.push(-1); // Placeholder for ellipsis
+                    for (
+                        let i = this.totalPages - 1;
+                        i <= this.totalPages;
+                        i++
+                    ) {
+                        pageArray.push(i);
+                    }
+                } else {
+                    for (let i = 1; i <= 2; i++) {
+                        pageArray.push(i);
+                    }
+                    pageArray.push(-1); // Placeholder for ellipsis
+                    for (let i = this.pageNo - 1; i <= this.pageNo + 1; i++) {
+                        pageArray.push(i);
+                    }
+                    pageArray.push(-1); // Placeholder for ellipsis
+                    for (
+                        let i = this.totalPages - 1;
+                        i <= this.totalPages;
+                        i++
+                    ) {
+                        pageArray.push(i);
+                    }
+                }
+            }
+        }
+        return pageArray;
     }
 }

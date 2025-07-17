@@ -1,9 +1,8 @@
-<div class="card container-fluid">
+<div class="container-fluid">
   <p class="m-3 font-bold font-size-18"><strong>Contractor Details</strong></p>
   <hr class="m-3">
   <form>
-    <div class="p-3">
-      <div class="row align-items-end">
+      <div class="row align-items-end p-3">
 
         <div class="col-md-6">
           <label for="bctaNo" class="form-label">BCTA Registration No:<span class="text-danger">*</span></label>
@@ -31,7 +30,26 @@
           <span class="font-size-14">{{formData.workCategory}}</span>
         </div>
       </div>
-    </div>
+        <div class="row align-items-end p-3" *ngIf="workType == 'OTHERS'">
+  <p class="font-bold font-size-18 m-0"><strong>Client Details</strong></p>
+  <hr class="m-3">
+        <div class="col-md-6">
+          <label for="bctaNo" class="form-label">Owner Name:<span class="text-danger">*</span></label>
+          <span class="font-size-14"> {{formData.client_owner_name}}</span>
+        </div>
+        <div class="col-md-6">
+          <label for="bctaNo" class="form-label">Client Address:<span class="text-danger">*</span></label>
+          <span class="font-size-14"> {{formData.clientAddress}}</span>
+        </div>
+        <div class="col-md-6">
+          <label for="bctaNo" class="form-label">Mobile Number:<span class="text-danger">*</span></label>
+          <span class="font-size-14"> {{formData.client_mobile_number}}</span>
+        </div>
+        <div class="col-md-6">
+          <label for="bctaNo" class="form-label">Email:<span class="text-danger">*</span></label>
+          <span class="font-size-14">{{formData.client_email}}</span>
+        </div>
+      </div>
   </form>
   <div class="container-fluid mt-3">
     <div class="overflow-auto">
@@ -261,7 +279,7 @@
     </div>
     <div class="mt-3">
       <app-onsite-facilitiesand-management *ngIf="showonsiteForm" [prevTableId]="prevTableId" [tableId]="tableId"
-        [Previousdata]="Previousdata" [data]="data" [datas]="datas" [workInformationdata]="workInformationdata"
+        [Previousdata]="Previousdata" [data]="data" [datas]="datas" [workInformationdata]="workInformationdata" [workId]="workId"
         [workType]="workType" [ownerId]="ownerId" [inspectionType]="inspectionType" (dataSaved)="onDataSaved($event)"
         (previousClicked)="goBackward($event)">
       </app-onsite-facilitiesand-management>
@@ -269,48 +287,48 @@
 
     <div class="mt-3">
       <app-contract-document *ngIf="showContractorDocForm" [prevTableId]="prevTableId" [tableId]="tableId"
-        [datas]="datas" [data]="data" [inspectionType]="inspectionType"
+        [datas]="datas" [data]="data" [inspectionType]="inspectionType" [workId]="workId"
         (onContractorDocSaved)="onContractorDocSaved($event)" (previousClicked)="goBackward($event)">
       </app-contract-document>
     </div>
 
     <div class="mt--3">
-      <app-work-progress *ngIf="showWorkProgressForm" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data"
+      <app-work-progress *ngIf="showWorkProgressForm" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data" [workId]="workId"
         [inspectionType]="inspectionType" (SavedWorkProgressData)="SavedWorkProgressData($event)"
         (previousClicked)="goBackward($event)">
       </app-work-progress>
     </div>
 
     <div class="mt-3">
-      <app-qualification *ngIf="showQualificationForm" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data"
+      <app-qualification *ngIf="showQualificationForm" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data" [workId]="workId"
         [inspectionType]="inspectionType" (SavedQualificationData)="SavedQualificationData($event)"
         (previousClicked)="goBackward($event)">
       </app-qualification>
     </div>
 
     <div class="mt-3">
-      <app-work-task-quantity *ngIf="showWorkTaskQuantityForm" [prevTableId]="prevTableId" [tableId]="tableId"
+      <app-work-task-quantity *ngIf="showWorkTaskQuantityForm" [prevTableId]="prevTableId" [tableId]="tableId" [workId]="workId"
         [data]="data" [inspectionType]="inspectionType" (SavedWorkTaskQuantityData)="SavedWorkTaskQuantityData($event)"
         (previousClicked)="goBackward($event)">
       </app-work-task-quantity>
     </div>
 
     <div class="mt--3">
-      <app-on-site-quality-check *ngIf="showOnSiteQualityCheck" [prevTableId]="prevTableId" [tableId]="tableId"
+      <app-on-site-quality-check *ngIf="showOnSiteQualityCheck" [prevTableId]="prevTableId" [tableId]="tableId" [workId]="workId"
         [data]="data" [inspectionType]="inspectionType"
         (SavedOnSiteQualityCheckData)="SavedOnSiteQualityCheckData($event)" (previousClicked)="goBackward($event)">
       </app-on-site-quality-check>
     </div>
 
     <div class="mt--3">
-      <app-reinforcement *ngIf="showReinforcementForm" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data"
+      <app-reinforcement *ngIf="showReinforcementForm" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data" [workId]="workId"
         [inspectionType]="inspectionType" (SavedReinforcementData)="SavedReinforcementData($event)"
         (previousClicked)="goBackward($event)">
       </app-reinforcement>
     </div>
 
     <div class="mt--3">
-      <app-occupational-health-and-safty *ngIf="showOccupationalHealthAndSaftyForm" [prevTableId]="prevTableId"
+      <app-occupational-health-and-safty *ngIf="showOccupationalHealthAndSaftyForm" [prevTableId]="prevTableId" [workId]="workId"
         [tableId]="tableId" [data]="data" [inspectionType]="inspectionType"
         (SavedOccupationalHealthAndSaftyData)="SavedOccupationalHealthAndSaftyData($event)"
         (previousClicked)="goBackward($event)">
@@ -318,29 +336,29 @@
     </div>
 
     <div class="mt--3">
-      <app-list-ofhrin-contract *ngIf="showHumanResourceForm" [prevTableId]="prevTableId" [tableId]="tableId"
+      <app-list-ofhrin-contract *ngIf="showHumanResourceForm" [prevTableId]="prevTableId" [tableId]="tableId" [workId]="workId"
         [data]="data" [inspectionType]="inspectionType"
         (saveHumanResourceContractData)="saveHumanResourceContractData($event)" (previousClicked)="goBackward($event)">
       </app-list-ofhrin-contract>
     </div>
 
     <div class="mt-3">
-      <app-certified-skilled-worker *ngIf="showCertifiedSkilledWorkerForm" [prevTableId]="prevTableId"
+      <app-certified-skilled-worker *ngIf="showCertifiedSkilledWorkerForm" [prevTableId]="prevTableId" [workId]="workId"
         [tableId]="tableId" [data]="data" [inspectionType]="inspectionType"
         (savedCertifiedSkilledWorkerData)="savedCertifiedSkilledWorkerData($event)"
         (previousClicked)="goBackward($event)">
       </app-certified-skilled-worker>
     </div>
 
-    <div class="mt-3">
-      <app-committed-equipment *ngIf="showCommittedEquipment" [prevTableId]="prevTableId" [tableId]="tableId"
+    <div class="mt-3"> 
+      <app-committed-equipment *ngIf="showCommittedEquipment" [prevTableId]="prevTableId" [tableId]="tableId" [workId]="workId"
         [data]="data" [inspectionType]="inspectionType"
         (saveCommittedEquipmentData)="saveCommittedEquipmentData($event)" (previousClicked)="goBackward($event)">
       </app-committed-equipment>
     </div>
 
     <div class="mt-3">
-      <app-hrstrength-at-site *ngIf="showHRStrengthAtSite" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data"
+      <app-hrstrength-at-site *ngIf="showHRStrengthAtSite" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data" [workId]="workId"
         [inspectionType]="inspectionType" (humanResourcestrengthsitedata)="humanResourcestrengthsitedata($event)"
         (previousClicked)="goBackward($event)">
       </app-hrstrength-at-site>
@@ -348,26 +366,26 @@
 
     <div class="mt--3">
       <app-contractor-present-during-site-monitoring *ngIf="showContractorPresentDuringSiteMonitoring"
-        [inspectionType]="inspectionType" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data"
+        [inspectionType]="inspectionType" [prevTableId]="prevTableId" [tableId]="tableId" [data]="data" [workId]="workId"
         (contractorPresentData)="contractorPresentData($event)" (previousClicked)="goBackward($event)">
       </app-contractor-present-during-site-monitoring>
     </div>
 
     <div class="mt--3">
-      <app-adding-site-engineer *ngIf="showAddingSiteEngineer" [tableId]="tableId" [data]="data"
+      <app-adding-site-engineer *ngIf="showAddingSiteEngineer" [tableId]="tableId" [data]="data" [workId]="workId"
         [prevTableId]="prevTableId" (siteEngineersData)="siteEngineersData($event)"
         (previousClicked)="goBackward($event)">
       </app-adding-site-engineer>
     </div>
 
     <div class="mt-3">
-      <app-monitor-team-lists *ngIf="showMonitorForm" [tableId]="tableId" [data]="data" [prevTableId]="prevTableId"
+      <app-monitor-team-lists *ngIf="showMonitorForm" [tableId]="tableId" [data]="data" [prevTableId]="prevTableId" [workId]="workId"
         (monitoringData)="monitoringData($event)" (previousClicked)="goBackward($event)">
       </app-monitor-team-lists>
     </div>
 
     <div class="mt-3">
-      <app-review-and-submit *ngIf="showReviewSubmitForm" [tableId]="tableId" [prevTableId]="prevTableId"
+      <app-review-and-submit *ngIf="showReviewSubmitForm" [tableId]="tableId" [prevTableId]="prevTableId" [workId]="workId"
         (previousClicked)="goBackward($event)">
       </app-review-and-submit>
     </div>

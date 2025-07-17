@@ -6,7 +6,7 @@
             class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.projectSignBoard" name="projectSignBoard"
           required #projectSignBoard="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -20,7 +20,7 @@
         <label class="form-label">Site Office:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.siteOffice" name="siteOffice" required
           #siteOffice="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -34,7 +34,7 @@
         <label class="form-label">Site Store:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.siteStore" name="siteStore" required
           #siteStore="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -50,7 +50,7 @@
             class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm " [(ngModel)]="formData.workerAccommodation"
           name="workerAccommodation" required #workerAccommodation="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -64,7 +64,7 @@
         <label class="form-label">Proper sanitation facilities:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.sanitationFacilities"
           name="sanitationFacilities" required #sanitationFacilities="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -78,7 +78,7 @@
         <label class="form-label">Access to potable water:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.potableWater" name="potableWater" required
           #potableWater="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -94,7 +94,7 @@
             class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.apsMaintained" name="papsMaintained" required
           #papsMaintained="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -110,7 +110,7 @@
         <select class="form-select form-control-sm" [(ngModel)]="formData.siteMeetingDocumented"
           name="siteMeetingDocumented" required #siteMeetingDocumented="ngModel"
           [disabled]="appNoStatus === 'REJECTED'">
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>

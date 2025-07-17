@@ -17,6 +17,7 @@ export class ReinforcementComponent {
     @Input() tableId: any;
     @Input() data: any;
     @Input() inspectionType: any;
+    @Input() workId: any;
     @Output() SavedReinforcementData = new EventEmitter<{
         tableId: any;
         data: any;
@@ -38,15 +39,17 @@ export class ReinforcementComponent {
 
     ngOnInit() {
         this.tableId = this.tableId;
+        
         this.data = this.data;
         this.inspectionType = this.inspectionType;
-         this.appNoStatus = this.data?.applicationStatus ?? null;
+         this.workId = this.data?.id || null;
+        this.appNoStatus = this.data?.applicationStatus ?? null;
         if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {
-            this.prevTableId = this.prevTableId
+            this.prevTableId = this.prevTableId;
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
         const userDetailsString = sessionStorage.getItem('userDetails');
@@ -55,44 +58,65 @@ export class ReinforcementComponent {
             this.userName = userDetails.username;
         }
     }
-    getDatabasedOnChecklistId() {
-        const payload: any = [
-            {
-                field: 'checklist_id',
-                value: this.prevTableId,
-                operator: 'AND',
-                condition: '=',
-            },
-        ];
-        this.service.fetchDetails(payload, 1, 10, 'reinforcement_view').subscribe(
-                (response: any) => {
-                    const data = response.data;
-                      this.formEntries = data.map((item: any) => {
-                    // Split and remove all 'NO_PATH' entries
-                    let filePaths = item.file_path
-                        ? item.file_path
-                            .split(',')
-                            .map((path: string) => path.trim())
-                            .filter((path: string) => path !== 'NO_PATH')
-                        : [];
-                        return {
-                            id: item.id,
-                            rebarNumber: item.rebar_quantity_design,
-                            rebarSpacing:item.longitudinal_rebar_spacing_design,
-                            stirrupSpacing: item.stirrup_spacing_design,
-                            concreteCover: item.concrete_cover_design,
-                            remarks: item.remarks,
-                            filePaths: filePaths,
-                        };
-                    });
+   getDatabasedOnChecklistId() {
+  const payload: any = [
+    {
+      field: 'checklist_id',
+      value: this.prevTableId,
+      operator: 'AND',
+      condition: '=',
+    },
+       {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
+  ];
 
-                    // ✅ Add this console to check the results
-                },
-                (error) => {
-                    console.error('Error fetching contractor details:', error);
-                }
-            );
+ this.service.fetchDetails(payload, 1, 10, 'reinforcement_view').subscribe(
+  (response: any) => {
+    const data = response.data;
+
+    this.formEntries = data.map((item: any) => {
+      // Process file paths
+      let filePaths = item.file_path
+        ? item.file_path
+            .split(',')
+            .map((path: string) => path.trim())
+            .filter((path: string) => path !== 'NO_PATH')
+        : [];
+
+      return {
+        id: item.id,
+        rebarNumber: item.rebar_quantity_design,
+        rebarSpacing: item.longitudinal_rebar_spacing_design,
+        stirrupSpacing: item.stirrup_spacing_design,
+        concreteCover: item.concrete_cover_design,
+        remarks: item.remarks,
+        filePaths: filePaths,
+
+        // File fields
+        fileInputs: [0],
+        fileErrors: [''],
+        files: [undefined],
+      };
+    });
+
+    // ✅ Fallback if formEntries is empty
+    if (!this.formEntries || this.formEntries.length === 0) {
+      this.addMore();
     }
+
+    console.log('Loaded form entries:', this.formEntries);
+  },
+  (error) => {
+    console.error('Error fetching contractor details:', error);
+  }
+);
+
+}
+
     /**
      * Uploads the selected file to the server.
      * Subscribes to the Observable returned by the service and
@@ -118,17 +142,29 @@ export class ReinforcementComponent {
             stirrupSpacing: '',
             concreteCover: '',
             remarks: '',
-            file: null,
+            fileInputs: [0], // start with one file input
+            fileErrors: [''],
+            files: [],
+            filePaths: [],
         },
     ];
     removeForm(index: number) {
         this.formEntries.splice(index, 1);
         this.fileErrors.splice(index, 1);
     }
-    addFileInput() {
-        this.fileInputs.push(this.fileInputs.length);
-        this.fileErrors.push('');
+    addFileInput(entryIndex: number) {
+        this.formEntries[entryIndex].fileInputs.push(
+            this.formEntries[entryIndex].fileInputs.length
+        );
+        this.formEntries[entryIndex].fileErrors.push('');
+        this.formEntries[entryIndex].files.push(undefined as any);
+
+        console.log(
+            `Added file input for form entry ${entryIndex}. Total file inputs:`,
+            this.formEntries[entryIndex].fileInputs.length
+        );
     }
+
     /**
      * Handles the file selection event and validates the selected file.
      * If a file is selected, it checks if the file size exceeds 2MB. If the file size
@@ -139,31 +175,64 @@ export class ReinforcementComponent {
      * @param index - The index of the file input field.
      */
 
-   onFileSelected(event: Event, index: number): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-        const file = input.files[0];
+    selectedFilesMap: Map<number, File[]> = new Map(); // index -> files array
 
-        // Check file size (2MB = 2 * 1024 * 1024 bytes)
-        if (file.size > 2 * 1024 * 1024) {
-        this.fileErrors[index] = 'File size must be less than or equal to 2MB.';
-        this.selectedFiles[index] = null;
-        input.value = ''; // Clear the input
-        return;
+    onFileSelected(event: any, entryIndex: number, fileIndex: number) {
+        const selectedFile = event.target.files[0];
+        const entry = this.formEntries[entryIndex];
+
+        if (!selectedFile) {
+            entry.fileErrors[fileIndex] = 'No file selected';
+            entry.files[fileIndex] = undefined as any;
+            console.warn(
+                `No file selected for entry ${entryIndex}, file input ${fileIndex}`
+            );
+            return;
         }
 
-        this.selectedFiles[index] = file;
-        this.fileErrors[index] = ''; // Clear error on valid file
-        console.log('selectedFiles', this.selectedFiles);
-    } else {
-        this.fileErrors[index] = 'Please select a valid file.';
+        // Allowed file types
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!allowedTypes.includes(selectedFile.type)) {
+            entry.fileErrors[fileIndex] =
+                'Invalid file type. Allowed: PDF, JPEG, PNG';
+            entry.files[fileIndex] = undefined as any;
+            console.error(
+                `Invalid file type "${selectedFile.type}" at entry ${entryIndex}, file ${fileIndex}`
+            );
+            return;
+        }
+
+        // Max size 3MB
+        const maxSize = 2 * 1024 * 1024;
+        if (selectedFile.size > maxSize) {
+            entry.fileErrors[fileIndex] = 'File size exceeds 2 MB limit';
+            entry.files[fileIndex] = undefined as any;
+            console.error(
+                `File size ${selectedFile.size} bytes exceeds limit at entry ${entryIndex}, file ${fileIndex}`
+            );
+            return;
+        }
+
+        // Success
+        entry.files[fileIndex] = selectedFile;
+        entry.fileErrors[fileIndex] = '';
+        console.log(
+            `File selected for entry ${entryIndex}, file input ${fileIndex}:`,
+            selectedFile.name,
+            `(${selectedFile.size} bytes)`
+        );
     }
+
+    removeFileInput(entryIndex: number, fileIndex: number) {
+        const entry = this.formEntries[entryIndex];
+        entry.fileInputs.splice(fileIndex, 1);
+        entry.fileErrors.splice(fileIndex, 1);
+        entry.files.splice(fileIndex, 1);
     }
-    removeFileInput(index: number) {
-        this.fileInputs.splice(index, 1);
-        this.fileErrors.splice(index, 1);
-        this.selectedFiles.splice(index, 1);
-    }
+
+    // removeForm(index: number) {
+    //   this.formEntries.splice(index, 1);
+    // }
 
     addMore(): void {
         this.formEntries.push({
@@ -173,7 +242,10 @@ export class ReinforcementComponent {
             stirrupSpacing: '',
             concreteCover: '',
             remarks: '',
-            file: null,
+            fileInputs: [0],
+            fileErrors: [''],
+            files: [],
+            filePaths: [],
         });
         this.fileErrors.push('');
     }
@@ -184,21 +256,37 @@ export class ReinforcementComponent {
                 const control = form.controls[field];
                 control.markAsTouched({ onlySelf: true });
             });
-            return; // Stop execution if form is invalid
+            return;
         }
-        // Always call uploadFiles, even if no files are selected
+
         const uploadObservables = [];
-        if (this.selectedFiles && this.selectedFiles.length > 0) {
-            for (const file of this.selectedFiles) {
-                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
+
+        this.formEntries.forEach((entry, index) => {
+            const selectedFiles = entry.files?.filter((file) => !!file); // remove undefined/null
+
+            if (selectedFiles.length > 0) {
+                for (const file of selectedFiles) {
+                    const upload$ = this.service.uploadFiles(
+                        file,
+                        entry.remarks,
+                        this.formType,
+                        this.userName,
+                        this.workId
+                    );
+                    uploadObservables.push(upload$);
+                }
+            } else {
+                const upload$ = this.service.uploadFiles(
+                    null,
+                    entry.remarks,
+                    this.formType,
+                    this.userName,
+                     this.workId
+                );
                 uploadObservables.push(upload$);
             }
-        }  else {
-        // Send dummy file instead of null
-        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
-        uploadObservables.push(upload$);
-       }
+        });
+
         forkJoin(uploadObservables).subscribe({
             next: (fileIds: any[]) => {
                 for (const id of fileIds) {
@@ -216,47 +304,63 @@ export class ReinforcementComponent {
         });
     }
 
-  private saveDraftPayload() {
-  const payload = this.formEntries.map((entry) => ({
-    id:entry.id,
-    rebarQuantityDesign: entry.rebarNumber,
-    longitudinalRebarSpacingDesign: entry.rebarSpacing,
-    stirrupSpacingDesign: entry.stirrupSpacing,
-    concreteCoverDesign: entry.concreteCover,
-    remarks: entry.remarks,
-  }));
+    private saveDraftPayload() {
+        const payload = this.formEntries.map((entry) => ({
+            id: entry.id,
+            rebarQuantityDesign: entry.rebarNumber,
+            longitudinalRebarSpacingDesign: entry.rebarSpacing,
+            stirrupSpacingDesign: entry.stirrupSpacing,
+            concreteCoverDesign: entry.concreteCover,
+            remarks: entry.remarks,
+        }));
 
-  this.service.saveReinforcementData(payload, this.tableId).subscribe({
-    next: (response: any) => {
-      if (this.tableId) {
-        if (this.appNoStatus === 'REJECTED') {
-          this.SavedReinforcementData.emit({
-            tableId: this.tableId,
-            data: this.data,
-            inspectionType: this.inspectionType,
-          });
-          this.router.navigate(['/monitoring/occupational-health-and-safty']);
-        } else {
-          this.assignCheckListId();
-          this.SavedReinforcementData.emit({
-            tableId: this.tableId,
-            data: this.data,
-            inspectionType: this.inspectionType,
-          });
-          this.router.navigate(['/monitoring/occupational-health-and-safty']);
-        }
+      this.service.saveReinforcementData(payload, this.tableId, this.workId).subscribe({
+  next: (response: any) => {
+    const parsedResponse = JSON.parse(response); // Convert string to object
+
+    // Use existing tableId if available, otherwise extract from response
+    if (!this.tableId) {
+      const id = parsedResponse?.[0]?.id;
+      this.tableId = id || this.getTableIdFromResponse(parsedResponse);
+    }
+
+    if (this.tableId) {
+      if (this.appNoStatus === 'REJECTED') {
+        this.SavedReinforcementData.emit({
+          tableId: this.tableId,
+          data: this.data,
+          inspectionType: this.inspectionType,
+        });
+        this.router.navigate(['/monitoring/occupational-health-and-safty']);
+      } else {
+        this.assignCheckListId();
+        this.SavedReinforcementData.emit({
+          tableId: this.tableId,
+          data: this.data,
+          inspectionType: this.inspectionType,
+        });
+        this.router.navigate(['/monitoring/occupational-health-and-safty']);
       }
-    },
-    error: (error) => {
-      console.error('Error saving draft:', error);
-    },
-  });
+    }
+  },
+  error: (error) => {
+    console.error('Error saving draft:', error);
+  },
+});
+
+    }
+    getTableIdFromResponse(response: any): any {
+  if (response && response.length > 0) {
+    // Add more fallback logic if needed
+    return response[0]?.someOtherId || null;
+  }
+  return null;
 }
 
 
     assignCheckListId() {
         const payload = this.fileId; // this is a valid array of fileIds
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 this.createNotification();
             },

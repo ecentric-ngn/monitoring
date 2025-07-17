@@ -94,11 +94,15 @@
       (click)="saveAndNext(form)" type="submit">
       Save & Next
     </button> -->
-    <button class="btn text-white save-next-btn"
-  [disabled]="!((appNoStatus === 'REJECTED' || isOtpValid) || inspectionType === 'OTHERS')"
-  (click)="saveAndNext(form)" type="submit">
+<button class="btn text-white save-next-btn"
+  *ngIf="dataList.length > 0"
+  [disabled]="!isSaveNextEnabled"
+  (click)="saveAndNext(form)"
+  type="submit">
   Save & Next
 </button>
+
+
 
   </div>
 </div>

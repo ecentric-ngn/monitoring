@@ -169,6 +169,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
                     }
         
                     const payload = {
+                        bctaNo: this.selectedAction.target?.contractorNo,
                         firmId: this.selectedAction.target?.contractorId,
                         firmType: "Contractor",
                         downgradeEntries,
@@ -184,6 +185,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
                         next: (res: string) => {
                             if (res && res.toLowerCase().includes('downgrade request submitted')) {
                                 Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                                 this.router.navigate(['/monitoring/construction']);
                                 this.closeModal();
                             } else {
                                 Swal.fire('Error', res || 'Something went wrong while forwarding.', 'error');
@@ -196,34 +198,10 @@ export class OfficeSignageAndDocComponent implements OnInit {
                             this.closeModal();
                         }
                     });
-        
-                } else if (this.selectedAction.actionType === 'cancel') {
-                    const payload = {
-                        contractorNo: this.selectedAction.target?.contractorNo,
-                        // contractorId: this.selectedAction.target?.contractorId, 
-                        contractorCancelledBy: this.authService.getUsername(),
-                        contractorCancelledDate: this.selectedAction.actionDate,
-                        contractorType: "Contractor",
-                        suspendDetails: this.selectedAction.remarks,
-                    };
-                    /**
-                     * Call cancel API
-                     * Success: Forwarded to Review Committee
-                     * Error: Failed to cancel contractor
-                     */
-                    this.service.cancelFirm(payload).subscribe({
-                        next: (res) => {
-                            Swal.fire('Success', 'Forwarded to Review Committee', 'success');
-                            this.closeModal();
-                        },
-                        error: (err) => {
-                            Swal.fire('Error', 'Failed to cancel contractor', 'error');
-                        }
-                    });
+                 
                 } else if (this.selectedAction.actionType === 'suspend') {
                     const payload = {
-                        firmNo: this.selectedAction.target?.contractorNo,
-                        // contractorId: this.selectedAction.target?.contractorId,
+                        firmNo: this.WorkDetail.data.contractorNo,
                         suspendedBy: this.authService.getUsername(),
                         suspensionDate: this.selectedAction.actionDate
                             ? new Date(this.selectedAction.actionDate).toISOString()
@@ -239,6 +217,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
                     this.service.suspendFirm(payload).subscribe({
                         next: (res) => {
                             Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                             this.router.navigate(['/monitoring/construction']);
                             this.closeModal();
                         },
                         error: (err) => {
@@ -383,7 +362,7 @@ extractFileName(filePath: string): string {
              firmNo: this.bctaNo,
              firmType: 'contractor',
              licenseStatus: 'Active',
-            applicationStatus: 'Reinstated',
+             applicationStatus: 'Reinstated',
          };
  
          const approvePayload = {

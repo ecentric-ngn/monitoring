@@ -229,6 +229,7 @@ export class MandatoryEquipmentComponent {
                             'success'
                         );
                         this.closeModal();
+                        this.router.navigate(['/monitoring/construction']);
                     } else {
                         Swal.fire(
                             'Error',
@@ -248,31 +249,10 @@ export class MandatoryEquipmentComponent {
                     this.closeModal();
                 },
             });
-        } else if (this.selectedAction.actionType === 'cancel') {
-            const payload = {
-                contractorNo: this.selectedAction.target?.contractorNo,
-                // contractorId: this.selectedAction.target?.contractorId,
-                contractorCancelledBy: this.authService.getUsername(),
-                contractorCancelledDate: this.selectedAction.actionDate,
-                contractorType: 'Contractor',
-                suspendDetails: this.selectedAction.remarks,
-            };
-            this.service.cancelFirm(payload).subscribe({
-                next: (res) => {
-                    Swal.fire(
-                        'Success',
-                        'Forwarded to Review Committee',
-                        'success'
-                    );
-                    this.closeModal();
-                },
-                error: (err) => {
-                    Swal.fire('Error', 'Failed to cancel contractor', 'error');
-                },
-            });
+        
         } else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
-                firmNo: this.selectedAction.target?.contractorNo,
+                firmNo: this.WorkDetail.data.contractorNo,
                 // contractorId: this.selectedAction.target?.contractorId,
                 suspendedBy: this.authService.getUsername(),
                 suspensionDate: this.selectedAction.actionDate
@@ -289,6 +269,7 @@ export class MandatoryEquipmentComponent {
                         'success'
                     );
                     this.closeModal();
+                    this.router.navigate(['/monitoring/construction']);
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend contractor', 'error');
@@ -296,7 +277,7 @@ export class MandatoryEquipmentComponent {
             });
         }
     }
-    closeModal() {
+     closeModal() {
         if (this.bsModal) {
             this.bsModal.hide();
         }

@@ -49,6 +49,8 @@ export class MonitoringComponent {
     onClick(Type: any) {
         if (Type === 'PUBLIC') {
          this.workType = Type;
+         this.searchQuery = '';
+         this.tenderList = [];
         this.showPublicWork = true;
         this.showPrivateWork = false;
         this.showOtherWork = false;
@@ -60,6 +62,8 @@ export class MonitoringComponent {
         }
         else {
         this.workType = Type; 
+         this.tenderList = [];
+         this.searchQuery = '';
         this.showPrivateWork = true; 
         this.showPublicWork = false; 
         this.showOtherWork = false;
@@ -156,7 +160,7 @@ export class MonitoringComponent {
     // Base filter conditions that are always included
   const baseConditions: Condition[] = [
     {
-        field: 'dzongkhagId',
+        field: 'dzongkhag',
         value: this.dzongkhagId,
     },
     {
@@ -202,7 +206,6 @@ export class MonitoringComponent {
             this.showTable = true;
             const data = response.data.filter((item: any) => item.agency !== 'Private Construction');
             this.tenderList = data;
-            console.log('response', this.tenderList );
             this.total_records = response.totalCount;
             this.totalPages = Math.ceil(this.total_records / this.pageSize);
         },

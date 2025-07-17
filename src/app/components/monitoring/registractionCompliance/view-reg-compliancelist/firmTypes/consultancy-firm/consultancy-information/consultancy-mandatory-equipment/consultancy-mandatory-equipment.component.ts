@@ -86,7 +86,7 @@ export class ConsultancyMandatoryEquipmentComponent {
         };
 
         if (this.bctaNo && this.applicationStatus === 'Suspension Resubmission') {
-            debugger
+            
          this.fetchSuspendDataBasedOnBctaNo();
         } else {
         this.fetchDataBasedOnBctaNo();

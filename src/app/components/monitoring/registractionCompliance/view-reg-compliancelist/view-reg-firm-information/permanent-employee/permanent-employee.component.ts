@@ -22,7 +22,11 @@ declare var bootstrap: any; // Bootstrap modal library
 })
 export class PermanentEmployeeComponent {
     formData: any = {}; // Holds form input data
-    @Output() activateTab = new EventEmitter<{ id: string; data:string; tab: string }>(); // Emits event to switch tab
+    @Output() activateTab = new EventEmitter<{
+        id: string;
+        data: string;
+        tab: string;
+    }>(); // Emits event to switch tab
     bctaNo: any; // Contractor registration number
     tableData: any = []; // Table data for employees
     @Input() id: string = ''; // Receives input ID from parent
@@ -53,7 +57,7 @@ export class PermanentEmployeeComponent {
         // Fetch Work Detail from service
         const WorkDetail = this.service.getData('BctaNo');
         this.WorkDetail = WorkDetail;
-         
+
         if (!WorkDetail || !WorkDetail.data) {
             console.error('WorkDetail or WorkDetail.data is undefined');
             return;
@@ -63,7 +67,7 @@ export class PermanentEmployeeComponent {
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.contractorNo;
         this.applicationStatus = WorkDetail.data.applicationStatus;
-        this.licenseStatus  = WorkDetail.data.licenseStatus;
+        this.licenseStatus = WorkDetail.data.licenseStatus;
         this.data = WorkDetail.data;
         this.tData = {
             hrFulfilled: '',
@@ -125,7 +129,7 @@ export class PermanentEmployeeComponent {
         };
         forkJoin({
             reinstate: this.service.reinstateLicense(payload),
-           // approve: this.service.approveReinstatement(approvePayload),
+            // approve: this.service.approveReinstatement(approvePayload),
         }).subscribe({
             next: ({ reinstate }) => {
                 if (
@@ -290,6 +294,7 @@ export class PermanentEmployeeComponent {
                             'success'
                         );
                         this.closeModal();
+                        this.router.navigate(['/monitoring/construction']);
                     } else {
                         Swal.fire(
                             'Error',
@@ -310,35 +315,10 @@ export class PermanentEmployeeComponent {
             });
         }
 
-        // Cancel contractor
-        else if (this.selectedAction.actionType === 'cancel') {
-            const payload = {
-                firmId: this.WorkDetail.data.contractorId,
-                contractorCancelledBy: this.authService.getUsername(),
-                contractorCancelledDate: this.selectedAction.actionDate,
-                contractorType: 'Contractor',
-                suspendDetails: this.selectedAction.remarks,
-            };
-
-            this.service.cancelFirm(payload).subscribe({
-                next: () => {
-                    Swal.fire(
-                        'Success',
-                        'Forwarded to Review Committee',
-                        'success'
-                    );
-                    this.closeModal();
-                },
-                error: () => {
-                    Swal.fire('Error', 'Failed to cancel contractor', 'error');
-                },
-            });
-        }
-
         // Suspend contractor
         else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
-                firmId: this.WorkDetail.data.contractorId,
+                firmNo: this.WorkDetail.data.contractorNo,
                 suspendedBy: this.authService.getUsername(),
                 suspensionDate: this.selectedAction.actionDate
                     ? new Date(this.selectedAction.actionDate).toISOString()
@@ -346,7 +326,6 @@ export class PermanentEmployeeComponent {
                 firmType: 'Contractor',
                 suspendDetails: this.selectedAction.remarks,
             };
-
             this.service.suspendFirm(payload).subscribe({
                 next: () => {
                     Swal.fire(
@@ -355,6 +334,7 @@ export class PermanentEmployeeComponent {
                         'success'
                     );
                     this.closeModal();
+                    this.router.navigate(['/monitoring/construction']);
                 },
                 error: () => {
                     Swal.fire('Error', 'Failed to suspend contractor', 'error');
@@ -456,7 +436,11 @@ export class PermanentEmployeeComponent {
 
         this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
             this.isSaving = false;
-            this.activateTab.emit({ id: this.tableId, data: this.WorkDetail,  tab: 'equipment' });
+            this.activateTab.emit({
+                id: this.tableId,
+                data: this.WorkDetail,
+                tab: 'equipment',
+            });
         });
     }
 
@@ -491,7 +475,11 @@ export class PermanentEmployeeComponent {
 
         this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
             this.isSaving = false;
-            this.activateTab.emit({id: this.tableId,data: this.WorkDetail, tab: 'equipment' });
+            this.activateTab.emit({
+                id: this.tableId,
+                data: this.WorkDetail,
+                tab: 'equipment',
+            });
         });
     }
 
@@ -531,5 +519,36 @@ export class PermanentEmployeeComponent {
                 });
             },
         });
+    }
+    isFetching: boolean = false;
+    payslipDetails: any[] = [];
+    showTable: boolean = false;
+    verifyPaySlip() {
+        this.isFetching = true;
+        this.service.verifyPayslipDetails(this.formData.tpnNo)
+            .subscribe((res: any) => {
+                this.payslipDetails = res.PayerDetails;
+                this.showTable = true;
+                  this.isFetching = false;
+            },
+            (error: HttpErrorResponse) => {
+                if (error.status === 404) {
+                    this.showErrorMessage='No product found with Registration No';
+                }else if (error.status === 500) {
+                    this.showErrorMessage = 'Something went wrong. Please try again.';
+                }
+            }
+        );
+    }
+
+    resetModalData() {
+        this.showTable = false;
+         this.isFetching = false;
+        this.formData.tpnNo = '';
+        this.payslipDetails = [];
+    }
+    clearErrorMessage() {
+        this.showErrorMessage = '';
+        this.isFetching = false;
     }
 }

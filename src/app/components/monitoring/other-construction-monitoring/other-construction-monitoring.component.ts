@@ -64,15 +64,19 @@ export class OtherConstructionMonitoringComponent {
             return;
         }
         const contractorDetails = {
-            bctaregNumber: this.formData.contractorNo || '',
-            ownerName: this.formData.ownerDetails || this.formData.ClientOwnerName,
-            specializedFirmName: this.formData.nameOfFirm || '',
-            specializedClass: this.formData.workClassification || '',
-            address: this.formData.establishmentAddress || this.formData.clientCurrentAddress,
-            mobileNumber: this.formData.mobileNo || this.formData.clientMobileNo,
-            email: this.formData.email || this.formData.clientEmailAddress,
+            bctaregNumber: this.formData.contractorNo,
+            ownerName: this.formData.ownerDetails,
+            specializedFirmName: this.formData.nameOfFirm,
+            specializedClass: this.formData.workClassification,
+            address: this.formData.establishmentAddress ,
+            mobileNumber: this.formData.mobileNo,
+            email: this.formData.email,
+            clientOwnerName: this.formData.ClientOwnerName,
+            clientAddress: this.formData.clientCurrentAddress,
+            clientMobileNumber: this.formData.clientMobileNo,
+            clientEmail: this.formData.clientEmailAddress,
+
         };
-        
         this.service.saveNewContractorInformationData(contractorDetails).subscribe(
                 (response: any) => {
                     // Success handler

@@ -75,7 +75,7 @@
           <select class="form-select font-size-16" id="dzongkhag"
             (change)="OnChangenDzoId($event.target.value,'Public')">
             <option>--select--</option>
-            <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.id">
+            <option *ngFor="let dzongkhag of dzongkhagList" [value]="dzongkhag.name">
               {{ dzongkhag.name }}
             </option>
           </select>
@@ -115,7 +115,7 @@
       <p class="mt-2">Loading...</p>
     </div>
   </div>
-  <div class="row mb--4" *ngIf="showTable">
+  <div class="row mb--4" *ngIf="showTable && showPrivateWork && workType !== 'OTHERS'">
     <div class="col d-flex pl-4">
       <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
       <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
@@ -127,6 +127,21 @@
       <p class="mr-1 p-1 text-gray-600">Search By : </p>
       <input type="text" placeholder="BCTA No" class="form-control form-control-sm col-md-4" id="search "
         [(ngModel)]="searchQuery" (input)="SearchPrivatefilter()" />
+    </div>
+  </div>
+
+   <div class="row mb--4" *ngIf="showTable && showPublicWork && workType !== 'OTHERS'">
+    <div class="col d-flex pl-4">
+      <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+      <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
+        style="border-color: #ced4da;">
+        <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+      </select>
+    </div>
+    <div class="col d-flex justify-content-end pr-2">
+      <p class="mr-1 p-1 text-gray-600">Search By : </p>
+      <input type="text" placeholder="BCTA No" class="form-control form-control-sm col-md-4" id="search "
+        [(ngModel)]="searchQuery" (input)="Searchfilter()" />
     </div>
   </div>
 
@@ -220,7 +235,7 @@
     </table>
 
   </div>
-  <div *ngIf="showTable">
+  <div *ngIf="showTable && workType !== 'OTHERS'">
     <div *ngIf="tenderList" class="justify-content-start mb--3">
       <div class="justify-content-start font-size-12 font-bold ml-2">
         <p>{{ calculateOffset() }}</p>

@@ -34,6 +34,7 @@ export class OnsiteFacilitiesandManagementComponent {
     @Input() workType: any;
     @Input() ownerId: any;
     @Input() Previousdata: any;
+    @Input() workId: any;
     showErrorMessage: any;
     checkListId: any;
     fileInputs: number[] = [0]; // Tracks each file input field
@@ -70,17 +71,18 @@ export class OnsiteFacilitiesandManagementComponent {
     } else {
         const WorkDetail = this.service.getData('BctaNo') || {};
         this.appNoStatus = WorkDetail.data?.applicationStatus || null;
+        this.workId = this.workId || null;
+        
         this.prevTableId = this.prevTableId || WorkDetail.data?.checklist_id || null;
         this.tableId = WorkDetail?.workId || WorkDetail?.checklist_id || null;
         this.data = WorkDetail?.data || this.datas || null;
-        
+        //this.egptenderId = this.data.referenceNo || this.data.egpTenderId;
     }
-    if(this.prevTableId){
+    if(this.prevTableId || this.workId) {
         this.getDatabasedOnChecklistId();
     }
 
 }
-
     pageNo: number = 1;
     pageSize: number = 10;
     viewName: string = 'onsite_facilities_and_management';
@@ -92,11 +94,17 @@ export class OnsiteFacilitiesandManagementComponent {
         operator: 'AND',
         condition: '=',
         },
+         {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
     ];
-
     this.service.fetchDetails(payload, this.pageNo, this.pageSize, this.viewName).subscribe(
         (response: any) => {
         const data = response.data[0];
+        this.prevTableId = data.checklist_id;
         this.formData.projectSignBoard = data.project_sign_installed;
         this.formData.siteOffice = data.site_office_available;
         this.formData.siteStore = data.site_store_available;
@@ -270,14 +278,14 @@ saveAndNext(form: NgForm) {
     const uploadObservables = [];
     if (this.selectedFiles && this.selectedFiles.length > 0) {
         for (const file of this.selectedFiles) {
-            const upload$ = this.service.uploadFiles(file, this.formData.meetingRemarks, this.formType, this.userName);
+            const upload$ = this.service.uploadFiles(file, this.formData.meetingRemarks, this.formType, this.userName,this.workId);
             uploadObservables.push(upload$);
         }
     } 
     else {
         // Send dummy file instead of null
         const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.meetingRemarks, this.formType, this.userName);
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.meetingRemarks, this.formType, this.userName,this.workId);
         uploadObservables.push(upload$);
     }
 
@@ -301,6 +309,7 @@ saveAndNext(form: NgForm) {
 
     private saveDraftPayload() {
     const payload: any = {
+    workID : this.workId,
     inspectionId: this.userId,
     id: this.prevTableId,
     inspectionType: this.workType,
@@ -313,11 +322,18 @@ saveAndNext(form: NgForm) {
     apsMaintainedByAgency: this.formData.apsMaintained,
     meetingsConductedAndDocumented: this.formData.siteMeetingDocumented,
   };
-
-  // Conditionally include egpTenderId only if workType is not 'OTHERSSSSSSSSS' and data exists
-  if (this.workType !== 'OTHERS' && this.data) {
-    payload.egpTenderId = parseInt(this.data.egpTenderId, 10) || this.data.BCTANo;
+// // 
+//   // Conditionally include egpTenderId only if workType is not 'OTHERSSSSSSSSS' and data exists
+//   if (this.workType !== 'OTHERS' && this.data) {
+//     payload.egpTenderId = parseInt(this.data.egpTenderId, 10);
+//   }
+if (this.data) {
+  if (this.workType === 'PRIVATE') {
+    payload.egpTenderId = this.data.BCTANo;
+  } else if (this.workType !== 'OTHERS') {
+    payload.egpTenderId = parseInt(this.data.egpTenderId, 10);
   }
+}
 
   // Conditionally include workId only if workType is 'OTHERSSSSSSSSS'
   if (this.workType === 'OTHERS') {
@@ -352,7 +368,7 @@ saveAndNext(form: NgForm) {
         const payload = this.fileId; // this is a valid array of fileIds
         console.log('fileId..............', payload);
         // Save the checklist ID with the uploaded file
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 // Log the result upon success
                 console.log('File ID assigned successfully:', response);

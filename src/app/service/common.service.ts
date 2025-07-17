@@ -105,17 +105,32 @@ export class CommonService {
     return this.http.post<string>(`${api_url_Monitoring}/draft`, payload, { responseType: 'text' as 'json' });
   }
 
-  saveOnQualityData(payload: any, tableId: any) {
-    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/oq-tests`, payload, { responseType: 'text' as 'json' });
-  }
+saveOnQualityData(payload: any, tableId: any, workId: any) {
+  return this.http.post<string>(
+    `${api_url_Monitoring}/${tableId}/oq-tests?workID=${workId}`,
+    payload,
+    { responseType: 'text' as 'json' }
+  );
+}
 
-  saveReinforcementData(payload: any, tableId: any) {
-    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/reinforcement`, payload, { responseType: 'text' as 'json' });
-  }
 
-  saveCertifiedSkillWorkerData(payload: any, tableId: any) {
-    return this.http.post<string>(`${api_url_Monitoring}/${tableId}/csw`, payload, { responseType: 'text' as 'json' });
-  }
+saveReinforcementData(payload: any, tableId: any, workId: any) {
+  return this.http.post<string>(
+    `${api_url_Monitoring}/${tableId}/reinforcement?workID=${workId}`,
+    payload,
+    { responseType: 'text' as 'json' }
+  );
+}
+
+
+saveCertifiedSkillWorkerData(payload: any, tableId: any, workId: any) {
+  return this.http.post<string>(
+    `${api_url_Monitoring}/${tableId}/csw?workID=${workId}`,
+    payload,
+    { responseType: 'text' as 'json' }
+  );
+}
+
   saveWorkInformation(payload: any): Observable<string> {
     return this.http.post(`${otp_api_url}/work-information`, payload, {
       responseType: 'text' as 'text'
@@ -154,18 +169,39 @@ export class CommonService {
     formData.append("file", file);
     return this.http.post(`${fileUpload_api_url_Monitoring}/file/upload`, formData, { responseType: 'text' });
   }
-  uploadFiles(file: File, remarks: string, formType: string, userName: string) {
+  // uploadFiles(file: File, remarks: string, formType: string, userName: string) {
+  //   const formData: FormData = new FormData();
+  //   formData.append("file", file);
+  //   formData.append("remarks", remarks);
+  //   formData.append("formType", formType);
+  //   formData.append("createdBy", userName);
+  //   formData.append('documentType', 'pdf'); // s✅ Add this
+  //   return this.http.post(`${fileUpload_api_url_Monitoring}/file/upload`, formData, { responseType: 'text' });
+  // }
+
+    uploadFiles(file: File, remarks: string, formType: string, userName: string,workId:any) {
     const formData: FormData = new FormData();
     formData.append("file", file);
     formData.append("remarks", remarks);
     formData.append("formType", formType);
     formData.append("createdBy", userName);
     formData.append('documentType', 'pdf'); // ✅ Add this
+    formData.append('workId', workId); // ✅ Add this
     return this.http.post(`${fileUpload_api_url_Monitoring}/file/upload`, formData, { responseType: 'text' });
   }
-  saveCheckListId(checklistId: any, payload: any) {
-    return this.http.post<any>(`${api_url_Monitoring}/${checklistId}/assign-files`, payload, { responseType: 'text' as 'json' });
-  }
+  // saveCheckListId(checklistId: any, payload: any) {
+  //   return this.http.post<any>(`${api_url_Monitoring}/${checklistId}/assign-files`, payload, { responseType: 'text' as 'json' });
+  // }
+
+saveCheckListId(checklistId: any, workId: any, payload: any) {
+  return this.http.post<any>(
+    `${api_url_Monitoring}/${checklistId}/assign-files?workID=${workId}`,
+    payload,
+    { responseType: 'text' as 'json' }
+  );
+}
+
+
 
   saveActionTakenByData(payload: any, checklistId: any) {
     return this.http.post<any>(`${api_url_Monitoring}/monitoring-actions/${checklistId}`, payload, { responseType: 'text' as 'json' });
@@ -231,13 +267,23 @@ export class CommonService {
       responseType: 'text' as 'json'  // casting to satisfy TypeScript
     });
   }
-  saveSiteEngineerData(payload: any, tableId) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/client-site-engineers/${tableId}`, payload, { responseType: 'text' as 'json' });
-  }
+saveSiteEngineerData(payload: any, tableId: any, workId: any) {
+  return this.http.post<any>(
+    `${api_url_Monitoring_siteEngineer}/client-site-engineers/${tableId}?workID=${workId}`,
+    payload,
+    { responseType: 'text' as 'json' }
+  );
+}
 
-  saveMonitoringTeamData(payload: any, tableId) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/monitoring-team-member/${tableId}`, payload, { responseType: 'text' as 'json' });
-  }
+
+ saveMonitoringTeamData(payload: any, tableId: any, workId: any) {
+  return this.http.post<any>(
+    `${api_url_Monitoring_siteEngineer}/monitoring-team-member/${tableId}?workID=${workId}`,
+    payload,
+    { responseType: 'text' as 'json' }
+  );
+}
+
   getUserDetails(payload: any) {
     return this.http.post<any>(`${userManagmentAPI}/usermgt/view`, payload);
   }
@@ -461,6 +507,13 @@ export class CommonService {
     );
   }
 
+  FetchPolicyDetails(policyNo: any) {
+   return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/searchThirdParty?registrationNo=${policyNo}` )
+  }
+
+    verifyPayslipDetails(policyNo: any) {
+   return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/searchTDS?registrationNo=${policyNo}` )
+  }
   getClassification(firmType: string, firmId: string) {
     const params = new HttpParams()
       .set('firmType', firmType)
@@ -480,9 +533,12 @@ export class CommonService {
     return this.http.get<any>(`${g2c_url}/compliance/suspensionFirm/${firmId}`);
   }
 
-  approveReinstatement(payload: any) {
-    return this.http.post<any>(`${g2c_url}/compliance/approved`, payload);
-  }
+approveReinstatement(payload: any) {
+  return this.http.post(`${g2c_url}/compliance/approved`, payload, {
+    responseType: 'text' as 'text'
+  });
+}
+
 
   downgradeFirm(payload: any) {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/downgrade/request`, payload, { responseType: 'text' });

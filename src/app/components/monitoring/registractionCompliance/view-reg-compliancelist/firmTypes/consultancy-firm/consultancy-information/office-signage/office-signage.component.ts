@@ -60,6 +60,7 @@ export class OfficeSignageComponent {
         this.data = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
         this.applicationStatus = WorkDetail.data.applicationStatus;
+        console.log('applicationStatusin consultancy', this.applicationStatus);
         if (this.applicationStatus === 'Suspension Resubmission' && this.bctaNo) {
             this.fetchSuspendDataBasedOnBctaNo();
         } else {
@@ -91,7 +92,7 @@ export class OfficeSignageComponent {
 
     onReviewChange() {
         if (this.formData.signboardReview === 'No') {
-            debugger
+            
             // Initialize resubmit fields when 'No' is selected
             this.formData.resubmitDate = null;
             this.formData.signboardRemarks = '';
@@ -99,7 +100,7 @@ export class OfficeSignageComponent {
     }
 
     fetchDataBasedOnBctaNo() {
-        debugger
+        
         this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
             // Merge API response with initialized formData
             this.formData = {
@@ -433,7 +434,7 @@ extractFileName(filePath: string): string {
             console.log('Suspend action initiated.');
 
             const payload = {
-                firmNo: this.selectedAction.target?.consultantNo,
+                firmNo: this.formData.firmType.consultantNo,
                 suspendedBy: this.authService.getUsername(),
                 suspensionDate: this.selectedAction.actionDate
                     ? new Date(this.selectedAction.actionDate).toISOString()

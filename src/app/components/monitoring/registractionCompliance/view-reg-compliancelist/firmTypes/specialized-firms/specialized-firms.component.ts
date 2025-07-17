@@ -48,6 +48,9 @@ export class SpecializedFirmsComponent {
         'Zhemgang', 'Chhukha', 'Dagana', 'Tsirang', 'Trongsa'];
 
     today: string = new Date().toISOString().substring(0, 10);
+    total_records: any;
+    totalPages: number;
+    totalCount: any;
 
     constructor(
         private service: CommonService,
@@ -162,57 +165,163 @@ export class SpecializedFirmsComponent {
                 break;
         }
     }
+pageNo: number = 1;
+    pageSize: number = 10;
+     fetchComplianceDetails(searchQuery?: string) {
+    const payload: any[] = [];
 
-    fetchComplianceDetails() {
-        this.service.fetchComplianceDataSpecializedFirms().subscribe(
-            (response: any) => {
-                this.tableData = response;
-                console.log('tableData................',this.tableData);
-                this.filteredData = this.tableData;
-                this.updateDisplayedData();
-            },
-            (error) => {
-                console.error('Error fetching compliance data:', error);
-            }
-        )
+    // Add search condition if searchQuery is provided
+    if (searchQuery) {
+        payload.push(
+            {
+            field: 'specializedFirmNo',
+            value: `%${searchQuery}%`,
+            condition: 'LIKE',
+            operator: 'AND'
+        },
+         {
+            field: 'applicationStatus',
+            value: `%${searchQuery}%`,
+            condition: 'LIKE',
+            operator: 'AND'
+        },
+         {
+            field: 'applicationStatus',
+            value: `%${searchQuery}%`,
+            condition: 'LIKE',
+            operator: 'AND'
+        }
+    );
     }
 
-    Searchfilter() {
-        const query = (this.searchQuery || '').toLowerCase();
-        this.filteredData = this.tableData.filter(item =>
-            (item.specializedFirmNo && item.specializedFirmNo.toString().toLowerCase().includes(query)) ||
-            (item.nameOfFirm && item.nameOfFirm.toLowerCase().includes(query)) ||
-            (item.applicationStatus && item.applicationStatus.toLowerCase().includes(query)) ||
-            (item.licenseStatus && item.licenseStatus.toLowerCase().includes(query))
+    this.service
+        .fetchDetails(
+            payload,
+            this.pageNo,
+            this.pageSize,
+            'emailed_specialized_firm_view'
+        )
+        .subscribe(
+            (response: any) => {
+                this.tableData = response.data;
+                this.total_records = response.totalCount;
+                this.totalPages = Math.ceil(this.total_records / this.pageSize);
+                this.totalCount = response.totalCount;
+            },
+            (error) => {
+                console.error('Error fetching contractor details:', error);
+            }
         );
-        this.currentPage = 1; // Reset to first page on new search
-        this.updateDisplayedData();
+}
+
+    setLimitValue(value: any) {
+        this.pageSize = parseInt(value);
+        this.pageNo = 1;
+        this.fetchComplianceDetails();
+    }
+
+    goToPreviousPage(): void {
+        if (this.pageNo > 1) {
+            this.pageNo--;
+            this.fetchComplianceDetails();
+        }
+    }
+    goToNextPage() {
+        const totalPages = Math.ceil(this.totalCount / this.pageSize);
+        if (this.pageNo < totalPages) {
+            this.pageNo++;
+            this.fetchComplianceDetails();
+        }
+    }
+    goToPage(pageSize: number) {
+        if (pageSize >= 1 && pageSize <= this.totalPages) {
+            this.pageNo = pageSize;
+            this.fetchComplianceDetails();
+        }
+    }
+    // Method to calculate starting and ending entry numbers
+    calculateOffset(): string {
+        const currentPage = (this.pageNo - 1) * this.pageSize + 1;
+        const limit_value = Math.min(
+            this.pageNo * this.pageSize,
+            this.total_records
+        );
+        return `Showing ${currentPage} to ${limit_value} of ${this.total_records} entries`;
+    }
+    generatePageArray(): number[] {
+        const pageArray: number[] = [];
+
+        // If total_pages is less than or equal to 4, display all pages
+        if (this.totalPages <= 4) {
+            for (let i = 1; i <= this.totalPages; i++) {
+                pageArray.push(i);
+            }
+        } else {
+            // Display the first two and last two pages
+            if (this.pageNo <= 2) {
+                for (let i = 1; i <= 2; i++) {
+                    pageArray.push(i);
+                }
+                pageArray.push(-1); // Placeholder for ellipsis
+                for (let i = this.totalPages - 1; i <= this.totalPages; i++) {
+                    pageArray.push(i);
+                }
+            } else if (this.pageNo >= this.totalPages - 1) {
+                for (let i = 1; i <= 2; i++) {
+                    pageArray.push(i);
+                }
+                pageArray.push(-1); // Placeholder for ellipsis
+                for (let i = this.totalPages - 1; i <= this.totalPages; i++) {
+                    pageArray.push(i);
+                }
+            } else {
+                // Display the current page, previous and next page, and the first and last pages
+                if (this.pageNo === 3) {
+                    for (let i = 1; i <= this.pageNo + 1; i++) {
+                        pageArray.push(i);
+                    }
+                    pageArray.push(-1); // Placeholder for ellipsis
+                    for (
+                        let i = this.totalPages - 1;
+                        i <= this.totalPages;
+                        i++
+                    ) {
+                        pageArray.push(i);
+                    }
+                } else {
+                    for (let i = 1; i <= 2; i++) {
+                        pageArray.push(i);
+                    }
+                    pageArray.push(-1); // Placeholder for ellipsis
+                    for (let i = this.pageNo - 1; i <= this.pageNo + 1; i++) {
+                        pageArray.push(i);
+                    }
+                    pageArray.push(-1); // Placeholder for ellipsis
+                    for (
+                        let i = this.totalPages - 1;
+                        i <= this.totalPages;
+                        i++
+                    ) {
+                        pageArray.push(i);
+                    }
+                }
+            }
+        }
+        return pageArray;
+    }
+
+     Searchfilter() {
+        if (this.searchQuery && this.searchQuery.trim() !== '') {
+            this.fetchComplianceDetails(this.searchQuery);
+        } else {
+            this.fetchComplianceDetails(this.searchQuery);
+        }
     }
 
     updateDisplayedData() {
         const start = (this.currentPage - 1) * this.itemsPerPage;
         const end = start + this.itemsPerPage;
         this.displayedData = this.filteredData.slice(start, end);
-    }
-
-    setLimitValue(value: any) {
-        this.itemsPerPage = +value;
-        this.currentPage = 1;
-        this.updateDisplayedData();
-    }
-
-    goToPreviousPage() {
-        if (this.currentPage > 1) {
-            this.currentPage--;
-            this.updateDisplayedData();
-        }
-    }
-
-    goToNextPage() {
-        if (this.currentPage * this.itemsPerPage < this.filteredData.length) {
-            this.currentPage++;
-            this.updateDisplayedData();
-        }
     }
 
     // In your component class

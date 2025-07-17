@@ -28,7 +28,7 @@ export class WorkTaskQuantityComponent {
     fileErrors: string[] = [];
     selectedFiles: File[] = [];
     appNoStatus: any;
-
+  @Input() workId: any;
     constructor(private service: CommonService, private router: Router) {}
 
     ngOnInit() {
@@ -47,7 +47,7 @@ export class WorkTaskQuantityComponent {
         } else {
             this.prevTableId = this.prevTableId
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
     }
@@ -60,6 +60,12 @@ export class WorkTaskQuantityComponent {
                 operator: 'AND',
                 condition: '=',
             },
+               {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
         ];
         this.service.fetchDetails(payload, 1, 2, 'work_task_quality').subscribe(
             (response: any) => {
@@ -148,13 +154,13 @@ export class WorkTaskQuantityComponent {
         const uploadObservables = [];
         if (this.selectedFiles && this.selectedFiles.length > 0) {
             for (const file of this.selectedFiles) {
-                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
+                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName, this.workId);
                 uploadObservables.push(upload$);
             }
         }  else {
         // Send dummy file instead of null
         const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName, this.workId);
         uploadObservables.push(upload$);
        }
         forkJoin(uploadObservables).subscribe({
@@ -177,6 +183,7 @@ export class WorkTaskQuantityComponent {
     private saveDraftPayload() {
       const payload = {
        id: this.tableId,
+        workID: this.workId,
        siteOrderBookAvailable: this.formData.bookAvailable,
        qualityControlActivitiesDocumented:
         this.formData.qualityInspectionsdocumented,
@@ -205,7 +212,7 @@ export class WorkTaskQuantityComponent {
     }
     assignCheckListId() {
         const payload = this.fileId; // this is a valid array of fileIds
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 console.log('File ID assigned successfully:', response);
             },

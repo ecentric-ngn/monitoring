@@ -7,7 +7,7 @@
             class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.contractorType" name="contractorType" required
        #contractor="ngModel"  [disabled]="appNoStatus === 'REJECTED'"> 
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
@@ -56,7 +56,7 @@
           Firm:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.LicensingContractor"
           name="LicensingContractor" required #LicensingContractor="ngModel"  [disabled]="appNoStatus === 'REJECTED'"> 
-          <option value="">-- Select --</option>
+          <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>

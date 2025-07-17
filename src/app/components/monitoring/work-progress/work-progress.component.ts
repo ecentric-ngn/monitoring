@@ -27,6 +27,7 @@ export class WorkProgressComponent {
     @Input() data: any;
     @Input() inspectionType: any;
     @Input() prevTableId: any;
+    @Input() workId: any;
     userName: any;
     fileAndRemark: any;
     fileInputs: number[] = [0]; // Tracks each file input field
@@ -45,13 +46,14 @@ export class WorkProgressComponent {
         this.data = this.data;
         this.appNoStatus = this.data?.applicationStatus ?? null;
         this.inspectionType = this.inspectionType;
+          this.workId = this.workId ?? null;;
         this.prevTableId= this.prevTableId 
          if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {
             this.prevTableId = this.prevTableId
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
       
@@ -61,6 +63,12 @@ export class WorkProgressComponent {
             {
                 field: 'checklist_id',
                 value: this.prevTableId,
+                operator: 'AND',
+                condition: '=',
+            },
+            {
+                field: 'workid',
+                value: this.workId,
                 operator: 'AND',
                 condition: '=',
             },
@@ -149,13 +157,13 @@ export class WorkProgressComponent {
         const uploadObservables = [];
         if (this.selectedFiles && this.selectedFiles.length > 0) {
             for (const file of this.selectedFiles) {
-                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
+                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName,this.workId);
                 uploadObservables.push(upload$);
             }
         }  else {
         // Send dummy file instead of null
         const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName,this.workId);
         uploadObservables.push(upload$);
        }
         forkJoin(uploadObservables).subscribe({
@@ -180,6 +188,7 @@ private saveDraftPayload() {
     physicalProgress: this.formData.physicalprogress,
     financialProgress: this.formData.financialprogress,
     id: this.tableId,
+    workID: this.workId,
   };
   this.service.saveAsDraft(payload).subscribe({
     next: (response: any) => {
@@ -202,7 +211,7 @@ private saveDraftPayload() {
 }
 assignCheckListId() {
         const payload = this.fileId; // this is a valid array of fileIds
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 console.log('File ID assigned successfully:', response);
             },

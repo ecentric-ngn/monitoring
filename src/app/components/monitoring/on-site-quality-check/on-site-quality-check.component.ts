@@ -16,12 +16,13 @@ export class OnSiteQualityCheckComponent {
         data: any;
         inspectionType: any;
     }>();
-    @Output() previousClicked = new EventEmitter<{tableId: any }>();
+    @Output() previousClicked = new EventEmitter<{ tableId: any }>();
     formData: any = {};
     fileError: string | null = null;
-    fileId: any=[];
+    fileId: any = [];
     @Input() tableId: any;
     @Input() data: any;
+      @Input() workId: any;
     @Input() inspectionType: any;
     userName: any;
     fileAndRemark: any;
@@ -37,14 +38,15 @@ export class OnSiteQualityCheckComponent {
     ngOnInit() {
         this.tableId = this.tableId;
         this.data = this.data;
-         this.appNoStatus = this.data?.applicationStatus ?? null;
-        this.prevTableId = this.prevTableId 
-         if (this.appNoStatus === 'REJECTED') {
+        this.workId = this.workId ?? null;;
+        this.appNoStatus = this.data?.applicationStatus ?? null;
+        this.prevTableId = this.prevTableId;
+        if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
         } else {
-            this.prevTableId = this.prevTableId
+            this.prevTableId = this.prevTableId;
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
         const userDetailsString = sessionStorage.getItem('userDetails');
@@ -61,40 +63,50 @@ export class OnSiteQualityCheckComponent {
                 operator: 'AND',
                 condition: '=',
             },
-        ];
-     this.service.fetchDetails(payload, 1, 100, 'oq_confirmation_view').subscribe(
-        (response: any) => {
-            const data = response.data;
-          this.formSections = data.map((item: any) => {
-            // Split and remove all 'NO_PATH' entries
-            let filePaths = item.file_path
-                ? item.file_path
-                    .split(',')
-                    .map((path: string) => path.trim())
-                    .filter((path: string) => path !== 'NO_PATH')
-                : [];
-
-            return {
-                id: item.id,
-                checklistId: item.checklist_id,
-                buildingComponents: item.building_components,
-                concreteAge: item.concrete_age,
-                concreteGrade: item.concrete_grade_contract,
-                schmidtTestHammertest: item.schmidt_hammer_test_result,
-                remarks: item.remarks,
-                filePaths: filePaths
-            };
-            });
-
-
-            // ✅ Add this console to check the results
-            console.log('Fetched formSections with file paths:', this.formSections);
+             {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
         },
-        (error) => {
-            console.error('Error fetching contractor details:', error);
-        }
-        );
+        ];
+        this.service
+            .fetchDetails(payload, 1, 100, 'oq_confirmation_view')
+            .subscribe(
+                (response: any) => {
+                    const data = response.data;
+                    this.formSections = data.map((item: any) => {
+                        // Split and remove all 'NO_PATH' entries
+                        let filePaths = item.file_path
+                            ? item.file_path
+                                  .split(',')
+                                  .map((path: string) => path.trim())
+                                  .filter((path: string) => path !== 'NO_PATH')
+                            : [];
 
+                        return {
+                            id: item.id,
+                            checklistId: item.checklist_id,
+                            buildingComponents: item.building_components,
+                            concreteAge: item.concrete_age,
+                            concreteGrade: item.concrete_grade_contract,
+                            schmidtTestHammertest:
+                                item.schmidt_hammer_test_result,
+                            remarks: item.remarks,
+                            filePaths: filePaths,
+                        };
+                    });
+
+                    // ✅ Add this console to check the results
+                    console.log(
+                        'Fetched formSections with file paths:',
+                        this.formSections
+                    );
+                },
+                (error) => {
+                    console.error('Error fetching contractor details:', error);
+                }
+            );
     }
     formSections = [
         {
@@ -104,9 +116,13 @@ export class OnSiteQualityCheckComponent {
             concreteAge: '',
             schmidtTestHammertest: '',
             remarks: '',
-            file: null,
+            fileInputs: [0], // start with one file input
+            fileErrors: [''],
+            files: [],
+            filePaths: [],
         },
     ];
+
     addMoreSection() {
         this.formSections.push({
             id: '',
@@ -115,7 +131,10 @@ export class OnSiteQualityCheckComponent {
             concreteAge: '',
             schmidtTestHammertest: '',
             remarks: '',
-            file: null,
+            fileInputs: [0], // start with one file input
+            fileErrors: [''],
+            files: [],
+            filePaths: [],
         });
     }
 
@@ -124,10 +143,11 @@ export class OnSiteQualityCheckComponent {
             this.formSections.splice(index, 1);
         }
     }
-    addFileInput() {
-        this.fileInputs.push(this.fileInputs.length);
-        this.fileErrors.push('');
-    }
+addFileInput(entryIndex: number) {
+  this.formSections[entryIndex].fileInputs.push(this.formSections[entryIndex].fileInputs.length);
+  this.formSections[entryIndex].fileErrors.push('');
+  this.formSections[entryIndex].files.push(undefined as any);
+}
 
     /**
      * Handles the file selection event and validates the selected file.
@@ -141,34 +161,61 @@ export class OnSiteQualityCheckComponent {
     fileInputs: number[] = [0]; // Tracks each file input field
     fileErrors: string[] = [];
     selectedFiles: File[] = [];
-    
-   onFileSelected(event: Event, index: number): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-        const file = input.files[0];
 
-        // Check file size (2MB = 2 * 1024 * 1024 bytes)
-        if (file.size > 2 * 1024 * 1024) {
-        this.fileErrors[index] = 'File size must be less than or equal to 2MB.';
-        this.selectedFiles[index] = null;
-        input.value = ''; // Clear the input
-        return;
+    selectedFilesMap: Map<number, File[]> = new Map(); // index -> files array
+
+    onFileSelected(event: any, entryIndex: number, fileIndex: number) {
+        const selectedFile = event.target.files[0];
+        const entry = this.formSections[entryIndex];
+
+        if (!selectedFile) {
+            entry.fileErrors[fileIndex] = 'No file selected';
+            entry.files[fileIndex] = undefined as any;
+            console.warn(
+                `No file selected for entry ${entryIndex}, file input ${fileIndex}`
+            );
+            return;
         }
 
-        this.selectedFiles[index] = file;
-        this.fileErrors[index] = ''; // Clear error on valid file
-        console.log('selectedFiles', this.selectedFiles);
-    } else {
-        this.fileErrors[index] = 'Please select a valid file.';
+        // Allowed file types
+        const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
+        if (!allowedTypes.includes(selectedFile.type)) {
+            entry.fileErrors[fileIndex] =
+                'Invalid file type. Allowed: PDF, JPEG, PNG';
+            entry.files[fileIndex] = undefined as any;
+            console.error(
+                `Invalid file type "${selectedFile.type}" at entry ${entryIndex}, file ${fileIndex}`
+            );
+            return;
+        }
+
+        // Max size 3MB
+        const maxSize = 2 * 1024 * 1024;
+        if (selectedFile.size > maxSize) {
+            entry.fileErrors[fileIndex] = 'File size exceeds 2 MB limit';
+            entry.files[fileIndex] = undefined as any;
+            console.error(
+                `File size ${selectedFile.size} bytes exceeds limit at entry ${entryIndex}, file ${fileIndex}`
+            );
+            return;
+        }
+
+        // Success
+        entry.files[fileIndex] = selectedFile;
+        entry.fileErrors[fileIndex] = '';
+        console.log(
+            `File selected for entry ${entryIndex}, file input ${fileIndex}:`,
+            selectedFile.name,
+            `(${selectedFile.size} bytes)`
+        );
     }
-    }
-    
-    removeFileInput(index: number) {
-        this.fileInputs.splice(index, 1);
-        this.fileErrors.splice(index, 1);
-        this.selectedFiles.splice(index, 1);
-    }
-      
+
+  removeFileInput(entryIndex: number, fileIndex: number) {
+  this.formSections[entryIndex].fileInputs.splice(fileIndex, 1);
+  this.formSections[entryIndex].fileErrors.splice(fileIndex, 1);
+  this.formSections[entryIndex].files.splice(fileIndex, 1);
+}
+
     /**
      * Uploads the selected file to the server and updates the file ID upon success.
      * A file must be uploaded for the form to be valid.
@@ -176,7 +223,7 @@ export class OnSiteQualityCheckComponent {
      * If the checklist ID is updated successfully, the user is redirected to the "Reinforcement" page.
      * @param form The form data to be uploaded.
      */
-      saveAndNext(form: NgForm) {
+    saveAndNext(form: NgForm) {
         if (form.invalid) {
             Object.keys(form.controls).forEach((field) => {
                 const control = form.controls[field];
@@ -186,17 +233,32 @@ export class OnSiteQualityCheckComponent {
         }
         // Always call uploadFiles, even if no files are selected
         const uploadObservables = [];
-        if (this.selectedFiles && this.selectedFiles.length > 0) {
-            for (const file of this.selectedFiles) {
-                const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
+
+        this.formSections.forEach((entry, index) => {
+            const selectedFiles = entry.files?.filter((file) => !!file); // remove undefined/null
+
+            if (selectedFiles.length > 0) {
+                for (const file of selectedFiles) {
+                    const upload$ = this.service.uploadFiles(
+                        file,
+                        entry.remarks,
+                        this.formType,
+                        this.userName,
+                        this.workId
+                    );
+                    uploadObservables.push(upload$);
+                }
+            } else {
+                const upload$ = this.service.uploadFiles(
+                    null,
+                    entry.remarks,
+                    this.formType,
+                    this.userName,
+                    this.workId
+                );
                 uploadObservables.push(upload$);
             }
-        } else {
-        // Send dummy file instead of null
-        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
-        uploadObservables.push(upload$);
-       }
+        });
         forkJoin(uploadObservables).subscribe({
             next: (fileIds: any[]) => {
                 for (const id of fileIds) {
@@ -215,29 +277,29 @@ export class OnSiteQualityCheckComponent {
     }
 
     private saveDraftPayload() {
-          const payload = this.formSections.map((section) => ({
-                id: section.id,
-                buildingComponents: section.buildingComponents,
-                concreteGradeContract: section.concreteGrade,
-                concreteAge: section.concreteAge,
-                schmidtHammerTestResult:section.schmidtTestHammertest,
-            }));
-      this.service.saveOnQualityData(payload,this.tableId).subscribe({
-        next: (response: any) => {
-          if (this.tableId) {
-            this.assignCheckListId();
-            this.SavedOnSiteQualityCheckData.emit({
-                tableId: this.tableId,
-                data: this.data,
-                inspectionType: this.inspectionType,
-            });
-              this.router.navigate(['/monitoring/reinforcement', ]);
-          }
-        },
-        error: (error) => {
-          console.error('Error saving draft:', error);
-        }
-      });
+        const payload = this.formSections.map((section) => ({
+            id: section.id,
+            buildingComponents: section.buildingComponents,
+            concreteGradeContract: section.concreteGrade,
+            concreteAge: section.concreteAge,
+            schmidtHammerTestResult: section.schmidtTestHammertest,
+        }));
+        this.service.saveOnQualityData(payload, this.tableId, this.workId).subscribe({
+            next: (response: any) => {
+                if (this.tableId) {
+                    this.assignCheckListId();
+                    this.SavedOnSiteQualityCheckData.emit({
+                        tableId: this.tableId,
+                        data: this.data,
+                        inspectionType: this.inspectionType,
+                    });
+                    this.router.navigate(['/monitoring/reinforcement']);
+                }
+            },
+            error: (error) => {
+                console.error('Error saving draft:', error);
+            },
+        });
     }
 
     /**
@@ -245,7 +307,7 @@ export class OnSiteQualityCheckComponent {
      */
     assignCheckListId() {
         const payload = this.fileId;
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 console.log('File ID assigned successfully:', response);
                 this.createNotification();
@@ -270,18 +332,24 @@ export class OnSiteQualityCheckComponent {
         this.previousClicked.emit(this.tableId);
         this.router.navigate(['/monitoring/work-task-quantity']);
     }
-        viewFile(attachment: string): void {
+    viewFile(attachment: string): void {
         this.service.downloadFile(attachment).subscribe(
             (response: HttpResponse<Blob>) => {
-            const binaryData = [response.body];
-            const blob = new Blob(binaryData, { type: response.body?.type });
-            const blobUrl = window.URL.createObjectURL(blob);
-            const fileName = this.extractFileName(attachment);
+                const binaryData = [response.body];
+                const blob = new Blob(binaryData, {
+                    type: response.body?.type,
+                });
+                const blobUrl = window.URL.createObjectURL(blob);
+                const fileName = this.extractFileName(attachment);
 
-            // Open file in new window for preview
-            const newWindow = window.open('', '_blank', 'width=800,height=600');
-            if (newWindow) {
-                newWindow.document.write(`
+                // Open file in new window for preview
+                const newWindow = window.open(
+                    '',
+                    '_blank',
+                    'width=800,height=600'
+                );
+                if (newWindow) {
+                    newWindow.document.write(`
                 <html>
                     <head><title>File Viewer</title></head>
                     <body style="margin:0;padding:0;display:flex;flex-direction:column;height:100%;">
@@ -300,24 +368,23 @@ export class OnSiteQualityCheckComponent {
                     </body>
                 </html>
                 `);
-            } else {
-                console.error('Failed to open the new window');
-            }
+                } else {
+                    console.error('Failed to open the new window');
+                }
             },
             (error: HttpErrorResponse) => {
-            if (error.status === 404) {
-                console.error('File not found', error);
-            }
+                if (error.status === 404) {
+                    console.error('File not found', error);
+                }
             }
         );
-        }
+    }
 
-
-        extractFileName(filePath: string): string {
-            return (
-                filePath.split('/').pop() ||
-                filePath.split('\\').pop() ||
-                'downloaded-file'
-            );
-        }
+    extractFileName(filePath: string): string {
+        return (
+            filePath.split('/').pop() ||
+            filePath.split('\\').pop() ||
+            'downloaded-file'
+        );
+    }
 }

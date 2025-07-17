@@ -101,6 +101,14 @@
     <div class="row mb-4">
       <!-- File Upload Section -->
       <div class="col-md-6">
+         <div class="col-md-6 d-flex">
+    <label class="form-label me-2 font-size-12">Upload:</label>
+    <div *ngFor="let item of fileAndRemark">
+      <button class="btn btn-outline-primary btn-sm mb-1" (click)="viewFile(item.file_paths)">
+        <i class="bi bi-eye me-1"></i> View Doc
+      </button>
+    </div>
+  </div>
         <label class="form-label fw-semibold mb-2">Upload Files</label>
         <div *ngFor="let fileInput of fileInputs; let i = index" class="border rounded p-2 mb-2">
           <div class="row align-items-end">
@@ -175,7 +183,7 @@
               <div class="d-flex align-items-start">
                 <input type="number" class="form-control form-control-sm me-2" name="cidNo" [(ngModel)]="formData.cidNo"
                   required #cidNo="ngModel" />
-                <button type="button" class="btn btn-sm btn-primary" (click)="getCidDetails(formData.cidNo)">
+                <button type="button" class="btn btn-primary" style="max-height: 37px" (click)="getCidDetails(formData.cidNo)">
                   Fetch
                 </button>
               </div>

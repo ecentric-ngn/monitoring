@@ -190,7 +190,7 @@ export class ViewMonitoredSiteAppComponent {
     reviewAgain(data: any) {
         const WorkDetail = {
             data: data,
-            workId: data.work_id,
+            workId: data.workid,
             workType: data.inspection_type,
         };
         console.log('WorkDetail', WorkDetail);

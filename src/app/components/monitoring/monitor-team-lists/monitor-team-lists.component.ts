@@ -20,14 +20,18 @@ export class MonitorTeamListsComponent {
     teamList: any;
     @Input() prevTableId: any;
     @Input() data: any;
+    @Input() workId: any;
     @Output() monitoringData = new EventEmitter<any>();
     @Output() previousClicked = new EventEmitter<void>();
     appNoStatus: any;
     constructor(private service: CommonService, private router: Router,private notification: NzNotificationService) {}
   
     ngOnInit() {
-        this.fetchCrpsUsers()
+       
         this.tableId = this.tableId
+        // if(!this.tableId){
+        // this.fetchCrpsUsers()
+        // }
         this.data = this.data
         const today = new Date();
         this.formData.monitoringDate = today.toISOString().split('T')[0];
@@ -39,38 +43,54 @@ export class MonitorTeamListsComponent {
         } else {
             this.prevTableId = this.prevTableId
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
     }
 
-       getDatabasedOnChecklistId() {
-       const payload : any =[ {
-                "field": "checklist_id",
-                "value": this.prevTableId,
-                "operator": "AND",
-                "condition": "="
-              }
-        ]
-          this.service.fetchDetails(payload,1,100,'monitoring_team_view').subscribe(
-            (response: any) => {
-            const data = response.data;
-            this.teamList = data.map((item: any) => {
-            return {
-                id: item.id,
-                cid_emp_id: item.cid_no,
-                name: item.full_name,
-                contact_no: item.mobile_no,
-                email: item.email,
-            };
-            });
-            },
-            // Error handler
-            (error) => {
-              console.error('Error fetching contractor details:', error); // Log the error
-            }
-          );
-        }
+    getDatabasedOnChecklistId() {
+  const payload: any = [
+    {
+      field: 'checklist_id',
+      value: this.prevTableId,
+      operator: 'AND',
+      condition: '='
+    },
+       {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
+  ];
+
+  this.service.fetchDetails(payload, 1, 100, 'v_monitoring_team_members').subscribe(
+    (response: any) => {
+      const data = response.data;
+
+      // If empty, call fetchCrpsUsers()
+      if (!data || data.length === 0) {
+        this.fetchCrpsUsers();
+        return;
+      }
+
+      // Otherwise map the data
+      this.teamList = data.map((item: any) => {
+        return {
+          id: item.id,
+          cid_emp_id: item.cid_no,
+          name: item.full_name,
+          contact_no: item.mobile_no,
+          email: item.email
+        };
+      });
+    },
+    (error) => {
+      console.error('Error fetching contractor details:', error);
+    }
+  );
+}
+
 
     /**
      * Fetches the list of users with role 'monitor' from the CRPS user list.
@@ -238,7 +258,7 @@ saveMonitorTeamList(form: NgForm) {
   console.log('Combined Payload:', payload);
 
   // Send merged data to backend
-  this.service.saveMonitoringTeamData(payload, this.tableId).subscribe({
+  this.service.saveMonitoringTeamData(payload, this.tableId,this.workId).subscribe({
     next: (response: any) => {
       this.createNotification();
       this.monitoringData.emit(this.tableId);

@@ -26,6 +26,7 @@ interface FormData {
     reflectiveVest?: string;
     safetyBoots?: string;
     safetyGloves?: string;
+    
     fireExtinguisherType?: string;
     firstAidBoxType?: string;
     peripheralBoundaryFencingType?: string;
@@ -64,6 +65,7 @@ export class OccupationalHealthAndSaftyComponent {
     @Input() data: any;
     @Input() inspectionType: any;
     @Input() prevTableId: any;
+      @Input() workId: any;
     @Output() previousClicked = new EventEmitter<{tableId: any }>();
     userName: any;
     fileAndRemark: any;
@@ -91,7 +93,7 @@ export class OccupationalHealthAndSaftyComponent {
         } else {
             this.prevTableId = this.prevTableId
         }
-        if (this.prevTableId) {
+        if (this.prevTableId || this.workId) {
             this.getDatabasedOnChecklistId();
         }
     }
@@ -159,6 +161,12 @@ export class OccupationalHealthAndSaftyComponent {
       operator: 'AND',
       condition: '=',
     },
+       {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
   ];
 
   this.service.fetchDetails(payload, 1, 10, 'ohs_view').subscribe(
@@ -195,7 +203,7 @@ export class OccupationalHealthAndSaftyComponent {
       this.formData.safetyHarness = data.safety_harness_used ?? '';
       this.formData.earPlug = data.ear_plugs_used ?? '';
       this.formData.safetyGloves = data.safety_gloves_used ?? '';
-
+      this.formData.remarks = data.remarks ?? '';
       // Handle file paths safely
       if (data.file_path && data.file_id) {
         this.formData.filePathList = data.file_path
@@ -337,13 +345,13 @@ export class OccupationalHealthAndSaftyComponent {
       const uploadObservables = [];
       if (this.selectedFiles && this.selectedFiles.length > 0) {
           for (const file of this.selectedFiles) {
-              const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName);
+              const upload$ = this.service.uploadFiles(file, this.formData.remarks, this.formType, this.userName, this.workId);
               uploadObservables.push(upload$);
           }
       }  else {
         // Send dummy file instead of null
         const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName);
+        const upload$ = this.service.uploadFiles(dummyFile, this.formData.remarks, this.formType, this.userName, this.workId);
         uploadObservables.push(upload$);
        }
     forkJoin(uploadObservables).subscribe({
@@ -365,6 +373,7 @@ export class OccupationalHealthAndSaftyComponent {
     private saveDraftPayload() {
       const payload = {
             id: this.tableId,
+              workID: this.workId,
             certifiedOhsInCharge: this.formData?.ohsInCharge,
             ohsCidNumber: this.formData.cidNo,
             ohsInChargeFullName: this.formData.fullName,
@@ -411,7 +420,7 @@ export class OccupationalHealthAndSaftyComponent {
      */
     assignCheckListId() {
         const payload = this.fileId; // this is a valid array of fileIds
-        this.service.saveCheckListId(this.tableId, payload).subscribe(
+        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
             (response) => {
                 this.createNotification();
                 console.log('File ID assigned successfully:', response);
