@@ -21,33 +21,26 @@ ngOnInit() {
     console.error('WorkDetail or WorkDetail.data is undefined');
     return;
   }
-
   this.WorkDetail = WorkDetail;
   this.licenseStatus = WorkDetail.data.licenseStatus;
   this.applicationStatus = WorkDetail.data.applicationStatus;
   this.formData.firmType = WorkDetail.data;
   this.bctaNo = WorkDetail.data.consultantNo;
-
-  console.log('WorkDetail', WorkDetail);
-  console.log('bctaNo', this.bctaNo);
-  console.log('licenseStatus', this.licenseStatus);
-  console.log('applicationStatus', this.applicationStatus);
-
   // Set activeTabId based on applicationStatus only if license is not suspended
   if (this.licenseStatus !== 'Suspended') {
     const status = this.applicationStatus;
-    if (status === 'Resubmitted OS' || status === 'Resubmitted PFS' || status === 'Resubmitted OS and PFS') {
+    if (status === 'Resubmitted OS and PFS') {
       this.activeTabId = 'consultancyOffice';
-    } else if (status === 'Resubmitted HR') {
+    } else if (status === 'Resubmitted HR and EQ') {
       this.activeTabId = 'consultancyEmployee';
-    } else if (status === 'Resubmitted EQ') {
+    } else if (status === 'Resubmitted HR and EQ') {
       this.activeTabId = 'consultancyEquipment';
     } else {
-      this.activeTabId = 'consultancyOffice';  // default tab
+       //this.activeTabId = 'consultancyOffice';  // default tab
     }
   } else {
     // licenseStatus is 'Suspended', default active tab
-    this.activeTabId = 'consultancyOffice';
+    this.activeTabId = '';
   }
 
   if (this.bctaNo) {

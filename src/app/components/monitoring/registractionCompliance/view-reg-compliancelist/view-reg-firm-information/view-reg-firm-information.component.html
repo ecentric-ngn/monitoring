@@ -37,17 +37,22 @@
                     <span *ngSwitchDefault>N/A</span>
                 </span>
             </div>
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">TPN No:</label>
+                <span class="font-size-12">{{formData?.tpnNumber || 'N/A'}}</span>
+            </div>
              <div class="col-md-4 mb-3">
                 <label class="form-label me-2 font-size-12">Application Status:</label>
                 <span class="font-size-12">{{applicationStatus || 'N/A'}}</span>
             </div>
+            
         </div>
 
         <div class="container-fluid ">
             <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
-                <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
+                <li class="nav-item" role="presentation">
                     <button class="nav-link border" [class.active]="activeTabId === 'office'" id="office-tab"
-                        (click)="setActiveTab('office')" [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ')" type="button" role="tab">
+                        (click)="setActiveTab('office')" [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted HR and EQ')" type="button" role="tab">
                         Office Signage & Documents
                     </button>
 

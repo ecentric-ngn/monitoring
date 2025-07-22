@@ -61,7 +61,7 @@
           Please select if the requirement is fulfilled
         </div>
       </div>
-      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No'">
+      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No' && applicationStatus !== 'Resubmitted HR and EQ'">
         <div class="col-md-4 mb-3">
           <label class="form-label">
             Last Date to Resubmit:<span class="text-danger font-size-12">*</span>
@@ -88,7 +88,7 @@
       <!-- Buttons in Same Row -->
       <div class="d-flex flex-wrap gap-2 justify-content-end mt-4">
         <!-- Save & Forward / Save & Next -->
-        <ng-container *ngIf="applicationStatus !== 'Resubmitted EQ'">
+        <ng-container *ngIf="applicationStatus !== 'Resubmitted HR and EQ'">
           <button type="submit" class="btn btn-success" (click)="notifyContractor()"
             *ngIf="tData.fulfillsRequirement === 'No'" [disabled]="isSaving">
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"
@@ -104,7 +104,7 @@
         </ng-container>
 
         <!-- Update Button -->
-        <button type="submit" class="btn btn-success" (click)="update()" *ngIf="applicationStatus === 'Resubmitted EQ'"
+        <button type="submit" class="btn btn-success" (click)="update()" *ngIf="applicationStatus === 'Resubmitted HR and EQ'"
           [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Update
@@ -112,7 +112,7 @@
 
         <!-- Action Button -->
         <button  type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
-          data-bs-target="#staticBackdropss" *ngIf="licenseStatus === 'Active' && applicationStatus === 'Suspension Resubmission'">
+          data-bs-target="#staticBackdropss" *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'No'">
           Action
         </button>
 

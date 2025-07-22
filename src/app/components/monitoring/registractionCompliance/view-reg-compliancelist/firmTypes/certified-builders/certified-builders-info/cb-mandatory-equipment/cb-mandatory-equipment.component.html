@@ -16,7 +16,10 @@
         </tr>
       </thead>
       <tbody>
+        <tr *ngIf="tableData?.length === 0">
+          <td colspan="8" class="text-center">No data found</td>
         <tr *ngFor="let data of tableData">
+
           <!-- Registered -->
           <ng-container *ngIf="data.owner !== 'Unregistered'; else notRegistered">
             <td>Yes</td>
@@ -45,7 +48,7 @@
     </table>
 
     <form>
-      <div class="col-md-4">
+      <div class="col-md-4 p-badge-no-gutter">
         <label class="form-label">Does the firm fulfill the required mandatory equipment:<span
             class="text-danger font-size-12">*</span></label>
         <select class="form-select h-50" name="fulfillsRequirement" [(ngModel)]="tData.fulfillsRequirement" required
@@ -58,7 +61,7 @@
           Please select if the requirement is fulfilled
         </div>
       </div>
-      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No'">
+      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No' && applicationStatus === 'Submitted'">
         <div class="col-md-4 mb-3">
           <label class="form-label">
             Last Date to Resubmit:<span class="text-danger font-size-12">*</span>
@@ -86,39 +89,46 @@
       <div class="d-flex justify-content-end mt-4 align-items-center gap-2">
         <!-- Save & Forward -->
         <button type="submit" class="btn btn-success"
-          *ngIf="applicationStatus !== 'Resubmitted EQ' && tData.fulfillsRequirement === 'No'"
+          *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'No'"
           (click)="notifyContractor()" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Forward
         </button>
 
         <!-- Save & Next -->
-        <button type="submit" class="btn btn-primary"
-          *ngIf="applicationStatus !== 'Resubmitted EQ' && tData.fulfillsRequirement === 'Yes'" (click)="saveAndNext()"
+        <button type="submit" class="btn btn-success"
+          *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'Yes'" (click)="saveAndNext()"
           [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Next
         </button>
 
         <!-- Update -->
-        <button type="submit" class="btn btn-success" *ngIf="applicationStatus === 'Resubmitted EQ'" (click)="update()"
+        <button type="submit" class="btn btn-success" *ngIf="applicationStatus === 'Resubmitted HR and EQ'" (click)="update()"
           [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Update
         </button>
 
         <!-- Action -->
-        <button class="btn btn-primary" (click)="openActionModal(applicationStatus)">
+        <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR and EQ'" (click)="openActionModal(applicationStatus)">
           Action
         </button>
 
         <!-- Reinstate -->
-        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+        <!-- <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
           (nzOnConfirm)="reinstate(bctaNo)">
           <button class="btn btn-danger h-100" *ngIf="licenseStatus === 'Suspended'">
             Reinstate
           </button>
-        </a>
+        </a> -->
+          <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
+                    [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
+                    <button class="btn btn-danger"
+                        *ngIf="applicationStatus === 'Suspension Resubmission' && tData.fulfillsRequirement === 'No'">
+                        Reject
+                    </button>
+                </a>
       </div>
 
     </form>

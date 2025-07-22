@@ -325,9 +325,9 @@ pageNo: number = 1;
     }
 
     navigate(data: any) {
-        if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS'
-            || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted OS'
-            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || data.applicationStatus === 'Suspension Resubmission') {
+        if (data.applicationStatus === 'Submitted'
+            || data.applicationStatus === 'Resubmitted OS and PFS'
+            || data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Suspension Resubmission') {
             const workId = data.certifiedBuilderNo;
             this.prepareAndNavigate(data, workId);
         }

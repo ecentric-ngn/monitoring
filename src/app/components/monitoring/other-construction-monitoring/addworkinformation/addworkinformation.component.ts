@@ -30,19 +30,22 @@ export class AddworkinformationComponent {
   // this.getPocuringAgency(); // Uncomment if needed
   this.getDzongkhagList();
   this.contractorPrevId = this.contractorPrevId ?? null;
-  
   const WorkDetail = this.service.getData('BctaNo');
   this.data = WorkDetail ?? null;
   const workData = WorkDetail?.data ?? {};
-  this.prevOwnerTableId = this.prevOwnerTableId || (workData.work_information_id ?? null);
+  this.prevOwnerTableId = this.prevOwnerTableId || WorkDetail?.data || (workData.work_information_id ?? null)
   this.appNoStatus = workData.applicationStatus ?? null;
   console.log('prevOwnerTableId', this.prevOwnerTableId);
+  debugger
   if (this.prevOwnerTableId) {
+    debugger
     this.getDatabasedOnOwnerId();
+
   }
   this.contractorId = WorkDetail?.newContractorId ?? null;
   
-  this.workType = this.workType; // seems unnecessary unless you're trying to update it dynamically
+  this.workType = this.workType || WorkDetail?.otherWorkType; // seems unnecessary unless you're trying to update it dynamically
+  debugger
   console.log('WorkDetailinaddinformation', WorkDetail);
 }
 

@@ -133,35 +133,74 @@ getActiveList() {
     );
   }
   
-  getReportList(searchQuery?: string) {
-    this.isLoading = true;
-    this.service.getDatabasedOnReviewAction().subscribe(
-      (response: any[]) => {
-        this.tableData = response;
-        this.showCancelTable = false
-        // this.tableData = response.map(item => ({
-        //   id: Number(item.id) || 0,
-        //   contractorNo: item.firmId || '', // Map bctaNo to contractorNo
-        //   type: this.formatType(item.firmType), // Map firmType to type
-        //   rawFirmType: item.firmType, // Store the original firmType
-        //   actionType: this.formatActionType(''), // You might need to adjust this
-        //   details: item.details || '-',
-        //   initiatedBy: item.initiatedBy || '-',
-        //   initiatedDate: item.initiatedDate,
-        //   status: item.status,
-        //   isEditing: false,
-        //   selected: false
-        // }));
-        this.filteredApplications = [...this.tableData];
-        this.totalCount = this.tableData.length;
-        this.isLoading = false;
-      },
-      (error) => {
-        this.isLoading = false;
-        this.notification.error('Error', 'Failed to load action items');
+fullTableData: any[] = [];
+
+getReportList(searchQuery?: string) {
+  this.isLoading = true;
+  this.service.getDatabasedOnReviewAction().subscribe(
+    (response: any[]) => {
+      // Store full data
+      this.fullTableData = response;
+      
+      // Apply filter if searchQuery is provided
+      if (searchQuery && searchQuery.trim() !== '') {
+        const query = searchQuery.trim().toLowerCase();
+        this.fullTableData = this.fullTableData.filter(item => 
+          (item.firmId?.toString().toLowerCase().includes(query)) || 
+          (item.firmType?.toString().toLowerCase().includes(query))
+        );
       }
-    );
+      this.setPageData(this.pageNo);
+      this.totalCount = this.fullTableData.length;
+      this.showCancelTable = false;
+      this.pageNo = 1; // reset to first page
+      
+      this.isLoading = false;
+    },
+    (error) => {
+      this.isLoading = false;
+      this.notification.error('Error', 'Failed to load action items');
+    }
+  );
+}
+
+
+// Searchfilter() {
+//   this.getReportList(this.searchQuery);
+// }
+
+
+setPageData(page: number): void {
+  const startIndex = (page - 1) * this.pageSize;
+  const endIndex = startIndex + this.pageSize;
+  this.tableData = this.fullTableData.slice(startIndex, endIndex);
+  console.log('Table Data:', this.tableData);
+}
+
+   calculateOffset(): string {
+        const currentPage = (this.pageNo - 1) * this.pageSize + 1;
+        const limit_value = Math.min(
+            this.pageNo * this.pageSize,
+            this.totalCount
+        );
+        return `Showing ${currentPage} to ${limit_value} of ${this.totalCount} entries`;
+    }
+  getTotalPages(): number {
+  return Math.ceil(this.totalCount / this.pageSize);
+}
+
+getPages(): number[] {
+  const totalPages = this.getTotalPages();
+  return Array.from({ length: totalPages }, (_, i) => i + 1);
+}
+
+goToPage(page: number): void {
+  if (page >= 1 && page <= this.getTotalPages()) {
+    this.pageNo = page;
+    this.setPageData(this.pageNo);
   }
+}
+
 
   private formatType(type: string): string {
     if (!type) return '-';
@@ -423,20 +462,33 @@ private handleError(operation: string, error: any): void {
 
 
 
-  Searchfilter() {
-    if(this.activeAction =='Suspended'){
-      this.endorse();
-    }else if (this.activeAction == 'cancel') {
-      this.cancelAppNo();
-      
-    }else if (this.activeAction == 'downgrade') {
-      this.DownGrade();
-    }else{
-     this.pageNo = 1;
-    this.getReportList(this.searchQuery);
-    }
+  // Searchfilter() {
+
+  //   // if(this.activeAction =='Suspended'){
+  //   //   this.endorse();
+  //   // }else if (this.activeAction == 'cancel') {
+  //   //   this.cancelAppNo();
+  //   // }else if (this.activeAction == 'downgrade') {
+  //   //   this.DownGrade();
+  //   // }else{
+  //   //  this.pageNo = 1;
+  //   // this.applySearchFilter();
+  //   // }
     
-  }
+  // }
+     Searchfilter(type: any) {
+      console.log('type', type);
+        if (this.searchQuery && this.searchQuery.trim() !== '') {
+          if(type == 'Suspend'){
+             this.getReportList(this.searchQuery);
+          }else if (type == 'Cancel'){
+            this.getCancelList(this.searchQuery);
+          }
+           
+        } else {
+            this.getReportList(this.searchQuery);
+        }
+    }
 
   setLimitValue(value: any) {
     this.pageSize = Number(value);
@@ -590,33 +642,15 @@ getCancelList(searchQuery?: string) {
       console.log('API Response:', response); // Debugging line
       this.filteredApplications = response
       console.log('Filtered Applications:', this.filteredApplications);
-      // this.tableData = response.map(item => ({
-      //   id: item.id,
-      //   firmNo: item.firmNo || '', // Direct access
-      //   firmType: item.firmType || '', // Direct access
-      //   contractorId: item.firmNo || '',
-      //   contractorNo: item.firmNo || '',
-      //   type: this.formatType(item.firmType),
-      //   actionType: 'Cancel',
-      //   details: item.details || '-',
-      //   status: item.status || 'PENDING',
-      //   initiatedBy: item.initiatedBy || '-',
-      //   initiatedDate: item.initiatedDate,
-      //   isEditing: false,
-      //   selected: false
-      // }));
-      
-      // if (searchQuery) {
-      //   const query = searchQuery.toLowerCase();
-      //   this.filteredApplications = this.tableData.filter(app => 
-      //     (app.firmNo?.toLowerCase().includes(query)) ||
-      //     (app.firmType?.toLowerCase().includes(query)) ||
-      //     (app.initiatedBy?.toLowerCase().includes(query))
-      //   );
-      // } else {
-      //   this.filteredApplications = [...this.tableData];
-      // }
-      
+       // Apply filter if searchQuery is provided
+      if (searchQuery && searchQuery.trim() !== '') {
+        const query = searchQuery.trim().toLowerCase();
+        this.filteredApplications = this.filteredApplications.filter(item => 
+          (item.firmId?.toString().toLowerCase().includes(query)) || 
+          (item.firmType?.toString().toLowerCase().includes(query))
+        );
+      }
+      this.setPageData(this.pageNo);
       this.totalCount = this.filteredApplications.length;
       this.isLoading = false;
     },

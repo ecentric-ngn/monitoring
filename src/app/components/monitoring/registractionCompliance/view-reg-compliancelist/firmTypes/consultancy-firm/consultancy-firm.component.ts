@@ -240,11 +240,8 @@ export class ConsultancyFirmComponent {
         // Only proceed if status is "Submitted"
         if (
             data.applicationStatus === 'Submitted' ||
-            data.applicationStatus === 'Resubmitted PFS' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
-            data.applicationStatus === 'Resubmitted OS' ||
-            data.applicationStatus === 'Resubmitted HR' ||
-            data.applicationStatus === 'Resubmitted EQ' ||
+            data.applicationStatus === 'Resubmitted HR and EQ' ||
             data.applicationStatus === 'Suspension Resubmission' ||
             data.applicationStatus === 'Suspension Approved'
         ) {

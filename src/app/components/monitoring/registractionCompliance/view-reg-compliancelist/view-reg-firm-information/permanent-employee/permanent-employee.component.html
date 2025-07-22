@@ -66,7 +66,7 @@
             </div>
 
             <!-- Conditional fields when HR not fulfilled -->
-            <ng-container *ngIf="tData.hrFulfilled === 'No'">
+            <ng-container *ngIf="tData.hrFulfilled === 'No' && applicationStatus === 'Submitted'">
                 <div class="row pt-4">
                     <div class="col-md-4">
                         <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
@@ -92,39 +92,54 @@
 
             <!-- Buttons -->
             <div class="col-md-12 d-flex justify-content-end align-items-center gap-2 flex-wrap mt-3">
+                <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
+                    [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
+                    <button class="btn btn-danger"
+                        *ngIf="applicationStatus === 'Suspension Resubmission' && tData.hrFulfilled === 'No'">
+                        Reject
+                    </button>
+                </a>
                 <!-- Save and Forward -->
-                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'No'" type="button"
-                    class="btn btn-success" (click)="saveAndForward()" [disabled]="isSaving">
-                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                    {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
-                </button>
+                <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and forward this application?'"
+                    [nzOkText]="'Yes, Forward'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndForward()"
+                    *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'No'">
+                    <button type="button" class="btn btn-success" [disabled]="isSaving">
+                        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
+                    </button>
+                </a>
 
                 <!-- Save and Next -->
-                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'Yes'" type="button"
-                    class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
-                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                    {{ isSaving ? 'Saving...' : 'Save and Next' }}
-                </button>
-
+                <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and proceed to the next step?'"
+                    [nzOkText]="'Yes'" [nzCancelText]="'No'" (nzOnConfirm)="saveAndNext()"
+                    *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'Yes'">
+                    <button type="button" class="btn btn-success" [disabled]="isSaving">
+                        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ isSaving ? 'Saving...' : 'Save and Next' }}
+                    </button>
+                </a>
                 <!-- Update -->
-                <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
-                    (click)="update()" [disabled]="isSaving">
-                    <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
-                    {{ isSaving ? 'Saving...' : 'Update' }}
-                </button>
-
+                <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to update this application?'"
+                    [nzOkText]="'Yes, Update'" [nzCancelText]="'Cancel'" (nzOnConfirm)="update()"
+                    *ngIf="applicationStatus === 'Resubmitted HR'">
+                    <button type="button" class="btn btn-success" [disabled]="isSaving">
+                        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+                        {{ isSaving ? 'Saving...' : 'Update' }}
+                    </button>
+                </a>
                 <!-- Action -->
-                <button *ngIf="licenseStatus === 'Active'" type="button" class="btn btn-primary" (click)="onClick()"
-                    data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                <button *ngIf="tData.hrFulfilled === 'No' && applicationStatus === 'Resubmitted HR and EQ'"
+                    type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
+                    data-bs-target="#staticBackdrop">
                     Action
                 </button>
 
-                <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+                <!-- <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
                     (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
                     <button class="btn btn-danger h-100">
                         Reinstate
                     </button>
-                </a>
+                </a> -->
             </div>
         </div>
     </form>
@@ -139,7 +154,7 @@
             <form #actionForm="ngForm">
                 <div class="modal-header" style="background-color: #495f8a">
                     <h5 class="modal-title text-white" id="staticBackdropLabel">Take Action</h5>
-                    <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+                    <button type="button" class="btn-close" aria-label="Close"></button>
                 </div>
 
                 <div class="modal-body">
@@ -169,7 +184,7 @@
                     </div>
 
                     <!-- Downgrade Table -->
-                    <div *ngIf="selectedAction.actionType === 'downgrade'" class="table-responsive">
+                 <div *ngIf="selectedAction.actionType === 'downgrade'" class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -179,22 +194,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <!-- <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
-                                    <td>{{ downgrade.workCategory }}</td>
-                                    <td>{{ downgrade.existingClass }}</td>
-                                    <td>
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                            <option *ngFor="let option of getClassOptions(downgrade.existingClass)"
-                                                [value]="option.value">
-                                                {{ option.label }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                </tr> -->
-
-                                <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                                <tr *ngFor="let downgrade of filteredDowngradeList; trackBy: trackByWorkCategory">
                                     <td>{{ downgrade.workCategory }}</td>
                                     <td>{{ downgrade.existingClass }}</td>
 
@@ -231,14 +231,18 @@
                                         </select>
                                     </td>
                                 </tr>
-
                             </tbody>
                         </table>
+
+                        <div *ngIf="filteredDowngradeList.length === 0" class="text-center text-muted mt-2">
+                            No registered downgrade classes available.
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" (click)="closeModal()"
+                    <button type="button" class="btn btn-secondary" #closeActionModal
                         data-bs-dismiss="modal">Close</button>
                     <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
                 </div>
@@ -276,7 +280,7 @@
                         <div class="text-danger" *ngIf="showErrorMessage">
                             {{ showErrorMessage }}
                         </div>
-                        </div>
+                    </div>
 
 
                 </form>

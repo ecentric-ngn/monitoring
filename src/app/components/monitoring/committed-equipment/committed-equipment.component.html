@@ -81,7 +81,7 @@
             <!-- Remove Button -->
             <td class="text-center" >
               <button class="btn btn-success btn-sm"(click)="showCertificateModal(item)"data-bs-toggle="modal" data-bs-target="#equipmentCertificateModal">Check</button>
-              <button *ngIf="additionalItems.length > 1" class="btn btn-danger btn-sm" (click)="removeAdditionalItem(j)">Remove</button>
+              <button *ngIf="additionalItems.length > 1" class="btn btn-danger btn-sm ml-1" (click)="removeAdditionalItem(j)">Remove</button>
             </td>
           </tr>
         </ng-container>
@@ -297,18 +297,9 @@
   </div>
 </div>
 
-
-
-
-
-
-
-
-
-
 <!-- Modal -->
 <div class="modal fade" id="equipmentCertificateModal" tabindex="-1" aria-labelledby="equipmentCertificateLabel" aria-hidden="true">
-  <div class="modal-dialog modal-dialog-centered">
+  <div class="modal-dialog modal-dialog-centered custom-modal-size">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="equipmentCertificateLabel">Vehicle Details</h5>
@@ -333,7 +324,7 @@
             </p> 
 
             <div *ngIf="VehicleDetails && !showErrorMessage">
-              <table class="table col-lg-7 offset-lg-3">
+              <table class="table col-lg-7 offset-lg-3 font-size-14">
                 <tr><th>Registration No :</th><td>{{VehicleDetails.vehicleNumber}}</td></tr>
                 <tr><th>Owner:</th><td>{{VehicleDetails.ownerName}}</td></tr>
                 <tr><th>Vehicle Type:</th><td>{{VehicleDetails.vehicleTypeName}}</td></tr>

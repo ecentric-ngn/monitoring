@@ -48,6 +48,7 @@ export class BctaWorkDetailComponent {
   contractorPrevId: any;
   newContractorId: any;
   workId: any;
+  applicationStatus: any;
   
 constructor(private router: Router,private service:CommonService) {
  
@@ -61,6 +62,8 @@ ngOnInit() {
   this.tableId = WorkDetail.data.checklist_id;
   this.workId = WorkDetail.data.id || WorkDetail.data.workid;
   this.newContractorId = WorkDetail.newContractorId;
+  this.applicationStatus = WorkDetail.data.applicationStatus;
+  debugger
   if (this.workType === 'OTHERS') {
     this.getContractorDetails();
     this.DisplayonWorkInformationForm();
@@ -353,6 +356,7 @@ DisplayonsiteForm(){
   this.prevTableId = this.tableId;
   this.inspectionType = this.inspectionType;
   this.workId = this.workId;
+   this.applicationStatus = this.applicationStatus;
   this.prevOwnerTableId = this.prevOwnerTableId ?? null ;
   this.showonsiteForm=true;
   this.showonWorkInformationForm=false;

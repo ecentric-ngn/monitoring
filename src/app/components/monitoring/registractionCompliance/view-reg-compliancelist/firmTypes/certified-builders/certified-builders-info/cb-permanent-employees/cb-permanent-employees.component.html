@@ -64,8 +64,8 @@
             </div>
 
             <!-- Conditional fields when HR not fulfilled -->
-            <ng-container *ngIf="tData.hrFulfilled === 'No'">
-                <div class="row pt-4">
+            <ng-container *ngIf="tData.hrFulfilled === 'No' && applicationStatus === 'Submitted'">
+                <div class="row pt-4 ml--1">
                     <div class="col-md-4">
                         <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
                         <input type="date" class="form-control form-control-sm" [(ngModel)]="tData.resubmitDate"
@@ -80,7 +80,7 @@
             </ng-container>
 
             <!-- Remarks when HR is fulfilled -->
-            <ng-container *ngIf="tData.hrFulfilled === 'Yes'">
+            <ng-container *ngIf="tData.hrFulfilled === 'Yes' && applicationStatus === 'Submitted'">
                 <div class="col-md-12">
                     <label class="form-label">Remarks</label>
                     <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="tData.remarks"
@@ -91,34 +91,42 @@
             <!-- Buttons -->
             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3 flex-wrap">
                 <!-- Save and Forward -->
-                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'No'" type="button"
+                <button *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.hrFulfilled === 'No'" type="button"
                     class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
                 </button>
 
                 <!-- Save and Next -->
-                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'Yes'" type="button"
+                <button *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.hrFulfilled === 'Yes'" type="button"
                     class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Save and Next' }}
                 </button>
 
                 <!-- Update -->
-                <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
+                <button *ngIf="applicationStatus === 'Resubmitted HR and EQ'" type="button" class="btn btn-success"
                     (click)="update()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Update' }}
                 </button>
                 <!-- Action -->
-                <button class="btn btn-primary" (click)="openActionModal(applicationStatus)">Action</button>
+                <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.hrFulfilled === 'No'" (click)="openActionModal(applicationStatus)">Action</button>
+
+                 <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
+                    [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
+                    <button class="btn btn-danger"
+                        *ngIf="applicationStatus === 'Suspension Resubmission' && tData.hrFulfilled === 'No'">
+                        Reject
+                    </button>
+                </a>
                 <!-- View (Reinstate) -->
-                <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+                <!-- <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
                     (nzOnConfirm)="reinstate(bctaNo)">
                     <button class="btn btn-danger h-100" *ngIf="licenseStatus === 'Suspended'">
                         Reinstate
                     </button>
-                </a>
+                </a> -->
             </div>
         </div>
     </form>

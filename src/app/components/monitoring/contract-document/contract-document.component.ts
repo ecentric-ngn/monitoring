@@ -379,6 +379,17 @@ export class ContractDocumentComponent {
         }
         
     }
+    onInsuranceTypeChange(event: any) {
+         this.showThirdPartyTable = false;
+        this.formData.thirdPartyInsurance = '';
+          this.showTable = false;
+        this.formData.workInsurance = '';
+        this.formData.workInsurance = '';
+       this.formData.WorkersInsurancePolicyNo = '';
+       this.formData.thirdPartyInsurancePolicyNo = '';
+       this.formData.policyNo = '';
+       this.WorkersInsurance = false;
+    }
   FetchPolicyDetails() {
   this.isFetching = true;
   this.service.FetchPolicyDetails(this.formData.policyNo).subscribe({
@@ -390,7 +401,7 @@ export class ContractDocumentComponent {
       //this.formData.thirdPartyInsurance = thirdPartyLiability?.particular || '';
       const workInsurance = response.insurance_policy_data?.[0]?.policy_holder_detail;
       this.formData.workInsurance = workInsurance?.insured_name || '';
-      this.getPolicyHolderDetails();
+    //   this.getPolicyHolderDetails();
     },
     error: (error) => {
       this.isFetching = false;
@@ -417,11 +428,11 @@ WorkersInsurance:boolean = false;
       this.isFetchingWorkersInsurancePolicyNo = false;
       this.WorkersInsurance = true;
       this.WorkersInsurancePolicyDetails = response;
-     const thirdPartyLiability = response.insurance_policy_data?.[0]?.third_party_liability?.[0];
-      this.formData.workersInsurance = thirdPartyLiability?.particular || '';
+     const workersInsuranceData = response?.insurance_policy_data[0].policy_holder_detail.insured_name ;
+      this.formData.workersInsurance = workersInsuranceData || '';
     //   const workInsurance = response.insurance_policy_data?.[0]?.policy_holder_detail;
     //   this.formData.workInsurance = workInsurance?.insured_name || '';
-      this.getPolicyHolderDetails();
+     // this.getPolicyHolderDetails();
     },
     error: (error) => {
       this.isFetchingWorkersInsurancePolicyNo = false;
@@ -452,7 +463,7 @@ showThirdPartyTable: boolean = false
       this.formData.thirdPartyInsurance = thirdPartyLiability?.particular || '';
     //   const workInsurance = response.insurance_policy_data?.[0]?.policy_holder_detail;
     //   this.formData.workInsurance = workInsurance?.insured_name || '';
-      this.getPolicyHolderDetails();
+    //   this.getPolicyHolderDetails();
     },
     error: (error) => {
       this.isFetching = false;
@@ -470,54 +481,6 @@ showThirdPartyTable: boolean = false
   });
 }
 
-getThirdPartyLiabilityDetails() {
-  if (!this.policyDetails?.insurance_policy_data?.[0]?.third_party_liability) return [];
-  
-  return [
-    { 
-      label: 'Third Party Liability', 
-      value: this.policyDetails.insurance_policy_data[0].third_party_liability[0].particular 
-    }
-  ];
-}
-getPolicyHolderDetails() {
-  if (!this.policyDetails?.insurance_policy_data?.[0]?.policy_holder_detail) return [];
-  const details = this.policyDetails.insurance_policy_data[0].policy_holder_detail;
-  return [
-    { label: 'Policy Number', value: details.policy_no },
-    { label: 'Insured Name', value: details.insured_name },
-    { label: 'Address', value: details.address },
-    { label: 'Cover Type', value: details.cover_type },
-    { label: 'Contact Number', value: details.contact_no },
-    { label: 'Nature of Contract', value: details.nature_of_contract },
-    { label: 'Location', value: details.location }
-  ];
-}
-
-getInsuranceValidateDetails() {
-  if (!this.policyDetails?.insurance_policy_data?.[0]?.insurance_validate) return [];
-  
-  const details = this.policyDetails.insurance_policy_data[0].insurance_validate;
-  return [
-    { label: 'Project Start Date', value: details.project_start_date },
-    { label: 'Project End Date', value: details.project_end_date },
-    { label: 'Maintenance Period Start Date', value: details.maintenance_period_start_date.split(',')[0] },
-    { label: 'Maintenance Period End Date', value: details.maintenance_period_end_date }
-  ];
-}
-
-getMaterialDamageDetails() {
-  if (!this.policyDetails?.insurance_policy_data?.[0]?.material_damage_coverage) return [];
-  
-  const details = this.policyDetails.insurance_policy_data[0].material_damage_coverage;
-  return [
-    { label: 'Material Damage Sum Insured', value: details.total_sum_insured },
-    { label: 'Material Damage Description', value: details.details[0].description }
-  ];
-}
-
-
-
 // getAddOnCoverageDetails() {
 //   if (!this.policyDetails?.insurance_policy_data?.[0]?.add_on_coverage) return [];
   
@@ -527,9 +490,7 @@ getMaterialDamageDetails() {
 //   ];
 // }
 
-get policy() {
-  return this.policyDetails.insurance_policy_data[0];
-}
+
 
     onPolicyNoChange(type: string) {
       if (type === 'thirdPartyInsurance') {
@@ -540,8 +501,8 @@ get policy() {
         this.formData.workInsurance = '';
       }else if (type === 'WorkersInsurance') {
         this.WorkersInsurance = false;
-       this.formData.workInsurance = '';
-       this.formData.thirdPartyInsurance = '';
+    //    this.formData.workInsurance = '';
+    //    this.formData.thirdPartyInsurance = '';
       }
     
       }

@@ -52,7 +52,7 @@
                     </tr>
 
                     <tr *ngIf="tableData.length === 0">
-                        <td colspan="10" class="text-center text-muted">No data available</td>
+                        <td colspan="18" class="text-center text-muted">No data available</td>
                     </tr>
                 </tbody>
             </table>
@@ -72,7 +72,7 @@
             </div>
 
             <!-- Conditional fields when HR not fulfilled -->
-            <ng-container *ngIf="tData.hrFulfilled === 'No'">
+            <ng-container *ngIf="tData.hrFulfilled === 'No' && applicationStatus !== 'Resubmitted HR and EQ'">
                 <div class="col-md-6">
                     <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
                     <input type="date" class="form-control form-control-sm" [(ngModel)]="tData.resubmitDate"
@@ -98,7 +98,7 @@
                 <div class="col-md-12 d-flex justify-content-end gap-2">
 
                     <!-- Save and Forward / Save and Next -->
-                    <ng-container *ngIf="applicationStatus !== 'Resubmitted HR'">
+                    <ng-container *ngIf="applicationStatus !== 'Resubmitted HR and EQ'">
                         <button *ngIf="tData.hrFulfilled === 'No'" type="button" class="btn btn-success"
                             (click)="saveAndNext()" [disabled]="isSaving">
                             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
@@ -113,7 +113,7 @@
                     </ng-container>
 
                     <!-- Update Button -->
-                    <button *ngIf="applicationStatus === 'Resubmitted HR'" type="button" class="btn btn-success"
+                    <button *ngIf="applicationStatus === 'Resubmitted HR and EQ'" type="button" class="btn btn-success"
                         (click)="update()" [disabled]="isSaving">
                         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                         {{ isSaving ? 'Saving...' : 'Update' }}
@@ -121,7 +121,7 @@
 
                     <!-- Action Button -->
                     <button  type="button" class="btn btn-primary"  data-bs-toggle="modal"
-                        data-bs-target="#staticBackdrops" *ngIf="licenseStatus === 'Active' && applicationStatus === 'Suspension Resubmission'">
+                        data-bs-target="#staticBackdrops" *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.hrFulfilled === 'No'">
                         Action
                     </button>
                     <!-- Reinstate Button -->

@@ -65,8 +65,8 @@
                 <tr *ngFor="let data of tableData" class="table-row">
                    
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
+                        [class.text-primary]="data.applicationStatus === 'Submitted'
+                        || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
                         (click)="navigate(data)">
                         {{ data.certifiedBuilderNo }}
                     </td>
@@ -75,11 +75,10 @@
                     <td>
                         <span class="text-bold" [ngClass]="{
                            'text-secondary': data.applicationStatus== 'Not Submitted',
-                            'text-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Cancel Request',
+                            'text-warning': data.applicationStatus== 'Pending' || data.applicationStatus== 'Cancel Request',
                             'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved',
-                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                                            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
-                            'text-info': data.applicationStatus== 'Ready for Review'
+                            'text-primary': data.applicationStatus== 'Submitted'
+                                            || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
                             }">
                             {{ data.applicationStatus }}
                         </span>
@@ -96,7 +95,7 @@
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
                      <td>
-                        <button *ngIf="data.licenseStatus !== 'Suspended' && data.applicationStatus !== 'Not Submitted' && data.applicationStatus !== 'Forwarded TO RC' && data.applicationStatus !== 'Suspension Request' && data.applicationStatus !== 'Suspension Resubmission' && data.applicationStatus !== 'Cancel Request' && data.applicationStatus !== 'Downgrade Request'" class="btn btn-primary btn-sm me-2 mb-1"
+                        <button *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
                             (click)="openActionModal(data)">Action</button>
                     </td>
                     <!-- <td>
@@ -245,7 +244,7 @@
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Type<span class="text-danger">*</span></label>
-                            <select class="form-select" [(ngModel)]="selectedAction.actionType" name="actionType"
+                            <select class="form-select h-3rem" [(ngModel)]="selectedAction.actionType" name="actionType"
                                 required (change)="onActionTypeChange()">
                                 <option value="">-- Select --</option>
                                 <option value="cancel">Cancel</option>
@@ -255,7 +254,7 @@
 
                         <div class="col-md-6 mb-3">
                             <label class="form-label">Action Date<span class="text-danger">*</span></label>
-                            <input type="date" class="form-control" [(ngModel)]="selectedAction.actionDate"
+                            <input type="date" class="form-control h-3rem" [(ngModel)]="selectedAction.actionDate"
                                 name="actionDate" [disabled]="true" required [value]="today">
                         </div>
                     </div>

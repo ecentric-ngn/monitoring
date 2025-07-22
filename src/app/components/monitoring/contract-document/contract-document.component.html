@@ -15,7 +15,7 @@
           Please select an ConstructionPermit
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Conditions of Contract:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.contractConditions" name="contractConditions"
@@ -29,54 +29,55 @@
           Please select an option for Site Office
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Insurance Type:<span class="text-danger font-size-12">*</span></label>
-        <select class="form-select form-control-sm" [(ngModel)]="formData.InsuranceType" name="InsuranceType" required
-          #InsuranceType="ngModel" [disabled]="appNoStatus === 'REJECTED'">
-          <option disabled>-- Select --</option>
+        <select class="form-select form-control-sm" [(ngModel)]="formData.InsuranceType"
+          (change)="onInsuranceTypeChange($event)" name="InsuranceType" required #InsuranceType="ngModel"
+          [disabled]="appNoStatus === 'REJECTED'">
+          <option disabled selected value="">-- Select --</option>
           <option value="RICBL">RICBL</option>
           <option value="BIL">BIL</option>
         </select>
         <div *ngIf="InsuranceType.invalid && InsuranceType.touched" class="text-danger font-size-12">
-          Please select an option InsuranceType
+          Please select an Insurance Type
         </div>
       </div>
+
     </div>
 
     <!-- Insurance Sections (BIL) -->
-    <div *ngIf="formData.InsuranceType === 'BIL'">
+    <div *ngIf="formData.InsuranceType === 'BIL' || formData.InsuranceType === 'RICBL'">
       <!-- Work Insurance Section -->
       <div class="row align-items-end">
         <div class="col-md-4 mb-3">
-          <label class="form-label">Policy No for Work Insurance:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Policy No for Work Insurance:</label>
           <div class="d-flex">
             <input type="text" name="policyNo" class="form-control me-2 form-control-sm" [(ngModel)]="formData.policyNo"
-              name="policyNo" required #bctaRegistrationNo="ngModel" (input)="onPolicyNoChange()" />
+              name="policyNo" (input)="onPolicyNoChange()" />
             <button type="button" class="btn btn-primary" (click)="onfetchDetails('workInsurance')">
               {{ isFetching ? 'Fetching...' : 'Fetch' }}
             </button>
           </div>
         </div>
-        
+
         <div class="col-md-4 mb-3">
-          <label class="form-label">Work Insurance:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Work Insurance:</label>
           <textarea class="form-control" [(ngModel)]="formData.workInsurance" placeholder="Enter work Insurance"
-            name="workInsurance" required #workInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'"
-            style="line-height: 1.2; font-size: 0.875rem;" readonly></textarea>
-          <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
-            Please enter Work Insurance
-          </div>
-        </div>
-        
-        <div class="col-md-4 mb-4">
-          <label class="form-label">Work Insurance Remarks:<span class="text-danger font-size-12">*</span></label>
-          <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.insuranceRemarks" id="remarks"
-            name="insuranceRemarks" required #insuranceRemarks="ngModel"
+            name="workInsurance" [disabled]="appNoStatus === 'REJECTED'"
             style="line-height: 1.2; font-size: 0.875rem;"></textarea>
-          <div *ngIf="insuranceRemarks.invalid && insuranceRemarks.touched" class="text-danger font-size-12">
+          <!-- <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
+            Please enter Work Insurance
+          </div> -->
+        </div>
+
+        <div class="col-md-4 mb-4">
+          <label class="form-label">Work Insurance Remarks:</label>
+          <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.workInsuranceRemarks"
+            id="remarks" name="insuranceRemarks" style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <!-- <div *ngIf="insuranceRemarks.invalid && insuranceRemarks.touched" class="text-danger font-size-12">
             Please enter insuranceRemarks.
-          </div>
+          </div> -->
         </div>
       </div>
       <!-- Policy Details Table -->
@@ -88,33 +89,41 @@
             </tr>
           </thead>
           <tbody>
+            <!-- Policy Holder Details -->
             <tr>
-              <td width="30%"><strong>Name of the Insured</strong></td>
-              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
+              <td width="30%"><strong>Product Name</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].product_name }}</td>
             </tr>
             <tr>
               <td><strong>Policy Number</strong></td>
               <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.policy_no }}</td>
             </tr>
             <tr>
-              <td><strong>Insurer</strong></td>
-              <td>Your Insurance Company Name</td>
+              <td><strong>Insured Name</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
             </tr>
             <tr>
-              <td><strong>Type of Insurance</strong></td>
-              <td>{{ policyDetails.insurance_policy_data[0].product_name }}</td>
+              <td><strong>Address</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.address }}</td>
             </tr>
             <tr>
-              <td><strong>Coverage Type</strong></td>
-              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.cover_type }}</td>
+              <td><strong>Cover Type</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.cover_type || 'N/A' }}</td>
             </tr>
             <tr>
-              <td><strong>Coverage Details</strong></td>
-              <td>
-                <div><strong>Material Damage:</strong> {{ policyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
-                <div><strong>Third Party Liability:</strong> {{ policyDetails.insurance_policy_data[0].third_party_liability[0].particular }}</div>
-              </td>
+              <td><strong>Contact Number</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.contact_no || 'N/A' }}</td>
             </tr>
+            <tr>
+              <td><strong>Nature of Contract</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.nature_of_contract || 'N/A' }}</td>
+            </tr>
+            <tr>
+              <td><strong>Location</strong></td>
+              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.location || 'N/A' }}</td>
+            </tr>
+
+            <!-- Insurance Validate Details -->
             <tr>
               <td><strong>Policy Period</strong></td>
               <td>
@@ -125,13 +134,43 @@
             <tr>
               <td><strong>Maintenance Period</strong></td>
               <td>
-                From {{ policyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date.split(',')[0] }}
-                to {{ policyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date }}
+                From {{ policyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date || 'N/A'
+                }}
+                to {{ policyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date || 'N/A' }}
               </td>
             </tr>
+
+            <!-- Material Damage Coverage -->
             <tr>
-              <td><strong>Project Reference</strong></td>
-              <td>{{ policyDetails.insurance_policy_data[0].policy_holder_detail.nature_of_contract }}</td>
+              <td><strong>Material Damage Coverage</strong></td>
+              <td>
+                <div
+                  *ngIf="policyDetails.insurance_policy_data[0].material_damage_coverage.details?.length > 0; else noMaterialDamage">
+                  <div *ngFor="let detail of policyDetails.insurance_policy_data[0].material_damage_coverage.details">
+                    <!-- Add detail fields here if they exist in your actual data -->
+                  </div>
+                  <div><strong>Total Sum Insured:</strong> {{
+                    policyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
+                </div>
+                <ng-template #noMaterialDamage>
+                  No material damage coverage details available
+                </ng-template>
+              </td>
+            </tr>
+
+            <!-- Add On Coverage -->
+            <tr>
+              <td><strong>Add On Coverage</strong></td>
+              <td>
+                <div *ngIf="policyDetails.insurance_policy_data[0].add_on_coverage?.length > 0; else noAddOnCoverage">
+                  <div *ngFor="let addOn of policyDetails.insurance_policy_data[0].add_on_coverage">
+                    <!-- Add add-on coverage fields here if they exist in your actual data -->
+                  </div>
+                </div>
+                <ng-template #noAddOnCoverage>
+                  No add-on coverage details available
+                </ng-template>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -140,39 +179,39 @@
       <!-- Third Party Insurance Section -->
       <div class="row align-items-end">
         <div class="col-md-4 mb-3">
-          <label class="form-label">Policy No for Third Party Insurance:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Policy No for Third Party Insurance:</label>
           <div class="d-flex">
-            <input type="text" name="policyNo" class="form-control me-2 form-control-sm" [(ngModel)]="formData.thirdPartyInsurancePolicyNo"
-              name="thirdPartyInsurancePolicyNo" required #thirdPartyInsurancePolicyNo="ngModel" (input)="onPolicyNoChange('thirdPartyInsurance')" />
+            <input type="text" name="policyNo" class="form-control me-2 form-control-sm"
+              [(ngModel)]="formData.thirdPartyInsurancePolicyNo" name="thirdPartyInsurancePolicyNo"
+              (input)="onPolicyNoChange('thirdPartyInsurance')" />
             <button type="button" class="btn btn-primary" (click)="onfetchDetails('thirdPartyInsurance')">
               {{ isFetchingThirdPartyPolicyNo ? 'Fetching...' : 'Fetch' }}
             </button>
           </div>
         </div>
-        
+
         <div class="col-md-4 mb-3">
-          <label class="form-label">Third Party Insurance:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Third Party Insurance:</label>
           <textarea class="form-control" [(ngModel)]="formData.thirdPartyInsurance"
-            placeholder="Enter third party insurance details" name="thirdPartyInsurance" required
-            #thirdPartyInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'"
-            style="line-height: 1.2; font-size: 0.875rem;" readonly></textarea>
-          <div *ngIf="thirdPartyInsurance.invalid && thirdPartyInsurance.touched" class="text-danger font-size-12">
+            placeholder="Enter third party insurance details" name="thirdPartyInsurance"
+            [disabled]="appNoStatus === 'REJECTED'" style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <!-- <div *ngIf="thirdPartyInsurance.invalid && thirdPartyInsurance.touched" class="text-danger font-size-12">
             Third Party Insurance is required.
-          </div>
+          </div> -->
         </div>
-        
+
         <div class="col-md-4 mb-4">
-          <label class="form-label">Third Party Remarks:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Third Party Remarks:</label>
           <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.ThirdPartyInsuranceRemarks"
-            id="ThirdPartyInsuranceRemarks" name="ThirdPartyInsuranceRemarks" required
-            #ThirdPartyInsuranceRemarks="ngModel" style="line-height: 1.2; font-size: 0.875rem;"></textarea>
-          <div *ngIf="ThirdPartyInsuranceRemarks.invalid && ThirdPartyInsuranceRemarks.touched"
+            id="ThirdPartyInsuranceRemarks" name="ThirdPartyInsuranceRemarks"
+            style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <!-- <div *ngIf="ThirdPartyInsuranceRemarks.invalid && ThirdPartyInsuranceRemarks.touched"
             class="text-danger font-size-12">
             Please enter ThirdPartyInsuranceRemarks.
-          </div>
+          </div> -->
         </div>
       </div>
-          <!-- Policy Details Table -->
+      <!-- Policy Details Table -->
       <div *ngIf="thirdPartyPolicyDetails && showThirdPartyTable">
         <table class="table table-bordered">
           <thead>
@@ -181,50 +220,96 @@
             </tr>
           </thead>
           <tbody>
+            <!-- Policy Holder Details -->
             <tr>
-              <td width="30%"><strong>Name of the Insured</strong></td>
-              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
+              <td width="30%"><strong>Product Name</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].product_name }}</td>
             </tr>
             <tr>
               <td><strong>Policy Number</strong></td>
               <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.policy_no }}</td>
             </tr>
             <tr>
-              <td><strong>Insurer</strong></td>
-              <td>Your Insurance Company Name</td>
+              <td><strong>Insured Name</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
             </tr>
             <tr>
-              <td><strong>Type of Insurance</strong></td>
-              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].product_name }}</td>
+              <td><strong>Address</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.address }}</td>
             </tr>
             <tr>
-              <td><strong>Coverage Type</strong></td>
+              <td><strong>Cover Type</strong></td>
               <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.cover_type }}</td>
             </tr>
             <tr>
-              <td><strong>Coverage Details</strong></td>
-              <td>
-                <div><strong>Material Damage:</strong> {{ policyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
-                <div><strong>Third Party Liability:</strong> {{ policyDetails.insurance_policy_data[0].third_party_liability[0].particular }}</div>
-              </td>
+              <td><strong>Contact Number</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.contact_no }}</td>
             </tr>
             <tr>
-              <td><strong>Policy Period</strong></td>
-              <td>
-                From {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.project_start_date }}
-                to {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.project_end_date }}
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Maintenance Period</strong></td>
-              <td>
-                From {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date.split(',')[0] }}
-                to {{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date }}
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Project Reference</strong></td>
+              <td><strong>Nature of Contract</strong></td>
               <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.nature_of_contract }}</td>
+            </tr>
+            <tr>
+              <td><strong>Location</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].policy_holder_detail.location }}</td>
+            </tr>
+
+            <!-- Insurance Validate Details -->
+            <tr>
+              <td><strong>Project Start Date</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.project_start_date }}</td>
+            </tr>
+            <tr>
+              <td><strong>Project End Date</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.project_end_date }}</td>
+            </tr>
+            <tr>
+              <td><strong>Maintenance Period Start Date</strong></td>
+              <td>{{
+                thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date.split(',')[0]
+                }}</td>
+            </tr>
+            <tr>
+              <td><strong>Maintenance Period End Date</strong></td>
+              <td>{{ thirdPartyPolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date }}
+              </td>
+            </tr>
+
+            <!-- Material Damage Coverage -->
+            <tr>
+              <td><strong>Material Damage Coverage</strong></td>
+              <td>
+                <div
+                  *ngFor="let detail of thirdPartyPolicyDetails.insurance_policy_data[0].material_damage_coverage.details">
+                  <div><strong>Particular:</strong> {{ detail.particular }}</div>
+                  <div><strong>Description:</strong> {{ detail.description }}</div>
+                  <div><strong>Sum Insured:</strong> {{ detail.sum_insured }}</div>
+                </div>
+                <div><strong>Total Sum Insured:</strong> {{
+                  thirdPartyPolicyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
+              </td>
+            </tr>
+
+            <!-- Third Party Liability -->
+            <tr>
+              <td><strong>Third Party Liability</strong></td>
+              <td>
+                <div *ngFor="let liability of thirdPartyPolicyDetails.insurance_policy_data[0].third_party_liability">
+                  <div><strong>Particular:</strong> {{ liability.particular }}</div>
+                  <div><strong>Description:</strong> {{ liability.description }}</div>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Add On Coverage -->
+            <tr>
+              <td><strong>Add On Coverage</strong></td>
+              <td>
+                <div *ngFor="let addOn of thirdPartyPolicyDetails.insurance_policy_data[0].add_on_coverage">
+                  <div><strong>Particular:</strong> {{ addOn.particular }}</div>
+                  <div><strong>Description:</strong> {{ addOn.description }}</div>
+                </div>
+              </td>
             </tr>
           </tbody>
         </table>
@@ -232,113 +317,113 @@
       <!-- Workers Insurance Section -->
       <div class="row align-items-end">
         <div class="col-md-4 mb-3">
-          <label class="form-label">Policy No for Workers Insurance:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Policy No for Workers Insurance:</label>
           <div class="d-flex">
-            <input type="text" name="WorkersInsurancePolicyNo" class="form-control me-2 form-control-sm" [(ngModel)]="formData.WorkersInsurancePolicyNo"
-              name="WorkersInsurancePolicyNo" required #WorkersInsurancePolicyNo="ngModel" (input)="onPolicyNoChange('WorkersInsurance')" />
+            <input type="text" name="WorkersInsurancePolicyNo" class="form-control me-2 form-control-sm"
+              [(ngModel)]="formData.WorkersInsurancePolicyNo" name="WorkersInsurancePolicyNo"
+              (input)="onPolicyNoChange('WorkersInsurance')" />
             <button type="button" class="btn btn-primary" (click)="onfetchDetails('WorkersInsurance')">
               {{ isFetchingWorkersInsurancePolicyNo ? 'Fetching...' : 'Fetch' }}
             </button>
           </div>
         </div>
-        
+
         <div class="col-md-4 mb-3">
-          <label class="form-label">Workers Insurance:<span class="text-danger font-size-12">*</span></label>
+          <label class="form-label">Workers Insurance:</label>
           <textarea class="form-control" [(ngModel)]="formData.workersInsurance"
-            placeholder="Enter Workers Insurance details" name="workersInsurance" required
-            #workersInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'"
-            style="line-height: 1.2; font-size: 0.875rem;" readonly></textarea>
-          <div *ngIf="workersInsurance.invalid && workersInsurance.touched" class="text-danger font-size-12">
+            placeholder="Enter Workers Insurance details" name="workersInsurance"
+            [disabled]="appNoStatus === 'REJECTED'" style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <!-- <div *ngIf="workersInsurance.invalid && workersInsurance.touched" class="text-danger font-size-12">
             Workers Insurance Insurance is required.
-          </div>
+          </div> -->
         </div>
-        
+
         <div class="col-md-4 mb-4">
-          <label class="form-label">Workers Insurance Remarks:<span class="text-danger font-size-12">*</span></label>
-          <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.ThirdPartyInsuranceRemarks"
-            id="ThirdPartyInsuranceRemarks" name="ThirdPartyInsuranceRemarks" required
-            #ThirdPartyInsuranceRemarks="ngModel" style="line-height: 1.2; font-size: 0.875rem;"></textarea>
-          <div *ngIf="ThirdPartyInsuranceRemarks.invalid && ThirdPartyInsuranceRemarks.touched"
+          <label class="form-label">Workers Insurance Remarks:</label>
+          <textarea class="form-control" placeholder="Enter remarks" [(ngModel)]="formData.WorkersInsuranceRemarks"
+            id="ThirdPartyInsuranceRemarks" name="ThirdPartyInsuranceRemarks"
+            style="line-height: 1.2; font-size: 0.875rem;"></textarea>
+          <!-- <div *ngIf="ThirdPartyInsuranceRemarks.invalid && ThirdPartyInsuranceRemarks.touched"
             class="text-danger font-size-12">
             Please enter ThirdPartyInsuranceRemarks.
-          </div>
+          </div> -->
         </div>
 
         <div *ngIf="WorkersInsurancePolicyDetails && WorkersInsurance">
-        <table class="table table-bordered">
-          <thead>
-            <tr>
-              <th colspan="2" class="text-center">Essential Policy Information</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td width="30%"><strong>Name of the Insured</strong></td>
-              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
-            </tr>
-            <tr>
-              <td><strong>Policy Number</strong></td>
-              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.policy_no }}</td>
-            </tr>
-            <tr>
-              <td><strong>Insurer</strong></td>
-              <td>Your Insurance Company Name</td>
-            </tr>
-            <tr>
-              <td><strong>Type of Insurance</strong></td>
-              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].product_name }}</td>
-            </tr>
-            <tr>
-              <td><strong>Coverage Type</strong></td>
-              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.cover_type }}</td>
-            </tr>
-            <tr>
-              <td><strong>Coverage Details</strong></td>
-              <td>
-                <div><strong>Material Damage:</strong> {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].material_damage_coverage.total_sum_insured }}</div>
-                <div><strong>Third Party Liability:</strong> {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].third_party_liability[0].particular }}</div>
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Policy Period</strong></td>
-              <td>
-                From {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.project_start_date }}
-                to {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.project_end_date }}
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Maintenance Period</strong></td>
-              <td>
-                From {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_start_date.split(',')[0] }}
-                to {{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.maintenance_period_end_date }}
-              </td>
-            </tr>
-            <tr>
-              <td><strong>Project Reference</strong></td>
-              <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.nature_of_contract }}</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th colspan="2" class="text-center">Essential Policy Information</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td width="30%"><strong>Product Name</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].product_name }}</td>
+              </tr>
+              <tr>
+                <td><strong>Policy Number</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.policy_no }}</td>
+              </tr>
+              <tr>
+                <td><strong>Insured Name</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.insured_name }}</td>
+              </tr>
+              <tr>
+                <td><strong>Address</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.address }}</td>
+              </tr>
+              <tr>
+                <td><strong>Contact Number</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].policy_holder_detail.contact_no }}</td>
+              </tr>
+              <tr>
+                <td><strong>Insured Start Date</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.insured_date_date }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Insured End Date</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.insured_end_date }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Total Sum Insured</strong></td>
+                <td>{{ WorkersInsurancePolicyDetails.insurance_policy_data[0].insurance_validate.total_sum_insured }}
+                </td>
+              </tr>
+              <tr>
+                <td><strong>Coverage Details</strong></td>
+                <td>
+                  <div *ngFor="let coverage of WorkersInsurancePolicyDetails.insurance_policy_data[0].coverage">
+                    <div><strong>Risk Cover Description:</strong> {{ coverage.risk_cover_description }}</div>
+                    <div><strong>Total Number of Persons:</strong> {{ coverage.total_number_of_persons }}</div>
+                    <div><strong>Total Sum Insured Amount:</strong> {{ coverage.total_sum_insured_amount }}</div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
     <!-- Documentation Section -->
     <div class="row align-items-end">
       <div class="col-md-4 mb-3">
-        <label class="form-label">Workers Insurance:<span class="text-danger font-size-12">*</span></label>
+        <label class="form-label">Workers Insurance:</label>
         <select class="form-select h-3rem form-control-sm" [(ngModel)]="formData.workInsuranceStatus"
-          name="workInsuranceStatus" required #workInsurance="ngModel" [disabled]="appNoStatus === 'REJECTED'">
+          name="workInsuranceStatus" [disabled]="appNoStatus === 'REJECTED'">
           <option disabled>-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
           <option value="Not Available">NA</option>
         </select>
-        <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
+        <!-- <div *ngIf="workInsurance.invalid && workInsurance.touched" class="text-danger font-size-12">
           Please select an work Insurance
-        </div>
+        </div> -->
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Approved Drawings:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.approvedDrawings" name="approvedDrawings"
@@ -352,7 +437,7 @@
           Please select an option for Approved Drawings
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Bill of Quantities:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.billofQuantities" name="billofQuantities"
@@ -371,7 +456,8 @@
     <!-- Quality Assurance Section -->
     <div class="row align-items-end">
       <div class="col-md-4 mb-3">
-        <label class="form-label">Materials quality certification:<span class="text-danger font-size-12">*</span></label>
+        <label class="form-label">Materials quality certification:<span
+            class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.materialsQualityCertification"
           name="materialsQualityCertification" required #materialsQualityCertification="ngModel"
           [disabled]="appNoStatus === 'REJECTED'">
@@ -385,7 +471,7 @@
           Please select an option for materials Quality Certification
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Quality Assurance Plan(QAP):<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.qualityAssurancePlan"
@@ -399,7 +485,7 @@
           Please select an option for Quality Assurance Plan(QAP)
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Quality Control Plan:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.qualityControlPlan" name="qualityControlPlan"
@@ -432,7 +518,7 @@
           Please select an option for Test conducted as per QAP, Specifications and Industry standards
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Test reports documented:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.testReportsDocumented"
@@ -447,7 +533,7 @@
           Please select an option for Test Reports Documented
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Hindrance Register maintained:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.HindranceRegisterSelectmaintained"
@@ -480,7 +566,7 @@
           Please select an option for Day work Journal Maintained
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-3">
         <label class="form-label">Environment Management Plan:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.envManagementPlan" name="envManagementPlan"
@@ -494,7 +580,7 @@
           Please select an option for Environment Management Plan
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-auto">
         <label class="form-label">Work plan:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.workplan" name="workplan" required
@@ -514,7 +600,8 @@
     <div class="row">
       <div class="col-md-4 mb-3">
         <label class="form-label mb-2">Upload Files</label>
-        <div *ngFor="let fileInput of fileInputs; let i = index" class="row ml-0 g-2 align-items-end mb-2 border rounded">
+        <div *ngFor="let fileInput of fileInputs; let i = index"
+          class="row ml-0 g-2 align-items-end mb-2 border rounded">
           <div class="col-9">
             <input type="file" class="form-control form-control-sm" (change)="onFileSelected($event, i)"
               [class.is-invalid]="fileErrors[i]" />
@@ -522,7 +609,7 @@
               {{ fileErrors[i] }}
             </div>
           </div>
-          
+
           <div class="col-3 d-flex flex-column gap-2">
             <button *ngIf="i === 0" type="button" class="btn btn-outline-primary btn-sm" (click)="addFileInput()">
               <i class="pi pi-plus me-1"></i> More
@@ -534,7 +621,7 @@
           </div>
         </div>
       </div>
-      
+
       <div class="col-md-4 mb-6" *ngIf="formData.filePathList && formData.filePathList.length > 0">
         <label class="form-label me-2 font-size-12">Uploaded Documents:</label>
         <div class="flex-wrap align-items-center gap-2 flex-column">

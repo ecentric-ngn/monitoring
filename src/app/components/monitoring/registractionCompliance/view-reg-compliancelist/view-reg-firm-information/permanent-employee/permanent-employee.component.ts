@@ -1,10 +1,12 @@
 // Importing core and utility modules
 import {
     Component,
+    ElementRef,
     EventEmitter,
     Input,
     Output,
     SimpleChanges,
+    ViewChild,
 } from '@angular/core';
 import { CommonService } from '../../../../../../service/common.service';
 import { Router } from '@angular/router';
@@ -12,6 +14,7 @@ import Swal from 'sweetalert2';
 import { AuthServiceService } from '../../../../../../auth.service';
 import { forkJoin } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 declare var bootstrap: any; // Bootstrap modal library
 
@@ -39,11 +42,14 @@ export class PermanentEmployeeComponent {
     today: string = new Date().toISOString().substring(0, 10); // Today's date in YYYY-MM-DD
     showErrorMessage: any; // For handling file download error messages
     licenseStatus: any;
+    @ViewChild('closeActionModal', { static: false })
+    closeActionModal!: ElementRef;
 
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+        private notification: NzNotificationService
     ) {}
 
     ngOnInit() {
@@ -180,11 +186,11 @@ export class PermanentEmployeeComponent {
     bsModal: any;
 
     // Close modal if open
-    closeModal() {
-        if (this.bsModal) {
-            this.bsModal.hide();
-        }
-    }
+    // closeModal() {
+    //     if (this.bsModal) {
+    //         this.bsModal.hide();
+    //     }
+    // }
 
     downgradeList: any[] = [];
     workClassificationList: any[] = [];
@@ -217,17 +223,18 @@ export class PermanentEmployeeComponent {
                         },
                         {}
                     );
-
-                    this.downgradeList = workCategories.map(
-                        (category: any) => ({
+                    this.downgradeList = workCategories.map((category: any) => {
+                        const downgradeItem = {
                             workCategory: category.workCategory,
                             workCategoryId: category.id,
                             existingClass:
                                 classificationMap[category.workCategory] ||
-                                'Unknown',
+                                'Not available',
                             newClass: '',
-                        })
-                    );
+                        };
+
+                        return downgradeItem;
+                    });
                 },
                 error: (err) => {
                     console.error('Error fetching downgrade data:', err);
@@ -237,7 +244,15 @@ export class PermanentEmployeeComponent {
             this.downgradeList = [];
         }
     }
+    get filteredDowngradeList() {
+        return this.downgradeList.filter(
+            (item) => item.existingClass !== 'Not available'
+        );
+    }
 
+    trackByWorkCategory(index: number, item: any): string {
+        return item.workCategoryId;
+    }
     // Submit action for downgrade, suspend or cancel
     submitAction() {
         if (
@@ -293,15 +308,15 @@ export class PermanentEmployeeComponent {
                             'Forwarded to Review Committee',
                             'success'
                         );
-                        this.closeModal();
-                        this.router.navigate(['/monitoring/construction']);
+                        this.closeActionModal.nativeElement.click();
+                        //this.router.navigate(['/monitoring/construction']);
                     } else {
                         Swal.fire(
                             'Error',
                             res || 'Something went wrong while forwarding.',
                             'error'
                         );
-                        this.closeModal();
+                        this.closeActionModal.nativeElement.click();
                     }
                 },
                 error: () => {
@@ -310,7 +325,7 @@ export class PermanentEmployeeComponent {
                         'Something went wrong while forwarding.',
                         'error'
                     );
-                    this.closeModal();
+                    this.closeActionModal.nativeElement.click();
                 },
             });
         }
@@ -333,13 +348,25 @@ export class PermanentEmployeeComponent {
                         'Forwarded to Review Committee',
                         'success'
                     );
-                    this.closeModal();
+                    this.closeActionModal.nativeElement.click();
                     this.router.navigate(['/monitoring/construction']);
                 },
                 error: () => {
                     Swal.fire('Error', 'Failed to suspend contractor', 'error');
                 },
             });
+        }
+    }
+    closeModal() {
+        const modalElement = this.closeActionModal?.nativeElement;
+
+        if (modalElement) {
+            const modal =
+                bootstrap.Modal.getInstance(modalElement) ||
+                new bootstrap.Modal(modalElement);
+            modal.hide();
+        } else {
+            console.warn('Modal element is not available.');
         }
     }
 
@@ -434,14 +461,46 @@ export class PermanentEmployeeComponent {
             employeeReviews: hr,
         };
 
-        this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
-            this.isSaving = false;
-            this.activateTab.emit({
-                id: this.tableId,
-                data: this.WorkDetail,
-                tab: 'equipment',
-            });
-        });
+        this.service.saveOfficeSignageAndDoc(payload).subscribe(
+            (res: any) => {
+                this.isSaving = false;
+                this.activateTab.emit(
+                    {
+                    id: this.tableId,
+                    data: this.WorkDetail,
+                    tab: 'equipment',
+                }
+            );
+            debugger
+            },
+            (error) => {
+                this.isSaving = false;
+
+                if (error.status === 500) {
+                    this.isSaving = false;
+                    this.createNotification(
+                        'error',
+                        'Server Error',
+                        'A server error occurred. Please try again later.'
+                    );
+                } else {
+                    this.createNotification(
+                        'error',
+                        'Error',
+                        'Something went wrong while saving the data.'
+                    );
+                }
+
+                console.error('Error saving data:', error);
+            }
+        );
+    }
+    createNotification(
+        type: 'success' | 'error' | 'info' | 'warning',
+        title: string,
+        message: string
+    ): void {
+        this.notification[type](title, message).onClick.subscribe(() => {});
     }
 
     // Save and forward data
@@ -473,14 +532,37 @@ export class PermanentEmployeeComponent {
             employeeReviews: hr,
         };
 
-        this.service.saveOfficeSignageAndDoc(payload).subscribe((res: any) => {
-            this.isSaving = false;
-            this.activateTab.emit({
-                id: this.tableId,
-                data: this.WorkDetail,
-                tab: 'equipment',
-            });
-        });
+        this.service.saveOfficeSignageAndDoc(payload).subscribe(
+            (res: any) => {
+                this.isSaving = false;
+                this.activateTab.emit({
+                    id: this.tableId,
+                    data: this.WorkDetail,
+                    tab: 'equipment',
+                });
+            },
+            (error) => {
+                this.isSaving = false;
+
+                if (error.status === 500) {
+                    this.isSaving = false;
+                    this.createNotification(
+                        'error',
+                        'Server Error',
+                        'A server error occurred (500). Please try again later.'
+                    );
+                } else {
+                    this.isSaving = false;
+                    this.createNotification(
+                        'error',
+                        'Error',
+                        'Something went wrong while saving the data.'
+                    );
+                }
+
+                console.error('Error saving data:', error);
+            }
+        );
     }
 
     // Update only the registration review data
@@ -525,17 +607,19 @@ export class PermanentEmployeeComponent {
     showTable: boolean = false;
     verifyPaySlip() {
         this.isFetching = true;
-        this.service.verifyPayslipDetails(this.formData.tpnNo)
-            .subscribe((res: any) => {
+        this.service.verifyPayslipDetails(this.formData.tpnNo).subscribe(
+            (res: any) => {
                 this.payslipDetails = res.PayerDetails;
                 this.showTable = true;
-                  this.isFetching = false;
+                this.isFetching = false;
             },
             (error: HttpErrorResponse) => {
                 if (error.status === 404) {
-                    this.showErrorMessage='No product found with Registration No';
-                }else if (error.status === 500) {
-                    this.showErrorMessage = 'Something went wrong. Please try again.';
+                    this.showErrorMessage =
+                        'No product found with Registration No';
+                } else if (error.status === 500) {
+                    this.showErrorMessage =
+                        'Something went wrong. Please try again.';
                 }
             }
         );
@@ -543,7 +627,7 @@ export class PermanentEmployeeComponent {
 
     resetModalData() {
         this.showTable = false;
-         this.isFetching = false;
+        this.isFetching = false;
         this.formData.tpnNo = '';
         this.payslipDetails = [];
     }
@@ -551,4 +635,5 @@ export class PermanentEmployeeComponent {
         this.showErrorMessage = '';
         this.isFetching = false;
     }
+    rejectApplication() {}
 }

@@ -18,6 +18,9 @@
         </tr>
       </thead>
       <tbody>
+        <tr *ngIf="tableData.length === 0">
+          <td colspan="10" class="text-center text-muted">No data available</td>
+        </tr>
         <tr *ngFor="let data of tableData">
           <!-- Registered -->
           <ng-container *ngIf="data.owner !== 'Unregistered'; else notRegistered">
@@ -65,12 +68,12 @@
           <option value="Yes">Yes</option>
           <option value="No">No</option>
         </select>
-        <div *ngIf="fulfillsRequirement.invalid && fulfillsRequirement.touched" class="text-danger font-size-12">
-          Please select if the requirement is fulfilled
+        <div *ngIf="showErrorMessage" class="text-danger font-size-12">
+          {{showErrorMessage}}
         </div>
       </div>
 
-      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No'">
+      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No' && applicationStatus === 'Submitted'">
         <div class="col-md-4 mb-3">
           <label class="form-label">
             Last Date to Resubmit:<span class="text-danger font-size-12">*</span>
@@ -90,7 +93,7 @@
 
       </div>
 
-      <div class="col-md-12 mb-3" *ngIf="tData.fulfillsRequirement === 'Yes'">
+      <div class="col-md-12 mt-3" *ngIf="tData.fulfillsRequirement === 'Yes'">
         <label class="form-label">Remarks</label>
         <textarea class="form-control form-control-sm" rows="2" name="finalRemarks"
           [(ngModel)]="formData.finalRemarks"></textarea>
@@ -98,40 +101,59 @@
 
       <!-- Buttons -->
       <div class="d-flex justify-content-end align-items-center gap-2 flex-wrap mt-4">
+        <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
+          [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
+          <button class="btn btn-danger"
+            *ngIf="applicationStatus === 'Suspension Resubmission' && tData.fulfillsRequirement === 'No'">
+            Reject
+          </button>
+        </a>
         <!-- Save & Forward -->
-        <button type="submit" class="btn btn-success" (click)="notifyContractor()"
-          *ngIf="applicationStatus !== 'Resubmitted EQ' && tData.fulfillsRequirement === 'No'" [disabled]="isSaving">
-          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          Save & Forward
-        </button>
+        <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and forward this application?'"
+          [nzOkText]="'Yes, Forward'" [nzCancelText]="'Cancel'" (nzOnConfirm)="notifyContractor()"
+          *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'No'">
+          <button type="button" class="btn btn-success" [disabled]="isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"
+              aria-hidden="true"></span>
+            {{ isSaving ? 'Forwarding...' : 'Save & Forward' }}
+          </button>
+        </a>
 
         <!-- Save & Next -->
-        <button type="submit" class="btn btn-success" (click)="saveAndNext()"
-          *ngIf="applicationStatus !== 'Resubmitted EQ' && tData.fulfillsRequirement === 'Yes'" [disabled]="isSaving">
-          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          Save & Next
-        </button>
-
+        <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and proceed to the next step?'"
+          [nzOkText]="'Yes, Continue'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndNext()"
+          *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'Yes'">
+          <button type="button" class="btn btn-success" [disabled]="isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"
+              aria-hidden="true"></span>
+            {{ isSaving ? 'Processing...' : 'Save & Next' }}
+          </button>
+        </a>
         <!-- Update -->
-        <button type="submit" class="btn btn-success" (click)="update()" *ngIf="applicationStatus === 'Resubmitted EQ'"
-          [disabled]="isSaving">
-          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          Update
-        </button>
+        <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to update this application?'"
+          [nzOkText]="'Yes, Update'" [nzCancelText]="'Cancel'" (nzOnConfirm)="update()"
+          *ngIf="applicationStatus === 'Resubmitted HR and EQ'">
+          <button type="button" class="btn btn-success" [disabled]="isSaving">
+            <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"
+              aria-hidden="true"></span>
+            {{ isSaving ? 'Updating...' : 'Update' }}
+          </button>
+        </a>
 
         <!-- Action -->
         <button type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
-          data-bs-target="#staticBackdrops" *ngIf="licenseStatus === 'Active' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Submitted'">
+          data-bs-target="#staticBackdrops"
+          *ngIf="applicationStatus === 'Pending' || applicationStatus === 'Resubmitted HR and EQ'">
           Action
         </button>
 
         <!-- Reinstate -->
-        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
-            <button class="btn btn-danger h-100">
-              Reinstate
-            </button>
-          </a>
+        <!-- <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+          (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
+          <button class="btn btn-danger h-100">
+            Reinstate
+          </button>
+        </a> -->
       </div>
 
     </form>
@@ -142,9 +164,9 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <form #actionForm="ngForm">
-       <div class="modal-header" style="background-color: #495f8a">
+        <div class="modal-header" style="background-color: #495f8a">
           <h5 class="modal-title text-white" id="staticBackdropLabel">Take Action</h5>
-          <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
+          <button type="button" class="btn-close" aria-label="Close"></button>
         </div>
 
         <div class="modal-body">
@@ -184,22 +206,7 @@
                 </tr>
               </thead>
               <tbody>
-                <!-- <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
-                                    <td>{{ downgrade.workCategory }}</td>
-                                    <td>{{ downgrade.existingClass }}</td>
-                                    <td>
-                                        <select class="form-select" [(ngModel)]="downgrade.newClass"
-                                            [name]="'newClass_' + downgrade.workCategory" required>
-                                            <option value="">-- Select --</option>
-                                            <option *ngFor="let option of getClassOptions(downgrade.existingClass)"
-                                                [value]="option.value">
-                                                {{ option.label }}
-                                            </option>
-                                        </select>
-                                    </td>
-                                </tr> -->
-
-                <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                <tr *ngFor="let downgrade of filteredDowngradeList; trackBy: trackByWorkCategory">
                   <td>{{ downgrade.workCategory }}</td>
                   <td>{{ downgrade.existingClass }}</td>
 
@@ -236,14 +243,17 @@
                     </select>
                   </td>
                 </tr>
-
               </tbody>
             </table>
+
+            <div *ngIf="filteredDowngradeList.length === 0" class="text-center text-muted mt-2">
+              No registered downgrade classes available.
+            </div>
           </div>
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" (click)="closeModal()" data-bs-dismiss="modal">Close</button>
+          <button type="button" class="btn btn-secondary" #closeActionModals data-bs-dismiss="modal">Close</button>
           <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
         </div>
       </form>

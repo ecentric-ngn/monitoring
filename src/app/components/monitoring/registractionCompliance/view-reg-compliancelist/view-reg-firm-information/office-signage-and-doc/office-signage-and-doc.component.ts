@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 declare var bootstrap: any;
 @Component({
   selector: 'app-office-signage-and-doc',
@@ -20,8 +21,9 @@ export class OfficeSignageAndDocComponent implements OnInit {
   applicationStatus: string = '';
   isSaving = false;
   showErrorMessage: any;
+  errormessage: string;
 
-  constructor(private service: CommonService, private router: Router, private authService: AuthServiceService) { }
+  constructor(private service: CommonService,private notification: NzNotificationService, private router: Router, private authService: AuthServiceService) { }
 
   ngOnInit() {
     this.initializeFormData();
@@ -121,112 +123,140 @@ export class OfficeSignageAndDocComponent implements OnInit {
                           return acc;
                       }, {});
                       // Populate the downgrade list with the work categories and existing/new classifications
-                      this.downgradeList = workCategories.map((category: any) => ({
-                          workCategory: category.workCategory,
-                          workCategoryId: category.id,
-                          existingClass: classificationMap[category.workCategory] || 'Unknown',
-                          newClass: ''
-                      }));
+                    this.downgradeList = workCategories.map((category: any) => ({
+                      workCategory: category.workCategory,
+                      workCategoryId: category.id,
+                      existingClass: classificationMap[category.workCategory] || 'No data available',
+                      newClass: ''
+                    }));
                   },
+                  
                   error: (err) => {
                       console.error('Error fetching downgrade data:', err);
                   }
               });
+              debugger
           } else {
               // Reset the downgrade list if the action type is not 'downgrade'
               this.downgradeList = [];
           }
       }
 
-        
+        rejectApplication() {
+          
+        }
             /**
              * Submit action for downgrade, suspend or cancel
              * Validates the input, constructs the payload and calls the respective API
              */
-            submitAction() {
-                if (!this.selectedAction.actionType || !this.selectedAction.actionDate || !this.selectedAction.remarks) {
-                    alert("All required fields must be filled.");
-                    return;
-                }
-        
-                if (this.selectedAction.actionType === 'downgrade') {
-                    const downgradeEntries = this.downgradeList
-                        .filter(entry => entry.newClass && entry.newClass !== '')
-                        .map(entry => {
-                            // Find the id for the selected newClass label
-                            const classification = this.workClassificationList.find(
-                                (c: any) => c.workClassification === entry.newClass
-                            );
-                            return {
-                                workCategoryId: entry.workCategoryId,
-                                newWorkClassificationId: classification ? classification.id : null
-                            };
-                        });
-        
-                    if (downgradeEntries.length === 0) {
-                        Swal.fire('Error', 'Please select at least one new class to downgrade.', 'error');
-                        return;
-                    }
-        
-                    const payload = {
-                        bctaNo: this.selectedAction.target?.contractorNo,
-                        firmId: this.selectedAction.target?.contractorId,
-                        firmType: "Contractor",
-                        downgradeEntries,
-                        requestedBy: this.authService.getUsername()
-                    };
-        
-                    /**
-                     * Call downgrade API
-                     * Success: Forwarded to Review Committee
-                     * Error: Something went wrong while forwarding.
-                     */
-                    this.service.downgradeFirm(payload).subscribe({
-                        next: (res: string) => {
-                            if (res && res.toLowerCase().includes('downgrade request submitted')) {
-                                Swal.fire('Success', 'Forwarded to Review Committee', 'success');
-                                 this.router.navigate(['/monitoring/construction']);
-                                this.closeModal();
-                            } else {
-                                Swal.fire('Error', res || 'Something went wrong while forwarding.', 'error');
-                                this.closeModal();
-                            }
-                        },
-                        error: (err) => {
-                            Swal.fire('Error', 'Something went wrong while forwarding.', 'error');
-                            console.error(err);
-                            this.closeModal();
-                        }
-                    });
-                 
-                } else if (this.selectedAction.actionType === 'suspend') {
-                    const payload = {
-                        firmNo: this.WorkDetail.data.contractorNo,
-                        suspendedBy: this.authService.getUsername(),
-                        suspensionDate: this.selectedAction.actionDate
-                            ? new Date(this.selectedAction.actionDate).toISOString()
-                            : null,
-                        firmType: "Contractor",
-                        suspendDetails: this.selectedAction.remarks,
-                    };
-                    /**
-                     * Call suspend API
-                     * Success: Forwarded to Review Committee
-                     * Error: Failed to suspend contractor
-                     */
-                    this.service.suspendFirm(payload).subscribe({
-                        next: (res) => {
-                            Swal.fire('Success', 'Forwarded to Review Committee', 'success');
-                             this.router.navigate(['/monitoring/construction']);
-                            this.closeModal();
-                        },
-                        error: (err) => {
-                            Swal.fire('Error', 'Failed to suspend contractor', 'error');
-                        }
-                    });
-                }
-            }
+  submitAction() {
+    console.log('submitAction() called', this.selectedAction); // Log initial action data
+    
+    if (!this.selectedAction.actionType || !this.selectedAction.actionDate || !this.selectedAction.remarks) {
+        console.error('Validation failed - missing required fields', {
+            actionType: this.selectedAction.actionType,
+            actionDate: this.selectedAction.actionDate,
+            remarks: this.selectedAction.remarks
+        });
+        alert("All required fields must be filled.");
+        return;
+    }
 
+    if (this.selectedAction.actionType === 'downgrade') {
+        console.log('Processing downgrade action...');
+        
+        const downgradeEntries = this.downgradeList
+            .filter(entry => entry.newClass && entry.newClass !== '')
+            .map(entry => {
+                console.log('Processing entry:', entry);
+                const classification = this.workClassificationList.find(
+                    (c: any) => c.workClassification === entry.newClass
+                );
+                
+                const result = {
+                    workCategoryId: entry.workCategoryId,
+                    newWorkClassificationId: classification ? classification.id : null
+                };
+                
+                console.log('Mapped entry result:', result);
+                return result;
+            });
+
+        console.log('Final downgradeEntries:', downgradeEntries);
+
+        if (downgradeEntries.length === 0) {
+            console.error('No valid downgrade entries found');
+            Swal.fire('Error', 'Please select at least one new class to downgrade.', 'error');
+            return;
+        }
+
+        const payload = {
+            bctaNo: this.selectedAction.target?.contractorNo,
+            firmId: this.selectedAction.target?.contractorId,
+            firmType: "Contractor",
+            downgradeEntries,
+            requestedBy: this.authService.getUsername()
+        };
+
+        console.log('Sending downgrade payload:', payload);
+
+        this.service.downgradeFirm(payload).subscribe({
+            next: (res: string) => {
+                console.log('Downgrade API response:', res);
+                if (res && res.toLowerCase().includes('downgrade request submitted')) {
+                    console.log('Downgrade successful');
+                    Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                    this.router.navigate(['/monitoring/construction']);
+                    this.closeModal();
+                } else {
+                    console.error('Downgrade API returned unexpected response');
+                    Swal.fire('Error', res || 'Something went wrong while forwarding.', 'error');
+                    this.closeModal();
+                }
+            },
+            error: (err) => {
+                console.error('Downgrade API error:', err);
+                Swal.fire('Error', 'Something went wrong while forwarding.', 'error');
+                this.closeModal();
+            }
+        });
+     
+    } else if (this.selectedAction.actionType === 'suspend') {
+        console.log('Processing suspend action...');
+        
+        const payload = {
+            firmNo: this.WorkDetail.data.contractorNo,
+            suspendedBy: this.authService.getUsername(),
+            suspensionDate: this.selectedAction.actionDate
+                ? new Date(this.selectedAction.actionDate).toISOString()
+                : null,
+            firmType: "Contractor",
+            suspendDetails: this.selectedAction.remarks,
+        };
+
+        console.log('Sending suspend payload:', payload);
+
+        this.service.suspendFirm(payload).subscribe({
+            next: (res) => {
+                console.log('Suspend API response:', res);
+                Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                this.router.navigate(['/monitoring/construction']);
+                this.closeModal();
+            },
+            error: (err) => {
+                console.error('Suspend API error:', err);
+                Swal.fire('Error', 'Failed to suspend contractor', 'error');
+            }
+        });
+    }
+}
+ get filteredDowngradeList() {
+    return this.downgradeList.filter(item => item.existingClass !== 'Not available');
+  }
+
+  trackByWorkCategory(index: number, item: any): string {
+    return item.workCategoryId;
+  }
   WorkDetail: any = {};
   licenseStatus: string = '';          
   loadWorkDetail() {
@@ -354,59 +384,6 @@ extractFileName(filePath: string): string {
         'downloaded-file'
     );
 }
-
-     // Perform reinstatement + approval
-     reinstate(row: any) {
-      
-         const payload = {
-             firmNo: this.bctaNo,
-             firmType: 'contractor',
-             licenseStatus: 'Active',
-             applicationStatus: 'Reinstated',
-         };
- 
-         const approvePayload = {
-             firmType: 'Contractor',
-             cdbNos: row,
-         };
- 
-         forkJoin({
-             reinstate: this.service.reinstateLicense(payload),
-           approve: this.service.approveReinstatement(approvePayload),
-         }).subscribe({
-             next: ({ reinstate }) => {
-                 if (
-                     reinstate &&
-                     reinstate
-                         .toLowerCase()
-                         .includes('license status updated to active')
-                 ) {
-                     Swal.fire(
-                         'Success',
-                         'License Reinstated and Approved Successfully',
-                         'success'
-                     );
-                 } else {
-                     Swal.fire(
-                         'Warning',
-                         'Unexpected response from server.',
-                         'warning'
-                     );
-                 }
-                 this.closeModal();
-                 this.router.navigate(['/monitoring/construction']);
-             },
-             error: (err) => {
-                 console.error('Reinstatement error:', err);
-                 Swal.fire(
-                     'Success',
-                     'License Reinstated and Approved Successfully',
-                     'success'
-                 );
-                 this.closeModal();
-             },
-         });
-     }
   isOfficeSignboardEnabled(): boolean {
     return ['Resubmitted OS', 'Resubmitted OS and PFS', 'Submitted'].includes(this.applicationStatus);
   }
@@ -484,21 +461,26 @@ isFieldEditable(field: string): boolean {
       }
     );
   }
-
+clearErrorMessage() {
+  this.errormessage = '';
+}
   saveAndNext() {
-
     this.isSaving = true;
-
-    if (this.formData.signboardReview === 'No' && !this.formData.signboardResubmitDate) {
-      alert("Please provide resubmit date for office signboard.");
+    if(!this.formData.filingReview && !this.formData.signboardReview){
+      this.errormessage = 'All fields are required';
+      this.isSaving = false;
       return;
     }
 
-    if (this.formData.filingReview === 'No' && !this.formData.filingResubmitDate) {
-      alert("Please provide resubmit date for proper filing system.");
-      return;
-    }
+    // if (this.formData.signboardReview === 'No' && !this.formData.signboardResubmitDate) {
+    //   alert("Please provide resubmit date for office signboard.");
+    //   return;
+    // }
 
+    // if (this.formData.filingReview === 'No' && !this.formData.filingResubmitDate) {
+    //   alert("Please provide resubmit date for proper filing system.");
+    //   return;
+    // }
     const payload = {
       registrationReview: {
         bctaNo: this.data.contractorNo,
@@ -529,24 +511,47 @@ isFieldEditable(field: string): boolean {
       }
     };
 
-    this.service.saveOfficeSignageAndDoc(payload).subscribe(
-      (response: any) => {
-        this.isSaving = false;
-        try {
-          const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
-          this.id = parsedResponse.registrationReview?.id;
-          this.activateTab.emit({ id: this.id, tab: 'employee' });
-        } catch (e) {
-          console.error('Error parsing response:', e);
-        }
-      },
-      (error) => {
-        this.isSaving = false;
-        console.error('Error saving data:', error);
-      }
-    );
+this.service.saveOfficeSignageAndDoc(payload).subscribe(
+  (response: any) => {
+    this.isSaving = false;
+    try {
+      const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+      this.id = parsedResponse.registrationReview?.id;
+      this.activateTab.emit({ id: this.id, tab: 'employee' });
+    } catch (e) {
+      console.error('Error parsing response:', e);
+    }
+  },
+  (error) => {
+    this.isSaving = false;
+
+    if (error.status === 500) {
+      this.createNotification(
+        'error',
+        'Server Error',
+        'A server error occurred (500). Please try again later.'
+      );
+    } else {
+      this.createNotification(
+        'error',
+        'Error',
+        'Something went wrong while sending the list.'
+      );
+    }
+
+    console.error('Error saving data:', error);
+  }
+);
   }
 
+createNotification(
+  type: 'success' | 'error' | 'info' | 'warning',
+  title: string,
+  message: string
+): void {
+  this.notification[type](title, message).onClick.subscribe(() => {
+  });
+}
 
   // openActionModal() {
   //   // Set up selectedAction and other data as needed
