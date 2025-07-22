@@ -21,8 +21,7 @@
             <!-- <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#consultancyFirmModal">
                 Send Mass Notification
             </button> -->
-             <button type="button" class="btn btn-primary" data-bs-toggle="modal"
-                data-bs-target="#consultancyFirmModal">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#consultancyFirmModal">
                 <span class="pi pi-bell"></span>
                 Send Mass Notification
             </button>
@@ -61,47 +60,51 @@
             </thead>
             <tbody>
                 <tr *ngFor="let data of tableData;let i = index" class="table-row">
-                   <td>{{ i+1 }}</td>
-                    <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS'|| data.applicationStatus === 'Suspension Resubmission' || data.applicationStatus === 'Suspension Approved'"
-                        (click)="navigate(data)">
+                    <td>{{ i+1 }}</td>
+                    <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus === 'Submitted'"
+                        [class.text-primary]="
+                            data.applicationStatus === 'Submitted' ||
+                            data.applicationStatus === 'Resubmitted HR and EQ' ||
+                            data.applicationStatus === 'Resubmitted OS and PFS' ||
+                            data.applicationStatus === 'Suspension Resubmission' ||
+                            data.applicationStatus === 'Suspension Approved'" (click)="navigate(data)">
                         {{ data.consultantNo }}
                     </td>
+
                     <td>{{ data.nameOfFirm }}</td>
                     <td>{{ data.sentDate }}</td>
                     <td>
                         <span class="text-bold" [ngClass]="{
                             'text-secondary': data.applicationStatus== 'Not Submitted',
-                            'text-warning': data.applicationStatus== 'In Process' || data.applicationStatus== 'Suspension Request' || data.applicationStatus === 'Cancel Request',
+                            'text-warning': data.applicationStatus== 'Pending' || data.applicationStatus== 'Suspension Request' || data.applicationStatus === 'Cancel Request',
                             'text-success': data.applicationStatus== 'Verified' || data.applicationStatus =='Suspension Approved',
-                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS' || data.applicationStatus === 'Suspension Resubmission'
-                                            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS',
-                            'text-info': data.applicationStatus== 'Ready for Review'
+                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'
+                                            || data.applicationStatus === 'Resubmitted HR and EQ',
                             }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
                     <!-- <td>{{ data.licenseStatus }}</td> -->
-                        <td>
-                     <span class="text-bold " [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'badge-primary': data.licenseStatus== 'Active'}">
+                    <td>
+                        <span class="text-bold "
+                            [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'text': data.licenseStatus== 'Active'}">
                             {{ data.licenseStatus }}
                         </span>
-                        </td>
+                    </td>
                     <td>
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
 
-                         <td>
-                        <button *ngIf="data.licenseStatus !== 'Suspended' && data.applicationStatus !== 'Not Submitted' && data.applicationStatus !== 'Forwarded TO RC' && data.applicationStatus !== 'Suspension Request' && data.applicationStatus !== 'Suspension Resubmission' && data.applicationStatus !== 'Cancel Request' && data.applicationStatus !== 'Downgrade Request'" class="btn btn-primary btn-sm me-2 mb-1"
-                            (click)="openActionModal(data)">Action</button>
+                    <td>
+                        <button *ngIf="data.applicationStatus === 'Suspension Resubmission'"
+                            class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                     </td>
-                        <!-- <div *ngIf="data.licenseStatus === 'Suspended'">
+                    <!-- <div *ngIf="data.licenseStatus === 'Suspended'">
                             <button class="btn btn-danger btn-sm"
                                 (click)="getReinstateApplication(data.consultantNo)">View</button>
                         </div> -->
-                     <td>
+                    <td>
                         <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
                             [value]="data.consultantNo" (change)="onCheckboxChange($event, data.id)">
                     </td>
@@ -117,7 +120,7 @@
             </tbody>
         </table>
 
-       <div *ngIf="tableData" class="justify-content-start mb--3">
+        <div *ngIf="tableData" class="justify-content-start mb--3">
             <div
                 class="d-flex font-bold font-size-12 justify-content-between justify-content-start ml-2 mt-7 font-size-12 font-bold ml-2">
                 <p>{{ calculateOffset() }}</p>
@@ -193,7 +196,7 @@
                             </div>
                         </div>
 
-                         <div class="col-md-6">
+                        <div class="col-md-6">
                             <label class="form-label">Dzongkhag</label>
                             <select class="form-select font-size-16" [(ngModel)]="formData.name" name="name"
                                 id="dzongkhag">
@@ -275,7 +278,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form #actionForm="ngForm">
-                 <div class="modal-header" style="background-color:  #495f8a ">
+                <div class="modal-header" style="background-color:  #495f8a ">
                     <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>

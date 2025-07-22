@@ -14,41 +14,51 @@ formData: any = {};
   licenseStatus: any;
   constructor(@Inject(CommonService) private service: CommonService) { }
 
-  ngOnInit(): void {
+ngOnInit(): void {
+  const WorkDetail = this.service.getData('BctaNo');
 
-    const status = this.applicationStatus;
-     
-    if (status === 'Resubmitted OS') {
-      this.activeTabId = 'office';
-    } else if (status === 'Resubmitted PFS') {
-      this.activeTabId = 'office';
-    } else if (status === 'Resubmitted HR') {
-      this.activeTabId = 'employee';
-    } else if (status === 'Resubmitted EQ') {
-      this.activeTabId = 'equipment';
-    } else if (status === 'Resubmitted OS and PFS') {
-      this.activeTabId = 'office';
-    }
-
-    const WorkDetail = this.service.getData('BctaNo');
-    this.licenseStatus = WorkDetail.data.licenseStatus;
-
-    if (!WorkDetail || !WorkDetail.data) {
-      console.error('WorkDetail or WorkDetail.data is undefined');
-      return;
-    }
-
-    this.applicationStatus = WorkDetail.data.applicationStatus;
-    this.formData.firmType = WorkDetail.data;
-    this.bctaNo = WorkDetail.data.certifiedBuilderNo;
-
-    console.log('WorkDetail', WorkDetail);
-    console.log('bctaNo', this.bctaNo);
-
-    if (this.bctaNo) {
-      this.fetchDataBasedOnBctaNo();
-    }
+  if (!WorkDetail || !WorkDetail.data) {
+    console.error('WorkDetail or WorkDetail.data is undefined');
+    return;
   }
+
+  this.licenseStatus = WorkDetail.data.licenseStatus;
+  this.applicationStatus = WorkDetail.data.applicationStatus;
+  console.log('applicationStatus', this.applicationStatus);
+  this.formData.firmType = WorkDetail.data;
+  this.bctaNo = WorkDetail.data.certifiedBuilderNo;
+
+  // Set default active tab based on status
+  if (this.applicationStatus === 'Resubmitted OS and PFS') {
+    this.activeTabId = 'cbOffice';
+  } else if (this.applicationStatus === 'Resubmitted HR and EQ') {
+    this.activeTabId = 'cbEmployee';
+  } else {
+    this.activeTabId = 'cbOffice'; // default tab
+  }
+
+  if (this.bctaNo) {
+    this.fetchDataBasedOnBctaNo();
+  }
+}
+isTabEnabled(tabId: string): boolean {
+  const status = this.applicationStatus;
+
+  if (status === 'Submitted' || status === 'Suspension Resubmission') {
+    return true; // Enable all tabs
+  }
+
+  if (status === 'Resubmitted OS and PFS') {
+    return tabId === 'cbOffice';
+  }
+
+  if (status === 'Resubmitted HR and EQ') {
+    return tabId === 'cbEmployee' || tabId === 'cbEquipment';
+  }
+
+  return false; // Disable by default
+}
+
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {

@@ -43,9 +43,9 @@
                             </button>
                         </td>
                         <td class="text-center bg-white" *ngIf="i === 0" [attr.rowspan]="tableData.length">
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                               data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                 Verify
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal">
+                                Verify
                             </button>
                         </td>
                     </tr>
@@ -64,7 +64,7 @@
             </div>
 
             <!-- Conditional fields when HR not fulfilled -->
-            <ng-container *ngIf="tData.hrFulfilled === 'No'">
+            <ng-container *ngIf="tData.hrFulfilled === 'No' && applicationStatus !== 'Resubmitted HR'">
                 <div class="row pt-4">
                     <div class="col-md-4">
                         <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
@@ -109,19 +109,21 @@
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Update' }}
                 </button>
-
+                <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
+                    [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
+                    <button class="btn btn-danger"
+                        *ngIf="applicationStatus === 'Suspension Resubmission'">
+                        Reject
+                    </button>
+                </a>
                 <!-- Action Button -->
-                <button class="btn btn-primary" (click)="openActionModal(tData)">
+                <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR'" class="btn btn-primary"
+                    (click)="openActionModal(tData)">
                     Action
                 </button>
 
                 <!-- Reinstate Button -->
-                <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-                    (nzOnConfirm)="reinstate(bctaNo)">
-                    <button class="btn btn-danger h-100" *ngIf="applicationStatus === 'Suspension Resubmission'">
-                        Reinstate
-                    </button>
-                </a>
+                
             </div>
         </div>
     </form>
@@ -149,7 +151,7 @@
                                 <option value="suspend">Suspend</option>
                             </select>
                         </div>
-                         <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Action Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
                                 name="actionDate" [disabled]="true" required />
@@ -224,7 +226,7 @@
                         <div class="text-danger" *ngIf="showErrorMessage">
                             {{ showErrorMessage }}
                         </div>
-                        </div>
+                    </div>
 
 
                 </form>

@@ -30,6 +30,7 @@ export class OnsiteFacilitiesandManagementComponent {
     @Input() workInformationdata: any;
     @Input() prevTableId: any;
     @Input() inspectionType: any;
+    @Input() applicationStatus: any;
     @Input() datas: any;
     @Input() workType: any;
     @Input() ownerId: any;
@@ -70,7 +71,7 @@ export class OnsiteFacilitiesandManagementComponent {
 
     } else {
         const WorkDetail = this.service.getData('BctaNo') || {};
-        this.appNoStatus = WorkDetail.data?.applicationStatus || null;
+        this.appNoStatus = WorkDetail.data?.applicationStatus || this.applicationStatus || null;
         this.workId = this.workId || null;
         
         this.prevTableId = this.prevTableId || WorkDetail.data?.checklist_id || null;

@@ -35,10 +35,10 @@
             </select>
         </div>
         <div class="col-lg-7 d-flex justify-content-end pr-2">
-      <p class="mr-1 p-1 text-gray-600">Search By : </p>
-      <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
-        id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
-    </div>
+            <p class="mr-1 p-1 text-gray-600">Search By : </p>
+            <input type="text" placeholder=" BCTA No or Application Status" class="form-control form-control-sm col-md-4"
+                id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+        </div>
     </div>
 
     <div class="table-responsive text-center ">
@@ -61,8 +61,8 @@
                 <tr *ngFor="let data of tableData; let i = index" class="table-row">
                     <td>{{ i+1 }}</td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS and FS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
+                        [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted PFS'
+                        || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
                         (click)="navigate(data)">
                         {{ data.contractorNo }}
                     </td>
@@ -71,10 +71,10 @@
                     <td>
                         <span class="text-bold" [ngClass]="{
                             'text-secondary': data.applicationStatus== 'Not Submitted',
-                            'text-warning': data.applicationStatus== 'In Process'  || data.applicationStatus== 'Suspension Request' || data.applicationStatus== 'Cancel Request'|| data.applicationStatus== 'Downgrade Request',
-                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus== 'Forwarded TO RC' || data.applicationStatus== 'Downgrade Approved' || data.applicationStatus== 'Cancel Approved',
-                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS' || data.applicationStatus === 'Resubmitted PFS'
-                                            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
+                            'text-warning': data.applicationStatus== 'In Process'  || data.applicationStatus== 'Suspension Request' || data.applicationStatus== 'Cancel Request'|| data.applicationStatus== 'Downgrade Request' || data.applicationStatus== 'Pending',
+                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus== 'Downgrade Approved' || data.applicationStatus== 'Cancel Approved',
+                            'text-primary': data.applicationStatus== 'Submitted'
+                                            || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
                             }">
                             {{ data.applicationStatus }}
                         </span>
@@ -93,11 +93,14 @@
                     </td>
 
                     <td>
-                        <button
+                        <!-- <button
                             *ngIf="data.applicationStatus !== 'Not Submitted' && data.applicationStatus !== 'Forwarded TO RC' && data.applicationStatus !== 'Suspension Request' && data.applicationStatus !== 'Suspension Resubmission' && data.applicationStatus !== 'Cancel Request' && data.applicationStatus !== 'Downgrade Request' && data.applicationStatus !== 'Suspension Approved' && data.applicationStatus !== 'Downgrade Approved' && data.applicationStatus !== 'Cancel Request'"
-                            class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
+                            class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button> -->
+                        <button *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
+                            (click)="openActionModal(data)">Action</button>
                         <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-                            (nzOnConfirm)="reinstate(data.contractorNo)" *ngIf="data.applicationStatus === 'Suspension Resubmission'">
+                            (nzOnConfirm)="reinstate(data.contractorNo)"
+                            *ngIf="data.applicationStatus === 'Suspension Resubmission'">
                             <button class="btn btn-danger btn-sm">
                                 Reinstate
                             </button>
@@ -215,7 +218,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
+                                <tr *ngFor="let downgrade of filteredDowngradeList; trackBy: trackByWorkCategory">
                                     <td>{{ downgrade.workCategory }}</td>
                                     <td>{{ downgrade.existingClass }}</td>
 
@@ -252,10 +255,14 @@
                                         </select>
                                     </td>
                                 </tr>
-
                             </tbody>
                         </table>
+
+                        <div *ngIf="filteredDowngradeList.length === 0" class="text-center text-muted mt-2">
+                            No registered downgrade classes available.
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="modal-footer">

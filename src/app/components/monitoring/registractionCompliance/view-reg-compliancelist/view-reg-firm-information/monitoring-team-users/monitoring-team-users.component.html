@@ -1,6 +1,6 @@
 <div class="scroll-wrapper">
 
-  <form #monitoringForm="ngForm" (ngSubmit)="onSubmit(monitoringForm)">
+  <form #monitoringForm="ngForm">
     <div class="m-4">
 
       <div class="table-responsive">
@@ -32,13 +32,28 @@
           </div>
         </div>
       </div>
+      <div class="row d-flex justify-content-end align-items-center">
+        <!-- Reinstate Button -->
+        <div class="col-auto mr--4">
+          <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+            (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
+            <button class="btn btn-danger h-100">
+              Reinstate
+            </button>
+          </a>
+        </div>
 
-      <!-- Save Button -->
-      <div class="d-flex justify-content-end mt-4">
-        <button type="submit" class="btn btn-success" [disabled]="monitoringForm.invalid || isSaving">
-          <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-          Save
-        </button>
+        <!-- Save Button -->
+        <div class="col-auto">
+          <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save these changes?'" [nzOkText]="'Yes, Save'"
+            [nzCancelText]="'Cancel'" (nzOnConfirm)="onSubmit(monitoringForm)"> <!-- Change to your actual submit handler -->
+            <button type="button" class="btn btn-success" [disabled]="monitoringForm.invalid || isSaving">
+              <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"
+                aria-hidden="true"></span>
+              {{ isSaving ? 'Saving...' : 'Save' }}
+            </button>
+          </a>
+        </div>
       </div>
     </div>
   </form>

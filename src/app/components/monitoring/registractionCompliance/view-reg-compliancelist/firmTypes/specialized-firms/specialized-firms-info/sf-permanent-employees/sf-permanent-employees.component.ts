@@ -123,7 +123,7 @@ export class SfPermanentEmployeesComponent {
             console.log('sf employee', this.formData);
         });
     }
-
+rejectApplication() {}
     /**
      * Handles the action type change event.
      * If the action type is 'downgrade', fetches the work categories and existing classifications
@@ -466,54 +466,7 @@ export class SfPermanentEmployeesComponent {
             });
         }
     }
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row,
-            firmType: 'specialized-firm',
-            licenseStatus: 'Active',
-        };
-        const approvePayload = {
-            firmType: 'SpecializedFirm',
-            cdbNos: row,
-        };
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
-                    this.closeModal();
-                } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
-                }
-                this.router.navigate(['/monitoring/special']);
-                this.closeModal();
-            },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
-    }
+  
 
     
         isFetching: boolean = false;

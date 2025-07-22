@@ -95,7 +95,7 @@ export class CbMandatoryEquipmentComponent {
 
     // For date validation (optional)
     minResubmitDate: string = this.getMinDate();
-
+rejectApplication () {}
     getMinDate(): string {
         const today = new Date();
         today.setDate(today.getDate()); // you can adjust if needed

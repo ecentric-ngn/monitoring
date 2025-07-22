@@ -50,6 +50,7 @@ export class CbOfficeSignageComponent {
         this.formData.firmType = WorkDetail.data;
         this.data = WorkDetail.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
+        console.log('applicationStatus', this.applicationStatus);
         this.licenseStatus = WorkDetail.data.licenseStatus;
         this.bctaNo = WorkDetail.data.certifiedBuilderNo;
         if (this.bctaNo && this.applicationStatus === 'Suspension Resubmission') {
@@ -64,6 +65,7 @@ export class CbOfficeSignageComponent {
             Object.assign(this.formData, res.complianceEntities[0]);
         });
     }
+    rejectApplication() {}
 
     fetchSuspendDataBasedOnBctaNo() {
     this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
@@ -340,7 +342,6 @@ export class CbOfficeSignageComponent {
 
     isOfficeSignboardEnabled(): boolean {
         return [
-            'Resubmitted OS',
             'Resubmitted OS and PFS',
             'Submitted',
         ].includes(this.applicationStatus);
@@ -348,7 +349,6 @@ export class CbOfficeSignageComponent {
 
     isFilingSystemEnabled(): boolean {
         return [
-            'Resubmitted PFS',
             'Resubmitted OS and PFS',
             'Submitted',
         ].includes(this.applicationStatus);
@@ -358,22 +358,22 @@ export class CbOfficeSignageComponent {
         return this.applicationStatus === 'Submitted';
     }
 
-    isFieldEditable(field: string): boolean {
-        switch (field) {
-            case 'officeSignboard':
-            case 'signboardReview':
-                return this.isOfficeSignboardEnabled();
-            case 'filingSystem':
-            case 'filingReview':
-                return this.isFilingSystemEnabled();
-            case 'ohs':
-            case 'ohsReview':
-                return this.isOhsEnabled();
-            default:
-                return false;
-        }
-    }
-
+    // isFieldEditable(field: string): boolean {
+    //     switch (field) {
+    //         case 'officeSignboard':
+    //         case 'signboardReview':
+    //             return this.isOfficeSignboardEnabled();
+    //         case 'filingSystem':
+    //         case 'filingReview':
+    //             return this.isFilingSystemEnabled();
+    //         case 'ohs':
+    //         case 'ohsReview':
+    //             return this.isOhsEnabled();
+    //         default:
+    //             return false;
+    //     }
+    // }
+isFieldEditable
     update() {
         this.isSaving = true;
         const payload = {

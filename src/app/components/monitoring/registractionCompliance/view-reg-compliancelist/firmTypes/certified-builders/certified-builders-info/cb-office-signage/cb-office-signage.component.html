@@ -1,8 +1,6 @@
 <div class="scroll-wrapper">
-
+  <!-- Location Section -->
   <div class="row m-4">
-
-    <!-- Location -->
     <div class="col-md-6 mb-3">
       <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
       <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation"
@@ -12,7 +10,6 @@
       </div>
     </div>
 
-    <!-- Review for Location -->
     <div class="col-md-6 mb-3">
       <label class="form-label">Review (Location):<span class="text-danger font-size-12">*</span></label>
       <select class="form-select form-control-sm" [(ngModel)]="formData.reviewLocation" name="reviewLocation" required
@@ -26,39 +23,39 @@
       </div>
     </div>
 
-    <!-- If Review is No: Show Resubmit Date and Remarks -->
-    <div class="col-md-6 mb-3" *ngIf="formData.reviewLocation === 'No'">
-      <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
-      <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.resubmitDate" name="resubmitDate"
-        required #resubmitDate="ngModel" />
-      <div *ngIf="resubmitDate.invalid && resubmitDate.touched" class="text-danger font-size-12">
-        Please provide a date
+    <!-- Location Review Conditional Fields -->
+    <div *ngIf="formData.reviewLocation === 'No' && applicationStatus === 'Submitted'" class="row m-0">
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
+        <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.resubmitDate" name="resubmitDate"
+          required #resubmitDate="ngModel" />
+        <div *ngIf="resubmitDate.invalid && resubmitDate.touched" class="text-danger font-size-12">
+          Please provide a date
+        </div>
       </div>
-    </div>
 
-    <div class="col-md-12 mb-3" *ngIf="formData.reviewLocation === 'No'">
-      <label class="form-label">Remarks:</label>
-      <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.resubmitRemarks"
-        name="resubmitRemarks">
-    </textarea>
+      <div class="col-md-6 mb-3">
+        <label class="form-label">Remarks:</label>
+        <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.resubmitRemarks"
+          name="resubmitRemarks"></textarea>
+      </div>
     </div>
   </div>
 
+  <!-- Filing System Section -->
   <div class="row m-4">
-    <!-- Proper Filing System -->
     <div class="col-md-6">
       <label class="form-label">Proper filing system:<span class="text-danger font-size-12">*</span></label>
       <button *ngIf="formData.properFillingPath" class="btn btn-sm btn-outline-primary"
-        [disabled]="!isFieldEditable('filingSystem')" (click)="downloadFile(formData.properFillingPath)">
+         (click)="downloadFile(formData.properFillingPath)">
         View doc
       </button>
     </div>
 
-    <!-- Review for Filing System -->
     <div class="col-md-6 mb-3">
       <label class="form-label">Review:<span class="text-danger font-size-12">*</span></label>
       <select class="form-select form-control-sm" [(ngModel)]="formData.filingReview" name="filingReview" required
-        #filingReview="ngModel" [disabled]="!isFieldEditable('filingReview')" (change)="onFilingReviewChange()">
+        #filingReview="ngModel" (change)="onFilingReviewChange()">
         <option value="">-- Select --</option>
         <option value="Yes">Yes</option>
         <option value="No">No</option>
@@ -68,8 +65,8 @@
       </div>
     </div>
 
-    <!-- Conditional fields when review is "No" -->
-    <div *ngIf="formData.filingReview === 'No'">
+    <!-- Filing System Review Conditional Fields -->
+    <div *ngIf="formData.filingReview === 'No' && applicationStatus === 'Submitted'" class="row m-0">
       <div class="col-md-6 mb-3">
         <label class="form-label">Resubmit Date:<span class="text-danger font-size-12">*</span></label>
         <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.fsresubmitDeadline"
@@ -79,7 +76,7 @@
         </div>
       </div>
 
-      <div class="col-md-12 mb-3">
+      <div class="col-md-6 mb-3">
         <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
         <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.fsRemarks" name="fsRemarks"
           required #fsRemarks="ngModel"></textarea>
@@ -88,72 +85,80 @@
         </div>
       </div>
     </div>
+  </div>
 
-
+  <!-- OHS Handbook Section -->
+  <div class="row m-4">
     <div class="col-md-6 mb-3">
       <label class="form-label">OHS Handbook:<span class="text-danger font-size-12">*</span></label>
-      <button *ngIf="formData.ohsHandBook" class="btn btn-sm btn-outline-primary" [disabled]="!isFieldEditable('ohs')"
+      <button *ngIf="formData.ohsHandBook" class="btn btn-sm btn-outline-primary"
         (click)="downloadFile(formData.ohsHandBook)">
         View doc
       </button>
     </div>
 
-    <!-- Review for OHS -->
     <div class="col-md-6 mb-3">
       <label class="form-label">Review (OHS Handbook):<span class="text-danger font-size-12">*</span></label>
       <select class="form-select form-control-sm" [(ngModel)]="formData.ohsReview" name="ohsReview" required
-        #ohsReview="ngModel" [disabled]="!isFieldEditable('ohsReview')">
+        #ohsReview="ngModel">
         <option value="">-- Select --</option>
         <option value="Yes">Yes</option>
         <option value="No">No</option>
       </select>
     </div>
+  </div>
 
-    <!-- General Remarks -->
+  <!-- General Remarks -->
+  <div class="row m-4">
     <div class="col-md-12 mb-3">
       <label class="form-label">Remarks:</label>
       <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.generalRemarks"
         name="generalRemarks"></textarea>
     </div>
+  </div>
 
-    <!-- Update button: Show when status is NOT Submitted -->
+  <!-- Action Buttons -->
+  <div class="row m-4">
     <div class="col-12 d-flex justify-content-end align-items-center gap-2 mt-3">
-      <!-- Update button: Show when status is not 'Submitted' -->
-      <button type="submit" class="btn btn-success" *ngIf="applicationStatus !== 'Submitted'" (click)="update()"
+      <button type="submit" class="btn btn-success" *ngIf="applicationStatus === 'Resubmitted OS and PFS'" (click)="update()"
         [disabled]="isSaving">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
         {{ isSaving ? 'Saving...' : 'Update' }}
       </button>
 
-      <!-- Save & Next button: Show only when status is 'Submitted' -->
-      <button type="submit" class="btn btn-primary" *ngIf="applicationStatus === 'Submitted'" (click)="saveAndNext()"
+      <button type="submit" class="btn btn-success" *ngIf="applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission'" (click)="saveAndNext()"
         [disabled]="isSaving">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
         {{ isSaving ? 'Saving...' : 'Save & Next' }}
       </button>
 
-      <!-- Action button -->
-      <button class="btn btn-primary" (click)="openActionModal(applicationStatus)">Action</button>
+      <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted OS and PFS'" 
+        (click)="openActionModal(applicationStatus)">Action</button>
 
-      <!-- Reinstate button: Show only when license is suspended -->
-      <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+         <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
+                    [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
+                    <button class="btn btn-danger"
+                        *ngIf="applicationStatus === 'Suspension Resubmission' && (formData.filingReview === 'No' || formData.ohsReview === 'No' || formData.signboardReview === 'No')">
+                        Reject
+                    </button>
+                </a>
+
+      <!-- <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
         (nzOnConfirm)="reinstate(bctaNo)">
         <button class="btn btn-danger h-100" *ngIf="licenseStatus === 'Suspended'">
           Reinstate
         </button>
-      </a>
+      </a> -->
     </div>
-
   </div>
 </div>
-
 
 <!-- Action Modal -->
 <div class="modal fade" id="actionModal" tabindex="-1" aria-labelledby="actionModalLabel">
   <div class="modal-dialog modal-lg modal-dialog-centered">
     <div class="modal-content">
       <form #actionForm="ngForm">
-        <div class="modal-header" style="background-color:#495f8a ">
+        <div class="modal-header" style="background-color:#495f8a">
           <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
           <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
         </div>

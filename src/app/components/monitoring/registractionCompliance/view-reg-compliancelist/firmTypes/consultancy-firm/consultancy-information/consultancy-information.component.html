@@ -39,7 +39,7 @@
             <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link border" [class.active]="activeTabId === 'consultancyOffice'" id="office-tab"
-                        (click)="setActiveTab('consultancyOffice')" [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ')" type="button" role="tab">
+                        (click)="setActiveTab('consultancyOffice')" [disabled]="applicationStatus === 'Resubmitted HR and EQ'" type="button" role="tab">
                         Office Signage & Document
                     </button>
 
@@ -49,7 +49,7 @@
                     <button (click)="specializedFirmForm()" class="nav-link border"
                         [class.active]="activeTabId === 'consultancyEmployee'" id="employee-tab"
                         (click)="setActiveTab('consultancyEmployee')"
-                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS and PFS')"
                         type="button" role="tab">
                         {{ formData?.firmType === 'specializedFirm' ? 'Specialized firms Information' : 'Permanent
                         Employees' }}

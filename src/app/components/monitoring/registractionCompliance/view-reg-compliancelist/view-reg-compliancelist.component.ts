@@ -211,12 +211,6 @@ export class ViewRegCompliancelistComponent {
             condition: 'LIKE',
             operator: 'AND'
         },
-         {
-            field: 'contractorNo',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
-        }
     );
     }
 
@@ -264,11 +258,8 @@ export class ViewRegCompliancelistComponent {
         // Only proceed if status is "Submitted"
         if (
             data.applicationStatus === 'Submitted' ||
-            data.applicationStatus === 'Resubmitted PFS' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
-            data.applicationStatus === 'Resubmitted OS' ||
-            data.applicationStatus === 'Resubmitted HR' ||
-            data.applicationStatus === 'Resubmitted EQ' ||
+            data.applicationStatus === 'Resubmitted HR and EQ' ||
             data.applicationStatus === 'Suspension Resubmission' ||
             data.applicationStatus === 'Suspension Approved'
         ) {
@@ -372,41 +363,45 @@ export class ViewRegCompliancelistComponent {
                     firmType,
                     firmId
                 ),
-            }).subscribe({
-                next: ({ categoryData, existingClassData }) => {
-                    const workCategories = categoryData.workCategory;
-                    this.workClassificationList =
-                        categoryData.workClassification;
+           }).subscribe({
+    next: ({ categoryData, existingClassData }) => {
+        const workCategories = categoryData.workCategory;
+        this.workClassificationList = categoryData.workClassification;
+        const classificationMap = existingClassData.reduce(
+            (acc: any, item: any) => {
+                acc[item.workCategory] = item.existingWorkClassification;
+                return acc;
+            },
+            {}
+        );
+        this.downgradeList = workCategories.map((category: any) => {
+            const downgradeItem = {
+                workCategory: category.workCategory,
+                workCategoryId: category.id,
+                existingClass: classificationMap[category.workCategory] || 'Not available',
+                newClass: '',
+            };
+            return downgradeItem;
+        });
 
-                    const classificationMap = existingClassData.reduce(
-                        (acc: any, item: any) => {
-                            acc[item.workCategory] =
-                                item.existingWorkClassification;
-                            return acc;
-                        },
-                        {}
-                    );
+        console.log('Step 7 - Final downgradeList:', this.downgradeList);
+    },
+    error: (err) => {
+        console.error('Error fetching downgrade data:', err);
+    },
+});
 
-                    this.downgradeList = workCategories.map(
-                        (category: any) => ({
-                            workCategory: category.workCategory,
-                            workCategoryId: category.id,
-                            existingClass:
-                                classificationMap[category.workCategory] ||
-                                'Unknown',
-                            newClass: '',
-                        })
-                    );
-                },
-                error: (err) => {
-                    console.error('Error fetching downgrade data:', err);
-                },
-            });
         } else {
             this.downgradeList = [];
         }
     }
+ get filteredDowngradeList() {
+    return this.downgradeList.filter(item => item.existingClass !== 'Not available');
+  }
 
+  trackByWorkCategory(index: number, item: any): string {
+    return item.workCategoryId;
+  }
     getClassOptions(existingClass: string) {
         const all = [
             { label: 'L - Large', value: 'L-Large' },
@@ -424,9 +419,9 @@ export class ViewRegCompliancelistComponent {
         return [];
     }
 
-    trackByWorkCategory(index: number, item: any) {
-        return item.workCategory;
-    }
+    // trackByWorkCategory(index: number, item: any) {
+    //     return item.workCategory;
+    // }
 
     closeModal() {
         if (this.bsModal) {

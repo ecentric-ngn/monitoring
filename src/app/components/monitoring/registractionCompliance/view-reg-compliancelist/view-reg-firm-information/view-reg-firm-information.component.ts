@@ -18,7 +18,7 @@ licenseStatus: string = '';
   constructor(private service: CommonService) { }
 
 ngOnInit(): void {
-    this.activeTabId = 'office';
+    // this.activeTabId = 'office';
   const WorkDetail = this.service.getData('BctaNo');
   if (!WorkDetail || !WorkDetail.data) {
     console.error('WorkDetail or WorkDetail.data is undefined');
@@ -31,16 +31,16 @@ ngOnInit(): void {
 
   // Set activeTabId depending on applicationStatus
   const status = this.applicationStatus;
-  if (this.licenseStatus === 'Suspended') {
+  if (this.applicationStatus === 'Suspension Resubmission' || this.applicationStatus === 'Submitted') {
     // Show all tabs enabled, so no change to activeTabId needed here
     this.activeTabId = this.activeTabId || 'office';  // default to office if undefined
   } else {
     // Existing logic when not suspended
-    if (status === 'Resubmitted OS' || status === 'Resubmitted PFS' || status === 'Resubmitted OS and PFS') {
+    if (status === 'Resubmitted OS and PFS') {
       this.activeTabId = 'office';
-    } else if (status === 'Resubmitted HR') {
+    } else if (status === 'Resubmitted HR and EQ') {
       this.activeTabId = 'employee';
-    } else if (status === 'Resubmitted EQ') {
+    } else if (status === 'Resubmitted HR and EQ') {
       this.activeTabId = 'equipment';
     }
   }

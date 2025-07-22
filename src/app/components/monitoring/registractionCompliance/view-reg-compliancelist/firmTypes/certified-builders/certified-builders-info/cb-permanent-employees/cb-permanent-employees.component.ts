@@ -160,7 +160,7 @@ export class CbPermanentEmployeesComponent {
             'downloaded-file'
         );
     }
-
+rejectApplication() {}
     update() {
         this.isSaving = true;
         const payload = {

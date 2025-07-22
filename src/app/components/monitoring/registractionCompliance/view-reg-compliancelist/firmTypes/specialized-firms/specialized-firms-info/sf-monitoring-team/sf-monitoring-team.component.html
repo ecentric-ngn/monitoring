@@ -35,10 +35,17 @@
 
       <!-- Save & Forward Button -->
       <div class="d-flex justify-content-end mt-4">
+        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
+          (nzOnConfirm)="reinstate(bctaNo)">
+          <button class="btn btn-danger h-100 mr-2" *ngIf="applicationStatus === 'Suspension Resubmission'">
+            Reinstate
+          </button>
+        </a>
         <button type="submit" class="btn btn-success" [disabled]="monitoringForm.invalid || isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save
         </button>
+
       </div>
     </div>
   </form>

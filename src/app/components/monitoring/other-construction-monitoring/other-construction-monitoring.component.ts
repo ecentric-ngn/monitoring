@@ -13,15 +13,58 @@ export class OtherConstructionMonitoringComponent {
     @Input() workType: any;
     displayMessage: string;
     dzongkhagList: any;
+    tableData: any;
     constructor(private router: Router, private service: CommonService) {}
 
     ngOnInit() {
         this.workType = this.workType;
-        console.log('workTypeinotherconstruction', this.workType);
+        this.fetchOtherConstructionDetails();
     }
     saveObservationReport(form: any) {
         console.log(this.formData);
     }
+
+    navigateToEdit(data: any) {
+        const workDetail = { data: data.work_information_id, checklistid: data.id, workType: this.workType,otherWorkType:data.workType };
+        this.service.setData(workDetail, 'BctaNo', 'monitoring/WorkDetail');
+    }
+pageNo:number = 1;
+pageSize:number = 10;
+   fetchOtherConstructionDetails(searchQuery?: string) {
+    const payload: any[] = [];
+    // Add search condition if searchQuery is provided
+    if (searchQuery) {
+        payload.push(
+            {
+            field: 'contractorNo',
+            value: `%${searchQuery}%`,
+            condition: 'LIKE',
+            operator: 'AND'
+        },
+         {
+            field: 'applicationStatus',
+            value: `%${searchQuery}%`,
+            condition: 'LIKE',
+            operator: 'AND'
+        },
+    );
+    }
+    this.service
+        .fetchDetails(
+            payload,
+            this.pageNo,
+            this.pageSize,
+            't_otherconstruction_view'
+        )
+        .subscribe(
+            (response: any) => {
+                this.tableData = response.data;
+            },
+            (error) => {
+                console.error('Error fetching contractor details:', error);
+            }
+        );
+}
 
     searchBasedOnBCTANo() {
         const contractor = {

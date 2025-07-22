@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { CommonService } from '../../../../../../service/common.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
@@ -26,7 +26,7 @@ export class MandatoryEquipmentComponent {
     WorkDetail: any;
     showErrorMessage: any;
     licenseStatus: any={};
-
+    @ViewChild('closeActionModals', { static: false }) closeActionModals!: ElementRef;
     constructor(
         private service: CommonService,
         private router: Router,
@@ -34,7 +34,7 @@ export class MandatoryEquipmentComponent {
     ) {}
 
     ngOnInit() {
-        this.data = this.data.data;
+        this.data = this.data;
         
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -59,13 +59,14 @@ export class MandatoryEquipmentComponent {
         // Set the id from input
         this.id = this.id;
         const WorkDetail = this.service.getData('BctaNo');
+        
         if (!WorkDetail || !WorkDetail.data) {
             console.error('WorkDetail or WorkDetail.data is undefined');
             return;
         }
-        this.formData.firmType = WorkDetail.data;
-        this.bctaNo = WorkDetail.data.contractorNo;
-        this.applicationStatus = WorkDetail.data.applicationStatus;
+        this.formData.firmType = WorkDetail.data || this.data.firmType;
+        this.bctaNo = WorkDetail.data.contractorNo || this.data.contractorNo;
+        this.applicationStatus = WorkDetail.data.applicationStatus || this.data.applicationStatus; 
         this.data = WorkDetail.data;
         this.WorkDetail = WorkDetail;
         
@@ -228,7 +229,7 @@ export class MandatoryEquipmentComponent {
                             'Forwarded to Review Committee',
                             'success'
                         );
-                        this.closeModal();
+                    this.closeActionModals.nativeElement.click();
                         this.router.navigate(['/monitoring/construction']);
                     } else {
                         Swal.fire(
@@ -236,7 +237,7 @@ export class MandatoryEquipmentComponent {
                             res || 'Something went wrong while forwarding.',
                             'error'
                         );
-                        this.closeModal();
+                    this.closeActionModals.nativeElement.click();
                     }
                 },
                 error: (err) => {
@@ -246,7 +247,7 @@ export class MandatoryEquipmentComponent {
                         'error'
                     );
                     console.error(err);
-                    this.closeModal();
+                   this.closeActionModals.nativeElement.click();
                 },
             });
         
@@ -268,7 +269,7 @@ export class MandatoryEquipmentComponent {
                         'Forwarded to Review Committee',
                         'success'
                     );
-                    this.closeModal();
+                   this.closeActionModals.nativeElement.click();
                     this.router.navigate(['/monitoring/construction']);
                 },
                 error: (err) => {
@@ -340,6 +341,7 @@ export class MandatoryEquipmentComponent {
             this.reinstateModal.hide();
         }
     }
+    rejectApplication() {}
     tableId: any;
     saveAndNext() {
         this.isSaving = true;
@@ -437,6 +439,9 @@ export class MandatoryEquipmentComponent {
 
     update() {
         this.isSaving = true;
+        if(this.tData.fulfillsRequirement){
+            this.showErrorMessage = 'please select a fulfillment option';
+        }
         const payload = {
             registrationReview: {
                 bctaNo: this.bctaNo,

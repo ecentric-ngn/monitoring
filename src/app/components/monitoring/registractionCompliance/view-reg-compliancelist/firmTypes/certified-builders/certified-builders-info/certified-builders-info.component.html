@@ -20,53 +20,49 @@
                 <label class="form-label me-2 font-size-12">Email Address:</label>
                 <span class="font-size-12">{{formData?.emailAddress || 'N/A'}}</span>
             </div>
+
+            <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">Status:</label>
+                <span class="font-size-12">{{applicationStatus}}</span>
+            </div>
         </div>
 
         <div class="container-fluid">
             <ul class="nav nav-tabs nav-fill w-100" id="myTab" role="tablist">
                 <li class="nav-item" role="presentation">
                     <button class="nav-link border" [class.active]="activeTabId === 'cbOffice'" id="office-tab"
-                        (click)="setActiveTab('cbOffice')"
-                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted EQ')"
-                        type="button" role="tab">
+                        (click)="setActiveTab('cbOffice')" [disabled]="!isTabEnabled('cbOffice')" type="button"
+                        role="tab">
                         Office Signage & Document
                     </button>
+
 
                 </li>
 
                 <li class="nav-item" role="presentation">
                     <button class="nav-link border" [class.active]="activeTabId === 'cbEmployee'" id="employee-tab"
-                        (click)="setActiveTab('cbEmployee')" [disabled]="licenseStatus !== 'Suspended' && 
-                            (applicationStatus === 'Resubmitted OS' || 
-                            applicationStatus === 'Resubmitted EQ' || 
-                            applicationStatus === 'Resubmitted PFS' || 
-                            applicationStatus === 'Resubmitted OS and PFS')" type="button" role="tab">
+                        (click)="setActiveTab('cbEmployee')" [disabled]="!isTabEnabled('cbEmployee')" type="button"
+                        role="tab">
                         Permanent Employees'
                     </button>
 
+
                 </li>
 
-                <li class="nav-item" role="presentation" *ngIf="formData?.firmType !== 'specializedFirm'">
-                    <button *ngIf="formData?.firmType !== 'specializedFirm'" class="nav-link border"
-                        [class.active]="activeTabId === 'cbEquipment'" id="equipment-tab"
-                        (click)="setActiveTab('cbEquipment')" [disabled]="licenseStatus !== 'Suspended' && 
-                            (applicationStatus === 'Resubmitted OS' || 
-                            applicationStatus === 'Resubmitted HR' || 
-                            applicationStatus === 'Resubmitted PFS' || 
-                            applicationStatus === 'Resubmitted OS and PFS')" type="button" role="tab">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link border" [class.active]="activeTabId === 'cbEquipment'" id="equipment-tab"
+                        (click)="setActiveTab('cbEquipment')" [disabled]="!isTabEnabled('cbEquipment')" type="button"
+                        role="tab">
                         Mandatory Equipment
                     </button>
+
 
                 </li>
 
                 <li class="nav-item" role="presentation">
                     <button class="nav-link border" [class.active]="activeTabId === 'cbMonitoring'" id="monitoring-tab"
-                        (click)="setActiveTab('cbMonitoring')" [disabled]="licenseStatus !== 'Suspended' && 
-                            (applicationStatus === 'Resubmitted OS' || 
-                            applicationStatus === 'Resubmitted EQ' || 
-                            applicationStatus === 'Resubmitted HR' || 
-                            applicationStatus === 'Resubmitted PFS' || 
-                            applicationStatus === 'Resubmitted OS and PFS')" type="button" role="tab">
+                        (click)="setActiveTab('cbMonitoring')" [disabled]="!isTabEnabled('cbMonitoring')" type="button"
+                        role="tab">
                         Monitoring Team Users
                     </button>
 
@@ -80,8 +76,7 @@
 
 <div class="tab-content">
     <div class="tab-pane fade" [class.show]="activeTabId === 'cbOffice'" [class.active]="activeTabId === 'cbOffice'"
-        id="office" role="tabpanel" aria-labelledby="office-tab"
-        *ngIf="activeTabId === 'cbOffice' && formData?.firmType !== 'specializedFirm'">
+        id="office" role="tabpanel" aria-labelledby="office-tab" *ngIf="activeTabId === 'cbOffice'">
         <p><app-cb-office-signage (activateTab)="onActivateTab($event)"></app-cb-office-signage></p>
     </div>
 
