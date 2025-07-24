@@ -21,6 +21,7 @@ export class SfMonitoringTeamComponent {
   @Input() id: string = ''; // Input from parent component
   bsModal: any;
   applicationStatus : string;
+  data: any;
 
   constructor(@Inject(CommonService) private service: CommonService, 
     private router: Router,
@@ -28,9 +29,9 @@ export class SfMonitoringTeamComponent {
 
   ngOnInit() {
     this.username = this.authService.getUsername() || 'NA';
-    console.log("Monitor table id:", this.id);
       const WorkDetail = this.service.getData('BctaNo');
    this.applicationStatus = WorkDetail.data.applicationStatus;
+   this.data = WorkDetail.data;
     this.service.bctaNo$.subscribe(bctaNo => {
       this.bctaNo = bctaNo;
     });
@@ -81,13 +82,14 @@ export class SfMonitoringTeamComponent {
 
     reinstate(row: any) {
         const payload = {
-            firmNo: row,
+            firmNo: this.data.specializedFirmNo ,
             firmType: 'specialized-firm',
             licenseStatus: 'Active',
+             applicationStatus: 'Reinstated',
         };
         const approvePayload = {
             firmType: 'SpecializedFirm',
-            cdbNos: row,
+            cdbNos: this.data.specializedFirmNo,
         };
         forkJoin({
             reinstate: this.service.reinstateLicense(payload),
@@ -106,6 +108,7 @@ export class SfMonitoringTeamComponent {
                         'success'
                     );
                     this.closeModal();
+                      this.router.navigate(['/monitoring/specialized']);
                 } else {
                     Swal.fire(
                         'Warning',
@@ -119,6 +122,7 @@ export class SfMonitoringTeamComponent {
             error: (err) => {
                 console.error('Reinstatement error:', err);
                 this.closeModal();
+                  this.router.navigate(['/monitoring/specialized']);
                 Swal.fire(
                     'Success',
                     'License Reinstated and Approved Successfully',

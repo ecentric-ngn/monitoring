@@ -1,8 +1,9 @@
 import { Component, Inject, Input } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonService } from 'src/app/service/common.service';
+import { CommonService } from '../../../../../../../../service/common.service';
 import Swal from 'sweetalert2';
-import { AuthServiceService } from 'src/app/auth.service';
+import { AuthServiceService } from '../../../../../../../../auth.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-cb-monitoring-team',
@@ -18,6 +19,7 @@ formData: any = {};
   username: string = '';
 
   @Input() id: string = ''; // Input from parent component
+  applicationStatus: any={};
 
   constructor(@Inject(CommonService) private service: CommonService,
    private router: Router,
@@ -26,9 +28,8 @@ formData: any = {};
   ngOnInit() {
 
     this.username = this.authService.getUsername() || 'NA';
-    
-    console.log("Monitor table id:",this.id);
-
+        const WorkDetail = this.service.getData('BctaNo');
+   this.applicationStatus = WorkDetail.data.applicationStatus
     this.service.bctaNo$.subscribe(bctaNo => {
         this.bctaNo = bctaNo;
     });
@@ -75,4 +76,61 @@ formData: any = {};
       }
     );
   }
+
+    reinstate(row: any) {
+          const payload = {
+              firmNo: row,
+              firmType: 'certified-builder',
+              licenseStatus: 'Active',
+          };
+  
+          const approvePayload = {
+              firmType: 'CertifiedBuilder',
+              cdbNos: row,
+          };
+          forkJoin({
+              reinstate: this.service.reinstateLicense(payload),
+              approve: this.service.approveReinstatement(approvePayload),
+          }).subscribe({
+              next: ({ reinstate, approve }) => {
+                  if (
+                      reinstate &&
+                      reinstate
+                          .toLowerCase()
+                          .includes('license status updated to active')
+                  ) {
+                      Swal.fire(
+                          'Success',
+                          'License Reinstated and Approved Successfully',
+                          'success'
+                      );
+                      this.closeModal();
+                  } else {
+                      Swal.fire(
+                          'Warning',
+                          'Unexpected response from server.',
+                          'warning'
+                      );
+                  }
+                  this.router.navigate(['/monitoring/certified']);
+                  this.closeModal();
+              },
+              error: (err) => {
+                  console.error('Reinstatement error:', err);
+                  this.closeModal();
+                  Swal.fire(
+                      'Success',
+                      'License Reinstated and Approved Successfully',
+                      'success'
+                  );
+              },
+          });
+      }
+
+         bsModal: any;
+    closeModal() {
+        if (this.bsModal) {
+            this.bsModal.hide();
+        }
+    }
 }

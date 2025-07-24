@@ -1,13 +1,11 @@
-<div class="scroll-wrapper">
+<div class="">
   <div *ngIf="formData">
     <!-- ==================== LOCATION SECTION ==================== -->
     <div class="row m-4">
       <div class="col-md-4 mb-3">
         <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
         <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation"
-          name="officeLocation" placeholder="Auto" required #officeLocation="ngModel"
-          [readonly]="licenseStatus !== 'Suspended' && licenseStatus !== 'Active'"
-          [disabled]="applicationStatus === 'Suspension Approved'">
+          name="officeLocation" placeholder="Auto" required #officeLocation="ngModel" readonly>
         <div *ngIf="officeLocation.invalid && officeLocation.touched" class="text-danger font-size-12">
           Location is required
         </div>
@@ -83,7 +81,7 @@
         <label class="form-label">Review:<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.filingReview" name="filingReview" required
           #filingReview="ngModel"
-          [disabled]="(licenseStatus !== 'Suspended' && !isFieldEditable('filingReview') && licenseStatus !== 'Active') || applicationStatus === 'Suspension Approved'">
+         >
           <option value="">-- Select --</option>
           <option value="Yes">Yes</option>
           <option value="No">No</option>
@@ -110,7 +108,7 @@
             <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
             <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.filingRemarks"
               name="filingRemarks" required #filingRemarks="ngModel"
-              [readonly]="licenseStatus !== 'Suspended' && licenseStatus !== 'Active'"></textarea>
+           ></textarea>
             <div *ngIf="filingRemarks?.invalid && filingRemarks?.touched" class="text-danger font-size-12">
               Remarks are required
             </div>
@@ -121,20 +119,20 @@
 
     <!-- ==================== ACTION BUTTONS SECTION ==================== -->
     <div class="row mt-3">
-      <div class="col-md-12 d-flex justify-content-end flex-wrap gap-2 m-5">
+      <div class="col-md-12 d-flex justify-content-end flex-wrap gap-2 ml--5">
         <!-- Save & Next button for Submitted status -->
-        <button
+        <!-- <button
           *ngIf="applicationStatus === 'Submitted' && formData.filingReview === 'Yes' || formData.signboardReview === 'Yes'"
           type="submit" class="btn btn-primary save-next-btn" (click)="saveAndNext()" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
           {{ isSaving ? 'Saving...' : 'Save & Next' }}
-        </button>
+        </button> -->
 
         <ng-container>
           <!-- Save and Forward Button with Popup -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and forward this application?'"
             [nzOkText]="'Yes, Forward'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndNext()"
-            *ngIf="(formData.filingReview === 'No' || formData.signboardReview === 'No') && applicationStatus !== 'Submitted' && applicationStatus !== 'Resubmitted OS and PFS'">
+            *ngIf="(formData.filingReview === 'No' || formData.signboardReview === 'No') && applicationStatus === 'Submitted' && applicationStatus !== 'Resubmitted OS and PFS'">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
               <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
               {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
@@ -145,7 +143,7 @@
           <!-- Save and Next Button with Popup -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and proceed to the next step?'"
             [nzOkText]="'Yes, Continue'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndNext()"
-            *ngIf="formData.hrFulfilled === 'Yes' && applicationStatus !== 'Resubmitted OS and PFS'">
+            *ngIf="(formData.filingReview === 'Yes' || formData.signboardReview === 'Yes' || formData.filingFulfilled === 'Yes') && applicationStatus !== 'Resubmitted OS and PFS'">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
               <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
               {{ isSaving ? 'Saving...' : 'Save and Next' }}
@@ -161,17 +159,16 @@
         </button>
 
         <!-- Action Button -->
-        <button class="btn btn-primary"
-          *ngIf="applicationStatus === 'Resubmitted OS and PFS' && formData.filingReview === 'No' || formData.signboardReview === 'No'"
-          data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+        <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted OS and PFS'" data-bs-toggle="modal"
+          data-bs-target="#staticBackdrop">
           Action
         </button>
 
         <!-- Reinstate Button -->
-        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-          (nzOnConfirm)="reinstate(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
+        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reject the application?'"
+          (nzOnConfirm)="rejectApplication(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">
           <button type="button" class="btn btn-danger">
-            Reinstate
+            Reject
           </button>
         </a>
       </div>
@@ -224,6 +221,7 @@
                 </tr>
               </thead>
               <tbody>
+                <tr *ngIf="downgradeList.length === 0"><td colspan="2" class="text-center text-muted">No data available</td></tr>
                 <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
                   <td>{{ downgrade.workCategory }}</td>
                   <td>

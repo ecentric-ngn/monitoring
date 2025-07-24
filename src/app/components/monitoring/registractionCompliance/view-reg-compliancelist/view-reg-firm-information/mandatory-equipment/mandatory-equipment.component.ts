@@ -1,10 +1,18 @@
-import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import {
+    Component,
+    ElementRef,
+    EventEmitter,
+    Input,
+    Output,
+    ViewChild,
+} from '@angular/core';
 import { CommonService } from '../../../../../../service/common.service';
 import { Router } from '@angular/router';
 import Swal from 'sweetalert2';
 import { AuthServiceService } from '../../../../../../auth.service';
 import { forkJoin } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 
 @Component({
     selector: 'app-mandatory-equipment',
@@ -13,29 +21,36 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 })
 export class MandatoryEquipmentComponent {
     formData: any = {};
-    @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
+    @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
 
     firmType: any;
     bctaNo: any;
     tableData: any = [];
     @Input() id: string = '';
     @Input() data: any = {};
-    tData: any=[]=[];
+    tData: any = ([] = []);
     applicationStatus: string = '';
     isSaving = false;
     WorkDetail: any;
     showErrorMessage: any;
-    licenseStatus: any={};
-    @ViewChild('closeActionModals', { static: false }) closeActionModals!: ElementRef;
+    licenseStatus: any = {};
+    @ViewChild('closeActionModals', { static: false })
+    closeActionModals!: ElementRef;
+    vehicleData: Object;
+    showSuccessMessage: string;
+    VehicleDetails: any;
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+        private notification: NzNotificationService,
     ) {}
 
     ngOnInit() {
-        this.data = this.data;
-        
+        this.data = this.data.data;
+        this.WorkDetail = this.data;
+        debugger
+
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
@@ -58,39 +73,39 @@ export class MandatoryEquipmentComponent {
 
         // Set the id from input
         this.id = this.id;
+
         const WorkDetail = this.service.getData('BctaNo');
-        
-        if (!WorkDetail || !WorkDetail.data) {
-            console.error('WorkDetail or WorkDetail.data is undefined');
-            return;
-        }
-        this.formData.firmType = WorkDetail.data || this.data.firmType;
-        this.bctaNo = WorkDetail.data.contractorNo || this.data.contractorNo;
-        this.applicationStatus = WorkDetail.data.applicationStatus || this.data.applicationStatus; 
-        this.data = WorkDetail.data;
-        this.WorkDetail = WorkDetail;
-        
-          this.licenseStatus = this.data.licenseStatus;
+
+        // Accept null or undefined WorkDetail and handle gracefully
+        const data = WorkDetail?.data ?? this.data ?? {}; // fallback to existing `this.data` or empty object
+        this.formData.firmType = data.firmType || '';
+        this.bctaNo = data.contractorNo || '';
+        this.applicationStatus = data.applicationStatus || '';
+        this.data = data; // update this.data safely
+        this.WorkDetail = WorkDetail ?? {}; // ensure it's at least an object
+        this.licenseStatus = this.data.licenseStatus || '';
+
         if (
-            this.data.contractorNo && this.data.applicationStatus !== 'Suspension Resubmission'
+            this.data.contractorNo &&
+            this.data.applicationStatus !== 'Suspension Resubmission'
         ) {
             this.fetchDataBasedOnBctaNo();
         } else {
             this.fetchSuspendDataBasedOnBctaNo();
         }
-
-        //this.service.setBctaNo(this.bctaNo);
     }
 
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.data.contractorNo).subscribe((res: any) => {
-            this.tableData = res.vehicles;
-            console.log('contractor equipment', this.formData);
-        });
+        this.service
+            .getDatabasedOnBctaNo(this.data.contractorNo)
+            .subscribe((res: any) => {
+                this.tableData = res.vehicles;
+                console.log('contractor equipment', this.formData);
+            });
     }
 
     fetchSuspendDataBasedOnBctaNo() {
-        this.bctaNo = this.data.contractorNo ;
+        this.bctaNo = this.data.contractorNo;
         this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
             (res: any) => {
                 this.tableData = res.vehicles;
@@ -164,6 +179,63 @@ export class MandatoryEquipmentComponent {
         }
     }
 
+      rejectApplication() {
+          this.service.rejectApplication('Contractor',this.data.contractorNo).subscribe(
+            (response: any) => {
+              console.log('Application rejected successfully:', response);
+              this.createNotification(
+                'success',
+                'Success',
+                'Application rejected successfully'
+              );
+              this.closeModal();
+              this.router.navigate(['monitoring/construction']);
+            },
+            (error) => {
+              console.error('Error rejecting application:', error);
+              this.createNotification(
+                'error',
+                'Error',
+                'Failed to reject application'
+              );
+            }
+          )
+        }
+
+     getVehicleData(data:any) {
+      this.service.getVehicleDetails(this.data.vehicleNumber,'Heavy_Vehicle')
+                .subscribe(
+                (response: any) => {
+                    const data = response.vehicleDetail;
+                    this.VehicleDetails = data;
+                 if ( response.vehicleDetail.vehicleRegistrationDetailsId ===0) {
+                        this.showErrorMessage =
+                            'No details found for this RegNo in BCTA';
+                        console.warn('No details found for this RegNo in BCTA');
+                    } else {
+                        this.showErrorMessage = ''; // Clear error if successful
+                    }
+                },
+                (error) => {
+                    if (error.status === 404) {
+                        this.showErrorMessage =
+                            'No details found for this RegNo in BCTA';
+                    } else {
+                        this.showErrorMessage = 'An unexpected error occurred';
+                    }
+                    this.showSuccessMessage = ''; // Clear success message on error
+                }
+            );
+    }
+
+createNotification(
+  type: 'success' | 'error' | 'info' | 'warning',
+  title: string,
+  message: string
+): void {
+  this.notification[type](title, message).onClick.subscribe(() => {
+  });
+}
     selectedAction: any = {
         actionType: '',
         actionDate: '',
@@ -229,7 +301,7 @@ export class MandatoryEquipmentComponent {
                             'Forwarded to Review Committee',
                             'success'
                         );
-                    this.closeActionModals.nativeElement.click();
+                        this.closeActionModals.nativeElement.click();
                         this.router.navigate(['/monitoring/construction']);
                     } else {
                         Swal.fire(
@@ -237,7 +309,7 @@ export class MandatoryEquipmentComponent {
                             res || 'Something went wrong while forwarding.',
                             'error'
                         );
-                    this.closeActionModals.nativeElement.click();
+                        this.closeActionModals.nativeElement.click();
                     }
                 },
                 error: (err) => {
@@ -247,10 +319,9 @@ export class MandatoryEquipmentComponent {
                         'error'
                     );
                     console.error(err);
-                   this.closeActionModals.nativeElement.click();
+                    this.closeActionModals.nativeElement.click();
                 },
             });
-        
         } else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
                 firmNo: this.WorkDetail.data.contractorNo,
@@ -269,7 +340,7 @@ export class MandatoryEquipmentComponent {
                         'Forwarded to Review Committee',
                         'success'
                     );
-                   this.closeActionModals.nativeElement.click();
+                    this.closeActionModals.nativeElement.click();
                     this.router.navigate(['/monitoring/construction']);
                 },
                 error: (err) => {
@@ -278,7 +349,7 @@ export class MandatoryEquipmentComponent {
             });
         }
     }
-     closeModal() {
+    closeModal() {
         if (this.bsModal) {
             this.bsModal.hide();
         }
@@ -290,7 +361,7 @@ export class MandatoryEquipmentComponent {
             firmNo: row,
             firmType: 'contractor',
             licenseStatus: 'Active',
-             applicationStatus: 'Reinstated',
+            applicationStatus: 'Reinstated',
         };
 
         const approvePayload = {
@@ -300,7 +371,7 @@ export class MandatoryEquipmentComponent {
 
         forkJoin({
             reinstate: this.service.reinstateLicense(payload),
-           // approve: this.service.approveReinstatement(approvePayload),
+            // approve: this.service.approveReinstatement(approvePayload),
         }).subscribe({
             next: ({ reinstate }) => {
                 if (
@@ -341,7 +412,6 @@ export class MandatoryEquipmentComponent {
             this.reinstateModal.hide();
         }
     }
-    rejectApplication() {}
     tableId: any;
     saveAndNext() {
         this.isSaving = true;
@@ -367,7 +437,7 @@ export class MandatoryEquipmentComponent {
                 eqFulfilled: this.tData.fulfillsRequirement,
                 eqResubmitDeadline: this.tData.resubmitDate,
                 eqRemarks: this.tData.resubmitRemarks,
-                // id:this.tableId 
+                // id:this.tableId
             },
             equipmentReviews: eq,
         };
@@ -376,7 +446,8 @@ export class MandatoryEquipmentComponent {
                 this.isSaving = false;
                 console.log('res', res);
                 // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
-                this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
+                this.activateTab.emit({ id: this.tableId,data:this.data, tab: 'monitoring' });
+                debugger
             },
             (error) => {
                 this.isSaving = false;
@@ -391,7 +462,11 @@ export class MandatoryEquipmentComponent {
 
     notifyContractor() {
         this.isSaving = true;
-        const table = this.service.setData(this.id,'tableId','office-signage' );
+        const table = this.service.setData(
+            this.id,
+            'tableId',
+            'office-signage'
+        );
         this.tableId = this.id;
         const eq = this.tableData.map((item: any) => ({
             isRegistered: item.equipmentType,
@@ -424,7 +499,7 @@ export class MandatoryEquipmentComponent {
                     confirmButtonText: 'OK',
                 });
                 // this.router.navigate(['monitoring/construction']);
-                this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
+                this.activateTab.emit({ id: this.tableId,data:this.data, tab: 'monitoring' });
             },
             error: (error) => {
                 this.isSaving = false;
@@ -439,12 +514,12 @@ export class MandatoryEquipmentComponent {
 
     update() {
         this.isSaving = true;
-        if(this.tData.fulfillsRequirement){
+        if (this.tData.fulfillsRequirement) {
             this.showErrorMessage = 'please select a fulfillment option';
         }
         const payload = {
             registrationReview: {
-                bctaNo: this.bctaNo,
+                bctaNo: this.data.contractorNo,
                 eqFulfilled: this.tData.fulfillsRequirement,
                 eqResubmitDeadline: this.tData.resubmitDate,
                 eqRemarks: this.tData.resubmitRemarks,
@@ -478,59 +553,81 @@ export class MandatoryEquipmentComponent {
     }
 
     // Handle file download and preview logic
-    downloadFile(filePath: string): void {
-        this.service.downloadFileFirm(filePath).subscribe(
-            (response: HttpResponse<Blob>) => {
-                const binaryData = [response.body];
-                const mimeType =
-                    response.body?.type || 'application/octet-stream';
-                const blob = new Blob(binaryData, { type: mimeType });
-                const blobUrl = window.URL.createObjectURL(blob);
-                const fileName = this.extractFileName(filePath);
-                const isImage = mimeType.startsWith('image/');
+downloadFile(filePath: string): void {
+  const sanitizedPath = filePath.replace(/\s+/g, ' ');
+  this.service.downloadFileFirm(sanitizedPath).subscribe(
+        (response: HttpResponse<Blob>) => {
+            const binaryData = [response.body];
+            const mimeType = response.body?.type || 'application/octet-stream';
+            const blob = new Blob(binaryData, { type: mimeType });
+            const blobUrl = window.URL.createObjectURL(blob);
 
-                const newWindow = window.open(
-                    '',
-                    '_blank',
-                    'width=800,height=600'
-                );
-                if (newWindow) {
-                    newWindow.document.write(`
-                            <html>
-                                <head><title>File Preview</title></head>
-                                <body style="margin:0; text-align: center;">
-                                    <div style="padding:10px;">
-                                        <a href="${blobUrl}" download="${fileName}" style="font-size:16px; color:blue;" target="_blank">⬇ Download File</a>
-                                    </div>
-                                    ${
-                                        isImage
-                                            ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
-                                            : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`
-                                    }
-                                </body>
-                            </html>
-                        `);
-                    setTimeout(
-                        () => window.URL.revokeObjectURL(blobUrl),
-                        10000
-                    );
-                }
-            },
-            (error: HttpErrorResponse) => {
-                if (error.status === 404) {
-                    console.error('File not found', error);
-                    this.showErrorMessage();
-                }
+            // Ensure filename is properly extracted and decoded
+            const fileName = this.extractFileName(filePath);
+            const isImage = mimeType.startsWith('image/');
+
+            const newWindow = window.open('', '_blank', 'width=800,height=600');
+            if (newWindow) {
+                newWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>File Preview</title>
+                        </head>
+                        <body style="margin:0; text-align: center;">
+                            <div style="padding:10px;">
+                                <a href="${blobUrl}" download="${fileName}" 
+                                   style="font-size:16px; color:blue;" 
+                                   target="_blank">⬇ Download ${fileName}</a>
+                            </div>
+                            ${isImage
+                                ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
+                                : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`}
+                        </body>
+                    </html>
+                `);
+
+                // Clean up after window is closed
+                newWindow.onbeforeunload = () => {
+                    window.URL.revokeObjectURL(blobUrl);
+                };
+            } else {
+                console.error('Failed to open the new window');
+                // Fallback to direct download if window fails to open
+                this.forceDownload(blob, fileName);
             }
-        );
-    }
+        },
+        (error: HttpErrorResponse) => {
+            if (error.status === 404) {
+                console.error('File not found', error);
+                this.showErrorMessage();
+            }
+        }
+    );
+}
 
-    // Extract filename from full path
-    extractFileName(filePath: string): string {
-        return (
-            filePath.split('/').pop() ||
-            filePath.split('\\').pop() ||
-            'downloaded-file'
-        );
+// Improved filename extraction
+private extractFileName(filePath: string): string {
+    try {
+        // Handle URL encoded paths
+        const decodedPath = decodeURIComponent(filePath);
+        // Extract filename and remove any query parameters
+        return decodedPath.split('/').pop()?.split('?')[0] || 'download';
+    } catch {
+        return filePath.split('/').pop() || 'download';
     }
+}
+
+// Fallback direct download method
+private forceDownload(blob: Blob, fileName: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 100);
+}
 }

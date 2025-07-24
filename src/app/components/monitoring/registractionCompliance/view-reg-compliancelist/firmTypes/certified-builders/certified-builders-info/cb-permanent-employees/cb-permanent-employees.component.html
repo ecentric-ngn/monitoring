@@ -1,7 +1,7 @@
 <div class="scroll-wrapper">
 
     <form #hrForm="ngForm">
-        <div class="row g-3 m-4">
+        <div class="row g-3 ml-3">
             <!-- Auto fields -->
             <table class="table table-bordered table-striped">
                 <thead>
@@ -42,10 +42,10 @@
                                 Fetch TDS/HC/Pension
                             </button>
                         </td>
-                         <td class="text-center bg-white" *ngIf="i === 0" [attr.rowspan]="tableData.length">
-                            <button type="button" class="btn btn-outline-primary btn-sm"
-                               data-bs-toggle="modal" data-bs-target="#exampleModal">
-                                 Verify
+                        <td class="text-center bg-white" *ngIf="i === 0" [attr.rowspan]="tableData.length">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                data-bs-target="#exampleModal">
+                                Verify
                             </button>
                         </td>
                     </tr>
@@ -80,7 +80,7 @@
             </ng-container>
 
             <!-- Remarks when HR is fulfilled -->
-            <ng-container *ngIf="tData.hrFulfilled === 'Yes' && applicationStatus === 'Submitted'">
+            <ng-container *ngIf="tData.hrFulfilled === 'Yes'">
                 <div class="col-md-12">
                     <label class="form-label">Remarks</label>
                     <textarea class="form-control form-control-sm" rows="2" [(ngModel)]="tData.remarks"
@@ -91,29 +91,33 @@
             <!-- Buttons -->
             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3 flex-wrap">
                 <!-- Save and Forward -->
-                <button *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.hrFulfilled === 'No'" type="button"
-                    class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
+                <button *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.hrFulfilled === 'No'"
+                    type="button" class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
                 </button>
 
                 <!-- Save and Next -->
-                <button *ngIf="applicationStatus !== 'Resubmitted HR and EQ' && tData.hrFulfilled === 'Yes'" type="button"
-                    class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
+                <button
+                    *ngIf="(applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Submitted')  && tData.hrFulfilled === 'Yes'"
+                    type="button" class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Save and Next' }}
                 </button>
 
+
                 <!-- Update -->
-                <button *ngIf="applicationStatus === 'Resubmitted HR and EQ'" type="button" class="btn btn-success"
+                <!-- <button *ngIf="applicationStatus === 'Resubmitted HR and EQ'" type="button" class="btn btn-success"
                     (click)="update()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Update' }}
-                </button>
+                </button> -->
                 <!-- Action -->
-                <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.hrFulfilled === 'No'" (click)="openActionModal(applicationStatus)">Action</button>
+                <button class="btn btn-primary"
+                    *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.hrFulfilled === 'No'"
+                    (click)="openActionModal(applicationStatus)">Action</button>
 
-                 <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
+                <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
                     [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
                     <button class="btn btn-danger"
                         *ngIf="applicationStatus === 'Suspension Resubmission' && tData.hrFulfilled === 'No'">
@@ -137,7 +141,7 @@
     <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
             <form #actionForm="ngForm">
-                 <div class="modal-header" style="background-color:#495f8a ">
+                <div class="modal-header" style="background-color:#495f8a ">
                     <h5 class="modal-title text-white" id="actionModalLabel">Take Action</h5>
                     <button type="button" class="btn-close" (click)="closeModal()" aria-label="Close"></button>
                 </div>
@@ -153,7 +157,7 @@
                             </select>
                         </div>
 
-                       <div class="col-md-6 mb-3">
+                        <div class="col-md-6 mb-3">
                             <label class="form-label">Action Date <span class="text-danger">*</span></label>
                             <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
                                 name="actionDate" [disabled]="true" required />
@@ -207,7 +211,7 @@
                         <div class="text-danger" *ngIf="showErrorMessage">
                             {{ showErrorMessage }}
                         </div>
-                        </div>
+                    </div>
 
 
                 </form>

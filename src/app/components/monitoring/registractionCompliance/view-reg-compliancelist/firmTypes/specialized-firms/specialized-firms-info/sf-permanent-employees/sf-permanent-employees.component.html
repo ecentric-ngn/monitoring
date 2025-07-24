@@ -21,6 +21,9 @@
                     </tr>
                 </thead>
                 <tbody>
+                    <tr *ngIf="tableData?.length === 0">
+                        <td colspan="12" class="text-center">No data found</td>
+                    </tr>
                     <tr *ngFor="let data of tableData; let i = index">
                         <td>{{ i+1 }}</td>
                         <td>{{ data.cId }}</td>
@@ -64,7 +67,7 @@
             </div>
 
             <!-- Conditional fields when HR not fulfilled -->
-            <ng-container *ngIf="tData.hrFulfilled === 'No' && applicationStatus !== 'Resubmitted HR'">
+            <ng-container *ngIf="tData.hrFulfilled === 'No' && applicationStatus !== 'Resubmitted HR' && applicationStatus !== 'Suspension Resubmission'">
                 <div class="row pt-4">
                     <div class="col-md-4">
                         <label class="form-label">Last Date to Resubmit<span class="text-danger">*</span></label>
@@ -91,7 +94,7 @@
             <!-- Buttons -->
             <div class="col-md-12 d-flex justify-content-end gap-2 mt-3 flex-wrap">
                 <!-- Save and Forward / Save and Next -->
-                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'No'" type="button"
+                <button *ngIf="applicationStatus !== 'Resubmitted HR' && tData.hrFulfilled === 'No' && applicationStatus !== 'Suspension Resubmission'" type="button"
                     class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
@@ -146,16 +149,15 @@
                             <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType"
                                 required (change)="onActionTypeChange()">
                                 <option value="">-- Select --</option>
-                                <option value="cancel">Cancel</option>
-                                <option value="downgrade">Downgrade</option>
+                                <option value="downgrade">Cancel</option>
                                 <option value="suspend">Suspend</option>
                             </select>
                         </div>
                         <div class="col-md-6 mb-3">
-                            <label class="form-label">Action Date <span class="text-danger">*</span></label>
-                            <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate"
-                                name="actionDate" [disabled]="true" required />
-                        </div>
+              <label class="form-label">Action Date <span class="text-danger">*</span></label>
+              <input type="date" class="form-control h-50" [(ngModel)]="selectedAction.actionDate" name="actionDate"
+                [disabled]="true" required />
+            </div>
                     </div>
 
                     <div class="mb-3">

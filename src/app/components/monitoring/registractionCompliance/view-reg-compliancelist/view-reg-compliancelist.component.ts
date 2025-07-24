@@ -62,7 +62,6 @@ export class ViewRegCompliancelistComponent {
         // Auto-refresh every 60 seconds (60000 ms)
         this.autoRefreshInterval = setInterval(() => {
             this.fetchComplianceDetails();
-            console.log('Auto-refreshed compliance data');
         }, 60000);
     }
 
@@ -78,12 +77,10 @@ export class ViewRegCompliancelistComponent {
             (response: any) => {
                 this.loading = false;
                 this.dzongkhagList = response.data;
-                console.log('responseDzongkag', response);
             },
             // Error handler
             (error) => {
                 this.loading = false; // Set loading to false as an error occurred
-                console.error('Error fetching contractor details:', error); // Log the error
             }
         );
     }
@@ -150,11 +147,9 @@ export class ViewRegCompliancelistComponent {
         });
     }
     private handleSuccess(response: any) {
-        console.log('Email sent successfully:', response);
     }
 
     private handleError(error: any) {
-        console.error('Error sending email:', error);
         Swal.fire({
             title: 'Error!',
             text: 'Failed to send mass email. Please try again.',
@@ -260,8 +255,7 @@ export class ViewRegCompliancelistComponent {
             data.applicationStatus === 'Submitted' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
-            data.applicationStatus === 'Suspension Resubmission' ||
-            data.applicationStatus === 'Suspension Approved'
+            data.applicationStatus === 'Suspension Resubmission'
         ) {
             const workId = data.contractorNo;
             this.prepareAndNavigate(data, workId);

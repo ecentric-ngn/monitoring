@@ -50,7 +50,7 @@
         <table id="datatable-1" class="table table-bordered table-sm rounded-2">
             <thead>
                 <tr>
-                  
+
                     <th>BCTA No.</th>
                     <th>Firm Name</th>
                     <th>Submitted On</th>
@@ -58,45 +58,52 @@
                     <th>License Status</th>
                     <th>Verified By</th>
                     <th>Action</th>
-                      <th>Select</th>
+                    <th>Select</th>
                 </tr>
             </thead>
             <tbody>
                 <tr *ngFor="let data of tableData" class="table-row">
-                   
-                    <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
+
+                    <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus === 'Submitted'"
                         [class.text-primary]="data.applicationStatus === 'Submitted'
-                        || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
-                        (click)="navigate(data)">
+        || data.applicationStatus === 'Resubmitted HR and EQ'
+        || data.applicationStatus === 'Resubmitted OS and PFS'
+        || data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
                         {{ data.certifiedBuilderNo }}
                     </td>
+
                     <td>{{ data.nameOfFirm }}</td>
                     <td>{{ data.sentDate }}</td>
                     <td>
                         <span class="text-bold" [ngClass]="{
-                           'text-secondary': data.applicationStatus== 'Not Submitted',
-                            'text-warning': data.applicationStatus== 'Pending' || data.applicationStatus== 'Cancel Request',
-                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved',
-                            'text-primary': data.applicationStatus== 'Submitted'
-                                            || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
-                            }">
+                        'text-secondary': data.applicationStatus === 'Not Submitted',
+                        'text-warning': data.applicationStatus === 'Pending' || data.applicationStatus === 'Cancel Request',
+                        'text-success': data.applicationStatus === 'Verified' || data.applicationStatus === 'Reinstated' || data.applicationStatus === 'Suspension Approved',
+                        'text-primary': data.applicationStatus === 'Submitted' 
+                            || data.applicationStatus === 'Resubmitted HR and EQ' 
+                            || data.applicationStatus === 'Resubmitted OS and PFS' 
+                            || data.applicationStatus === 'Suspension Resubmission'
+                    }">
                             {{ data.applicationStatus }}
                         </span>
+
                     </td>
 
                     <td>
-                     <span class="text-bold" [ngClass]="{'text-danger': data.licenseStatus== 'Suspended' || data.licenseStatus== 'Cancelled' || data.licenseStatus== 'Downgraded', 'text-primary': data.licenseStatus== 'Active'}">
+                        <span class="text-bold"
+                            [ngClass]="{'text-danger': data.licenseStatus== 'Suspended' || data.licenseStatus== 'Cancelled' || data.licenseStatus== 'Downgraded', 'text-primary': data.licenseStatus== 'Active'}">
                             {{ data.licenseStatus }}
                         </span>
-                        </td>
+                    </td>
 
                     <td>
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
-                     <td>
-                        <button *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
-                            (click)="openActionModal(data)">Action</button>
+                    <td>
+                        <button
+                            *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'"
+                            class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                     </td>
                     <!-- <td>
                         <button class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
@@ -104,10 +111,15 @@
                            
                         </div>
                     </td> -->
-                     <td>
+                    <!-- <td>
                         <input type="checkbox" [disabled]="data.applicationStatus !== 'Ready for Review'"
                             [value]="data.certifiedBuilderNo" (change)="onCheckboxChange($event, data.id)">
+                    </td> -->
+                    <td>
+                        <input type="checkbox" [disabled]="!['Verified', 'In Process'].includes(data.applicationStatus)"
+                            [value]="data.certifiedBuilderNo" (change)="onCheckboxChange($event, data.id)" />
                     </td>
+
                 </tr>
 
                 <tr *ngIf="tableData.length === 0">
@@ -120,7 +132,7 @@
             </tbody>
         </table>
 
-          <div *ngIf="tableData" class="justify-content-start mb--3">
+        <div *ngIf="tableData" class="justify-content-start mb--3">
             <div
                 class="d-flex font-bold font-size-12 justify-content-between justify-content-start ml-2 mt-7 font-size-12 font-bold ml-2">
                 <p>{{ calculateOffset() }}</p>
@@ -145,8 +157,16 @@
             </div>
         </div>
 
-        <div class="text-end" *ngIf="selectedIds.length !== 0">
+        <!-- <div class="text-end" *ngIf="selectedIds.length !== 0">
             <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>
+        </div> -->
+        <div class="d-flex justify-content-end mb-3" *ngIf="tableData">
+            <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Forward the application?'"
+                (nzOnConfirm)="forwardToRC()" *ngIf="selectedIds.length !== 0">
+                <button class="btn btn-success">
+                    Forward to RC
+                </button>
+            </a>
         </div>
     </div>
 </div>

@@ -544,6 +544,18 @@ approveReinstatement(payload: any) {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/downgrade/request`, payload, { responseType: 'text' });
   }
 
+rejectApplication(category: string, bctaNo: string) {
+  const params = new HttpParams()
+    .set('category', category)
+    .set('bctaNO', bctaNo);
+
+  return this.http.post(
+    `${api_url_Monitoring_siteEngineer}/contractor/compliance/reject`,
+    {}, // No body
+    { params, responseType: 'text' }
+  );
+}
+
   downgradeConsultancy(payload: any) {
     return this.http.post(`${api_url_Monitoring_siteEngineer}/classification/consultant/request-downgrade`, payload, { responseType: 'text' });
   }

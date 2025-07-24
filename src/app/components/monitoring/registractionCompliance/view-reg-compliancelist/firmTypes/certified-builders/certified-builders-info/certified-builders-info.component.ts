@@ -12,6 +12,7 @@ formData: any = {};
   applicationStatus: string = '';
   activeTabId: string = '';
   licenseStatus: any;
+  data: string;
   constructor(@Inject(CommonService) private service: CommonService) { }
 
 ngOnInit(): void {
@@ -76,17 +77,21 @@ isTabEnabled(tabId: string): boolean {
 
   type: string = '';
   id: string = '';
-  onActivateTab(event: { id: string, tab: string }) {
+  onActivateTab(event: { id: string, data: string, tab: string }) {
     this.type = event.tab;
     this.id = event.id
 
     console.log('id', this.id);
     if (this.type === 'cbEmployee') {
       this.activeTabId = 'cbEmployee';
+      this.data = event.data
     } else if (this.type === 'cbEquipment') {
       this.activeTabId = 'cbEquipment';
+         this.data = event.data
+         debugger
     } else if (this.type === 'cbMonitoring') {
       this.activeTabId = 'cbMonitoring';
+         this.data = event.data
     } else {
       this.activeTabId = 'cbOffice';
     }

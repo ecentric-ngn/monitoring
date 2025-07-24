@@ -5,6 +5,8 @@ import Swal from 'sweetalert2';
 import { AuthServiceService } from '../../../../../../../../auth.service';
 import { forkJoin } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+
 declare var bootstrap: any;
 @Component({
     selector: 'app-office-signage',
@@ -16,8 +18,6 @@ export class OfficeSignageComponent {
     @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
     bctaNo: any;
     data: any;
-    reinstateModal: any = null;
-    reinstateData: any = null;
     bsModal: any;
     applicationStatus: string = '';
     isSaving = false;
@@ -32,7 +32,7 @@ export class OfficeSignageComponent {
         contractorId: '',
         contractorNo: '',
     };
-  showErrorMessage: any;
+    showErrorMessage: any;
 
     private getPrefix(workCategory: string): string {
         if (workCategory.startsWith('S-')) return 'S';
@@ -44,7 +44,8 @@ export class OfficeSignageComponent {
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+        private notification: NzNotificationService,
     ) {}
 
     ngOnInit() {
@@ -52,7 +53,7 @@ export class OfficeSignageComponent {
         this.date();
         const WorkDetail = this.service.getData('BctaNo');
         this.licenseStatus = WorkDetail.data.licenseStatus;
-        
+
         if (!WorkDetail || !WorkDetail.data) {
             return;
         }
@@ -61,20 +62,23 @@ export class OfficeSignageComponent {
         this.bctaNo = WorkDetail.data.consultantNo;
         this.applicationStatus = WorkDetail.data.applicationStatus;
         console.log('applicationStatusin consultancy', this.applicationStatus);
-        if (this.applicationStatus === 'Suspension Resubmission' && this.bctaNo) {
+        if (
+            this.applicationStatus === 'Suspension Resubmission' &&
+            this.bctaNo
+        ) {
             this.fetchSuspendDataBasedOnBctaNo();
         } else {
-             this.fetchDataBasedOnBctaNo();
+            this.fetchDataBasedOnBctaNo();
         }
     }
 
-    date(){
-    const today = new Date();
-    const yyyy = today.getFullYear();
-    const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
-    const dd = String(today.getDate()).padStart(2, '0');
+    date() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0'); // Months are 0-based
+        const dd = String(today.getDate()).padStart(2, '0');
 
-    this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
+        this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
     }
     initializeFormData() {
         this.formData = {
@@ -92,7 +96,6 @@ export class OfficeSignageComponent {
 
     onReviewChange() {
         if (this.formData.signboardReview === 'No') {
-            
             // Initialize resubmit fields when 'No' is selected
             this.formData.resubmitDate = null;
             this.formData.signboardRemarks = '';
@@ -100,102 +103,125 @@ export class OfficeSignageComponent {
     }
 
     fetchDataBasedOnBctaNo() {
-        
         this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
             // Merge API response with initialized formData
             this.formData = {
                 ...this.formData, // Keep initialized values
                 ...res.complianceEntities[0], // Add API data
             };
-            console.log('Updated formData:', this.formData);
         });
     }
 
     fetchSuspendDataBasedOnBctaNo() {
-    //this.bctaNo = this.WorkDetail.data.contractorNo;
-    this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-      (res: any) => {
-        this.formData = {
-                ...this.formData, // Keep initialized values
-                ...res.complianceEntities[0], // Add API data
-            };
-      },
-      (error) => {
-        console.error('Error fetching data:', error);
-      }
-    );
-  }
+        //this.bctaNo = this.WorkDetail.data.contractorNo;
+        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+            (res: any) => {
+                this.formData = {
+                    ...this.formData, // Keep initialized values
+                    ...res.complianceEntities[0], // Add API data
+                };
+            },
+            (error) => {
+                console.error('Error fetching data:', error);
+            }
+        );
+    }
 
-downloadFile(filePath: string): void {
-    this.service.downloadFileFirm(filePath).subscribe(
-        (response: HttpResponse<Blob>) => {
-            const binaryData = [response.body];
-            const mimeType = response.body?.type || 'application/octet-stream';
-            const blob = new Blob(binaryData, { type: mimeType });
-            const blobUrl = window.URL.createObjectURL(blob);
+    downloadFile(filePath: string): void {
+        const sanitizedPath = filePath.replace(/\s+/g, ' ');
+        this.service.downloadFileFirm(sanitizedPath).subscribe(
+            (response: HttpResponse<Blob>) => {
+                const binaryData = [response.body];
+                const mimeType =
+                    response.body?.type || 'application/octet-stream';
+                const blob = new Blob(binaryData, { type: mimeType });
+                const blobUrl = window.URL.createObjectURL(blob);
 
-            const fileName = this.extractFileName(filePath);
-            const isImage = mimeType.startsWith('image/'); // Check if the file is an image
+                // Ensure filename is properly extracted and decoded
+                const fileName = this.extractFileName(filePath);
+                const isImage = mimeType.startsWith('image/');
 
-            const newWindow = window.open('', '_blank', 'width=800,height=600');
-            if (newWindow) {
-                newWindow.document.write(`
+                const newWindow = window.open(
+                    '',
+                    '_blank',
+                    'width=800,height=600'
+                );
+                if (newWindow) {
+                    newWindow.document.write(`
                     <html>
                         <head>
                             <title>File Preview</title>
                         </head>
                         <body style="margin:0; text-align: center;">
                             <div style="padding:10px;">
-                                <a href="${blobUrl}" download="${fileName}" style="font-size:16px; color:blue;" target="_blank">⬇ Download File</a>
+                                <a href="${blobUrl}" download="${fileName}" 
+                                   style="font-size:16px; color:blue;" 
+                                   target="_blank">⬇ Download ${fileName}</a>
                             </div>
-                            ${isImage
-                                ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
-                                : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`}
+                            ${
+                                isImage
+                                    ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
+                                    : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`
+                            }
                         </body>
                     </html>
                 `);
 
-                // Delay the revoke to give browser time to load
-                setTimeout(() => {
-                    window.URL.revokeObjectURL(blobUrl);
-                }, 10000);
-            } else {
-                console.error('Failed to open the new window');
+                    // Clean up after window is closed
+                    newWindow.onbeforeunload = () => {
+                        window.URL.revokeObjectURL(blobUrl);
+                    };
+                } else {
+                    console.error('Failed to open the new window');
+                    // Fallback to direct download if window fails to open
+                    this.forceDownload(blob, fileName);
+                }
+            },
+            (error: HttpErrorResponse) => {
+                if (error.status === 404) {
+                    console.error('File not found', error);
+                    this.showErrorMessage();
+                }
             }
-        },
-        (error: HttpErrorResponse) => {
-            if (error.status === 404) {
-                console.error('File not found', error);
-                this.showErrorMessage();
-            }
+        );
+    }
+
+    // Improved filename extraction
+    private extractFileName(filePath: string): string {
+        try {
+            // Handle URL encoded paths
+            const decodedPath = decodeURIComponent(filePath);
+            // Extract filename and remove any query parameters
+            return decodedPath.split('/').pop()?.split('?')[0] || 'download';
+        } catch {
+            return filePath.split('/').pop() || 'download';
         }
-    );
-}
+    }
 
-
-
-extractFileName(filePath: string): string {
-    return (
-        filePath.split('/').pop() ||
-        filePath.split('\\').pop() ||
-        'downloaded-file'
-    );
-}
+    // Fallback direct download method
+    private forceDownload(blob: Blob, fileName: string) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 100);
+    }
 
     isOfficeSignboardEnabled(): boolean {
-        return [
-            'Resubmitted OS',
-            'Resubmitted OS and PFS',
-            'Submitted',
-        ].includes(this.applicationStatus);
+        return ['Resubmitted OS and PFS', 'Submitted'].includes(
+            this.applicationStatus
+        );
     }
 
     isFilingSystemEnabled(): boolean {
-        return [
-            'Resubmitted PFS',
-            'Resubmitted OS and PFS',
-            'Submitted',
-        ].includes(this.applicationStatus);
+        return ['Resubmitted OS and PFS', 'Submitted'].includes(
+            this.applicationStatus
+        );
     }
 
     isOhsEnabled(): boolean {
@@ -288,7 +314,6 @@ extractFileName(filePath: string): string {
     id: any;
     saveAndNext() {
         this.isSaving = true;
-
         const payload = {
             consultantRegistrationDto: {
                 bctaNo: this.data.consultantNo,
@@ -307,13 +332,6 @@ extractFileName(filePath: string): string {
                 osremarks: this.formData.signboardRemarks,
                 fsremarks: this.formData.filingRemarks,
                 fsresubmitDeadline: this.formData.filingResubmitDate,
-                reviewDate: '',
-                hrFulfilled: '',
-                hrResubmitDeadline: '',
-                hrRemarks: '',
-                eqFulfilled: '',
-                eqResubmitDeadline: '',
-                eqRemarks: '',
             },
         };
 
@@ -326,8 +344,6 @@ extractFileName(filePath: string): string {
                         ? JSON.parse(response)
                         : response;
                 this.id = parsedResponse.consultantRegistrationDto.id;
-                console.log('this.id', this.id);
-                //  this.id = res.registrationReview.id
                 this.activateTab.emit({
                     id: this.id,
                     tab: 'consultancyEmployee',
@@ -362,8 +378,6 @@ extractFileName(filePath: string): string {
         }
 
         if (this.selectedAction.actionType === 'cancel') {
-            console.log('Cancel action initiated.');
-
             // Collect all unchecked, previously pre-checked classifications
             const downgradeEntries: any[] = [];
             this.downgradeList.forEach((entry) => {
@@ -376,9 +390,6 @@ extractFileName(filePath: string): string {
                     }
                 });
             });
-
-            console.log('Downgrade entries:', downgradeEntries);
-
             if (downgradeEntries.length === 0) {
                 Swal.fire(
                     'Error',
@@ -387,15 +398,11 @@ extractFileName(filePath: string): string {
                 );
                 return;
             }
-
             const payload = {
                 consultantId: this.formData.firmType.consultantId,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
             };
-
-            console.log('Downgrade payload:', payload);
-
             this.service.downgradeConsultancy(payload).subscribe({
                 next: (res: string) => {
                     console.log('Downgrade response:', res);
@@ -431,8 +438,6 @@ extractFileName(filePath: string): string {
                 },
             });
         } else if (this.selectedAction.actionType === 'suspend') {
-            console.log('Suspend action initiated.');
-
             const payload = {
                 firmNo: this.formData.firmType.consultantNo,
                 suspendedBy: this.authService.getUsername(),
@@ -442,9 +447,6 @@ extractFileName(filePath: string): string {
                 firmType: 'Consultant',
                 suspendDetails: this.selectedAction.remarks,
             };
-
-            console.log('Suspend payload:', payload);
-
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {
                     console.log('Suspend response:', res);
@@ -462,58 +464,36 @@ extractFileName(filePath: string): string {
             });
         }
     }
-
-
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row,
-            firmType: 'consultant',
-            licenseStatus: 'Active',
-        };
-
-        const approvePayload = {
-            firmType: 'Consultant',
-            cdbNos: row,
-        };
-
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
-                    this.closeModal();
-                } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
-                }
-                this.router.navigate(['/monitoring/consultancy']);
-                this.closeModal();
+   rejectApplication() {
+          this.service.rejectApplication('consultant',this.data.consultantNo).subscribe(
+            (response: any) => {
+              console.log('Application rejected successfully:', response);
+              this.createNotification(
+                'success',
+                'Success',
+                'Application rejected successfully'
+              );
+              this.closeModal();
+              this.router.navigate(['monitoring/construction']);
             },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
-    }
+            (error) => {
+              console.error('Error rejecting application:', error);
+              this.createNotification(
+                'error',
+                'Error',
+                'Failed to reject application'
+              );
+            }
+          )
+        }
+createNotification(
+  type: 'success' | 'error' | 'info' | 'warning',
+  title: string,
+  message: string
+): void {
+  this.notification[type](title, message).onClick.subscribe(() => {
+  });
+}
     emptyHrFulfilledMsg: string = '';
 
     onActionTypeChange() {

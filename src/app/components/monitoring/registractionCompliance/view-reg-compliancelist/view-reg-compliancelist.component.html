@@ -18,7 +18,7 @@
         </div>
 
         <div class="col-md-8 text-end">
-            <button type="button" class="btn btn-primary" data-bs-toggle="modal"
+            <button type="button" class="btn btn-primary mr-2" data-bs-toggle="modal"
                 data-bs-target="#constructionFirmModal">
                 <span class="pi pi-bell"></span>
                 Send Mass Notification
@@ -27,8 +27,8 @@
     </div>
 
     <div class="row">
-        <div class="col d-flex pl-4">
-            <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
+        <div class="col d-flex">
+            <p class="text-gray-600">Items Per Page</p>
             <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
                 style="border-color: #ced4da;">
                 <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
@@ -36,7 +36,7 @@
         </div>
         <div class="col-lg-7 d-flex justify-content-end pr-2">
             <p class="mr-1 p-1 text-gray-600">Search By : </p>
-            <input type="text" placeholder=" BCTA No or Application Status" class="form-control form-control-sm col-md-4"
+            <input type="text" placeholder=" BCTA No or Application Status" class="form-control form-control-sm col-md-4 mr-3"
                 id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
         </div>
     </div>
@@ -73,8 +73,7 @@
                             'text-secondary': data.applicationStatus== 'Not Submitted',
                             'text-warning': data.applicationStatus== 'In Process'  || data.applicationStatus== 'Suspension Request' || data.applicationStatus== 'Cancel Request'|| data.applicationStatus== 'Downgrade Request' || data.applicationStatus== 'Pending',
                             'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus== 'Downgrade Approved' || data.applicationStatus== 'Cancel Approved',
-                            'text-primary': data.applicationStatus== 'Submitted'
-                                            || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission',
+                            'text-primary': data.applicationStatus== 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Submitted' || data.applicationStatus === 'Suspension Resubmission',
                             }">
                             {{ data.applicationStatus }}
                         </span>
@@ -136,7 +135,7 @@
         </nav> -->
         <div *ngIf="tableData" class="justify-content-start mb--3">
             <div
-                class="d-flex font-bold font-size-12 justify-content-between justify-content-start ml-2 mt-7 font-size-12 font-bold ml-2">
+                class="d-flex font-bold font-size-12 justify-content-between justify-content-start mt-5 font-size-12 font-bold ml-2">
                 <p>{{ calculateOffset() }}</p>
                 <div class="d-flex justify-content-end m-3 mr-0 m-lg--5">
                     <div *ngIf="tableData" class="Page navigation">

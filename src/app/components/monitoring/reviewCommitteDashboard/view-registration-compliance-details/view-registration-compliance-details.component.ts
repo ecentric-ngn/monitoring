@@ -275,12 +275,12 @@ onCheckboxChange(changedAction: any): void {
   }
 
   if (changedAction.selected) {
-    if (!this.selectedContractorNumbers.includes(changedAction.firmId || changedAction.id)) {
-      this.selectedContractorNumbers.push(changedAction.firmId || changedAction.id);
+    if (!this.selectedContractorNumbers.includes(changedAction.firmId || changedAction.id || changedAction.contractorNo)) {
+      this.selectedContractorNumbers.push(changedAction.firmId || changedAction.id || changedAction.contractorNo);
     }
   } else {
     this.selectedContractorNumbers = this.selectedContractorNumbers.filter(
-      id => id !== changedAction.firmId || id !== changedAction.id
+      id => id !== changedAction.firmId || id !== changedAction.id || changedAction.contractorNo
     );
   }
 }
@@ -372,7 +372,7 @@ endorse(): void {
    cdbNos: this.selectedContractorNumbers.map(item => item.toString()), 
     firmType: this.firmTypesssss
   };
-
+debugger
   // First API call - Endorse in Monitoring System
   this.service.endorseApplications(endorsePayload).subscribe({
     next: (endorseResponse: string) => {
@@ -386,6 +386,7 @@ endorse(): void {
           this.selectedIds = [];
           this.selectedContractorNumbers = [];
           this.isLoading = false;
+          this.formData.remarks = '';
        this.closeRemarkButton.nativeElement.click();
 
           Swal.fire({
@@ -483,6 +484,8 @@ private handleError(operation: string, error: any): void {
              this.getReportList(this.searchQuery);
           }else if (type == 'Cancel'){
             this.getCancelList(this.searchQuery);
+          }else if (type == 'downgrade'){
+            this.getDownGradeList(this.searchQuery);
           }
            
         } else {
@@ -587,13 +590,14 @@ getDownGradeList(searchQuery?: string) {
           fromTo: `${oldClassification}${newClassification}`,
           initiatedBy: item.requestedBy || '-',
           initiatedDate: item.requestedOn || '',
-          status: item.status || 'PENDING',
+          status: item.status,
           actionType: '',
           selected: false
         };
       });
       this.filteredApplications = [...this.tableData];
-      this.totalCount = this.tableData.length;
+      this.totalCount = this.filteredApplications.length;
+      console.log('Filtered Applications:', this.totalCount);
       this.isLoading = false;
        this.showCancelTable = false
     },
@@ -622,6 +626,7 @@ DownGrade(): void {
       this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
        this.getDownGradeList();
       this.selectedIds = [];
+      this.formData.remarks = '';
        this.closeRemarkButton.nativeElement.click();
       Swal.fire('Success', 'Operation completed', 'success');
     },
@@ -664,12 +669,12 @@ activeAction: 'cancel' | 'downgrade' | 'Suspended' | 'rejected' | null = null;
 get modalTitle(): string {
   switch (this.activeAction) {
     case 'cancel':
-      return 'Cancellation Remarks';
+      return 'Remarks';
     case 'downgrade':
-      return 'Downgrade Remarks';
+      return 'Remarks';
     case 'Suspended':
     case 'rejected':
-      return 'Suspend Remarks';
+      return 'Remarks';
     default:
       return '';
   }
@@ -728,6 +733,7 @@ cancelAppNo(): void {
           this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
           this.getCancelList();
           this.selectedIds = [];
+          this.formData.remarks = '';
           this.selectedContractorNumbers = [];
           this.isLoading = false;
           this.closeRemarkButton.nativeElement.click();

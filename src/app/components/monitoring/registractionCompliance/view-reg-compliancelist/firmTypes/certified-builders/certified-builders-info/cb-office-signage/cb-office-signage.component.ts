@@ -6,6 +6,7 @@ import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import { forkJoin } from 'rxjs';
 import { AuthServiceService } from '../../../../../../../../auth.service';
 declare var bootstrap: any;
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 @Component({
     selector: 'app-cb-office-signage',
     templateUrl: './cb-office-signage.component.html',
@@ -13,7 +14,7 @@ declare var bootstrap: any;
 })
 export class CbOfficeSignageComponent {
     formData: any = {};
-    @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
+    @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
     bctaNo: any;
     data: any;
     applicationStatus: string = '';
@@ -36,13 +37,12 @@ export class CbOfficeSignageComponent {
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+        private notification: NzNotificationService,
     ) {}
 
     ngOnInit() {
         const WorkDetail = this.service.getData('BctaNo');
-        console.log('Retrieved WorkDetail:', WorkDetail);
-
         if (!WorkDetail || !WorkDetail.data) {
             console.error('WorkDetail or WorkDetail.data is undefined');
             return;
@@ -50,10 +50,12 @@ export class CbOfficeSignageComponent {
         this.formData.firmType = WorkDetail.data;
         this.data = WorkDetail.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
-        console.log('applicationStatus', this.applicationStatus);
         this.licenseStatus = WorkDetail.data.licenseStatus;
         this.bctaNo = WorkDetail.data.certifiedBuilderNo;
-        if (this.bctaNo && this.applicationStatus === 'Suspension Resubmission') {
+        if (
+            this.bctaNo &&
+            this.applicationStatus === 'Suspension Resubmission'
+        ) {
             this.fetchSuspendDataBasedOnBctaNo();
         } else {
             this.fetchDataBasedOnBctaNo();
@@ -65,18 +67,47 @@ export class CbOfficeSignageComponent {
             Object.assign(this.formData, res.complianceEntities[0]);
         });
     }
-    rejectApplication() {}
+       rejectApplication() {
+          this.service.rejectApplication('certified-Builder',this.data.certifiedBuilderNo).subscribe(
+            (response: any) => {
+              console.log('Application rejected successfully:', response);
+              this.createNotification(
+                'success',
+                'Success',
+                'Application rejected successfully'
+              );
+              this.closeModal();
+              this.router.navigate(['monitoring/construction']);
+            },
+            (error) => {
+              console.error('Error rejecting application:', error);
+              this.createNotification(
+                'error',
+                'Error',
+                'Failed to reject application'
+              );
+            }
+          )
+        }
+createNotification(
+  type: 'success' | 'error' | 'info' | 'warning',
+  title: string,
+  message: string
+): void {
+  this.notification[type](title, message).onClick.subscribe(() => {
+  });
+}
 
     fetchSuspendDataBasedOnBctaNo() {
-    this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-      (res: any) => {
-        Object.assign(this.formData, res.complianceEntities[0]);
-      },
-      (error) => {
-        console.error('Error fetching data:', error);
-      }
-    );
-  }
+        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+            (res: any) => {
+                Object.assign(this.formData, res.complianceEntities[0]);
+            },
+            (error) => {
+                console.error('Error fetching data:', error);
+            }
+        );
+    }
     openActionModal(row: any) {
         this.selectedAction = {
             actionType: '',
@@ -108,15 +139,17 @@ export class CbOfficeSignageComponent {
         }
     }
 
-    // Handle file download and preview logic
     downloadFile(filePath: string): void {
-        this.service.downloadFileFirm(filePath).subscribe(
+        const sanitizedPath = filePath.replace(/\s+/g, ' ');
+        this.service.downloadFileFirm(sanitizedPath).subscribe(
             (response: HttpResponse<Blob>) => {
                 const binaryData = [response.body];
                 const mimeType =
                     response.body?.type || 'application/octet-stream';
                 const blob = new Blob(binaryData, { type: mimeType });
                 const blobUrl = window.URL.createObjectURL(blob);
+
+                // Ensure filename is properly extracted and decoded
                 const fileName = this.extractFileName(filePath);
                 const isImage = mimeType.startsWith('image/');
 
@@ -127,24 +160,33 @@ export class CbOfficeSignageComponent {
                 );
                 if (newWindow) {
                     newWindow.document.write(`
-                           <html>
-                               <head><title>File Preview</title></head>
-                               <body style="margin:0; text-align: center;">
-                                   <div style="padding:10px;">
-                                       <a href="${blobUrl}" download="${fileName}" style="font-size:16px; color:blue;" target="_blank">⬇ Download File</a>
-                                   </div>
-                                   ${
-                                       isImage
-                                           ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
-                                           : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`
-                                   }
-                               </body>
-                           </html>
-                       `);
-                    setTimeout(
-                        () => window.URL.revokeObjectURL(blobUrl),
-                        10000
-                    );
+                    <html>
+                        <head>
+                            <title>File Preview</title>
+                        </head>
+                        <body style="margin:0; text-align: center;">
+                            <div style="padding:10px;">
+                                <a href="${blobUrl}" download="${fileName}" 
+                                   style="font-size:16px; color:blue;" 
+                                   target="_blank">⬇ Download ${fileName}</a>
+                            </div>
+                            ${
+                                isImage
+                                    ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
+                                    : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`
+                            }
+                        </body>
+                    </html>
+                `);
+
+                    // Clean up after window is closed
+                    newWindow.onbeforeunload = () => {
+                        window.URL.revokeObjectURL(blobUrl);
+                    };
+                } else {
+                    console.error('Failed to open the new window');
+                    // Fallback to direct download if window fails to open
+                    this.forceDownload(blob, fileName);
                 }
             },
             (error: HttpErrorResponse) => {
@@ -156,13 +198,30 @@ export class CbOfficeSignageComponent {
         );
     }
 
-    // Extract filename from full path
-    extractFileName(filePath: string): string {
-        return (
-            filePath.split('/').pop() ||
-            filePath.split('\\').pop() ||
-            'downloaded-file'
-        );
+    // Improved filename extraction
+    private extractFileName(filePath: string): string {
+        try {
+            // Handle URL encoded paths
+            const decodedPath = decodeURIComponent(filePath);
+            // Extract filename and remove any query parameters
+            return decodedPath.split('/').pop()?.split('?')[0] || 'download';
+        } catch {
+            return filePath.split('/').pop() || 'download';
+        }
+    }
+
+    // Fallback direct download method
+    private forceDownload(blob: Blob, fileName: string) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 100);
     }
     submitAction() {
         if (
@@ -183,9 +242,6 @@ export class CbOfficeSignageComponent {
                 firmType: 'certified-builder',
                 reason: this.selectedAction.remarks,
             };
-            ;
-            console.log('payload..........', payload);
-            // Call cancel API
             this.service.cancelFirm(payload).subscribe({
                 next: (res) => {
                     Swal.fire(
@@ -230,55 +286,7 @@ export class CbOfficeSignageComponent {
         }
     }
 
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row,
-            firmType: 'certified-builder',
-            licenseStatus: 'Active',
-        };
-
-        const approvePayload = {
-            firmType: 'CertifiedBuilder',
-            cdbNos: row,
-        };
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
-                    this.closeModal();
-                } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
-                }
-                this.router.navigate(['/monitoring/certified']);
-                this.closeModal();
-            },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
-    }
+  
     bsModal: any;
     closeModal() {
         if (this.bsModal) {
@@ -341,17 +349,15 @@ export class CbOfficeSignageComponent {
     }
 
     isOfficeSignboardEnabled(): boolean {
-        return [
-            'Resubmitted OS and PFS',
-            'Submitted',
-        ].includes(this.applicationStatus);
+        return ['Resubmitted OS and PFS', 'Submitted'].includes(
+            this.applicationStatus
+        );
     }
 
     isFilingSystemEnabled(): boolean {
-        return [
-            'Resubmitted OS and PFS',
-            'Submitted',
-        ].includes(this.applicationStatus);
+        return ['Resubmitted OS and PFS', 'Submitted'].includes(
+            this.applicationStatus
+        );
     }
 
     isOhsEnabled(): boolean {
@@ -373,7 +379,7 @@ export class CbOfficeSignageComponent {
     //             return false;
     //     }
     // }
-isFieldEditable
+    isFieldEditable;
     update() {
         this.isSaving = true;
         const payload = {
@@ -451,12 +457,7 @@ isFieldEditable
                 fsreview: this.formData.filingReview,
                 fsremarks: this.formData.fsRemarks,
                 reviewDate: this.formData.reviewDate,
-                hrFulfilled: '',
-                hrResubmitDeadline: '',
-                hrRemarks: '',
-                eqFulfilled: '',
-                eqResubmitDeadline: '',
-                eqRemarks: '',
+              
             },
         };
         this.service.saveOfficeSignageAndDocCB(payload).subscribe(
@@ -470,7 +471,7 @@ isFieldEditable
                 // this.service.setData(this.id, 'tableId', 'yourRouteValueHere');
                 console.log('this.id', this.id);
                 //  this.id = res.registrationReview.id
-                this.activateTab.emit({ id: this.id, tab: 'cbEmployee' });
+                this.activateTab.emit({ id: this.id,data: this.data, tab: 'cbEmployee' });
             },
             (error) => {
                 this.isSaving = false;

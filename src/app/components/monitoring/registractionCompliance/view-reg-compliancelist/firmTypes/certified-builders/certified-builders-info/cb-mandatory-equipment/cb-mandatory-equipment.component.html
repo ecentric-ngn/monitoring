@@ -1,6 +1,6 @@
 <div class="scroll-wrapper">
 
-  <div class="m-4">
+  <div class="ml-4">
 
     <table class="table table-bordered table-striped">
       <thead>
@@ -30,6 +30,14 @@
             <td>{{ data.chassisNumber }}</td>
             <td>-</td>
             <td>-</td>
+             <td class="text-center bg-white">
+              <a *ngIf="data.filePath" (click)="downloadFile(data.filePath)" class="btn" style="cursor: pointer;">
+                <i class="pi pi-download"></i>
+              </a>
+            </td>
+              <td>
+              <button class="btn btn-info btn-sm" (click)="getVehicleData(data)" data-bs-toggle="modal" data-bs-target="#exampleModal">Verify</button>
+            </td>
           </ng-container>
 
           <!-- Not Registered -->
@@ -80,7 +88,7 @@
 
       </div>
 
-      <div class="col-md-12 mb-3" *ngIf="tData.fulfillsRequirement === 'Yes'">
+      <div class="col-md-12 mb-3 col-md-12 mb-3 ml--3 mt-3" *ngIf="tData.fulfillsRequirement === 'Yes'">
         <label class="form-label">Remarks</label>
         <textarea class="form-control form-control-sm" rows="2" name="remarks" [(ngModel)]="tData.remarks"></textarea>
       </div>
@@ -111,7 +119,7 @@
         </button>
 
         <!-- Action -->
-        <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR and EQ'" (click)="openActionModal(applicationStatus)">
+        <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'No'" (click)="openActionModal(applicationStatus)">
           Action
         </button>
 
@@ -178,6 +186,59 @@
           <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Vehicle Details </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+        <div class="modal-body">
+        <div class="certificate-container border">
+          <img src="../../assets/logo.png" alt="Background Logo" class="background-logo">
+          <div class="content">
+            <div class="header">
+              <div class="subtitle">Bhutan Construction and Transport Authority - BCTA</div>
+            </div>
+
+             <!-- <p *ngIf="!VehicleDetails && !showMessage" class="text-danger text-center">
+              <b>{{showMessage}}</b>
+            </p>
+            <p *ngIf="showMessage" class="text-danger text-center">
+              <b>{{showMessage}}</b>
+            </p> -->
+           <p *ngIf="showErrorMessage" class="text-danger text-center">
+              <b>{{showErrorMessage}}</b>
+            </p> 
+
+            <div *ngIf="VehicleDetails && !showErrorMessage">
+              <table class="table col-lg-7 offset-lg-3 font-size-14">
+                <tr><th>Registration No :</th><td>{{VehicleDetails.vehicleNumber}}</td></tr>
+                <tr><th>Owner:</th><td>{{VehicleDetails.ownerName}}</td></tr>
+                <tr><th>Vehicle Type:</th><td>{{VehicleDetails.vehicleTypeName}}</td></tr>
+                <tr><th>Vehicle Model:</th><td>{{VehicleDetails.vehicleModel}}</td></tr>
+                <tr><th>Chassis Number :</th><td>{{VehicleDetails.chassisNumber}}</td></tr>
+                <tr><th>Engine Number:</th><td>{{VehicleDetails.engineNumber}}</td></tr>
+                <tr><th>Expiry Date:</th><td>{{VehicleDetails.expiryDate}}</td></tr>
+              </table>
+            </div>
+
+            <!-- <table class="table col-lg-8 offset-lg-2">
+              <tr>
+                <th *ngIf="!employeeEngaged" colspan="2" class="text-center text-success">This Equipment is not engaged in any work or project.</th>
+                <th *ngIf="employeeEngaged" colspan="2" class="text-center text-danger">This Equipment is engaged in work.</th>
+              </tr>
+            </table> -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>

@@ -13,6 +13,8 @@
           <th>Remarks</th>
           <th>Equipment Type*</th>
           <th>Number of equipment(s)</th>
+          <th>Document</th>
+          <th>Action</th>
         </tr>
       </thead>
       <tbody>
@@ -39,6 +41,15 @@
             <td>{{ data.chassisNumber }}</td>
             <td>{{ data.vehicleType }}</td>
             <td>{{ data.engineNumber }}</td>
+            <td class="text-center bg-white">
+              <a *ngIf="data.filePath" (click)="downloadFile(data.filePath)" class="btn" style="cursor: pointer;">
+                <i class="pi pi-download"></i>
+              </a>
+            </td>
+            <td>
+              <button class="btn btn-info btn-sm" (click)="getVehicleData(data)" data-bs-toggle="modal"
+                data-bs-target="#exampleModal">Verify</button>
+            </td>
           </ng-template>
         </tr>
 
@@ -61,7 +72,8 @@
           Please select if the requirement is fulfilled
         </div>
       </div>
-      <div class="row m-0 mt-5" *ngIf="tData.fulfillsRequirement === 'No' && applicationStatus !== 'Resubmitted HR and EQ'">
+      <div class="row m-0 mt-5"
+        *ngIf="tData.fulfillsRequirement === 'No' && applicationStatus !== 'Resubmitted HR and EQ' && applicationStatus !== 'Suspension Resubmission'">
         <div class="col-md-4 mb-3">
           <label class="form-label">
             Last Date to Resubmit:<span class="text-danger font-size-12">*</span>
@@ -96,39 +108,37 @@
             Save & Forward
           </button>
           <button (click)="saveAndNext()" type="submit" class="btn btn-success"
-            *ngIf="tData.fulfillsRequirement === 'Yes'" [disabled]="isSaving">
+            *ngIf="tData.fulfillsRequirement === 'Yes' && (applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission')"
+            [disabled]="isSaving">
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"
               aria-hidden="true"></span>
             Save & Next
           </button>
+
         </ng-container>
 
         <!-- Update Button -->
-        <button type="submit" class="btn btn-success" (click)="update()" *ngIf="applicationStatus === 'Resubmitted HR and EQ'"
+        <button type="submit" class="btn btn-success" (click)="update()"
+          *ngIf="(applicationStatus === 'Resubmitted HR and EQ') && tData.fulfillsRequirement === 'Yes'"
           [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Update
         </button>
 
+
         <!-- Action Button -->
-        <button  type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
-          data-bs-target="#staticBackdropss" *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'No'">
+        <button type="button" class="btn btn-primary" (click)="onClick()" data-bs-toggle="modal"
+          data-bs-target="#staticBackdropss"
+          *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'No'">
           Action
         </button>
-
-        <!-- Reinstate Button -->
-        <!-- <button *ngIf="WorkDetail?.licenseStatus === 'Suspended'" class="btn btn-danger"
-          (click)="getReinstateApplication(data.contractorNo)" data-bs-toggle="modal" data-bs-target="#reinstateModal">
-          Reinstate
-        </button> -->
-         <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
-                        (nzOnConfirm)="reinstate(bctaNo)">
-                        <button class="btn btn-danger h-100" *ngIf="WorkDetail?.licenseStatus === 'Suspension Resubmission'">
-                            Reinstate
-                        </button>
-                    </a>
+        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reject the application?'"
+          (nzOnConfirm)="rejectApplication()">
+          <button class="btn btn-danger h-100" *ngIf="applicationStatus === 'Suspension Resubmission'">
+            Reject
+          </button>
+        </a>
       </div>
-
     </form>
   </div>
 </div>
@@ -177,6 +187,10 @@
                 </tr>
               </thead>
               <tbody>
+                <tr *ngIf="downgradeList.length === 0">
+                  <td colspan="2" class="text-center text-muted">No data available</td>
+                </tr>
+
                 <tr *ngFor="let downgrade of downgradeList; trackBy: trackByWorkCategory">
                   <td>{{ downgrade.workCategory }}</td>
                   <td>
@@ -195,10 +209,86 @@
         </div>
 
         <div class="modal-footer">
-          <button type="button" class="btn btn-danger" (click)="closeModal()" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-danger" #closeActionModal (click)="closeModal()"
+            data-bs-dismiss="modal">Cancel</button>
           <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
         </div>
       </form>
+    </div>
+  </div>
+</div>
+
+
+<div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="exampleModalLabel">Vehicle Details </h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="certificate-container border">
+          <img src="../../assets/logo.png" alt="Background Logo" class="background-logo">
+          <div class="content">
+            <div class="header">
+              <div class="subtitle">Bhutan Construction and Transport Authority - BCTA</div>
+            </div>
+
+            <!-- <p *ngIf="!VehicleDetails && !showMessage" class="text-danger text-center">
+              <b>{{showMessage}}</b>
+            </p>
+            <p *ngIf="showMessage" class="text-danger text-center">
+              <b>{{showMessage}}</b>
+            </p> -->
+            <p *ngIf="showErrorMessage" class="text-danger text-center">
+              <b>{{showErrorMessage}}</b>
+            </p>
+
+            <div *ngIf="VehicleDetails && !showErrorMessage">
+              <table class="table col-lg-7 offset-lg-3 font-size-14">
+                <tr>
+                  <th>Registration No :</th>
+                  <td>{{VehicleDetails.vehicleNumber}}</td>
+                </tr>
+                <tr>
+                  <th>Owner:</th>
+                  <td>{{VehicleDetails.ownerName}}</td>
+                </tr>
+                <tr>
+                  <th>Vehicle Type:</th>
+                  <td>{{VehicleDetails.vehicleTypeName}}</td>
+                </tr>
+                <tr>
+                  <th>Vehicle Model:</th>
+                  <td>{{VehicleDetails.vehicleModel}}</td>
+                </tr>
+                <tr>
+                  <th>Chassis Number :</th>
+                  <td>{{VehicleDetails.chassisNumber}}</td>
+                </tr>
+                <tr>
+                  <th>Engine Number:</th>
+                  <td>{{VehicleDetails.engineNumber}}</td>
+                </tr>
+                <tr>
+                  <th>Expiry Date:</th>
+                  <td>{{VehicleDetails.expiryDate}}</td>
+                </tr>
+              </table>
+            </div>
+
+            <!-- <table class="table col-lg-8 offset-lg-2">
+              <tr>
+                <th *ngIf="!employeeEngaged" colspan="2" class="text-center text-success">This Equipment is not engaged in any work or project.</th>
+                <th *ngIf="employeeEngaged" colspan="2" class="text-center text-danger">This Equipment is engaged in work.</th>
+              </tr>
+            </table> -->
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
     </div>
   </div>
 </div>

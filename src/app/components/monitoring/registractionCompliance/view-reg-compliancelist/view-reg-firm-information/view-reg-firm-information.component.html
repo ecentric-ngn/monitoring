@@ -1,5 +1,5 @@
 <div class="container-fluid">
- <button type="button" class="btn pi pi-arrow-circle-left text-white" (click)="goBack()" style="background: #48546c;">
+ <button type="button" class="btn btn-primary btn btn-primary pi pi-arrow-circle-left" (click)="goBack()">
     <span class="text-white">Back</span> 
   </button>
 </div>
@@ -149,5 +149,5 @@
      [class.show]="true"
      [class.active]="true"
      id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
-  <p><app-monitoring-team-users [id]="id"></app-monitoring-team-users></p>
+  <p><app-monitoring-team-users [id]="id" [data]="data"></app-monitoring-team-users></p>
 </div>
