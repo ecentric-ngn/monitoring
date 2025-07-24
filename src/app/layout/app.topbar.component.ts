@@ -62,7 +62,7 @@ export class AppTopBarComponent {
     }
     const encrypted = CryptoJS.AES.encrypt(userDetails, environment.encryptionKey).toString();
     return encodeURIComponent(encrypted);
-  }
+  }zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
   backToPortal() {
     const encryptedData = this.getEncryptedUserDetails();
     if (!encryptedData) return;

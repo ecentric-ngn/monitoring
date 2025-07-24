@@ -747,7 +747,7 @@ export class CommittedEquipmentComponent {
                 equipmentName: item.name,
                 registrationNumber: item.registrationNo,
                 remarks: this.formData.remarks,
-                status: matchedForm?.status,
+                status: item?.status,
                 isRegistered: matchedForm?.isRegistered,
                 vehicleType: item.vehicleType,
                 equipmentType:

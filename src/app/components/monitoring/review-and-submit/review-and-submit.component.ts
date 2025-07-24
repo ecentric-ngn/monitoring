@@ -31,6 +31,7 @@ export class ReviewAndSubmitComponent {
     pageSize: number = 100;
     fileAndRemark: any = [];
      set_limit: number[] = [10, 15, 25, 100];
+    contractorsList: any;
     constructor(private service: CommonService, private router: Router) {}
 
     ngOnInit() {
@@ -44,6 +45,7 @@ export class ReviewAndSubmitComponent {
             this.getSiteMonitoringTeamList();
             this.getCommitedEquipmentList();
             this.getSkilledWorkerList();
+            this.getDatabasedOnChecklistId();
         }
         // this.getAllData();
         // this.gethumanResourceList();
@@ -64,7 +66,34 @@ export class ReviewAndSubmitComponent {
     toggleReplace(index: number): void {
         this.showReplacMap[index] = !this.showReplacMap[index];
     }
+   getDatabasedOnChecklistId() {
+    const payload: any = [
+        {
+            field: 'checklist_id',
+            value: this.tableId,
+            operator: 'AND',
+            condition: '=',
+        },
+           {
+        field: 'workid',
+        value: this.workId,
+        operator: 'AND',
+        condition: '=',
+        },
+    ];
 
+    this.service
+        .fetchDetails(payload, 1, 100, 'contractorPresentduringmonitoring_view') // increase limit if needed
+        .subscribe({
+            next: (response: any) => {
+                this.contractorsList = response.data;
+               
+            },
+            error: (error) => {
+                console.error('Error fetching contractor details:', error);
+            },
+        });
+}
     gethumanResourceList() {
         const payload: any = [
             {
@@ -482,41 +511,61 @@ export class ReviewAndSubmitComponent {
     //         }
     //     );
     // }
-    submitAllData() {
-        this.service.generateApplicationNo(this.tableId).subscribe(
-            (response: any) => {
-                const parsedResponse =
-                    typeof response === 'string'
-                        ? JSON.parse(response)
-                        : response;
-                this.applicationNumber =
-                    parsedResponse.checklistsInfo.applicationNumber;
+    isSubmitting: boolean = false;
+   submitAllData() {
+    this.isSubmitting = true;
+    
+    this.service.generateApplicationNo(this.tableId).subscribe({
+        next: (response: any) => {
+            this.isSubmitting = false;
+            
+            try {
+                const parsedResponse = typeof response === 'string' 
+                    ? JSON.parse(response) 
+                    : response;
+                
+                this.applicationNumber = parsedResponse.checklistsInfo?.applicationNumber;
 
                 Swal.fire({
                     icon: 'success',
                     title: 'Submission Successful',
-                    text: `You have successfully submitted. The new application number is: ${this.applicationNumber}`,
+                    text: this.applicationNumber 
+                        ? `You have successfully submitted. The new application number is: ${this.applicationNumber}`
+                        : 'You have successfully submitted.',
+                    confirmButtonText: 'OK',
+                    allowOutsideClick: false
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        // Navigate to review-report-list component
                         this.router.navigate(['viewApplication']);
                     }
                 });
-            },
-            (error: any) => {
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Submission Failed',
-                    text: 'Something went wrong. Please try again.',
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        // Navigate to review-report-list component
-                        // this.router.navigate(['viewApplication']);
-                    }
-                });
-            } // <-- Close error callback
-        ); // <-- Close subscribe call
-    }
+            } catch (parseError) {
+                console.error('Error parsing response:', parseError);
+                this.handleSubmissionError();
+            }
+        },
+        error: (error: any) => {
+            this.isSubmitting = false;
+            console.error('Submission error:', error);
+            
+            Swal.fire({
+                icon: 'error',
+                title: 'Submission Failed',
+                text: error.error?.message || 'Something went wrong. Please try again.',
+                confirmButtonText: 'OK'
+            });
+        }
+    });
+}
+
+private handleSubmissionError() {
+    Swal.fire({
+        icon: 'error',
+        title: 'Submission Error',
+        text: 'There was a problem processing your submission. Please try again.',
+        confirmButtonText: 'OK'
+    });
+}
 
 
     onPreviousClick() {

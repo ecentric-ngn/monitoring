@@ -14,7 +14,7 @@ export class ViewRegFirmInformationComponent implements OnInit {
   activeTabId: string = '';
 WorkDetail: any = {};
 licenseStatus: string = '';
-  data: any;
+  data: any = {};
   constructor(private service: CommonService) { }
 
 ngOnInit(): void {
@@ -87,6 +87,8 @@ goBack() {
        this.data =event.data;
     } else if (this.type === 'monitoring') {
       this.activeTabId = 'monitoring';
+        this.data =event.data;
+        debugger
     } else {
       this.activeTabId = 'office';
     }
@@ -107,6 +109,9 @@ goBack() {
 
   monitoringTeam() {
     this.id = this.id
+     const data = this.WorkDetail
+     this.data = data
+     debugger
     this.activeTabId = 'monitoring';
   }
 }

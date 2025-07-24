@@ -59,11 +59,12 @@ ngOnInit() {
   this.bctaNo = WorkDetail.data.BCTANo || WorkDetail.data.awardedBctaNo || WorkDetail.data.bctaregNumber || WorkDetail.data.awardedBctaNo || WorkDetail.data.other_bcta_no;
   this.workType = WorkDetail.workType;
   this.data = WorkDetail.data;
-  this.tableId = WorkDetail.data.checklist_id;
+  this.tableId = WorkDetail.data.checklist_id || WorkDetail.checklistid;
   this.workId = WorkDetail.data.id || WorkDetail.data.workid;
   this.newContractorId = WorkDetail.newContractorId;
+  this.ownerId = WorkDetail.data;
+  
   this.applicationStatus = WorkDetail.data.applicationStatus;
-  debugger
   if (this.workType === 'OTHERS') {
     this.getContractorDetails();
     this.DisplayonWorkInformationForm();
@@ -83,7 +84,7 @@ getContractorDetails() {
   const payload: any = [
     {
       field: 'id',
-      value: this.newContractorId,
+      value: this.newContractorId || null,
       operator: 'AND',
       condition: '=',
     },
@@ -842,7 +843,7 @@ occupationalHealthAndSaftyTabEnabled: boolean = false;
  onDataSaved(event: { tableId: any, data: any,inspectionType:any }) {
     this.moveToStep(1);
     this.workId = this.workId 
-    debugger
+    
     this.highestCompletedStep = Math.max(this.highestCompletedStep, 1);
     this.tableId = event.tableId;
     this.data = event.data;

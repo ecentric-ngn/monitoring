@@ -33,6 +33,10 @@
                 <label class="form-label me-2 font-size-12">Email Address:</label>
                 <span class="font-size-12">{{applicationStatus || 'N/A'}}</span>
             </div>
+              <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">TPN No:</label>
+                <span class="font-size-12">{{formData?.tpnNumber || 'N/A'}}</span>
+            </div>
         </div>
 
         <div class="container-fluid">
@@ -66,11 +70,20 @@
                     </button>
                 </li>
 
-                <li class="nav-item" role="presentation">
+                <!-- <li class="nav-item" role="presentation">
                     <button (click)="monitoringTeam()" class="nav-link border"
                         [class.active]="activeTabId === 'consultancyMonitoring'" id="monitoring-tab"
                         (click)="setActiveTab('consultancyMonitoring')"
-                        [disabled]=" licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS' || applicationStatus === 'Resubmitted EQ' || applicationStatus === 'Resubmitted HR' || applicationStatus === 'Resubmitted PFS' || applicationStatus === 'Resubmitted OS and PFS')"
+                        [disabled]=" licenseStatus !== 'Suspended'"
+                        type="button" role="tab">
+                        Monitoring Team Users
+                    </button>
+                </li> -->
+                 <li class="nav-item" role="presentation">
+                    <button (click)="monitoringTeam()" class="nav-link border"
+                        [class.active]="activeTabId === 'consultancyMonitoring'" id="monitoring-tab"
+                        (click)="setActiveTab('consultancyMonitoring')"
+                        [disabled]="licenseStatus !== 'Suspended' && (applicationStatus === 'Resubmitted OS and PFS' || applicationStatus === 'Resubmitted HR and EQ')"
                         type="button" role="tab">
                         Monitoring Team Users
                     </button>
@@ -97,7 +110,7 @@
         [class.active]="activeTabId === 'consultancyEmployee'"
         id="employee" role="tabpanel" aria-labelledby="employee-tab">
         <ng-container *ngIf="activeTabId === 'consultancyEmployee'">
-            <app-permanent-employees (activateTab)="onActivateTab($event)" [id]="id"></app-permanent-employees>
+            <app-permanent-employees (activateTab)="onActivateTab($event)" [id]="id" [data]="data"></app-permanent-employees>
         </ng-container>
     </div>
 
@@ -106,7 +119,7 @@
         [class.active]="activeTabId === 'consultancyEquipment'"
         id="equipment" role="tabpanel" aria-labelledby="equipment-tab">
         <ng-container *ngIf="activeTabId === 'consultancyEquipment'">
-            <app-consultancy-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-consultancy-mandatory-equipment>
+            <app-consultancy-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id" [data]="data"></app-consultancy-mandatory-equipment>
         </ng-container>
     </div>
 
@@ -115,7 +128,7 @@
         [class.active]="activeTabId === 'consultancyMonitoring'"
         id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab">
         <ng-container *ngIf="activeTabId === 'consultancyMonitoring'">
-            <app-consultancy-monitoring-team [id]="id"></app-consultancy-monitoring-team>
+            <app-consultancy-monitoring-team [id]="id" [data]="data"></app-consultancy-monitoring-team>
         </ng-container>
     </div>
 </div>

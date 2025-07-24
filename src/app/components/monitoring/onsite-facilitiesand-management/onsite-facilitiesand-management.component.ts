@@ -22,8 +22,8 @@ export class OnsiteFacilitiesandManagementComponent {
         data: any;
         inspectionType: any;
     }>();
-  @Output() previousClicked = new EventEmitter<{ ownerId: any }>();
-    data:any={};
+    @Output() previousClicked = new EventEmitter<{ ownerId: any }>();
+    data: any = {};
     userId: any;
     userName: any;
     @Input() tableId: any;
@@ -51,98 +51,118 @@ export class OnsiteFacilitiesandManagementComponent {
     ) {}
 
     ngOnInit() {
-        
-        console.log('onsitedata');
-    // Get user details from session storage safely
-    const userDetailsString = sessionStorage.getItem('userDetails');
-    if (userDetailsString) {
-        try {
-        const userDetails = JSON.parse(userDetailsString);
-        this.userId = userDetails.userId;
-        this.userName = userDetails.username;
-        } catch (e) {
-        console.error('Error parsing userDetails from sessionStorage', e);
+        // Get user details from session storage safely
+        const userDetailsString = sessionStorage.getItem('userDetails');
+        if (userDetailsString) {
+            try {
+                const userDetails = JSON.parse(userDetailsString);
+                this.userId = userDetails.userId;
+                this.userName = userDetails.username;
+            } catch (e) {
+                console.error(
+                    'Error parsing userDetails from sessionStorage',
+                    e
+                );
+            }
+        }
+        if (this.workType === 'OTHERS') {
+            this.appNoStatus =
+                this.workInformationdata?.applicationStatus || null;
+            this.prevTableId =
+                this.prevTableId ||
+                this.workInformationdata?.checklist_id ||
+                null;
+            this.data = this.datas || this.workInformationdata;
+        } else {
+            const WorkDetail = this.service.getData('BctaNo') || {};
+            this.appNoStatus =
+                WorkDetail.data?.applicationStatus ||
+                this.applicationStatus ||
+                null;
+            this.workId = this.workId || null;
+
+            this.prevTableId =
+                this.prevTableId || WorkDetail.data?.checklist_id || null;
+            this.tableId =
+                WorkDetail?.workId || WorkDetail?.checklist_id || null;
+            this.data = WorkDetail?.data || this.datas || null;
+            //this.egptenderId = this.data.referenceNo || this.data.egpTenderId;
+        }
+        if (this.prevTableId || this.workId) {
+            this.getDatabasedOnChecklistId();
         }
     }
-    if (this.workType === 'OTHERS') {
-        this.appNoStatus = this.workInformationdata?.applicationStatus || null;
-        this.prevTableId = this.prevTableId || this.workInformationdata?.checklist_id || null;
-        this.data = this.datas || this.workInformationdata;
-
-    } else {
-        const WorkDetail = this.service.getData('BctaNo') || {};
-        this.appNoStatus = WorkDetail.data?.applicationStatus || this.applicationStatus || null;
-        this.workId = this.workId || null;
-        
-        this.prevTableId = this.prevTableId || WorkDetail.data?.checklist_id || null;
-        this.tableId = WorkDetail?.workId || WorkDetail?.checklist_id || null;
-        this.data = WorkDetail?.data || this.datas || null;
-        //this.egptenderId = this.data.referenceNo || this.data.egpTenderId;
-    }
-    if(this.prevTableId || this.workId) {
-        this.getDatabasedOnChecklistId();
-    }
-
-}
     pageNo: number = 1;
     pageSize: number = 10;
     viewName: string = 'onsite_facilities_and_management';
     getDatabasedOnChecklistId() {
-    const payload: any = [
-        {
-        field: 'checklist_id',
-        value: this.prevTableId,
-        operator: 'AND',
-        condition: '=',
-        },
-         {
-        field: 'workid',
-        value: this.workId,
-        operator: 'AND',
-        condition: '=',
-        },
-    ];
-    this.service.fetchDetails(payload, this.pageNo, this.pageSize, this.viewName).subscribe(
-        (response: any) => {
-        const data = response.data[0];
-        this.prevTableId = data.checklist_id;
-        this.formData.projectSignBoard = data.project_sign_installed;
-        this.formData.siteOffice = data.site_office_available;
-        this.formData.siteStore = data.site_store_available;
-        this.formData.workerAccommodation = data.workers_accommodation_available;
-        this.formData.potableWater = data.potable_water_access;
-        this.formData.sanitationFacilities = data.proper_sanitation_facilities;
-        this.formData.apsMaintained = data.aps_maintained_by_agency;
-        this.formData.siteMeetingDocumented = data.meetings_conducted_and_documented;
-        this.formData.meetingRemarks = data.remarks;
-        if (data.file_path) {
-            this.formData.filePathList = data.file_path
-            .split(',')
-            .map(path => path.trim());
+        const payload: any = [
+            {
+                field: 'checklist_id',
+                value: this.prevTableId,
+                operator: 'AND',
+                condition: '=',
+            },
+            {
+                field: 'workid',
+                value: this.workId,
+                operator: 'AND',
+                condition: '=',
+            },
+        ];
+        this.service
+            .fetchDetails(payload, this.pageNo, this.pageSize, this.viewName)
+            .subscribe(
+                (response: any) => {
+                    const data = response.data[0];
+                    this.prevTableId = data.checklist_id;
+                    this.formData.projectSignBoard =
+                        data.project_sign_installed;
+                    this.formData.siteOffice = data.site_office_available;
+                    this.formData.siteStore = data.site_store_available;
+                    this.formData.workerAccommodation =
+                        data.workers_accommodation_available;
+                    this.formData.potableWater = data.potable_water_access;
+                    this.formData.sanitationFacilities =
+                        data.proper_sanitation_facilities;
+                    this.formData.apsMaintained = data.aps_maintained_by_agency;
+                    this.formData.siteMeetingDocumented =
+                        data.meetings_conducted_and_documented;
+                    this.formData.meetingRemarks = data.remarks;
+                    if (data.file_path) {
+                        this.formData.filePathList = data.file_path
+                            .split(',')
+                            .map((path) => path.trim());
 
-            this.formData.fileIdList = data.file_id
-            .split(',')
-            .map(id => id.trim());
+                        this.formData.fileIdList = data.file_id
+                            .split(',')
+                            .map((id) => id.trim());
 
-            // 🔽 Add this line: Check if all paths are 'NO_PATH'
-            this.formData.allPathsNoFile = this.formData.filePathList.every(path => path === 'NO_PATH');
+                        // 🔽 Add this line: Check if all paths are 'NO_PATH'
+                        this.formData.allPathsNoFile =
+                            this.formData.filePathList.every(
+                                (path) => path === 'NO_PATH'
+                            );
 
-            console.log('filePathList', this.formData.filePathList);
-            console.log('fileIdList', this.formData.fileIdList);
-            console.log('allPathsNoFile', this.formData.allPathsNoFile);
-        }
-        },
-        (error) => {
-        console.error('Error fetching contractor details:', error);
-        }
-    );
+                        console.log('filePathList', this.formData.filePathList);
+                        console.log('fileIdList', this.formData.fileIdList);
+                        console.log(
+                            'allPathsNoFile',
+                            this.formData.allPathsNoFile
+                        );
+                    }
+                },
+                (error) => {
+                    console.error('Error fetching contractor details:', error);
+                }
+            );
     }
 
     deleteFile(fileId: string, index: number) {
         this.service.deleteFile(fileId).subscribe(
             (response) => {
                 console.log('File deleted successfully:', response);
-                this.getDatabasedOnChecklistId()
+                this.getDatabasedOnChecklistId();
             },
             (error) => {
                 console.error('Error deleting file:', error);
@@ -193,7 +213,22 @@ export class OnsiteFacilitiesandManagementComponent {
                 // Check for specific error status
                 if (error.status === 404) {
                     console.error('File not found', error);
-                    this.showErrorMessage();
+                    this.notification
+                        .error(
+                            'Error', // Title
+                            'File not found', // Message
+                            { nzDuration: 3000 } // Options (3 seconds display)
+                        )
+                        .onClick.subscribe(() => {
+                            console.log('notification clicked!');
+                        });
+                } else {
+                    // Handle other errors
+                    this.notification.error(
+                        'Error',
+                        'An unexpected error occurred',
+                        { nzDuration: 3000 }
+                    );
                 }
             }
         );
@@ -206,8 +241,12 @@ export class OnsiteFacilitiesandManagementComponent {
         );
     }
     onPreviousClick() {
-     this.previousClicked.emit(this.ownerId,);
-       const WorkDetail = this.service.setData(this.data,'BctaNo','monitoring/WorkDetail');
+        this.previousClicked.emit(this.ownerId);
+        const WorkDetail = this.service.setData(
+            this.data,
+            'BctaNo',
+            'monitoring/WorkDetail'
+        );
         this.router.navigate(['/monitoring/addworkinformation']);
     }
 
@@ -219,7 +258,6 @@ export class OnsiteFacilitiesandManagementComponent {
      *
      * @param event - The file input change event containing the selected file.
      */
-
 
     addFileInput() {
         this.fileInputs.push(this.fileInputs.length);
@@ -234,26 +272,27 @@ export class OnsiteFacilitiesandManagementComponent {
      *
      * @param event - The file input change event containing the selected file.
      * @param index - The index of the file input field.
-        */
+     */
     onFileSelected(event: Event, index: number): void {
-    const input = event.target as HTMLInputElement;
-    if (input.files && input.files.length > 0) {
-        const file = input.files[0];
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) {
+            const file = input.files[0];
 
-        // Check file size (2MB = 2 * 1024 * 1024 bytes)
-        if (file.size > 2 * 1024 * 1024) {
-        this.fileErrors[index] = 'File size must be less than or equal to 2MB.';
-        this.selectedFiles[index] = null;
-        input.value = ''; // Clear the input
-        return;
+            // Check file size (2MB = 2 * 1024 * 1024 bytes)
+            if (file.size > 2 * 1024 * 1024) {
+                this.fileErrors[index] =
+                    'File size must be less than or equal to 2MB.';
+                this.selectedFiles[index] = null;
+                input.value = ''; // Clear the input
+                return;
+            }
+
+            this.selectedFiles[index] = file;
+            this.fileErrors[index] = ''; // Clear error on valid file
+            console.log('selectedFiles', this.selectedFiles);
+        } else {
+            this.fileErrors[index] = 'Please select a valid file.';
         }
-
-        this.selectedFiles[index] = file;
-        this.fileErrors[index] = ''; // Clear error on valid file
-        console.log('selectedFiles', this.selectedFiles);
-    } else {
-        this.fileErrors[index] = 'Please select a valid file.';
-    }
     }
 
     removeFileInput(index: number) {
@@ -261,88 +300,103 @@ export class OnsiteFacilitiesandManagementComponent {
         this.fileErrors.splice(index, 1);
         this.selectedFiles.splice(index, 1);
     }
-   
+
     /**
      * Uploads the selected file to the server and updates the file ID upon success.
      */
- // Create a static dummy file
+    // Create a static dummy file
 
-saveAndNext(form: NgForm) {
-    if (form.invalid) {
-        Object.keys(form.controls).forEach((field) => {
-            const control = form.controls[field];
-            control.markAsTouched({ onlySelf: true });
-        });
-        return;
-    }
+    saveAndNext(form: NgForm) {
+        if (form.invalid) {
+            Object.keys(form.controls).forEach((field) => {
+                const control = form.controls[field];
+                control.markAsTouched({ onlySelf: true });
+            });
+            return;
+        }
 
-    const uploadObservables = [];
-    if (this.selectedFiles && this.selectedFiles.length > 0) {
-        for (const file of this.selectedFiles) {
-            const upload$ = this.service.uploadFiles(file, this.formData.meetingRemarks, this.formType, this.userName,this.workId);
+        const uploadObservables = [];
+        if (this.selectedFiles && this.selectedFiles.length > 0) {
+            for (const file of this.selectedFiles) {
+                const upload$ = this.service.uploadFiles(
+                    file,
+                    this.formData.meetingRemarks,
+                    this.formType,
+                    this.userName,
+                    this.workId
+                );
+                uploadObservables.push(upload$);
+            }
+        } else {
+            // Send dummy file instead of null
+            const dummyFile = new File([new Blob()], 'empty.txt', {
+                type: 'text/plain',
+            });
+            const upload$ = this.service.uploadFiles(
+                dummyFile,
+                this.formData.meetingRemarks,
+                this.formType,
+                this.userName,
+                this.workId
+            );
             uploadObservables.push(upload$);
         }
-    } 
-    else {
-        // Send dummy file instead of null
-        const dummyFile = new File([new Blob()], 'empty.txt', { type: 'text/plain' });
-        const upload$ = this.service.uploadFiles(dummyFile, this.formData.meetingRemarks, this.formType, this.userName,this.workId);
-        uploadObservables.push(upload$);
+
+        forkJoin(uploadObservables).subscribe({
+            next: (fileIds: any[]) => {
+                for (const id of fileIds) {
+                    const match = id?.match?.(/[0-9a-fA-F\-]{36}/);
+                    if (match) {
+                        this.fileId.push(match[0]);
+                    }
+                }
+                this.saveDraftPayload();
+            },
+            error: (err) => {
+                console.error('Error uploading files:', err);
+                this.fileError = 'File upload failed.';
+            },
+        });
     }
 
-    forkJoin(uploadObservables).subscribe({
-        next: (fileIds: any[]) => {
-            for (const id of fileIds) {
-                const match = id?.match?.(/[0-9a-fA-F\-]{36}/);
-                if (match) {
-                    this.fileId.push(match[0]);
-                }
-            }
-            this.saveDraftPayload();
-        },
-        error: (err) => {
-            console.error('Error uploading files:', err);
-            this.fileError = 'File upload failed.';
-        },
-    });
-}
-
-
     private saveDraftPayload() {
-    const payload: any = {
-    workID : this.workId,
-    inspectionId: this.userId,
-    id: this.prevTableId,
-    inspectionType: this.workType,
-    projectSignInstalled: this.formData.projectSignBoard,
-    siteOfficeAvailable: this.formData.siteOffice,
-    siteStoreAvailable: this.formData.siteStore,
-    workersAccommodationAvailable: this.formData.workerAccommodation,
-    properSanitationFacilities: this.formData.sanitationFacilities,
-    potableWaterAccess: this.formData.potableWater,
-    apsMaintainedByAgency: this.formData.apsMaintained,
-    meetingsConductedAndDocumented: this.formData.siteMeetingDocumented,
-  };
-// // 
-//   // Conditionally include egpTenderId only if workType is not 'OTHERSSSSSSSSS' and data exists
-//   if (this.workType !== 'OTHERS' && this.data) {
-//     payload.egpTenderId = parseInt(this.data.egpTenderId, 10);
-//   }
-if (this.data) {
-  if (this.workType === 'PRIVATE') {
-    payload.egpTenderId = this.data.BCTANo;
-  } else if (this.workType !== 'OTHERS') {
-    payload.egpTenderId = parseInt(this.data.egpTenderId, 10);
-  }
-}
+        const payload: any = {
+            workID: this.workId,
+            inspectionId: this.userId,
+            id: this.prevTableId,
+            inspectionType: this.workType,
+            projectSignInstalled: this.formData.projectSignBoard,
+            siteOfficeAvailable: this.formData.siteOffice,
+            siteStoreAvailable: this.formData.siteStore,
+            workersAccommodationAvailable: this.formData.workerAccommodation,
+            properSanitationFacilities: this.formData.sanitationFacilities,
+            potableWaterAccess: this.formData.potableWater,
+            apsMaintainedByAgency: this.formData.apsMaintained,
+            meetingsConductedAndDocumented: this.formData.siteMeetingDocumented,
+        };
+        // //
+        //   // Conditionally include egpTenderId only if workType is not 'OTHERSSSSSSSSS' and data exists
+        //   if (this.workType !== 'OTHERS' && this.data) {
+        //     payload.egpTenderId = parseInt(this.data.egpTenderId, 10);
+        //   }
+        if (this.data) {
+            if (this.workType === 'PRIVATE') {
+                payload.egpTenderId = this.data.BCTANo;
+            } else if (this.workType !== 'OTHERS') {
+                payload.egpTenderId = parseInt(this.data.egpTenderId, 10);
+            }
+        }
 
-  // Conditionally include workId only if workType is 'OTHERSSSSSSSSS'
-  if (this.workType === 'OTHERS') {
-    payload.workInformationId = this.ownerId;
-  }
+        // Conditionally include workId only if workType is 'OTHERSSSSSSSSS'
+        if (this.workType === 'OTHERS') {
+            payload.workInformationId = this.ownerId ;
+        }
         this.service.saveAsDraft(payload).subscribe({
             next: (response: any) => {
-                const parsedResponse = typeof response === 'string' ? JSON.parse(response): response;
+                const parsedResponse =
+                    typeof response === 'string'
+                        ? JSON.parse(response)
+                        : response;
                 this.tableId = parsedResponse.checklistsInfo.id;
                 if (this.tableId) {
                     this.assignCheckListId();
@@ -355,38 +409,53 @@ if (this.data) {
                 }
             },
             error: (error) => {
-                console.error('Error saving draft:', error);
-            },
-        });
-    }
+            console.error('Error saving draft:', error);
+            if (error.status === 500) {
+                this.createNotification('error', 'Failed to save data');
+            } else {
+                this.createNotification('error', error.message || 'An error occurred while saving data');
+            }
+        },
+    });
+}
 
     /**
      * Assigns the uploaded file to the given checklist ID.
      * The method sends a request to save the checklist ID and
      * logs the result upon success or error.
      */
-    assignCheckListId() {
-        const payload = this.fileId; // this is a valid array of fileIds
-        console.log('fileId..............', payload);
-        // Save the checklist ID with the uploaded file
-        this.service.saveCheckListId(this.tableId,this.workId, payload).subscribe(
+assignCheckListId() {
+    const payload = this.fileId;
+    this.service
+        .saveCheckListId(this.tableId, this.workId, payload)
+        .subscribe(
             (response) => {
-                // Log the result upon success
-                console.log('File ID assigned successfully:', response);
-                this.createNotification();
+                this.createNotification('success');
             },
             (error) => {
-                // Log the error upon failure
                 console.error('Error assigning File ID:', error);
+                if (error.status === 500) {
+                    this.createNotification('error', 'Failed to save checklist data');
+                } else {
+                    this.createNotification('error', error.message || 'An error occurred while saving checklist data');
+                }
             }
         );
-    }
+}
 
-    createNotification(): void {
+   createNotification(type: 'success' | 'error', message?: string): void {
+    if (type === 'success') {
         this.notification
-            .success('Success', 'The data has been saved successfully')
+            .success('Success', message || 'The data has been saved successfully')
             .onClick.subscribe(() => {
                 console.log('notification clicked!');
             });
+    } else {
+        this.notification
+            .error('Error', message || 'Failed to save data')
+            .onClick.subscribe(() => {
+                console.log('error notification clicked!');
+            });
     }
+}
 }

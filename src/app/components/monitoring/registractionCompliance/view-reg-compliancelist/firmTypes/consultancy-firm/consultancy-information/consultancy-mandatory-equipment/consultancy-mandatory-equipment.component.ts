@@ -1,9 +1,12 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { CommonService } from '../../../../../../../../service/common.service';
 import Swal from 'sweetalert2';
 import { AuthServiceService } from '../../../../../../../../auth.service';
+import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
+
 declare var bootstrap: any;
 @Component({
     selector: 'app-consultancy-mandatory-equipment',
@@ -12,18 +15,16 @@ declare var bootstrap: any;
 })
 export class ConsultancyMandatoryEquipmentComponent {
     formData: any = {};
-    @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
+    @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
 
     firmType: any;
     bctaNo: any;
     tableData: any[] = [];
     @Input() id: string = '';
-    data: any;
-    tData: any;
+    @Input() data: any;
+    tData: any = [];
     applicationStatus: string = '';
     isSaving = false;
-    reinstateModal: any = null;
-    reinstateData: any = null;
     bsModal: any;
     downgradeList: any[] = [];
     selectedAction: any = {
@@ -35,7 +36,11 @@ export class ConsultancyMandatoryEquipmentComponent {
         contractorNo: '',
     };
     licenseStatus: any;
-
+    @ViewChild('closeActionModal', { static: false }) closeActionModal!: ElementRef;
+    vehicleData: Object;
+    VehicleDetails: any;
+    showErrorMessage: any;
+    showSuccessMessage: string;
     private getPrefix(workCategory: string): string {
         if (workCategory.startsWith('S-')) return 'S';
         if (workCategory.startsWith('A-')) return 'A';
@@ -46,10 +51,15 @@ export class ConsultancyMandatoryEquipmentComponent {
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+         private notification: NzNotificationService,
     ) {}
     WorkDetail: any;
     ngOnInit() {
+         this.data = this.data;
+          this.applicationStatus = this.data.applicationStatus;
+         this.fetchDataBasedOnBctaNo();
+         console.log('this.data', this.data);
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -69,16 +79,15 @@ export class ConsultancyMandatoryEquipmentComponent {
         // Set the id from input
         this.id = this.id;
         const WorkDetail = this.service.getData('BctaNo');
-        this.WorkDetail = WorkDetail.data;
+         this.WorkDetail = WorkDetail?.data ?? this.data ?? {}; // fallback to existing `this.data` or empty object
         if (!WorkDetail || !WorkDetail.data) {
-            console.error('WorkDetail or WorkDetail.data is undefined');
             return;
         }
-        this.formData.firmType = WorkDetail.data;
-        this.bctaNo = WorkDetail.data.consultantNo;
-        this.applicationStatus = WorkDetail.data.applicationStatus;
-        this.licenseStatus = WorkDetail.data.licenseStatus;
-        this.data = WorkDetail.data;
+        this.formData.firmType = WorkDetail.data || this.data || '';
+        this.bctaNo = WorkDetail.data.consultantNo || this.data.consultantNo || '';
+        this.applicationStatus = WorkDetail.data.applicationStatus || this.data.applicationStatus || '';
+        debugger
+        this.licenseStatus = WorkDetail.data.licenseStatus ||  this.data || '';
         this.tData = {
             eqFulfilled: '',
             eqResubmitDeadline: '',
@@ -86,17 +95,17 @@ export class ConsultancyMandatoryEquipmentComponent {
         };
 
         if (this.bctaNo && this.applicationStatus === 'Suspension Resubmission') {
-            
          this.fetchSuspendDataBasedOnBctaNo();
-        } else {
+        } else if(this.data.consultantNo){
         this.fetchDataBasedOnBctaNo();
+        }else{
+ this.service.setBctaNo(this.bctaNo);
         }
-        this.service.setBctaNo(this.bctaNo);
+       
     }
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNo(this.data.consultantNo).subscribe((res: any) => {
             this.tableData = res.vehicles;
-            console.log('consultant equipments', this.formData);
         });
     }
 
@@ -107,7 +116,6 @@ export class ConsultancyMandatoryEquipmentComponent {
                 this.tableData = res.hrCompliance;
             },
             (error) => {
-                console.error('Error fetching data:', error);
             }
         );
     }
@@ -120,7 +128,36 @@ export class ConsultancyMandatoryEquipmentComponent {
     }
 
     onSubmit() {}
-
+   rejectApplication() {
+          this.service.rejectApplication('consultant',this.data.consultantNo).subscribe(
+            (response: any) => {
+              console.log('Application rejected successfully:', response);
+              this.createNotification(
+                'success',
+                'Success',
+                'Application rejected successfully'
+              );
+              this.closeModal();
+              this.router.navigate(['monitoring/construction']);
+            },
+            (error) => {
+              console.error('Error rejecting application:', error);
+              this.createNotification(
+                'error',
+                'Error',
+                'Failed to reject application'
+              );
+            }
+          )
+        }
+createNotification(
+  type: 'success' | 'error' | 'info' | 'warning',
+  title: string,
+  message: string
+): void {
+  this.notification[type](title, message).onClick.subscribe(() => {
+  });
+}
     tableId: any;
     saveAndNext() {
         this.isSaving = true;
@@ -140,7 +177,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
         const payload = {
             consultantRegistrationDto: {
-                bctaNo: this.bctaNo,
+                bctaNo: this.data.consultantNo || this.bctaNo,
                 eqFulfilled: this.tData.fulfillsRequirement,
                 eqResubmitDeadline: this.tData.resubmitDate,
                 eqRemarks: this.tData.remarks,
@@ -150,12 +187,9 @@ export class ConsultancyMandatoryEquipmentComponent {
         this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe(
             (res: any) => {
                 this.isSaving = false;
-                console.log('res', res);
-                // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
-                console.log('Emitting consultancyMonitoring', this.tableId);
-
                 this.activateTab.emit({
                     id: this.tableId,
+                    data:this.data,
                     tab: 'consultancyMonitoring',
                 });
             },
@@ -188,7 +222,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
         const payload = {
             consultantRegistrationDto: {
-                bctaNo: this.bctaNo,
+                bctaNo: this.data.consultantNo || this.bctaNo,
                 eqFulfilled: this.tData.fulfillsRequirement,
                 eqResubmitDeadline: this.tData.resubmitDate,
                 eqRemarks: this.tData.remarks,
@@ -205,8 +239,8 @@ export class ConsultancyMandatoryEquipmentComponent {
                     icon: 'warning',
                     confirmButtonText: 'OK',
                 });
-                // this.router.navigate(['monitoring/consultancy']);
-                this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
+                this.router.navigate(['monitoring/consultancy']);
+               // this.activateTab.emit({ id: this.tableId, tab: 'monitoring' });
             },
             error: (error) => {
                 this.isSaving = false;
@@ -223,7 +257,7 @@ export class ConsultancyMandatoryEquipmentComponent {
         this.isSaving = true;
         const payload = {
             consultantRegistrationDto: {
-                bctaNo: this.bctaNo,
+                bctaNo: this.data.consultantNo || this.bctaNo,
                 eqFulfilled: this.tData.fulfillsRequirement,
                 eqResubmitDeadline: this.tData.resubmitDate,
                 eqRemarks: this.tData.remarks,
@@ -255,7 +289,9 @@ export class ConsultancyMandatoryEquipmentComponent {
             },
         });
     }
-
+  closeModal() {
+        this.closeActionModal.nativeElement.click();
+    }
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'cancel') {
             const firmId = this.formData.firmType.consultantId;
@@ -359,10 +395,8 @@ export class ConsultancyMandatoryEquipmentComponent {
             alert('All required fields must be filled.');
             return;
         }
-
         if (this.selectedAction.actionType === 'cancel') {
             console.log('Cancel action initiated.');
-
             // Collect all unchecked, previously pre-checked classifications
             const downgradeEntries: any[] = [];
             this.downgradeList.forEach((entry) => {
@@ -392,12 +426,8 @@ export class ConsultancyMandatoryEquipmentComponent {
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
             };
-
-            console.log('Downgrade payload:', payload);
-
             this.service.downgradeConsultancy(payload).subscribe({
                 next: (res: string) => {
-                    console.log('Downgrade response:', res);
                     if (
                         res &&
                         res
@@ -410,6 +440,7 @@ export class ConsultancyMandatoryEquipmentComponent {
                             'success'
                         );
                         this.closeModal();
+                         this.router.navigate(['monitoring/consultancy']);
                     } else {
                         Swal.fire(
                             'Error',
@@ -417,6 +448,7 @@ export class ConsultancyMandatoryEquipmentComponent {
                             'error'
                         );
                         this.closeModal();
+                         this.router.navigate(['monitoring/consultancy']);
                     }
                 },
                 error: (err) => {
@@ -441,9 +473,6 @@ export class ConsultancyMandatoryEquipmentComponent {
                 firmType: 'Consultant',
                 suspendDetails: this.selectedAction.remarks,
             };
-
-            console.log('Suspend payload:', payload);
-
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {
                     console.log('Suspend response:', res);
@@ -453,6 +482,7 @@ export class ConsultancyMandatoryEquipmentComponent {
                         'success'
                     );
                     this.closeModal();
+                     this.router.navigate(['monitoring/consultancy']);
                 },
                 error: (err) => {
                     console.error('Error during suspension:', err);
@@ -461,87 +491,109 @@ export class ConsultancyMandatoryEquipmentComponent {
             });
         }
     }
-
     onClick() {}
-    getReinstateApplication(bctaNo: string) {
-        if (!bctaNo) {
-            console.error('Firm ID is missing.');
-            return;
-        }
-
-        this.service.getReinstateApplication(bctaNo).subscribe({
-            next: (data) => {
-                this.reinstateData = data[0];
-                setTimeout(() => {
-                    const modalEl = document.getElementById('reinstateModal');
-                    this.reinstateModal = new bootstrap.Modal(modalEl, {
-                        backdrop: 'static',
-                        keyboard: false,
-                    });
-                    this.reinstateModal.show();
-                }, 0);
-            },
-            error: (err) => {
-                console.error('Error fetching reinstate data:', err);
-                this.reinstateData = null;
-            },
-        });
-    }
-
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row,
-            firmType: 'consultant',
-            licenseStatus: 'Active',
-        };
-
-        const approvePayload = {
-            firmType: 'Consultant',
-            cdbNos: row,
-        };
-
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
-                    this.closeModal();
+    downloadFile(filePath: string): void {
+      const sanitizedPath = filePath.replace(/\s+/g, ' ');
+      this.service.downloadFileFirm(sanitizedPath).subscribe(
+            (response: HttpResponse<Blob>) => {
+                const binaryData = [response.body];
+                const mimeType = response.body?.type || 'application/octet-stream';
+                const blob = new Blob(binaryData, { type: mimeType });
+                const blobUrl = window.URL.createObjectURL(blob);
+    
+                // Ensure filename is properly extracted and decoded
+                const fileName = this.extractFileName(filePath);
+                const isImage = mimeType.startsWith('image/');
+    
+                const newWindow = window.open('', '_blank', 'width=800,height=600');
+                if (newWindow) {
+                    newWindow.document.write(`
+                        <html>
+                            <head>
+                                <title>File Preview</title>
+                            </head>
+                            <body style="margin:0; text-align: center;">
+                                <div style="padding:10px;">
+                                    <a href="${blobUrl}" download="${fileName}" 
+                                       style="font-size:16px; color:blue;" 
+                                       target="_blank">⬇ Download ${fileName}</a>
+                                </div>
+                                ${isImage
+                                    ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
+                                    : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`}
+                            </body>
+                        </html>
+                    `);
+    
+                    // Clean up after window is closed
+                    newWindow.onbeforeunload = () => {
+                        window.URL.revokeObjectURL(blobUrl);
+                    };
                 } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
+                    console.error('Failed to open the new window');
+                    // Fallback to direct download if window fails to open
+                    this.forceDownload(blob, fileName);
                 }
-                this.router.navigate(['/monitoring/consultancy']);
-                this.closeModal();
             },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
+            (error: HttpErrorResponse) => {
+                if (error.status === 404) {
+                    console.error('File not found', error);
+                    this.showErrorMessage();
+                }
+            }
+        );
     }
 
-    closeModal() {
-        if (this.bsModal) {
-            this.bsModal.hide();
+    
+    // Improved filename extraction
+    private extractFileName(filePath: string): string {
+        try {
+            // Handle URL encoded paths
+            const decodedPath = decodeURIComponent(filePath);
+            // Extract filename and remove any query parameters
+            return decodedPath.split('/').pop()?.split('?')[0] || 'download';
+        } catch {
+            return filePath.split('/').pop() || 'download';
         }
+    }
+    
+    // Fallback direct download method
+    private forceDownload(blob: Blob, fileName: string) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 100);
+    }
+
+    getVehicleData(data:any) {
+      this.service.getVehicleDetails(this.data.vehicleNumber,this.data.vehicleType)
+                .subscribe(
+                (response: any) => {
+                    const data = response.vehicleDetail;
+                    this.VehicleDetails = data;
+                 if ( response.vehicleDetail.vehicleRegistrationDetailsId ===0) {
+                        this.showErrorMessage =
+                            'No details found for this RegNo in BCTA';
+                        console.warn('No details found for this RegNo in BCTA');
+                    } else {
+                        this.showErrorMessage = ''; // Clear error if successful
+                    }
+                },
+                (error) => {
+                    if (error.status === 404) {
+                        this.showErrorMessage =
+                            'No details found for this RegNo in BCTA';
+                    } else {
+                        this.showErrorMessage = 'An unexpected error occurred';
+                    }
+                    this.showSuccessMessage = ''; // Clear success message on error
+                }
+            );
     }
 }

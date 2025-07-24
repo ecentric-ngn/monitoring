@@ -17,19 +17,22 @@ export class MonitoringTeamUsersComponent implements OnInit {
   bctaNo: any;
   isSaving = false;
   username: string = '';
-applicationStatus : string = '';
+applicationStatus : any;
   @Input() id: string = ''; // Input from parent component
-
+@Input() data: any;
+  complianceData: string;
   constructor(private service: CommonService,
     private router: Router,
     private authService: AuthServiceService) { }
 
   ngOnInit() {
+    this.data = this.data;
     this.username = this.authService.getUsername() || 'NA';
     this.id = this.id;
-     const WorkDetail = this.service.getData('BctaNo');
-     this.applicationStatus = WorkDetail.data.applicationStatus;
-     debugger
+    //  const WorkDetail = this.service.getData('BctaNo');
+    this.applicationStatus = this.data.applicationStatus;
+     console.log('this.applicationStatus', this.applicationStatus);
+     
     this.service.bctaNo$.subscribe(bctaNo => {
         this.bctaNo = bctaNo;
     });
@@ -37,20 +40,20 @@ applicationStatus : string = '';
   }
    reinstate(row: any) {
         const payload = {
-            firmNo: row,
-            firmType: 'contractor',
+            firmNo: this.data.contractorNo,
+            firmType: 'Contractor',
             licenseStatus: 'Active',
              applicationStatus: 'Reinstated',
         };
 
         const approvePayload = {
             firmType: 'Contractor',
-            cdbNos: row,
+            cdbNos: this.data.contractorNo,
         };
 
         forkJoin({
             reinstate: this.service.reinstateLicense(payload),
-           // approve: this.service.approveReinstatement(approvePayload),
+           approve: this.service.approveReinstatement(approvePayload),
         }).subscribe({
             next: ({ reinstate }) => {
                 if (
@@ -116,6 +119,7 @@ applicationStatus : string = '';
         reviewDate: this.formData.reviewDate
       }
     };
+    
     this.service.saveOfficeSignageAndDoc(payload).subscribe(
       (res: any) => {
         this.isSaving = false;

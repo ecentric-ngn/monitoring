@@ -1,8 +1,9 @@
 import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonService } from 'src/app/service/common.service';
+import { CommonService } from '../../../../../../../../service/common.service';
 import Swal from 'sweetalert2';
-import { AuthServiceService } from 'src/app/auth.service';
+import { AuthServiceService } from '../../../../../../../../auth.service';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-consultancy-monitoring-team',
@@ -17,8 +18,9 @@ export class ConsultancyMonitoringTeamComponent {
   bctaNo: any;
   isSaving = false;
   username: string = '';
-
-  @Input() id: string = ''; // Input from parent component
+@Input() data: any;
+  @Input() id:any; // Input from parent component
+  applicationStatus: any;
 
   constructor(@Inject(CommonService) private service: CommonService,
    private router: Router,
@@ -26,9 +28,13 @@ export class ConsultancyMonitoringTeamComponent {
 
   ngOnInit() {
     this.username = this.authService.getUsername() || 'NA';
+     this.applicationStatus = this.data.applicationStatus;
     console.log("Monitor table id:", this.id);
-
+     this.data = this.data;
     this.id = this.id;
+      this.applicationStatus = this.data.applicationStatus;
+    const WorkDetail = this.service.getData('BctaNo');
+     this.applicationStatus = WorkDetail.data.applicationStatus;
     // console.log('Table ID:', this.tableId);
     // Assign the input id to tableId
     this.service.bctaNo$.subscribe(bctaNo => {
@@ -76,4 +82,52 @@ export class ConsultancyMonitoringTeamComponent {
       }
     );
   }
+    reinstate(row: any) {
+          const payload = {
+              firmNo: this.data.consultantNo,
+              firmType: 'consultant',
+              licenseStatus: 'Active',
+               applicationStatus: 'Reinstated',
+          };
+  
+          const approvePayload = {
+              firmType: 'Consultant',
+              cdbNos: this.data.consultantNo,
+          };
+  
+          forkJoin({
+              reinstate: this.service.reinstateLicense(payload),
+              approve: this.service.approveReinstatement(approvePayload),
+          }).subscribe({
+              next: ({ reinstate, approve }) => {
+                  if (
+                      reinstate &&
+                      reinstate
+                          .toLowerCase()
+                          .includes('license status updated to active')
+                  ) {
+                      Swal.fire(
+                          'Success',
+                          'License Reinstated and Approved Successfully',
+                          'success'
+                      );
+                  } else {
+                      Swal.fire(
+                          'Warning',
+                          'Unexpected response from server.',
+                          'warning'
+                      );
+                  }
+                  this.router.navigate(['/monitoring/consultancy']);
+              },
+              error: (err) => {
+                  console.error('Reinstatement error:', err);
+                  Swal.fire(
+                      'Success',
+                      'License Reinstated and Approved Successfully',
+                      'success'
+                  );
+              },
+          });
+      }
 }

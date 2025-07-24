@@ -35,18 +35,12 @@ export class AddworkinformationComponent {
   const workData = WorkDetail?.data ?? {};
   this.prevOwnerTableId = this.prevOwnerTableId || WorkDetail?.data || (workData.work_information_id ?? null)
   this.appNoStatus = workData.applicationStatus ?? null;
-  console.log('prevOwnerTableId', this.prevOwnerTableId);
-  debugger
   if (this.prevOwnerTableId) {
-    debugger
     this.getDatabasedOnOwnerId();
 
   }
-  this.contractorId = WorkDetail?.newContractorId ?? null;
-  
+this.contractorId = WorkDetail?.newContractorId ?? WorkDetail?.data ?? null;
   this.workType = this.workType || WorkDetail?.otherWorkType; // seems unnecessary unless you're trying to update it dynamically
-  debugger
-  console.log('WorkDetailinaddinformation', WorkDetail);
 }
 
 
@@ -159,7 +153,7 @@ export class AddworkinformationComponent {
             proposedCompletionDate: this.formData.proposedCompletionDate,
             client: this.formData.client,
             contractorId: this.contractorId,
-            workType: this.otherWorkType
+            workType: this.otherWorkType || this.data.workType 
         };
 
         this.service.saveWorkInformation(payload).subscribe((response: any) => {

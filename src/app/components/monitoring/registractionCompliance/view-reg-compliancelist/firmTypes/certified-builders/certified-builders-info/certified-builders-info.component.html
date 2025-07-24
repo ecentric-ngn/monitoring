@@ -25,6 +25,10 @@
                 <label class="form-label me-2 font-size-12">Status:</label>
                 <span class="font-size-12">{{applicationStatus}}</span>
             </div>
+             <div class="col-md-4 mb-3">
+                <label class="form-label me-2 font-size-12">TPN No:</label>
+                <span class="font-size-12">{{formData?.tpnNumber || 'N/A'}}</span>
+            </div>
         </div>
 
         <div class="container-fluid">
@@ -82,19 +86,19 @@
 
     <div class="tab-pane fade" [class.show]="activeTabId === 'cbEmployee'" [class.active]="activeTabId === 'cbEmployee'"
         id="employee" role="tabpanel" aria-labelledby="employee-tab" *ngIf="activeTabId === 'cbEmployee'">
-        <p><app-cb-permanent-employees (activateTab)="onActivateTab($event)" [id]="id"></app-cb-permanent-employees></p>
+        <p><app-cb-permanent-employees (activateTab)="onActivateTab($event)" [id]="id" [data]="data"></app-cb-permanent-employees></p>
     </div>
 
     <div class="tab-pane fade" [class.show]="activeTabId === 'cbEquipment'"
         [class.active]="activeTabId === 'cbEquipment'" id="equipment" role="tabpanel" aria-labelledby="equipment-tab"
         *ngIf="activeTabId === 'cbEquipment'">
-        <p><app-cb-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id"></app-cb-mandatory-equipment></p>
+        <p><app-cb-mandatory-equipment (activateTab)="onActivateTab($event)" [id]="id" [data]="data"></app-cb-mandatory-equipment></p>
     </div>
 
     <div class="tab-pane fade" [class.show]="activeTabId === 'cbMonitoring'"
         [class.active]="activeTabId === 'cbMonitoring'" id="monitoring" role="tabpanel" aria-labelledby="monitoring-tab"
         *ngIf="activeTabId === 'cbMonitoring'">
-        <p><app-cb-monitoring-team [id]="id"></app-cb-monitoring-team></p>
+        <p><app-cb-monitoring-team [id]="id" [data]="data"></app-cb-monitoring-team></p>
     </div>
 
 </div>

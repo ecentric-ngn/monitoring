@@ -369,9 +369,7 @@ pageNo: number = 1;
             Swal.fire('Warning', 'No items selected', 'warning');
             return;
         }
-
         const payload = this.selectedIds
-
         this.service.forwardToReviewCommitee(payload).subscribe(
             (res) => {
                 console.log('Successfully sent selected IDs:', res);

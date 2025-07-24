@@ -242,8 +242,7 @@ export class ConsultancyFirmComponent {
             data.applicationStatus === 'Submitted' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
-            data.applicationStatus === 'Suspension Resubmission' ||
-            data.applicationStatus === 'Suspension Approved'
+            data.applicationStatus === 'Suspension Resubmission'
         ) {
             const workId = data.consultantNo;
             this.prepareAndNavigate(data, workId);
@@ -265,7 +264,7 @@ export class ConsultancyFirmComponent {
         );
     }
 
-    onCheckboxChange(event: Event, id: string) {
+  onCheckboxChange(event: Event, id: string) {
         const isChecked = (event.target as HTMLInputElement).checked;
         const numericId = Number(id); // convert to number
 
@@ -287,9 +286,7 @@ export class ConsultancyFirmComponent {
             Swal.fire('Warning', 'No items selected', 'warning');
             return;
         }
-
         const payload = this.selectedIds;
-
         this.service.forwardToReviewCommitee(payload).subscribe(
             (res) => {
                 console.log('Successfully sent selected IDs:', res);

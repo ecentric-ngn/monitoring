@@ -13,6 +13,7 @@ export class ConsultancyInformationComponent implements OnInit {
   activeTabId: string = '';
 WorkDetail: any={};
 licenseStatus: string = '';
+  data: string;
   constructor( private service: CommonService) { }
 
 ngOnInit() {
@@ -23,9 +24,13 @@ ngOnInit() {
   }
   this.WorkDetail = WorkDetail;
   this.licenseStatus = WorkDetail.data.licenseStatus;
+  debugger
   this.applicationStatus = WorkDetail.data.applicationStatus;
   this.formData.firmType = WorkDetail.data;
   this.bctaNo = WorkDetail.data.consultantNo;
+  if (this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Resubmission') {
+    this.activeTabId = 'consultancyOffice';
+  }
   // Set activeTabId based on applicationStatus only if license is not suspended
   if (this.licenseStatus !== 'Suspended') {
     const status = this.applicationStatus;
@@ -65,16 +70,20 @@ ngOnInit() {
 
   type: string = '';
   id: string = '';
-  onActivateTab(event: { id: string, tab: string }) {
+  onActivateTab(event: { id: string,data:string, tab: string }) {
     this.type = event.tab;
     this.id = event.id
-
+    this.data=event.data
     console.log('id', this.id);
     if (this.type === 'consultancyEmployee') {
       this.activeTabId = 'consultancyEmployee';
     } else if (this.type === 'consultancyEquipment') {
       this.activeTabId = 'consultancyEquipment';
+      this.data=event.data
+      debugger
     } else if (this.type === 'consultancyMonitoring') {
+       this.id = event.id
+        this.data=event.data
       this.activeTabId = 'consultancyMonitoring';
     } else {
       this.activeTabId = 'consultancyOffice';
@@ -87,11 +96,13 @@ ngOnInit() {
   }
   equipmentForm() {
     this.id = this.id
+     this.data=this.data
     this.activeTabId = 'consultancyEquipment';
   }
 
   monitoringTeam() {
     this.id = this.id
+     this.data=this.data
     this.activeTabId = 'consultancyMonitoring';
   }
 }

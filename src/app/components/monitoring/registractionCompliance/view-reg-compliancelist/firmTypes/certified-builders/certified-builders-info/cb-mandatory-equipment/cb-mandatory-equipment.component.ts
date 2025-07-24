@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { forkJoin } from 'rxjs';
 import { AuthServiceService } from '../../../../../../../../auth.service';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 declare var bootstrap: any;
 
 @Component({
@@ -17,7 +18,7 @@ export class CbMandatoryEquipmentComponent {
     @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
     firmType: any;
     bctaNo: any;
-    tableData: any;
+    tableData: any = [];
     tData: any;
     applicationStatus: string = '';
     isSaving = false;
@@ -27,16 +28,22 @@ export class CbMandatoryEquipmentComponent {
     downgradeList: any[] = [];
     today: any;
     showErrorMessage: any;
-
+    showSuccessMessage: string;
+    VehicleDetails: any;
+@Input() data: any
+    WorkDetail: any;
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+        private notification: NzNotificationService
     ) {}
 
     ngOnInit() {
-        console.log('id', this.id);
         this.date();
+        this.data= this.data;
+        this.applicationStatus = this.data.applicationStatus;
+        debugger
         // Initialize formData with default values
         this.formData = {
             vehicleType: '',
@@ -55,13 +62,20 @@ export class CbMandatoryEquipmentComponent {
 
         this.id = this.id;
         const WorkDetail = this.service.getData('BctaNo');
-        this.formData.firmType = WorkDetail.data;
-        this.bctaNo = WorkDetail.data.certifiedBuilderNo;
-        this.licenseStatus = WorkDetail.data.licenseStatus;
-        this.applicationStatus = WorkDetail.data.applicationStatus;
+         const data = WorkDetail?.data ?? this.data ?? {}; // fallback to existing `this.data` or empty object
+        this.formData.firmType = data.firmType || '';
+        this.bctaNo = data.contractorNo || '';
+        this.applicationStatus = data.applicationStatus || '';
+        this.data = data; // update this.data safely
+        this.WorkDetail = WorkDetail ?? {}; // ensure it's at least an object
+        this.licenseStatus = this.data.licenseStatus || '';
+        debugger
         this.service.setBctaNo(this.bctaNo);
 
-        if (this.bctaNo && this.applicationStatus === 'Suspension Resubmission') {
+        if (
+            this.bctaNo &&
+            this.applicationStatus === 'Suspension Resubmission'
+        ) {
             this.fetchSuspendDataBasedOnBctaNo();
         } else {
             this.fetchDataBasedOnBctaNo();
@@ -71,7 +85,7 @@ export class CbMandatoryEquipmentComponent {
     fetchSuspendDataBasedOnBctaNo() {
         this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
             (res: any) => {
-               this.tableData = res.vehicles;
+                this.tableData = res.vehicles;
             },
             (error) => {
                 // Log error if fetching data fails
@@ -95,7 +109,7 @@ export class CbMandatoryEquipmentComponent {
 
     // For date validation (optional)
     minResubmitDate: string = this.getMinDate();
-rejectApplication () {}
+
     getMinDate(): string {
         const today = new Date();
         today.setDate(today.getDate()); // you can adjust if needed
@@ -156,10 +170,6 @@ rejectApplication () {}
         this.service.saveOfficeSignageAndDocCB(payload).subscribe(
             (res: any) => {
                 this.isSaving = false;
-                console.log('res', res);
-                // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
-                console.log('Emitting cbMonitoring', this.tableId);
-
                 this.activateTab.emit({
                     id: this.tableId,
                     tab: 'cbMonitoring',
@@ -341,7 +351,6 @@ rejectApplication () {}
                 firmType: 'certified-builder',
                 reason: this.selectedAction.remarks,
             };
-            console.log('payload..........', payload);
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
                 next: (res) => {
@@ -388,56 +397,6 @@ rejectApplication () {}
     }
 
     bsModal: any;
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row,
-            firmType: 'certified-builder',
-            licenseStatus: 'Active',
-        };
-
-        const approvePayload = {
-            firmType: 'CertifiedBuilder',
-            cdbNos: row,
-        };
-
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
-                    this.closeModal();
-                } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
-                }
-                this.router.navigate(['/monitoring/certified']);
-                this.closeModal();
-            },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
-    }
 
     closeModal() {
         if (this.bsModal) {
@@ -445,15 +404,49 @@ rejectApplication () {}
         }
     }
 
-    // Handle file download and preview logic
+    rejectApplication() {
+        this.service
+            .rejectApplication('certified-Builder', this.bctaNo)
+            .subscribe(
+                (response: any) => {
+                    console.log('Application rejected successfully:', response);
+                    this.createNotification(
+                        'success',
+                        'Success',
+                        'Application rejected successfully'
+                    );
+                    this.closeModal();
+                    this.router.navigate(['monitoring/construction']);
+                },
+                (error) => {
+                    console.error('Error rejecting application:', error);
+                    this.createNotification(
+                        'error',
+                        'Error',
+                        'Failed to reject application'
+                    );
+                }
+            );
+    }
+    createNotification(
+        type: 'success' | 'error' | 'info' | 'warning',
+        title: string,
+        message: string
+    ): void {
+        this.notification[type](title, message).onClick.subscribe(() => {});
+    }
+
     downloadFile(filePath: string): void {
-        this.service.downloadFileFirm(filePath).subscribe(
+        const sanitizedPath = filePath.replace(/\s+/g, ' ');
+        this.service.downloadFileFirm(sanitizedPath).subscribe(
             (response: HttpResponse<Blob>) => {
                 const binaryData = [response.body];
                 const mimeType =
                     response.body?.type || 'application/octet-stream';
                 const blob = new Blob(binaryData, { type: mimeType });
                 const blobUrl = window.URL.createObjectURL(blob);
+
+                // Ensure filename is properly extracted and decoded
                 const fileName = this.extractFileName(filePath);
                 const isImage = mimeType.startsWith('image/');
 
@@ -464,24 +457,33 @@ rejectApplication () {}
                 );
                 if (newWindow) {
                     newWindow.document.write(`
-                               <html>
-                                   <head><title>File Preview</title></head>
-                                   <body style="margin:0; text-align: center;">
-                                       <div style="padding:10px;">
-                                           <a href="${blobUrl}" download="${fileName}" style="font-size:16px; color:blue;" target="_blank">⬇ Download File</a>
-                                       </div>
-                                       ${
-                                           isImage
-                                               ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
-                                               : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`
-                                       }
-                                   </body>
-                               </html>
-                           `);
-                    setTimeout(
-                        () => window.URL.revokeObjectURL(blobUrl),
-                        10000
-                    );
+                    <html>
+                        <head>
+                            <title>File Preview</title>
+                        </head>
+                        <body style="margin:0; text-align: center;">
+                            <div style="padding:10px;">
+                                <a href="${blobUrl}" download="${fileName}" 
+                                   style="font-size:16px; color:blue;" 
+                                   target="_blank">⬇ Download ${fileName}</a>
+                            </div>
+                            ${
+                                isImage
+                                    ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
+                                    : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`
+                            }
+                        </body>
+                    </html>
+                `);
+
+                    // Clean up after window is closed
+                    newWindow.onbeforeunload = () => {
+                        window.URL.revokeObjectURL(blobUrl);
+                    };
+                } else {
+                    console.error('Failed to open the new window');
+                    // Fallback to direct download if window fails to open
+                    this.forceDownload(blob, fileName);
                 }
             },
             (error: HttpErrorResponse) => {
@@ -493,12 +495,55 @@ rejectApplication () {}
         );
     }
 
-    // Extract filename from full path
-    extractFileName(filePath: string): string {
-        return (
-            filePath.split('/').pop() ||
-            filePath.split('\\').pop() ||
-            'downloaded-file'
-        );
+    // Improved filename extraction
+    private extractFileName(filePath: string): string {
+        try {
+            // Handle URL encoded paths
+            const decodedPath = decodeURIComponent(filePath);
+            // Extract filename and remove any query parameters
+            return decodedPath.split('/').pop()?.split('?')[0] || 'download';
+        } catch {
+            return filePath.split('/').pop() || 'download';
+        }
+    }
+
+    // Fallback direct download method
+    private forceDownload(blob: Blob, fileName: string) {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = fileName;
+        document.body.appendChild(a);
+        a.click();
+        setTimeout(() => {
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        }, 100);
+    }
+
+       getVehicleData(data:any) {
+      this.service.getVehicleDetails(data.vehicleNumber,'Light_Vehicle')
+                .subscribe(
+                (response: any) => {
+                    const data = response.vehicleDetail;
+                    this.VehicleDetails = data;
+                 if ( response.vehicleDetail.vehicleRegistrationDetailsId ===0) {
+                        this.showErrorMessage =
+                            'No details found for this RegNo in BCTA';
+                        console.warn('No details found for this RegNo in BCTA');
+                    } else {
+                        this.showErrorMessage = ''; // Clear error if successful
+                    }
+                },
+                (error) => {
+                    if (error.status === 404) {
+                        this.showErrorMessage =
+                            'No details found for this RegNo in BCTA';
+                    } else {
+                        this.showErrorMessage = 'An unexpected error occurred';
+                    }
+                    this.showSuccessMessage = ''; // Clear success message on error
+                }
+            );
     }
 }

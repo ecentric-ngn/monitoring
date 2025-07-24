@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonService } from '../../../../../../../../service/common.service';
 import Swal from 'sweetalert2';
@@ -6,7 +6,7 @@ import { forkJoin } from 'rxjs';
 import { AuthServiceService } from '../../../../../../../../auth.service';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 declare var bootstrap: any;
-
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 @Component({
     selector: 'app-permanent-employees',
     templateUrl: './permanent-employees.component.html',
@@ -15,18 +15,22 @@ declare var bootstrap: any;
 export class PermanentEmployeesComponent {
     tableData: any[] = [];
     formData: any = {};
-    @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
+    @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
     bctaNo: any;
+    @ViewChild('closeActionModal', { static: false }) closeActionModal!: ElementRef;
     @Input() id: string = '';
     applicationStatus: string = '';
     tData: any;
     isSaving = false;
     showErrorMessage: any;
     licenseStatus: any;
+    data: any;
+
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+          private notification: NzNotificationService,
     ) {}
     private getPrefix(workCategory: string): string {
         if (workCategory.startsWith('S-')) return 'S';
@@ -46,8 +50,10 @@ export class PermanentEmployeesComponent {
         const WorkDetail = this.service.getData('BctaNo');
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
+        this.data = WorkDetail.data;
         this.licenseStatus = WorkDetail.data.licenseStatus;
         this.applicationStatus = WorkDetail.data.applicationStatus;
+        debugger
         this.tData = {
             hrFulfilled: '',
             resubmitDate: '',
@@ -81,13 +87,7 @@ export class PermanentEmployeesComponent {
     );
   }
     fetchTdsHcPension() {}
-    closeReinstateModal() {
-        if (this.reinstateModal) {
-            this.reinstateModal.hide();
-        }
-    }
-    reinstateModal: any = null;
-    reinstateData: any = null;
+ 
     bsModal: any;
     downgradeList: any[] = [];
     workClassificationList: any[] = [];
@@ -159,9 +159,7 @@ export class PermanentEmployeesComponent {
     }
 
     closeModal() {
-        if (this.bsModal) {
-            this.bsModal.hide();
-        }
+        this.closeActionModal.nativeElement.click();
     }
 
   onActionTypeChange() {
@@ -298,10 +296,12 @@ export class PermanentEmployeesComponent {
                 console.log('Downgrade response:', res);
                 if (res && res.toLowerCase().includes('downgrade request submitted')) {
                     Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                     this.router.navigate(['monitoring/consultancy']);
                     this.closeModal();
                 } else {
                     Swal.fire('Error', res || 'Something went wrong while forwarding.', 'error');
                     this.closeModal();
+                     this.router.navigate(['monitoring/consultancy']);
                 }
             },
             error: (err) => {
@@ -316,7 +316,7 @@ export class PermanentEmployeesComponent {
         console.log('Suspend action initiated.');
 
         const payload = {
-            firmNo: this.selectedAction.target?.consultantNo,
+            firmNo:  this.bctaNo,
             suspendedBy: this.authService.getUsername(),
             suspensionDate: this.selectedAction.actionDate
                 ? new Date(this.selectedAction.actionDate).toISOString()
@@ -324,14 +324,12 @@ export class PermanentEmployeesComponent {
             firmType: 'Consultant',
             suspendDetails: this.selectedAction.remarks,
         };
-
-        console.log('Suspend payload:', payload);
-
         this.service.suspendFirm(payload).subscribe({
             next: (res) => {
                 console.log('Suspend response:', res);
                 Swal.fire('Success', 'Forwarded to Review Committee', 'success');
                 this.closeModal();
+                 this.router.navigate(['monitoring/consultancy']);
             },
             error: (err) => {
                 console.error('Error during suspension:', err);
@@ -340,60 +338,37 @@ export class PermanentEmployeesComponent {
         });
     }
 }
-
-
- 
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row,
-            firmType: 'consultant',
-            licenseStatus: 'Active',
-        };
-
-        const approvePayload = {
-            firmType: 'Consultant',
-            cdbNos: row,
-        };
-
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
-                    this.closeModal();
-                } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
-                }
-                this.router.navigate(['/monitoring/consultancy']);
-                this.closeModal();
+   rejectApplication() {
+          this.service.rejectApplication('consultant',this.data.consultantNo).subscribe(
+            (response: any) => {
+              console.log('Application rejected successfully:', response);
+              this.createNotification(
+                'success',
+                'Success',
+                'Application rejected successfully'
+              );
+              this.closeModal();
+              this.router.navigate(['monitoring/construction']);
             },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
-    }
-    emptyHrFulfilledMsg: string = '';
+            (error) => {
+              console.error('Error rejecting application:', error);
+              this.createNotification(
+                'error',
+                'Error',
+                'Failed to reject application'
+              );
+            }
+          )
+        }
+createNotification(
+  type: 'success' | 'error' | 'info' | 'warning',
+  title: string,
+  message: string
+): void {
+  this.notification[type](title, message).onClick.subscribe(() => {
+  });
+}
+ emptyHrFulfilledMsg: string = '';
  update() {
     // Clear previous message
     this.emptyHrFulfilledMsg = '';
@@ -442,7 +417,6 @@ export class PermanentEmployeesComponent {
     tableId: any;
     saveAndNext() {
         this.isSaving = true;
-
         const table = this.service.setData(
             this.id,
             'tableId',
@@ -472,10 +446,9 @@ export class PermanentEmployeesComponent {
         this.service.saveOfficeSignageAndDocConsultancy(payload).subscribe(
             (res: any) => {
                 this.isSaving = false;
-                console.log('res', res);
-                //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
                 this.activateTab.emit({
                     id: this.tableId,
+                    data:this.data,
                     tab: 'consultancyEquipment',
                 });
             },

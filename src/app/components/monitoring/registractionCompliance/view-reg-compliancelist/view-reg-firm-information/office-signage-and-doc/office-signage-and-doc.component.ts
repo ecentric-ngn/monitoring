@@ -135,23 +135,98 @@ export class OfficeSignageAndDocComponent implements OnInit {
                       console.error('Error fetching downgrade data:', err);
                   }
               });
-              debugger
+              
           } else {
               // Reset the downgrade list if the action type is not 'downgrade'
               this.downgradeList = [];
           }
       }
+        saveAndForward() {
+        this.isSaving = true;
+        const payload = {
+      registrationReview: {
+        bctaNo: this.data.contractorNo,
+        firmName: this.formData.firmName,
+        contactNo: this.formData.mobileNo,
+        email: this.formData.emailAddress,
+        classification: this.formData.classification,
+        applicationStatus: this.data.status,
+        officeSignboard: this.formData.officeSignboardPath,
+        osresubmitDeadline: this.formData.signboardResubmitDate,
+        filingSystem: this.formData.properFillingPath,
+        ohsHandbook: this.formData.ohsHandBook,
+        ohsReview: this.formData.ohsReview,
+        ohsRemarks: this.formData.generalRemarks,
+        reviewDate: this.formData.reviewDate,
+        fsreview: this.formData.filingReview,
+        fsremarks: this.formData.filingRemarks,
+        fsresubmitDeadline: this.formData.filingResubmitDate,
+        oslocation: this.formData.officeLocation,
+        osreview: this.formData.signboardReview,
+        osremarks: this.formData.signboardRemarks,
+      }
+    };
 
-        rejectApplication() {
-          
+  this.service.saveOfficeSignageAndDoc(payload).subscribe(
+  (response: any) => {
+    this.isSaving = false;
+    try {
+      const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+      this.id = parsedResponse.registrationReview?.id;
+      this.activateTab.emit({ id: this.id, tab: 'employee' });
+    } catch (e) {
+      console.error('Error parsing response:', e);
+    }
+  },
+  (error) => {
+    this.isSaving = false;
+
+    if (error.status === 500) {
+      this.createNotification(
+        'error',
+        'Server Error',
+        'A server error occurred (500). Please try again later.'
+      );
+    } else {
+      this.createNotification(
+        'error',
+        'Error',
+        'Something went wrong while sending the list.'
+      );
+    }
+
+    console.error('Error saving data:', error);
+  }
+);
+  }
+
+   rejectApplication() {
+          this.service.rejectApplication('Contractor',this.data.contractorNo).subscribe(
+            (response: any) => {
+              console.log('Application rejected successfully:', response);
+              this.createNotification(
+                'success',
+                'Success',
+                'Application rejected successfully'
+              );
+              this.closeModal();
+              this.router.navigate(['monitoring/construction']);
+            },
+            (error) => {
+              console.error('Error rejecting application:', error);
+              this.createNotification(
+                'error',
+                'Error',
+                'Failed to reject application'
+              );
+            }
+          )
         }
             /**
              * Submit action for downgrade, suspend or cancel
              * Validates the input, constructs the payload and calls the respective API
              */
   submitAction() {
-    console.log('submitAction() called', this.selectedAction); // Log initial action data
-    
     if (!this.selectedAction.actionType || !this.selectedAction.actionDate || !this.selectedAction.remarks) {
         console.error('Validation failed - missing required fields', {
             actionType: this.selectedAction.actionType,
@@ -330,15 +405,17 @@ export class OfficeSignageAndDocComponent implements OnInit {
   }
 
 downloadFile(filePath: string): void {
-    this.service.downloadFileFirm(filePath).subscribe(
+  const sanitizedPath = filePath.replace(/\s+/g, ' ');
+  this.service.downloadFileFirm(sanitizedPath).subscribe(
         (response: HttpResponse<Blob>) => {
             const binaryData = [response.body];
             const mimeType = response.body?.type || 'application/octet-stream';
             const blob = new Blob(binaryData, { type: mimeType });
             const blobUrl = window.URL.createObjectURL(blob);
 
+            // Ensure filename is properly extracted and decoded
             const fileName = this.extractFileName(filePath);
-            const isImage = mimeType.startsWith('image/'); // Check if the file is an image
+            const isImage = mimeType.startsWith('image/');
 
             const newWindow = window.open('', '_blank', 'width=800,height=600');
             if (newWindow) {
@@ -349,7 +426,9 @@ downloadFile(filePath: string): void {
                         </head>
                         <body style="margin:0; text-align: center;">
                             <div style="padding:10px;">
-                                <a href="${blobUrl}" download="${fileName}" style="font-size:16px; color:blue;" target="_blank">⬇ Download File</a>
+                                <a href="${blobUrl}" download="${fileName}" 
+                                   style="font-size:16px; color:blue;" 
+                                   target="_blank">⬇ Download ${fileName}</a>
                             </div>
                             ${isImage
                                 ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
@@ -358,12 +437,14 @@ downloadFile(filePath: string): void {
                     </html>
                 `);
 
-                // Delay the revoke to give browser time to load
-                setTimeout(() => {
+                // Clean up after window is closed
+                newWindow.onbeforeunload = () => {
                     window.URL.revokeObjectURL(blobUrl);
-                }, 10000);
+                };
             } else {
                 console.error('Failed to open the new window');
+                // Fallback to direct download if window fails to open
+                this.forceDownload(blob, fileName);
             }
         },
         (error: HttpErrorResponse) => {
@@ -375,14 +456,30 @@ downloadFile(filePath: string): void {
     );
 }
 
+// Improved filename extraction
+private extractFileName(filePath: string): string {
+    try {
+        // Handle URL encoded paths
+        const decodedPath = decodeURIComponent(filePath);
+        // Extract filename and remove any query parameters
+        return decodedPath.split('/').pop()?.split('?')[0] || 'download';
+    } catch {
+        return filePath.split('/').pop() || 'download';
+    }
+}
 
-
-extractFileName(filePath: string): string {
-    return (
-        filePath.split('/').pop() ||
-        filePath.split('\\').pop() ||
-        'downloaded-file'
-    );
+// Fallback direct download method
+private forceDownload(blob: Blob, fileName: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 100);
 }
   isOfficeSignboardEnabled(): boolean {
     return ['Resubmitted OS', 'Resubmitted OS and PFS', 'Submitted'].includes(this.applicationStatus);
@@ -418,7 +515,6 @@ isFieldEditable(field: string): boolean {
 
 
   update() {
-
     this.isSaving = true;
     const payload = {
       registrationReview: {
@@ -471,16 +567,6 @@ clearErrorMessage() {
       this.isSaving = false;
       return;
     }
-
-    // if (this.formData.signboardReview === 'No' && !this.formData.signboardResubmitDate) {
-    //   alert("Please provide resubmit date for office signboard.");
-    //   return;
-    // }
-
-    // if (this.formData.filingReview === 'No' && !this.formData.filingResubmitDate) {
-    //   alert("Please provide resubmit date for proper filing system.");
-    //   return;
-    // }
     const payload = {
       registrationReview: {
         bctaNo: this.data.contractorNo,
@@ -502,12 +588,6 @@ clearErrorMessage() {
         oslocation: this.formData.officeLocation,
         osreview: this.formData.signboardReview,
         osremarks: this.formData.signboardRemarks,
-        hrFulfilled: "",
-        hrResubmitDeadline: "",
-        hrRemarks: "",
-        eqFulfilled: "",
-        eqResubmitDeadline: "",
-        eqRemarks: ""
       }
     };
 

@@ -5,6 +5,7 @@ import Swal from 'sweetalert2';
 import { AuthServiceService } from '../../../../../../../../auth.service';
 import { forkJoin } from 'rxjs';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { NzNotificationService } from 'ng-zorro-antd/notification';
 declare var bootstrap: any;
 @Component({
     selector: 'app-cb-permanent-employees',
@@ -13,7 +14,7 @@ declare var bootstrap: any;
 })
 export class CbPermanentEmployeesComponent {
     formData: any = {};
-    @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
+    @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
     bctaNo: any;
     tableData: any;
     @Input() id: string = '';
@@ -26,16 +27,17 @@ export class CbPermanentEmployeesComponent {
     downgradeList: any[] = [];
     licenseStatus: string = '';
     today: string = new Date().toISOString().substring(0, 10);
-  showErrorMessage: any;
+    showErrorMessage: any;
+    @Input() data: any
     constructor(
         private service: CommonService,
         private router: Router,
-        private authService: AuthServiceService
+        private authService: AuthServiceService,
+          private notification: NzNotificationService,
     ) {}
 
     ngOnInit() {
         this.id = this.id;
-        console.log('idinemployee', this.id);
          const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -45,6 +47,7 @@ export class CbPermanentEmployeesComponent {
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.certifiedBuilderNo;
         this.licenseStatus = WorkDetail.data.licenseStatus;
+         this.data = this.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
         this.tData = {
             hrFulfilled: '',
@@ -83,7 +86,6 @@ export class CbPermanentEmployeesComponent {
     fetchDataBasedOnBctaNo() {
         this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
             this.tableData = res.hrCompliance;
-            console.log('employee', this.formData);
         });
     }
 
@@ -95,8 +97,6 @@ export class CbPermanentEmployeesComponent {
             newClassification: '',
             target: row, // attach row data if needed
         };
-        console.log('Row passed to modal:', row);
-
         const modalEl = document.getElementById('actionModal');
         this.bsModal = new bootstrap.Modal(modalEl, {
             backdrop: 'static', // Optional: prevents closing on outside click
@@ -104,63 +104,114 @@ export class CbPermanentEmployeesComponent {
         });
         this.bsModal.show();
     }
-    // Handle file download and preview logic
-    downloadFile(filePath: string): void {
-        this.service.downloadFileFirm(filePath).subscribe(
-            (response: HttpResponse<Blob>) => {
-                const binaryData = [response.body];
-                const mimeType =
-                    response.body?.type || 'application/octet-stream';
-                const blob = new Blob(binaryData, { type: mimeType });
-                const blobUrl = window.URL.createObjectURL(blob);
-                const fileName = this.extractFileName(filePath);
-                const isImage = mimeType.startsWith('image/');
+downloadFile(filePath: string): void {
+  const sanitizedPath = filePath.replace(/\s+/g, ' ');
+  this.service.downloadFileFirm(sanitizedPath).subscribe(
+        (response: HttpResponse<Blob>) => {
+            const binaryData = [response.body];
+            const mimeType = response.body?.type || 'application/octet-stream';
+            const blob = new Blob(binaryData, { type: mimeType });
+            const blobUrl = window.URL.createObjectURL(blob);
 
-                const newWindow = window.open(
-                    '',
-                    '_blank',
-                    'width=800,height=600'
-                );
-                if (newWindow) {
-                    newWindow.document.write(`
-                           <html>
-                               <head><title>File Preview</title></head>
-                               <body style="margin:0; text-align: center;">
-                                   <div style="padding:10px;">
-                                       <a href="${blobUrl}" download="${fileName}" style="font-size:16px; color:blue;" target="_blank">⬇ Download File</a>
-                                   </div>
-                                   ${
-                                       isImage
-                                           ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
-                                           : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`
-                                   }
-                               </body>
-                           </html>
-                       `);
-                    setTimeout(
-                        () => window.URL.revokeObjectURL(blobUrl),
-                        10000
+            // Ensure filename is properly extracted and decoded
+            const fileName = this.extractFileName(filePath);
+            const isImage = mimeType.startsWith('image/');
+
+            const newWindow = window.open('', '_blank', 'width=800,height=600');
+            if (newWindow) {
+                newWindow.document.write(`
+                    <html>
+                        <head>
+                            <title>File Preview</title>
+                        </head>
+                        <body style="margin:0; text-align: center;">
+                            <div style="padding:10px;">
+                                <a href="${blobUrl}" download="${fileName}" 
+                                   style="font-size:16px; color:blue;" 
+                                   target="_blank">⬇ Download ${fileName}</a>
+                            </div>
+                            ${isImage
+                                ? `<img src="${blobUrl}" style="max-width:100%; height:auto;" alt="Image Preview"/>`
+                                : `<iframe src="${blobUrl}" width="100%" height="90%" style="border:none;"></iframe>`}
+                        </body>
+                    </html>
+                `);
+
+                // Clean up after window is closed
+                newWindow.onbeforeunload = () => {
+                    window.URL.revokeObjectURL(blobUrl);
+                };
+            } else {
+                console.error('Failed to open the new window');
+                // Fallback to direct download if window fails to open
+                this.forceDownload(blob, fileName);
+            }
+        },
+        (error: HttpErrorResponse) => {
+            if (error.status === 404) {
+                console.error('File not found', error);
+                this.showErrorMessage();
+            }
+        }
+    );
+}
+
+// Improved filename extraction
+private extractFileName(filePath: string): string {
+    try {
+        // Handle URL encoded paths
+        const decodedPath = decodeURIComponent(filePath);
+        // Extract filename and remove any query parameters
+        return decodedPath.split('/').pop()?.split('?')[0] || 'download';
+    } catch {
+        return filePath.split('/').pop() || 'download';
+    }
+}
+
+// Fallback direct download method
+private forceDownload(blob: Blob, fileName: string) {
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => {
+        document.body.removeChild(a);
+        window.URL.revokeObjectURL(url);
+    }, 100);
+}
+   rejectApplication() {
+        this.service
+            .rejectApplication('certified-Builder', this.bctaNo)
+            .subscribe(
+                (response: any) => {
+                    console.log('Application rejected successfully:', response);
+                    this.createNotification(
+                        'success',
+                        'Success',
+                        'Application rejected successfully'
+                    );
+                    this.closeModal();
+                    this.router.navigate(['monitoring/construction']);
+                },
+                (error) => {
+                    console.error('Error rejecting application:', error);
+                    this.createNotification(
+                        'error',
+                        'Error',
+                        'Failed to reject application'
                     );
                 }
-            },
-            (error: HttpErrorResponse) => {
-                if (error.status === 404) {
-                    console.error('File not found', error);
-                    this.showErrorMessage();
-                }
-            }
-        );
+            );
     }
-
-    // Extract filename from full path
-    extractFileName(filePath: string): string {
-        return (
-            filePath.split('/').pop() ||
-            filePath.split('\\').pop() ||
-            'downloaded-file'
-        );
+    createNotification(
+        type: 'success' | 'error' | 'info' | 'warning',
+        title: string,
+        message: string
+    ): void {
+        this.notification[type](title, message).onClick.subscribe(() => {});
     }
-rejectApplication() {}
     update() {
         this.isSaving = true;
         const payload = {
@@ -230,9 +281,7 @@ rejectApplication() {}
         this.service.saveOfficeSignageAndDocCB(payload).subscribe(
             (res: any) => {
                 this.isSaving = false;
-                console.log('res', res);
-                //  this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
-                this.activateTab.emit({ id: this.tableId, tab: 'cbEquipment' });
+                this.activateTab.emit({ id: this.tableId,data: this.data, tab: 'cbEquipment' });
             },
             (err) => {
                 this.isSaving = false;
@@ -315,56 +364,6 @@ rejectApplication() {}
         }
     }
 
-    reinstate(row: any) {
-        const payload = {
-            firmNo: row,
-            firmType: 'certified-builder',
-            licenseStatus: 'Active',
-        };
-
-        const approvePayload = {
-            firmType: 'CertifiedBuilder',
-            cdbNos: row,
-        };
-
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
-                    this.closeModal();
-                } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
-                }
-                this.router.navigate(['/monitoring/certified']);
-                this.closeModal();
-            },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
-    }
     bsModal: any;
     closeModal() {
         if (this.bsModal) {

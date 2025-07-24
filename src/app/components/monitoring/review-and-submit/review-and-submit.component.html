@@ -652,6 +652,29 @@
     </div>
   </form>
 
+  <span class=" font-bold font-size-12">view doc name of contractor present during the site monitoring</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th>SL No.</th>
+          <th>CID No</th>
+          <th>Full Name</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- <tr *ngIf="?.length === 0">
+          <td colspan="10" class="text-center">No data found</td>
+        </tr> -->
+        <tr *ngFor="let item of contractorsList; let i = index">
+          <td class="text-center bg-white">{{ i+1}}</td>
+          <td class="text-center bg-white">{{ item.cid_no }}</td>
+          <td class="text-center bg-white">{{ item.full_name }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </form>
   <span class=" font-bold font-size-12">view doc name of client site engineers present during the site monitoring</span>
   <hr>
   <form>
@@ -682,7 +705,6 @@
       </tbody>
     </table>
   </form>
-
   <span class=" font-bold font-size-12">Monitoring team names, BCTA officials</span>
   <hr>
   <form>
@@ -711,5 +733,17 @@
 </div>
 <div class="justify-content-end d-flex">
   <button class="btn mr-1 text-white prev-btn" type="submit" (click)="onPreviousClick()">Prev</button>
-  <button class="btn text-white save-next-btn" (click)="submitAllData()" type="submit">Submit</button>
+ <a nz-popconfirm 
+   [nzPopconfirmTitle]="'Are you sure you want to submit? Please check all details before submitting.'"
+   [nzOkText]="'Submit'"
+   [nzCancelText]="'Cancel'"
+   (nzOnConfirm)="submitAllData()">
+   
+   <button class="btn text-white save-next-btn" 
+           type="button" 
+           [disabled]="isSubmitting">
+     <span *ngIf="isSubmitting" class="spinner-border spinner-border-sm me-2"></span>
+     {{ isSubmitting ? 'Submitting...' : 'Submit' }}
+   </button>
+</a>
 </div>

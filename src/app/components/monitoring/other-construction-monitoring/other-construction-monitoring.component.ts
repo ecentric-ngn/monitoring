@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonService } from '../../../service/common.service';
 import { NgForm } from '@angular/forms';
@@ -14,6 +14,7 @@ export class OtherConstructionMonitoringComponent {
     displayMessage: string;
     dzongkhagList: any;
     tableData: any;
+   @ViewChild('closeModal', { static: false }) closeModal: ElementRef;
     constructor(private router: Router, private service: CommonService) {}
 
     ngOnInit() {
@@ -123,6 +124,7 @@ pageSize:number = 10;
         this.service.saveNewContractorInformationData(contractorDetails).subscribe(
                 (response: any) => {
                     // Success handler
+                     this.closeModal.nativeElement.click() 
                     const idMatch = response.match(/\d+/); // extract digits from string
                     this.newContractorId = idMatch
                         ? parseInt(idMatch[0], 10)
@@ -139,7 +141,7 @@ pageSize:number = 10;
                         'BctaNo',
                         'monitoring/WorkDetail'
                     );
-                },
+                 },
                 (error: any) => {
                     console.error('Error saving work information', error);
                     // Optionally show error toast or message
