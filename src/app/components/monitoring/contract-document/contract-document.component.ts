@@ -235,7 +235,7 @@ export class ContractDocumentComponent {
     private saveDraftPayload() {
         const payload = {
             id: parseInt(this.tableId, 10),
-            workID: this.workId,
+            workID: this.workId || '',
             constructionPermitAvailable: this.formData.ConstructionPermit,
             constructionConditionsComplied: this.formData.contractConditions,
             workersInsurance: this.formData.workInsurance,

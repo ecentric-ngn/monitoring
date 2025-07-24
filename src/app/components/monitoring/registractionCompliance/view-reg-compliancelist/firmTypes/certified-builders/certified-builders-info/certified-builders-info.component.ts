@@ -88,7 +88,6 @@ isTabEnabled(tabId: string): boolean {
     } else if (this.type === 'cbEquipment') {
       this.activeTabId = 'cbEquipment';
          this.data = event.data
-         debugger
     } else if (this.type === 'cbMonitoring') {
       this.activeTabId = 'cbMonitoring';
          this.data = event.data
@@ -99,15 +98,18 @@ isTabEnabled(tabId: string): boolean {
 
   specializedFirmForm() {
     this.id = this.id
+    this.data=this.data
     this.activeTabId = 'cbEmployee';
   }
   equipmentForm() {
     this.id = this.id
+    this.data=this.data
     this.activeTabId = 'cbEquipment';
   }
 
   monitoringTeam() {
     this.id = this.id
+       this.data=this.data
     this.activeTabId = 'cbMonitoring';
   }
 }

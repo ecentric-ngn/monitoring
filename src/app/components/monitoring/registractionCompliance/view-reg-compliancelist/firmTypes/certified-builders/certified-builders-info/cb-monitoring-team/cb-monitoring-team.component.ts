@@ -20,13 +20,14 @@ formData: any = {};
 
   @Input() id: string = ''; // Input from parent component
   applicationStatus: any={};
-
+@Input() data: any
   constructor(@Inject(CommonService) private service: CommonService,
    private router: Router,
   private authService: AuthServiceService) { }
 
   ngOnInit() {
-
+    this.data = this.data
+       this.applicationStatus = this.data.applicationStatus;
     this.username = this.authService.getUsername() || 'NA';
         const WorkDetail = this.service.getData('BctaNo');
    this.applicationStatus = WorkDetail.data.applicationStatus
@@ -79,14 +80,15 @@ formData: any = {};
 
     reinstate(row: any) {
           const payload = {
-              firmNo: row,
+              firmNo: this.data.certifiedBuilderNo,
               firmType: 'certified-builder',
               licenseStatus: 'Active',
+               applicationStatus: 'Reinstated',
           };
   
           const approvePayload = {
               firmType: 'CertifiedBuilder',
-              cdbNos: row,
+              cdbNos: this.data.certifiedBuilderNo,
           };
           forkJoin({
               reinstate: this.service.reinstateLicense(payload),

@@ -328,6 +328,7 @@ private forceDownload(blob: Blob, fileName: string) {
                         'success'
                     );
                     this.closeModal();
+                     this.router.navigate(['monitoring/construction']);
                 },
                 error: (err) => {
                     Swal.fire(
@@ -356,6 +357,7 @@ private forceDownload(blob: Blob, fileName: string) {
                         'success'
                     );
                     this.closeModal();
+                     this.router.navigate(['monitoring/construction']);
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');

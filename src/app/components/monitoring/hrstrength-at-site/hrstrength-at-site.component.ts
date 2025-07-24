@@ -119,7 +119,7 @@ export class HRStrengthAtSiteComponent {
                     totalNonBhutaneseLabors:
                         this.formData.totalNoOfNumericNonBhutaneseLabors,
                     id: this.tableId,
-                    workID: this.workId,
+                    workID: this.workId || '',
                 };
 
                 this.service.saveAsDraft(payload).subscribe((response: any) => {

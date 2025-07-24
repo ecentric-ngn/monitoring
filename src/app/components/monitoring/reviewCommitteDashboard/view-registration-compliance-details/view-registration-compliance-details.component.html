@@ -53,7 +53,7 @@
             <td>{{ action.type }}</td>
             <td>{{ action.details }}</td>
             <td>{{ action.subject }}</td>
-            <td>{{ action.sentDate | date: 'mediumDate' }}</td>
+            <td>{{ action.sentDate | date: 'yyyy-MM-dd' }}</td>
             <td>
               <span [ngClass]="getStatusClass(action.status)">
                 {{ action.applicationStatus }}
@@ -134,7 +134,7 @@
             <td>{{ action.firmType }}</td>
             <td>{{ action.details }}</td>
             <td>{{ action.initiatedBy }}</td>
-            <td>{{ action.createdOn}}</td>
+            <td>{{ action.createdOn | date: 'yyyy-MM-dd'}}</td>
             <td>
               <span [ngClass]="getStatusClass(action.status)">
                 {{ action.status }}
@@ -231,7 +231,7 @@
             <td>{{ app.firmType }}</td>
             <td>{{ app.details }}</td>
             <td>{{ app.initiatedBy }}</td>
-            <td>{{ app.initiatedDate | date:'mediumDate' }}</td>
+            <td>{{ app.initiatedDate | date: 'yyyy-MM-dd' }}</td>
             <td>{{ app.status}}</td>
             <td class="text-center">
               <input type="checkbox" [(ngModel)]="app.selected" (change)="onCheckboxChange(app)">
@@ -350,7 +350,7 @@
                 title="{{ item.details }}">{{ item.details }}</td>
               <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.fromTo }}</td>
               <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.initiatedBy }}</td>
-              <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.initiatedDate | date:'medium' }}
+              <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.initiatedDate | date: 'yyyy-MM-dd' }}
               </td>
               <td class="text-wrap">
                   {{ item.status }}

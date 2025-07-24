@@ -236,7 +236,7 @@ const payload = {
     mobileNo: item.mobileNo
   })),
   id: this.prevTableId || this.tableId,
-  workID: this.workId
+  workID: this.workId || ''
 };
 
 

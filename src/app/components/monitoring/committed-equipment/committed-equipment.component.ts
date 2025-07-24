@@ -821,7 +821,7 @@ export class CommittedEquipmentComponent {
         const payload = {
             committedEquipments: this.savedData,
             id: this.tableId,
-            workID: this.workId,
+            workID: this.workId || '',
         };
 
         this.service.saveAsDraft(payload).subscribe({

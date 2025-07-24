@@ -258,7 +258,7 @@ saveMonitorTeamList(form: NgForm) {
   console.log('Combined Payload:', payload);
 
   // Send merged data to backend
-  this.service.saveMonitoringTeamData(payload, this.tableId,this.workId).subscribe({
+  this.service.saveMonitoringTeamData(payload, this.tableId,this.workId || '').subscribe({
     next: (response: any) => {
       this.createNotification();
       this.monitoringData.emit(this.tableId);

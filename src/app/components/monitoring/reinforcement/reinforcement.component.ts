@@ -314,7 +314,7 @@ export class ReinforcementComponent {
             remarks: entry.remarks,
         }));
 
-      this.service.saveReinforcementData(payload, this.tableId, this.workId).subscribe({
+      this.service.saveReinforcementData(payload, this.tableId, this.workId || '').subscribe({
   next: (response: any) => {
     const parsedResponse = JSON.parse(response); // Convert string to object
 

@@ -20,8 +20,6 @@ export class CbOfficeSignageComponent {
     applicationStatus: string = '';
     isSaving = false;
     showErrorMessage: any;
-    reinstateData: any = null;
-    reinstateModal: any = null;
     workClassificationList: any[] = [];
     downgradeList: any[] = [];
     selectedAction: any = {
@@ -77,7 +75,7 @@ export class CbOfficeSignageComponent {
                 'Application rejected successfully'
               );
               this.closeModal();
-              this.router.navigate(['monitoring/construction']);
+           this.router.navigate(['/monitoring/certified']);
             },
             (error) => {
               console.error('Error rejecting application:', error);
@@ -413,7 +411,7 @@ createNotification(
                         timer: 2000,
                         showConfirmButton: false,
                     });
-                    this.router.navigate(['monitoring/construction']);
+                  this.router.navigate(['/monitoring/certified']);
                 } catch (e) {
                     console.error('Error parsing response:', e);
                     Swal.fire(
