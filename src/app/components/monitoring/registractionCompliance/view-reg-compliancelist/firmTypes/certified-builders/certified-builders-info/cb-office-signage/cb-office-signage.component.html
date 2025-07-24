@@ -1,6 +1,6 @@
 <div class="scroll-wrapper">
   <!-- Location Section -->
-  <div class="row ml-4">
+  <div class="row">
     <div class="col-6 mb-3">
       <label class="form-label">Location:<span class="text-danger font-size-12">*</span></label>
       <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.officeLocation"
@@ -132,9 +132,9 @@
           applicationStatus === 'Suspension Resubmission' ||
           applicationStatus === 'Resubmitted OS and PFS'
         ) && (
-          formData.filingReview === 'No' ||
-          formData.ohsReview === 'No' ||
-          formData.signboardReview === 'No'
+          formData.filingReview === 'Yes' ||
+          formData.ohsReview === 'Yes' ||
+          formData.signboardReview === 'Yes'
         )" (click)="saveAndNext()" [disabled]="isSaving">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
         {{ isSaving ? 'Saving...' : 'Save & Next' }}

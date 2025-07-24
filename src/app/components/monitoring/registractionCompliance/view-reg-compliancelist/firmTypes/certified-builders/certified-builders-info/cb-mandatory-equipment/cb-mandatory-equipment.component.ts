@@ -15,7 +15,7 @@ declare var bootstrap: any;
 })
 export class CbMandatoryEquipmentComponent {
     formData: any = {};
-    @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
+    @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
     firmType: any;
     bctaNo: any;
     tableData: any = [];
@@ -43,7 +43,6 @@ export class CbMandatoryEquipmentComponent {
         this.date();
         this.data= this.data;
         this.applicationStatus = this.data.applicationStatus;
-        debugger
         // Initialize formData with default values
         this.formData = {
             vehicleType: '',
@@ -69,7 +68,6 @@ export class CbMandatoryEquipmentComponent {
         this.data = data; // update this.data safely
         this.WorkDetail = WorkDetail ?? {}; // ensure it's at least an object
         this.licenseStatus = this.data.licenseStatus || '';
-        debugger
         this.service.setBctaNo(this.bctaNo);
 
         if (
@@ -172,6 +170,7 @@ export class CbMandatoryEquipmentComponent {
                 this.isSaving = false;
                 this.activateTab.emit({
                     id: this.tableId,
+                    data: this.data,
                     tab: 'cbMonitoring',
                 });
             },
@@ -221,6 +220,7 @@ export class CbMandatoryEquipmentComponent {
                 });
                 this.activateTab.emit({
                     id: this.tableId,
+                    data:this.data,
                     tab: 'cbMonitoring',
                 });
             },
