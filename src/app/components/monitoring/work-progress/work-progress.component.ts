@@ -188,7 +188,7 @@ private saveDraftPayload() {
     physicalProgress: this.formData.physicalprogress,
     financialProgress: this.formData.financialprogress,
     id: this.tableId,
-    workID: this.workId,
+    workID: this.workId || '',
   };
   this.service.saveAsDraft(payload).subscribe({
     next: (response: any) => {

@@ -248,7 +248,7 @@ export class QualificationComponent {
     private saveDraftPayload() {
         const payload = {
             id: this.tableId,
-            workID: this.workId,
+            workID: this.workId || '',
             subContractorExists: this.formData.contractorType,
             bctaRegistrationNo: this.formData.bctaRegistrationNo,
             registrationValidUntil: this.formData.expiryDate,
