@@ -360,6 +360,7 @@ export class CbMandatoryEquipmentComponent {
                         'success'
                     );
                     this.closeModal();
+                    this.router.navigate(['/monitoring/certified']);
                 },
                 error: (err) => {
                     Swal.fire(
@@ -388,6 +389,7 @@ export class CbMandatoryEquipmentComponent {
                         'success'
                     );
                     this.closeModal();
+                    this.router.navigate(['/monitoring/certified']);
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');
@@ -416,7 +418,7 @@ export class CbMandatoryEquipmentComponent {
                         'Application rejected successfully'
                     );
                     this.closeModal();
-                    this.router.navigate(['monitoring/construction']);
+                 this.router.navigate(['/monitoring/certified']);
                 },
                 (error) => {
                     console.error('Error rejecting application:', error);
