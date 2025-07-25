@@ -287,7 +287,8 @@ export class ConsultancyFirmComponent {
             return;
         }
         const payload = this.selectedIds;
-        this.service.forwardToReviewCommitee(payload).subscribe(
+        debugger
+        this.service.forwardToReviewCommiteeConsultancy(payload).subscribe(
             (res) => {
                 console.log('Successfully sent selected IDs:', res);
                 Swal.fire(
@@ -616,6 +617,7 @@ export class ConsultancyFirmComponent {
                             'success'
                         );
                         this.closeModal();
+                        this.fetchComplianceDetails();
                     } else {
                         Swal.fire(
                             'Error',
@@ -623,6 +625,7 @@ export class ConsultancyFirmComponent {
                             'error'
                         );
                         this.closeModal();
+                           this.fetchComplianceDetails();
                     }
                 },
                 error: (err) => {
@@ -633,6 +636,7 @@ export class ConsultancyFirmComponent {
                     );
                     console.error(err);
                     this.closeModal();
+                       this.fetchComplianceDetails();
                 },
             });
         } else if (this.selectedAction.actionType === 'suspend') {
@@ -655,6 +659,7 @@ export class ConsultancyFirmComponent {
                         'success'
                     );
                     this.closeModal();
+                       this.fetchComplianceDetails();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend contractor', 'error');
@@ -692,6 +697,7 @@ export class ConsultancyFirmComponent {
                         'success'
                     );
                     this.closeModal();
+                       this.fetchComplianceDetails();
                 } else {
                     Swal.fire(
                         'Warning',
@@ -701,6 +707,7 @@ export class ConsultancyFirmComponent {
                 }
                 this.router.navigate(['/monitoring/consultancy']);
                 this.closeModal();
+                   this.fetchComplianceDetails();
             },
             error: (err) => {
                 console.error('Reinstatement error:', err);

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Inject, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonService } from '../../../../../../../../service/common.service';
 import Swal from 'sweetalert2';
@@ -14,7 +14,11 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 })
 export class CbOfficeSignageComponent {
     formData: any = {};
-    @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
+    @Output() activateTab = new EventEmitter<{
+        id: string;
+        data: string;
+        tab: string;
+    }>();
     bctaNo: any;
     data: any;
     applicationStatus: string = '';
@@ -32,11 +36,12 @@ export class CbOfficeSignageComponent {
     };
     licenseStatus: any;
     today: any;
+@ViewChild('closeModal') closeModalButton: ElementRef<HTMLButtonElement> | undefined;
     constructor(
         private service: CommonService,
         private router: Router,
         private authService: AuthServiceService,
-        private notification: NzNotificationService,
+        private notification: NzNotificationService
     ) {}
 
     ngOnInit() {
@@ -45,6 +50,8 @@ export class CbOfficeSignageComponent {
             console.error('WorkDetail or WorkDetail.data is undefined');
             return;
         }
+        this.date();
+
         this.formData.firmType = WorkDetail.data;
         this.data = WorkDetail.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
@@ -60,41 +67,56 @@ export class CbOfficeSignageComponent {
         }
     }
 
+    date() {
+        const today = new Date();
+        const yyyy = today.getFullYear();
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const dd = String(today.getDate()).padStart(2, '0');
+        this.selectedAction = this.selectedAction || {};
+        this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
+
+        console.log('Action Date set to:', this.selectedAction.actionDate);
+    }
+
     fetchDataBasedOnBctaNo() {
         this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
             Object.assign(this.formData, res.complianceEntities[0]);
         });
     }
-       rejectApplication() {
-          this.service.rejectApplication('certified-Builder',this.data.certifiedBuilderNo).subscribe(
-            (response: any) => {
-              console.log('Application rejected successfully:', response);
-              this.createNotification(
-                'success',
-                'Success',
-                'Application rejected successfully'
-              );
-              this.closeModal();
-           this.router.navigate(['/monitoring/certified']);
-            },
-            (error) => {
-              console.error('Error rejecting application:', error);
-              this.createNotification(
-                'error',
-                'Error',
-                'Failed to reject application'
-              );
-            }
-          )
-        }
-createNotification(
-  type: 'success' | 'error' | 'info' | 'warning',
-  title: string,
-  message: string
-): void {
-  this.notification[type](title, message).onClick.subscribe(() => {
-  });
-}
+    rejectApplication() {
+        this.service
+            .rejectApplication(
+                'certified-Builder',
+                this.data.certifiedBuilderNo
+            )
+            .subscribe(
+                (response: any) => {
+                    console.log('Application rejected successfully:', response);
+                    this.createNotification(
+                        'success',
+                        'Success',
+                        'Application rejected successfully'
+                    );
+                    this.closeModal();
+                    this.router.navigate(['/monitoring/certified']);
+                },
+                (error) => {
+                    console.error('Error rejecting application:', error);
+                    this.createNotification(
+                        'error',
+                        'Error',
+                        'Failed to reject application'
+                    );
+                }
+            );
+    }
+    createNotification(
+        type: 'success' | 'error' | 'info' | 'warning',
+        title: string,
+        message: string
+    ): void {
+        this.notification[type](title, message).onClick.subscribe(() => {});
+    }
 
     fetchSuspendDataBasedOnBctaNo() {
         this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
@@ -105,21 +127,6 @@ createNotification(
                 console.error('Error fetching data:', error);
             }
         );
-    }
-    openActionModal(row: any) {
-        this.selectedAction = {
-            actionType: '',
-            actionDate: this.today,
-            remarks: '',
-            newClassification: '',
-            target: row, // attach row data if needed
-        };
-        const modalEl = document.getElementById('actionModal');
-        this.bsModal = new bootstrap.Modal(modalEl, {
-            backdrop: 'static', // Optional: prevents closing on outside click
-            keyboard: false, // Optional: disables ESC key closing
-        });
-        this.bsModal.show();
     }
     onReviewChange() {
         if (this.formData.signboardReview === 'No') {
@@ -284,13 +291,19 @@ createNotification(
         }
     }
 
-  
     bsModal: any;
-    closeModal() {
-        if (this.bsModal) {
-            this.bsModal.hide();
-        }
-    }
+  closeModal() {
+  if (this.bsModal) {
+    this.bsModal.hide();
+  }
+
+  if (this.closeModalButton) {
+    this.closeModalButton.nativeElement.click(); // trigger the close button
+  }
+
+  this.router.navigate(['/monitoring/certified']);
+}
+
 
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'downgrade') {
@@ -411,7 +424,7 @@ createNotification(
                         timer: 2000,
                         showConfirmButton: false,
                     });
-                  this.router.navigate(['/monitoring/certified']);
+                    this.router.navigate(['/monitoring/certified']);
                 } catch (e) {
                     console.error('Error parsing response:', e);
                     Swal.fire(
@@ -455,7 +468,6 @@ createNotification(
                 fsreview: this.formData.filingReview,
                 fsremarks: this.formData.fsRemarks,
                 reviewDate: this.formData.reviewDate,
-              
             },
         };
         this.service.saveOfficeSignageAndDocCB(payload).subscribe(
@@ -469,7 +481,11 @@ createNotification(
                 // this.service.setData(this.id, 'tableId', 'yourRouteValueHere');
                 console.log('this.id', this.id);
                 //  this.id = res.registrationReview.id
-                this.activateTab.emit({ id: this.id,data: this.data, tab: 'cbEmployee' });
+                this.activateTab.emit({
+                    id: this.id,
+                    data: this.data,
+                    tab: 'cbEmployee',
+                });
             },
             (error) => {
                 this.isSaving = false;

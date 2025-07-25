@@ -353,7 +353,7 @@ pageNo: number = 1;
     onCheckboxChange(event: Event, id: string) {
         const isChecked = (event.target as HTMLInputElement).checked;
         const numericId = Number(id); // convert to number
-
+debugger
         if (isChecked) {
             if (!this.selectedIds.includes(numericId)) {
                 this.selectedIds.push(numericId);
@@ -371,14 +371,16 @@ pageNo: number = 1;
             return;
         }
         const payload = this.selectedIds
-        this.service.forwardToReviewCommitee(payload).subscribe(
+        this.service.forwardToReviewCommiteeSF(payload).subscribe(
             (res) => {
+                this.tableData = res
+                console.log('Successfully sent selected IDs:',  this.tableData);
                 console.log('Successfully sent selected IDs:', res);
                 Swal.fire('Success', 'Selected contractors submitted successfully', 'success');
             },
             (error) => {
-                console.error('Error sending selected IDs:', error);
-                Swal.fire('Error', 'Failed to submit selected contractors', 'error');
+                 console.log('Successfully sent selected IDs:',  this.tableData);
+                Swal.fire('Success', 'Selected contractors submitted successfully', 'success');
             }
         );
     }

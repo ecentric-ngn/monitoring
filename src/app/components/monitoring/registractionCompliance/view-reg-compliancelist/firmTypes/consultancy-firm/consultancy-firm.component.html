@@ -95,9 +95,11 @@
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
-
-                    <button *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
+                    <td>
+                        <button *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
                             (click)="openActionModal(data)">Action</button>
+                    </td>
+                    
                     <!-- <div *ngIf="data.licenseStatus === 'Suspended'">
                             <button class="btn btn-danger btn-sm"
                                 (click)="getReinstateApplication(data.consultantNo)">View</button>

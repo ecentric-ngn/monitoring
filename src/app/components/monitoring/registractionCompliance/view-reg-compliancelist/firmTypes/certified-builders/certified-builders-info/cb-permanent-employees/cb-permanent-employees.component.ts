@@ -47,7 +47,7 @@ export class CbPermanentEmployeesComponent {
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.certifiedBuilderNo;
         this.licenseStatus = WorkDetail.data.licenseStatus;
-         this.data = this.data;
+         this.data = this.data || WorkDetail.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
         this.tData = {
             hrFulfilled: '',
@@ -318,7 +318,6 @@ private forceDownload(blob: Blob, fileName: string) {
                 reason: this.selectedAction.remarks,
             };
             ;
-            console.log('payload..........', payload);
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
                 next: (res) => {
@@ -328,7 +327,7 @@ private forceDownload(blob: Blob, fileName: string) {
                         'success'
                     );
                     this.closeModal();
-                     this.router.navigate(['monitoring/construction']);
+                   this.router.navigate(['/monitoring/certified']);
                 },
                 error: (err) => {
                     Swal.fire(
@@ -357,7 +356,7 @@ private forceDownload(blob: Blob, fileName: string) {
                         'success'
                     );
                     this.closeModal();
-                     this.router.navigate(['monitoring/construction']);
+                  this.router.navigate(['/monitoring/certified']);
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');
