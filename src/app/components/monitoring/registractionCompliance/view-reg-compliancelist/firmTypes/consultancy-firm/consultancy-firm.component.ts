@@ -298,9 +298,9 @@ export class ConsultancyFirmComponent {
                 );
             },
             (error) => {
-                console.error('Error sending selected IDs:', error);
-                Swal.fire('Error', 'Failed to submit selected firms', 'error');
-            }
+                            console.log('Successfully sent selected IDs:',  this.tableData);
+                           Swal.fire('Success', 'Selected consultancy submitted successfully', 'success');
+                       }
         );
     }
 

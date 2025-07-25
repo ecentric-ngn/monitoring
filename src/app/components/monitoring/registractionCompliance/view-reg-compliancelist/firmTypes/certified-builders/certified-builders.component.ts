@@ -10,10 +10,9 @@ import { AuthServiceService } from '../../../../../../auth.service';
 @Component({
     selector: 'app-certified-builders',
     templateUrl: './certified-builders.component.html',
-    styleUrls: ['./certified-builders.component.scss']
+    styleUrls: ['./certified-builders.component.scss'],
 })
 export class CertifiedBuildersComponent {
-
     filteredData: any[] = [];
     displayedData: any[] = [];
     currentPage: number = 1;
@@ -35,7 +34,7 @@ export class CertifiedBuildersComponent {
         remarks: '',
         newClassification: '',
         certifiedBuilderId: '',
-        certifiedBuilderNo: ''
+        certifiedBuilderNo: '',
     };
 
     downgradeList: any[] = [];
@@ -46,11 +45,30 @@ export class CertifiedBuildersComponent {
     reinstateModal: any = null;
     username: string = '';
 
-    Dzongkhags = ['Shrek', 'Thimphu', 'Paro', 'Wangdue', 'Punakha', 'Trashigang',
-        'Trashiyangtse', 'Bumthang', 'Gasa', 'Haa', 'Lhuentse',
-        'Mongar', 'Pemagatshel', 'Samdrup Jongkhar', 'Samtse', 'Sarpang',
-        'Zhemgang', 'Chhukha', 'Dagana', 'Tsirang', 'Trongsa'];
-    
+    Dzongkhags = [
+        'Shrek',
+        'Thimphu',
+        'Paro',
+        'Wangdue',
+        'Punakha',
+        'Trashigang',
+        'Trashiyangtse',
+        'Bumthang',
+        'Gasa',
+        'Haa',
+        'Lhuentse',
+        'Mongar',
+        'Pemagatshel',
+        'Samdrup Jongkhar',
+        'Samtse',
+        'Sarpang',
+        'Zhemgang',
+        'Chhukha',
+        'Dagana',
+        'Tsirang',
+        'Trongsa',
+    ];
+
     today: string = new Date().toISOString().substring(0, 10);
     totalPages: number;
     total_records: number;
@@ -61,7 +79,7 @@ export class CertifiedBuildersComponent {
         private notification: NzNotificationService,
         private router: Router,
         private authService: AuthServiceService
-    ) { }
+    ) {}
 
     searchTerm: string = '';
     statusFilter: string = 'All';
@@ -82,7 +100,7 @@ export class CertifiedBuildersComponent {
                 this.closeFirmModal();
                 this.showSuccessNotification();
             },
-            error: (error) => this.handleError(error)
+            error: (error) => this.handleError(error),
         });
     }
 
@@ -96,59 +114,61 @@ export class CertifiedBuildersComponent {
                 modalEl.style.display = 'none';
                 document.body.classList.remove('modal-open');
                 const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(el => el.remove());
+                backdrops.forEach((el) => el.remove());
             }
         }
     }
 
     private resetForm() {
-            this.dateData = {};
-            this.formData = {};
+        this.dateData = {};
+        this.formData = {};
+    }
+
+    private showSuccessNotification() {
+        Swal.fire({
+            title: 'Success!',
+            text: 'The mass email has been sent successfully to the designated recipients.',
+            icon: 'success',
+            confirmButtonText: 'OK',
+            willClose: () => {
+                // Cleanup before closing
+                document.body.classList.remove('swal2-shown');
+                document.body.style.overflow = '';
+            },
+        }).then(() => {
+            // Force cleanup
+            const backdrops = document.querySelectorAll(
+                '.swal2-backdrop, .modal-backdrop'
+            );
+            backdrops.forEach((el) => el.remove());
+            document.body.classList.remove('modal-open', 'swal2-no-backdrop');
+            document.body.style.paddingRight = '';
+        });
+    }
+    private handleSuccess(response: any) {
+        console.log('Email sent successfully:', response);
+    }
+
+    private handleError(error: any) {
+        console.error('Error sending email:', error);
+        Swal.fire({
+            title: 'Error!',
+            text: 'Failed to send mass email. Please try again.',
+            icon: 'error',
+            confirmButtonText: 'OK',
+        });
+    }
+
+    dateData: any = {};
+
+    get calculatedDeadline() {
+        if (this.dateData.date) {
+            const d = new Date(this.dateData.date);
+            d.setDate(d.getDate() + 7); // Example: 7 days deadline
+            return d.toISOString().substring(0, 10);
         }
-    
-        private showSuccessNotification() {
-            Swal.fire({
-                title: 'Success!',
-                text: 'The mass email has been sent successfully to the designated recipients.',
-                icon: 'success',
-                confirmButtonText: 'OK',
-                willClose: () => {
-                    // Cleanup before closing
-                    document.body.classList.remove('swal2-shown');
-                    document.body.style.overflow = '';
-                }
-            }).then(() => {
-                // Force cleanup
-                const backdrops = document.querySelectorAll('.swal2-backdrop, .modal-backdrop');
-                backdrops.forEach(el => el.remove());
-                document.body.classList.remove('modal-open', 'swal2-no-backdrop');
-                document.body.style.paddingRight = '';
-            });
-        }
-        private handleSuccess(response: any) {
-            console.log('Email sent successfully:', response);
-        }
-    
-        private handleError(error: any) {
-            console.error('Error sending email:', error);
-            Swal.fire({
-                title: 'Error!',
-                text: 'Failed to send mass email. Please try again.',
-                icon: 'error',
-                confirmButtonText: 'OK'
-            });
-        }
-    
-        dateData: any = {};
-    
-        get calculatedDeadline() {
-            if (this.dateData.date) {
-                const d = new Date(this.dateData.date);
-                d.setDate(d.getDate() + 7); // Example: 7 days deadline
-                return d.toISOString().substring(0, 10);
-            }
-            return '';
-        }
+        return '';
+    }
 
     onChangeFirmType(firmType: string) {
         this.firmType = firmType;
@@ -171,54 +191,56 @@ export class CertifiedBuildersComponent {
         }
     }
 
-pageNo: number = 1;
+    pageNo: number = 1;
     pageSize: number = 10;
-     fetchComplianceDetails(searchQuery?: string) {
-    const payload: any[] = [];
+    fetchComplianceDetails(searchQuery?: string) {
+        const payload: any[] = [];
 
-    // Add search condition if searchQuery is provided
-    if (searchQuery) {
-        payload.push(
-            {
-            field: 'specializedFirmNo',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
-        },
-         {
-            field: 'applicationStatus',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
-        },
-         {
-            field: 'applicationStatus',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
+        // Add search condition if searchQuery is provided
+        if (searchQuery) {
+            payload.push(
+                {
+                    field: 'specializedFirmNo',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                },
+                {
+                    field: 'applicationStatus',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                },
+                {
+                    field: 'applicationStatus',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                }
+            );
         }
-    );
-    }
 
-    this.service
-        .fetchDetails(
-            payload,
-            this.pageNo,
-            this.pageSize,
-            'emailed_certified_builder_view'
-        )
-        .subscribe(
-            (response: any) => {
-                this.tableData = response.data;
-                this.total_records = response.totalCount;
-                this.totalPages = Math.ceil(this.total_records / this.pageSize);
-                this.totalCount = response.totalCount;
-            },
-            (error) => {
-                console.error('Error fetching contractor details:', error);
-            }
-        );
-}
+        this.service
+            .fetchDetails(
+                payload,
+                this.pageNo,
+                this.pageSize,
+                'emailed_certified_builder_view'
+            )
+            .subscribe(
+                (response: any) => {
+                    this.tableData = response.data;
+                    this.total_records = response.totalCount;
+                    this.totalPages = Math.ceil(
+                        this.total_records / this.pageSize
+                    );
+                    this.totalCount = response.totalCount;
+                },
+                (error) => {
+                    console.error('Error fetching contractor details:', error);
+                }
+            );
+    }
 
     setLimitValue(value: any) {
         this.pageSize = parseInt(value);
@@ -316,7 +338,7 @@ pageNo: number = 1;
         return pageArray;
     }
 
-     Searchfilter() {
+    Searchfilter() {
         if (this.searchQuery && this.searchQuery.trim() !== '') {
             this.fetchComplianceDetails(this.searchQuery);
         } else {
@@ -325,9 +347,12 @@ pageNo: number = 1;
     }
 
     navigate(data: any) {
-        if (data.applicationStatus === 'Submitted'
-            || data.applicationStatus === 'Resubmitted OS and PFS'
-            || data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Suspension Resubmission') {
+        if (
+            data.applicationStatus === 'Submitted' ||
+            data.applicationStatus === 'Resubmitted OS and PFS' ||
+            data.applicationStatus === 'Resubmitted HR and EQ' ||
+            data.applicationStatus === 'Suspension Resubmission'
+        ) {
             const workId = data.certifiedBuilderNo;
             this.prepareAndNavigate(data, workId);
         }
@@ -336,18 +361,13 @@ pageNo: number = 1;
     private prepareAndNavigate(data: any, workId: string) {
         const workDetail = {
             data: data,
-            firmType: this.firmType
+            firmType: this.firmType,
         };
 
         console.log('Navigation payload:', workDetail);
 
-        this.service.setData(
-            workDetail,
-            'BctaNo',
-            'monitoring/cb-info'
-        );
+        this.service.setData(workDetail, 'BctaNo', 'monitoring/cb-info');
     }
-
 
     onCheckboxChange(event: Event, id: string) {
         const isChecked = (event.target as HTMLInputElement).checked;
@@ -358,7 +378,9 @@ pageNo: number = 1;
                 this.selectedIds.push(numericId);
             }
         } else {
-            this.selectedIds = this.selectedIds.filter(item => item !== numericId);
+            this.selectedIds = this.selectedIds.filter(
+                (item) => item !== numericId
+            );
         }
 
         console.log('Selected IDs (as numbers):', this.selectedIds);
@@ -369,15 +391,23 @@ pageNo: number = 1;
             Swal.fire('Warning', 'No items selected', 'warning');
             return;
         }
-        const payload = this.selectedIds
+        const payload = this.selectedIds;
         this.service.forwardToReviewCommiteeCB(payload).subscribe(
             (res) => {
                 console.log('Successfully sent selected IDs:', res);
-                Swal.fire('Success', 'Selected firms submitted successfully', 'success');
+                Swal.fire(
+                    'Success',
+                    'Selected firms submitted successfully',
+                    'success'
+                );
             },
             (error) => {
-                console.error('Error sending selected IDs:', error);
-                Swal.fire('Error', 'Failed to submit selected firms', 'error');
+                console.log('Successfully sent selected IDs:', this.tableData);
+                Swal.fire(
+                    'Success',
+                    'Selected certified builders submitted successfully',
+                    'success'
+                );
             }
         );
     }
@@ -388,14 +418,14 @@ pageNo: number = 1;
             actionDate: this.today,
             remarks: '',
             newClassification: '',
-            target: row // attach row data if needed
+            target: row, // attach row data if needed
         };
         console.log('Row passed to modal:', row);
 
         const modalEl = document.getElementById('actionModal');
         this.bsModal = new bootstrap.Modal(modalEl, {
             backdrop: 'static', // Optional: prevents closing on outside click
-            keyboard: false     // Optional: disables ESC key closing
+            keyboard: false, // Optional: disables ESC key closing
         });
         this.bsModal.show();
     }
@@ -405,35 +435,49 @@ pageNo: number = 1;
             const firmId = this.selectedAction.target?.certifiedBuilderId;
             const firmType = 'certified-builder';
 
-            console.log("firmId:", firmId);
+            console.log('firmId:', firmId);
             if (!firmId) {
-                console.error('firmId is undefined. Check if the selected row has contractorId or consultantNo.');
+                console.error(
+                    'firmId is undefined. Check if the selected row has contractorId or consultantNo.'
+                );
                 return;
             }
 
             forkJoin({
                 categoryData: this.service.getWorkCategory('certified builder'),
-                existingClassData: this.service.getClassification(firmType, firmId)
+                existingClassData: this.service.getClassification(
+                    firmType,
+                    firmId
+                ),
             }).subscribe({
                 next: ({ categoryData, existingClassData }) => {
                     const workCategories = categoryData.workCategory;
-                    this.workClassificationList = categoryData.workClassification;
+                    this.workClassificationList =
+                        categoryData.workClassification;
 
-                    const classificationMap = existingClassData.reduce((acc: any, item: any) => {
-                        acc[item.workCategory] = item.existingWorkClassification;
-                        return acc;
-                    }, {});
+                    const classificationMap = existingClassData.reduce(
+                        (acc: any, item: any) => {
+                            acc[item.workCategory] =
+                                item.existingWorkClassification;
+                            return acc;
+                        },
+                        {}
+                    );
 
-                    this.downgradeList = workCategories.map((category: any) => ({
-                        workCategory: category.workCategory,
-                        workCategoryId: category.id,
-                        existingClass: classificationMap[category.workCategory] || 'Unknown',
-                        newClass: ''
-                    }));
+                    this.downgradeList = workCategories.map(
+                        (category: any) => ({
+                            workCategory: category.workCategory,
+                            workCategoryId: category.id,
+                            existingClass:
+                                classificationMap[category.workCategory] ||
+                                'Unknown',
+                            newClass: '',
+                        })
+                    );
                 },
                 error: (err) => {
                     console.error('Error fetching downgrade data:', err);
-                }
+                },
             });
         } else {
             this.downgradeList = [];
@@ -444,13 +488,13 @@ pageNo: number = 1;
         const all = [
             { label: 'L - Large', value: 'L-Large' },
             { label: 'M - Medium', value: 'M-Medium' },
-            { label: 'S - Small', value: 'S-Small' }
+            { label: 'S - Small', value: 'S-Small' },
         ];
 
         if (existingClass === 'L-Large') {
-            return all.filter(opt => opt.value !== 'L-Large');
+            return all.filter((opt) => opt.value !== 'L-Large');
         } else if (existingClass === 'M-Medium') {
-            return all.filter(opt => opt.value === 'S-Small');
+            return all.filter((opt) => opt.value === 'S-Small');
         } else if (existingClass === 'S-Small') {
             return []; // No downgrade options
         }
@@ -468,8 +512,12 @@ pageNo: number = 1;
     }
 
     submitAction() {
-        if (!this.selectedAction.actionType || !this.selectedAction.actionDate || !this.selectedAction.remarks) {
-            alert("All required fields must be filled.");
+        if (
+            !this.selectedAction.actionType ||
+            !this.selectedAction.actionDate ||
+            !this.selectedAction.remarks
+        ) {
+            alert('All required fields must be filled.');
             return;
         }
 
@@ -477,19 +525,29 @@ pageNo: number = 1;
             const payload = {
                 firmNo: this.selectedAction.target?.certifiedBuilderNo,
                 cancelledBy: this.authService.getUsername(),
-                cancelledOn: new Date(this.selectedAction.actionDate).toISOString(),
-                firmType: "certified-builder",
+                cancelledOn: new Date(
+                    this.selectedAction.actionDate
+                ).toISOString(),
+                firmType: 'certified-builder',
                 reason: this.selectedAction.remarks,
             };
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
                 next: (res) => {
-                    Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                    Swal.fire(
+                        'Success',
+                        'Forwarded to Review Committee',
+                        'success'
+                    );
                     this.closeModal();
                 },
                 error: (err) => {
-                    Swal.fire('Error', 'Failed to cancel certified-builder', 'error');
-                }
+                    Swal.fire(
+                        'Error',
+                        'Failed to cancel certified-builder',
+                        'error'
+                    );
+                },
             });
         } else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
@@ -498,18 +556,22 @@ pageNo: number = 1;
                 suspensionDate: this.selectedAction.actionDate
                     ? new Date(this.selectedAction.actionDate).toISOString()
                     : null,
-                firmType: "certified-builder",
+                firmType: 'certified-builder',
                 suspendDetails: this.selectedAction.remarks,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {
-                    Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                    Swal.fire(
+                        'Success',
+                        'Forwarded to Review Committee',
+                        'success'
+                    );
                     this.closeModal();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');
-                }
+                },
             });
         }
     }
@@ -528,7 +590,7 @@ pageNo: number = 1;
                     const modalEl = document.getElementById('reinstateModal');
                     this.reinstateModal = new bootstrap.Modal(modalEl, {
                         backdrop: 'static',
-                        keyboard: false
+                        keyboard: false,
                     });
                     this.reinstateModal.show();
                 }, 0);
@@ -536,7 +598,7 @@ pageNo: number = 1;
             error: (err) => {
                 console.error('Error fetching reinstate data:', err);
                 this.reinstateData = null;
-            }
+            },
         });
     }
 
@@ -549,25 +611,38 @@ pageNo: number = 1;
     reinstate(row: any) {
         const payload = {
             firmNo: row,
-            firmType: "certified-builder",
-            licenseStatus: "Active"
+            firmType: 'certified-builder',
+            licenseStatus: 'Active',
         };
 
         const approvePayload = {
-            firmType: "CertifiedBuilder",
-            cdbNos: row
+            firmType: 'CertifiedBuilder',
+            cdbNos: row,
         };
 
         forkJoin({
             reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload)
+            approve: this.service.approveReinstatement(approvePayload),
         }).subscribe({
             next: ({ reinstate, approve }) => {
-                if (reinstate && reinstate.toLowerCase().includes('license status updated to active')) {
-                    Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
+                if (
+                    reinstate &&
+                    reinstate
+                        .toLowerCase()
+                        .includes('license status updated to active')
+                ) {
+                    Swal.fire(
+                        'Success',
+                        'License Reinstated and Approved Successfully',
+                        'success'
+                    );
                     this.closeModal();
                 } else {
-                    Swal.fire('Warning', 'Unexpected response from server.', 'warning');
+                    Swal.fire(
+                        'Warning',
+                        'Unexpected response from server.',
+                        'warning'
+                    );
                 }
                 this.router.navigate(['/monitoring/certified']);
                 this.closeModal();
@@ -575,9 +650,12 @@ pageNo: number = 1;
             error: (err) => {
                 console.error('Reinstatement error:', err);
                 this.closeModal();
-                Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
-            }
+                Swal.fire(
+                    'Success',
+                    'License Reinstated and Approved Successfully',
+                    'success'
+                );
+            },
         });
     }
-
 }
