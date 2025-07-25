@@ -87,7 +87,7 @@ formData: any = {};
           };
   
           const approvePayload = {
-              firmType: 'CertifiedBuilder',
+              firmType: 'certified-builder',
               cdbNos: this.data.certifiedBuilderNo,
           };
           forkJoin({
@@ -107,6 +107,7 @@ formData: any = {};
                           'success'
                       );
                       this.closeModal();
+                       
                   } else {
                       Swal.fire(
                           'Warning',
@@ -121,7 +122,7 @@ formData: any = {};
                   console.error('Reinstatement error:', err);
                   this.closeModal();
                   Swal.fire(
-                      'Success',
+                      'Warning',
                       'License Reinstated and Approved Successfully',
                       'success'
                   );
@@ -134,5 +135,6 @@ formData: any = {};
         if (this.bsModal) {
             this.bsModal.hide();
         }
+        this.router.navigate(['/monitoring/certified']);
     }
 }

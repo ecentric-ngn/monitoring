@@ -370,7 +370,7 @@ pageNo: number = 1;
             return;
         }
         const payload = this.selectedIds
-        this.service.forwardToReviewCommitee(payload).subscribe(
+        this.service.forwardToReviewCommiteeCB(payload).subscribe(
             (res) => {
                 console.log('Successfully sent selected IDs:', res);
                 Swal.fire('Success', 'Selected firms submitted successfully', 'success');

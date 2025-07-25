@@ -36,8 +36,9 @@
         </div>
         <div class="col-lg-7 d-flex justify-content-end pr-2">
             <p class="mr-1 p-1 text-gray-600">Search By : </p>
-            <input type="text" placeholder=" BCTA No or Application Status" class="form-control form-control-sm col-md-4 mr-3"
-                id="search " [(ngModel)]="searchQuery" (input)="Searchfilter()" />
+            <input type="text" placeholder=" BCTA No or Application Status"
+                class="form-control form-control-sm col-md-4 mr-3" id="search " [(ngModel)]="searchQuery"
+                (input)="Searchfilter()" />
         </div>
     </div>
 
@@ -70,14 +71,26 @@
                     <td>{{ data.sentDate }}</td>
                     <td>
                         <span class="text-bold" [ngClass]="{
-                            'text-secondary': data.applicationStatus== 'Not Submitted',
-                            'text-warning': data.applicationStatus== 'In Process'  || data.applicationStatus== 'Suspension Request' || data.applicationStatus== 'Cancel Request'|| data.applicationStatus== 'Downgrade Request' || data.applicationStatus== 'Pending',
-                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Reinstated' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus== 'Downgrade Approved' || data.applicationStatus== 'Cancel Approved',
-                            'text-primary': data.applicationStatus== 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Submitted' || data.applicationStatus === 'Suspension Resubmission',
-                            }">
+          'text-secondary': data.applicationStatus === 'Not Submitted',
+          'text-warning': data.applicationStatus === 'In Process' || 
+                          data.applicationStatus === 'Suspension Request' || 
+                          data.applicationStatus === 'Cancel Request' || 
+                          data.applicationStatus === 'Downgrade Request' || 
+                          data.applicationStatus === 'Pending',
+          'text-success': data.applicationStatus === 'Verified' || 
+                          data.applicationStatus === 'Reinstated' || 
+                          data.applicationStatus === 'Suspension Approved' || 
+                          data.applicationStatus === 'Downgrade Approved' || 
+                          data.applicationStatus === 'Cancel Approved',
+          'text-primary': data.applicationStatus === 'Resubmitted OS and PFS' || 
+                          data.applicationStatus === 'Resubmitted HR and EQ' || 
+                          data.applicationStatus === 'Submitted' || 
+                          data.applicationStatus === 'Suspension Resubmission'
+        }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
+
                     <!-- <td>{{ data.category }}</td> -->
                     <!-- <td>{{ data.licenseStatus }} -->
                     <td>
@@ -95,8 +108,9 @@
                         <!-- <button
                             *ngIf="data.applicationStatus !== 'Not Submitted' && data.applicationStatus !== 'Forwarded TO RC' && data.applicationStatus !== 'Suspension Request' && data.applicationStatus !== 'Suspension Resubmission' && data.applicationStatus !== 'Cancel Request' && data.applicationStatus !== 'Downgrade Request' && data.applicationStatus !== 'Suspension Approved' && data.applicationStatus !== 'Downgrade Approved' && data.applicationStatus !== 'Cancel Request'"
                             class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button> -->
-                        <button *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
-                            (click)="openActionModal(data)">Action</button>
+                        <button
+                            *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'"
+                            class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                         <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reinstate the application?'"
                             (nzOnConfirm)="reinstate(data.contractorNo)"
                             *ngIf="data.applicationStatus === 'Suspension Resubmission'">

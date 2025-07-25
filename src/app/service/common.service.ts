@@ -250,7 +250,7 @@ saveCheckListId(checklistId: any, workId: any, payload: any) {
   }
 
   forwardToReviewCommiteeConsultancy(id: any) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/forward-to-committee/${id}`,null);
   }
   forwardToReviewCommiteeCB(id: any) {
     return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/certified-builder/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
