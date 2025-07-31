@@ -604,7 +604,6 @@ export class ConsultancyFirmComponent {
                 bctaNo: this.selectedAction.target?.consultantNo,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
-                applicationID: this.selectedAction.target?.appNo,
             };
 
             this.service.downgradeConsultancy(payload).subscribe({
@@ -653,7 +652,6 @@ export class ConsultancyFirmComponent {
                     : null,
                 firmType: 'Consultant',
                 suspendDetails: this.selectedAction.remarks,
-                applicationID: this.selectedAction.target?.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({
@@ -680,7 +678,6 @@ export class ConsultancyFirmComponent {
                     : null,
                 firmType: 'Consultant',
                 suspendDetails: this.selectedAction.remarks,
-                applicationID: this.selectedAction.target?.appNo,
             };
             // Call suspend API
             this.service.cancelFirm(payload).subscribe({
