@@ -103,7 +103,7 @@ export class OfficeSignageComponent {
     }
 
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.bctaNo,this.data.appNo).subscribe((res: any) => {
             // Merge API response with initialized formData
             this.formData = {
                 ...this.formData, // Keep initialized values
@@ -402,7 +402,9 @@ export class OfficeSignageComponent {
                 consultantId: this.formData.firmType.consultantId,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
+                  applicationID: this.formData.firmType.appNo,
             };
+            
             this.service.downgradeConsultancy(payload).subscribe({
                 next: (res: string) => {
                     console.log('Downgrade response:', res);
@@ -446,6 +448,7 @@ export class OfficeSignageComponent {
                     : null,
                 firmType: 'Consultant',
                 suspendDetails: this.selectedAction.remarks,
+                  applicationID: this.formData.firmType.appNo,
             };
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {

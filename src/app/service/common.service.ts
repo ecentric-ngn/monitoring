@@ -249,15 +249,15 @@ saveCheckListId(checklistId: any, workId: any, payload: any) {
     });
   }
 
-  forwardToReviewCommiteeConsultancy(id: any) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/forward-to-committee/${id}`,null);
+  forwardToReviewCommiteeConsultancy(payload: any) {
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/consultant/compliance/forward-to-committee`,payload);
   }
-  forwardToReviewCommiteeCB(id: any) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/certified-builder/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
+  forwardToReviewCommiteeCB(payload: any) {
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/certified-builder/compliance/forward-to-committee`,payload, { responseType: 'text' as 'json' });
   }
 
-  forwardToReviewCommiteeSF(id: any) {
-    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/forward-to-committee/${id}`, { responseType: 'text' as 'json' });
+  forwardToReviewCommiteeSF(payload: any) {
+    return this.http.post<any>(`${api_url_Monitoring_siteEngineer}/specialized-firm/compliance/forward-to-committee`,payload, { responseType: 'text' as 'json' });
   }
   generateOtp(mobileNo: any) {
     console.log('mobileNo', mobileNo);
@@ -448,6 +448,9 @@ saveSiteEngineerData(payload: any, tableId: any, workId: any) {
   getDatabasedOnBctaNo(bctaNo: any) {
     return this.http.get(`${g2c_url}/compliance/full/${bctaNo}`);
   }
+   getDatabasedOnBctaNos(bctaNo: any,appNo: any) {
+    return this.http.get(`${g2c_url}/compliance/full/${bctaNo}/${appNo}`);
+  }
 
    getSuspendedDatabasedOnBctaNo(bctaNo: any) {
     return this.http.get(`${g2c_url_Suspended}/compliance/fullSuspension/${bctaNo}`);
@@ -609,6 +612,45 @@ rejectApplication(category: string, bctaNo: string) {
     );
   }
 
+   approveActiveApplications(payload: { suspensionIds: number[], reviewedBy: string }): Observable<string> {
+    return this.http.post(
+      `${api_url_Monitoring_siteEngineer}/status/license-status/update`,
+      payload,
+      {
+        responseType: 'text' as const,  // Crucial for text responses
+        observe: 'response'  // Get full response object
+      }
+    ).pipe(
+      map(response => {
+        // Return the response body text
+        return response.body || 'Suspensions endorsed successfully';
+      }),
+      catchError(error => {
+        // Convert HttpErrorResponse to error message string
+        let errorMessage = 'Failed to forward applications';
+        if (error.error instanceof ErrorEvent) {
+          // Client-side error
+          errorMessage = error.error.message;
+        } else {
+          // Server-side error
+          errorMessage = error.error || error.message;
+        }
+        return throwError(errorMessage);
+      })
+    );
+  }
+
+// approveActiveApplications(payload: { suspensionIds: number[], reviewedBy: string }): Observable<string> {
+//   return this.http.post<string>(
+//     `${api_url_Monitoring_siteEngineer}/status/license-status/update`,
+//     payload,
+//     {
+//       responseType: 'text' as const
+//     }
+//   );
+// }
+
+
   getDownGradeDetails() {
     return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/classification/review-actions/downgrades`);
 
@@ -728,7 +770,4 @@ rejectApplication(category: string, bctaNo: string) {
 
 }
 
-function specilizedFirmNotifyingMonitoringCommittee(ids: number[], arg1: any) {
-  throw new Error("Function not implemented.");
-}
 

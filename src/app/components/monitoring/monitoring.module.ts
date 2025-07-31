@@ -29,7 +29,6 @@ import { PermanentEmployeeComponent } from './registractionCompliance/view-reg-c
 import { MandatoryEquipmentComponent } from './registractionCompliance/view-reg-compliancelist/view-reg-firm-information/mandatory-equipment/mandatory-equipment.component';
 import { MonitoringTeamUsersComponent } from './registractionCompliance/view-reg-compliancelist/view-reg-firm-information/monitoring-team-users/monitoring-team-users.component';
 import { ViewRegistrationComplianceDetailsComponent } from './reviewCommitteDashboard/view-registration-compliance-details/view-registration-compliance-details.component';
-import { ViewRegDetailsComponent } from './reviewCommitteDashboard/view-registration-compliance-details/view-reg-details/view-reg-details.component';
 import { CbMandatoryEquipmentComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/certified-builders/certified-builders-info/cb-mandatory-equipment/cb-mandatory-equipment.component';
 import { CbMonitoringTeamComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/certified-builders/certified-builders-info/cb-monitoring-team/cb-monitoring-team.component';
 import { CbOfficeSignageComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/certified-builders/certified-builders-info/cb-office-signage/cb-office-signage.component';
@@ -47,6 +46,12 @@ import { SfPermanentEmployeesComponent } from './registractionCompliance/view-re
 import { SpecializedFirmsInfoComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/specialized-firms/specialized-firms-info/specialized-firms-info.component';
 import { SpecializedFirmsComponent } from './registractionCompliance/view-reg-compliancelist/firmTypes/specialized-firms/specialized-firms.component';
 import { ActionModalConstructionComponent } from './shared/action-modal-construction/action-modal-construction.component';
+import { ViewCancelRequestAppNoComponent } from './reviewCommitteDashboard/view-registration-compliance-details/view-cancel-request-app-no/view-cancel-request-app-no.component';
+import { ViewDowngradeRequestAppNoComponent } from './reviewCommitteDashboard/view-registration-compliance-details/view-downgrade-request-app-no/view-downgrade-request-app-no.component';
+import { ViewSuspendRequestAppNoComponent } from './reviewCommitteDashboard/view-registration-compliance-details/view-suspend-request-app-no/view-suspend-request-app-no.component';
+import { ViewCancelAppDetailsComponent } from './reviewCommitteDashboard/view-registration-compliance-details/view-cancel-request-app-no/view-cancel-app-details/view-cancel-app-details.component';
+import { ViewActiveAppDetailsComponent } from './reviewCommitteDashboard/view-registration-compliance-details/view-active-app-details/view-active-app-details.component';
+
 
 @NgModule({
     imports: [
@@ -83,7 +88,6 @@ import { ActionModalConstructionComponent } from './shared/action-modal-construc
         MandatoryEquipmentComponent,
         MonitoringTeamUsersComponent,
         ViewRegistrationComplianceDetailsComponent,
-        ViewRegDetailsComponent,
          ConsultancyFirmComponent,
         CertifiedBuildersComponent,
         SpecializedFirmsComponent,
@@ -101,6 +105,11 @@ import { ActionModalConstructionComponent } from './shared/action-modal-construc
         SfPermanentEmployeesComponent,
         SfMonitoringTeamComponent,
         ActionModalConstructionComponent,
+        ViewCancelRequestAppNoComponent,
+        ViewDowngradeRequestAppNoComponent,
+        ViewSuspendRequestAppNoComponent,
+        ViewCancelAppDetailsComponent,
+        ViewActiveAppDetailsComponent
         ],
     providers:[]
 })

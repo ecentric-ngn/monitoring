@@ -14,6 +14,7 @@ export class ConsultancyInformationComponent implements OnInit {
 WorkDetail: any={};
 licenseStatus: string = '';
   data: string;
+  appNo: any;
   constructor( private service: CommonService) { }
 
 ngOnInit() {
@@ -24,10 +25,10 @@ ngOnInit() {
   }
   this.WorkDetail = WorkDetail;
   this.licenseStatus = WorkDetail.data.licenseStatus;
-  debugger
   this.applicationStatus = WorkDetail.data.applicationStatus;
   this.formData.firmType = WorkDetail.data;
   this.bctaNo = WorkDetail.data.consultantNo;
+  this.appNo = WorkDetail.data.appNo;
   if (this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Resubmission') {
     this.activeTabId = 'consultancyOffice';
   }
@@ -55,7 +56,7 @@ ngOnInit() {
 
 
   fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+    this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
       this.formData = res.complianceEntities[0];
       console.log('this.formData', this.formData);
     })
@@ -80,7 +81,7 @@ ngOnInit() {
     } else if (this.type === 'consultancyEquipment') {
       this.activeTabId = 'consultancyEquipment';
       this.data=event.data
-      debugger
+      
     } else if (this.type === 'consultancyMonitoring') {
        this.id = event.id
         this.data=event.data

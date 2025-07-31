@@ -44,6 +44,7 @@ export class PermanentEmployeeComponent {
     licenseStatus: any;
     @ViewChild('closeActionModal', { static: false })
     closeActionModal!: ElementRef;
+    appNo: any;
 
     constructor(
         private service: CommonService,
@@ -72,6 +73,7 @@ export class PermanentEmployeeComponent {
         // Populate key data from fetched WorkDetail
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.contractorNo;
+        this.appNo = WorkDetail.data.appNo;
         this.applicationStatus = WorkDetail.data.applicationStatus;
         this.licenseStatus = WorkDetail.data.licenseStatus;
         this.data = WorkDetail.data;
@@ -82,7 +84,7 @@ export class PermanentEmployeeComponent {
         };
         // If contractor number exists, fetch HR compliance data
         if (
-            this.bctaNo &&
+            this.bctaNo && this.appNo &&
             this.applicationStatus !== 'Suspension Resubmission'
         ) {
             this.fetchDataBasedOnBctaNo();
@@ -96,7 +98,7 @@ export class PermanentEmployeeComponent {
 
     // Fetch employee HR compliance data by BCTA number
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
             this.tableData = res.hrCompliance;
         });
     }
@@ -293,6 +295,7 @@ export class PermanentEmployeeComponent {
                 firmId: this.WorkDetail.data.contractorId,
                 firmType: 'Contractor',
                 downgradeEntries,
+                 applicationID: this.WorkDetail.data.appNo,
                 requestedBy: this.authService.getUsername(),
             };
 
@@ -340,6 +343,7 @@ export class PermanentEmployeeComponent {
                     : null,
                 firmType: 'Contractor',
                 suspendDetails: this.selectedAction.remarks,
+                  applicationID: this.WorkDetail.data.appNo,
             };
             this.service.suspendFirm(payload).subscribe({
                 next: () => {

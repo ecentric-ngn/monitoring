@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, HostListener, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { LayoutService } from '../service/app.layout.service'
 import { userManagment_redirection } from '../app.const/const';
@@ -12,6 +12,7 @@ export class AppTopBarComponent {
     @ViewChild('menubutton') menuButton!: ElementRef;
     @ViewChild('topbarmenubutton') topbarMenuButton!: ElementRef;
     @ViewChild('topbarmenu') menu!: ElementRef;
+@ViewChild('wrapperMenu') wrapperMenu!: ElementRef;
 
     access: any;
   module: any;
@@ -48,7 +49,29 @@ export class AppTopBarComponent {
           this.username = userDetails.username;
         }
       }
+  // Optional: toggle manually
+  toggleMenu() {
+    this.isMenuOpen = !this.isMenuOpen;
+    console.log('Menu toggled:', this.isMenuOpen);
+  }
 
+  isMenuOpen = false;
+@HostListener('document:click', ['$event'])
+handleClickOutside(event: MouseEvent): void {
+  if (!this.wrapperMenu || !this.wrapperMenu.nativeElement) {
+    return;
+  }
+
+  const clickedInside = this.wrapperMenu.nativeElement.contains(event.target);
+  if (!clickedInside) {
+    console.log('Clicked outside .wrapper-menu');
+    this.closeSidebar();
+  }
+}
+   closeSidebar(): void {
+    // Your logic to close sidebar/menu
+    console.log('Sidebar closed');
+  }
   Logout() {
     // sessionStorage.clear();
     // localStorage.clear();
@@ -62,7 +85,7 @@ export class AppTopBarComponent {
     }
     const encrypted = CryptoJS.AES.encrypt(userDetails, environment.encryptionKey).toString();
     return encodeURIComponent(encrypted);
-  }zzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz
+  }
   backToPortal() {
     const encryptedData = this.getEncryptedUserDetails();
     if (!encryptedData) return;

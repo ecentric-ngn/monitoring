@@ -75,8 +75,8 @@
                     <td>
                         <span class="text-bold" [ngClass]="{
                             'text-secondary': data.applicationStatus== 'Not Submitted',
-                            'text-warning': data.applicationStatus== 'Pending' || data.applicationStatus === 'Suspension Request'|| data.applicationStatus === 'Cancel Request',
-                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Suspension Approved' ,
+                            'text-warning': data.applicationStatus== 'Pending' || data.applicationStatus === 'Suspension Request'|| data.applicationStatus === 'Cancel Request' ,
+                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus === 'Forwarded TO RC',
                             'text-danger': data.applicationStatus== 'Rejected',
                             'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'|| data.applicationStatus === 'Suspension Resubmission'
                             }">
@@ -100,8 +100,8 @@
                           
                         </div>
                     </td> -->
-                      <td>
-                        <button *ngIf="data.applicationStatus === 'Suspension Resubmission'" class="btn btn-primary btn-sm me-2 mb-1"
+                       <td>
+                        <button *ngIf="data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
                             (click)="openActionModal(data)">Action</button>
                     </td>
                     <!-- <td>

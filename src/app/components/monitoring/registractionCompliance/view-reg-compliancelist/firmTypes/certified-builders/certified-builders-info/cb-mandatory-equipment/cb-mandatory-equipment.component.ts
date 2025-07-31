@@ -32,6 +32,7 @@ export class CbMandatoryEquipmentComponent {
     VehicleDetails: any;
 @Input() data: any
     WorkDetail: any;
+    appNo: any;
     constructor(
         private service: CommonService,
         private router: Router,
@@ -64,6 +65,7 @@ export class CbMandatoryEquipmentComponent {
          const data = WorkDetail?.data ?? this.data ?? {}; // fallback to existing `this.data` or empty object
         this.formData.firmType = data.firmType || '';
         this.bctaNo = data.contractorNo || '';
+        this.appNo = data.appNo || '';
         this.applicationStatus = data.applicationStatus || '';
         this.data = data; // update this.data safely
         this.WorkDetail = WorkDetail ?? {}; // ensure it's at least an object
@@ -99,7 +101,7 @@ export class CbMandatoryEquipmentComponent {
         this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
     }
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo || this.data.certifiedBuilderNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.bctaNo || this.data.certifiedBuilderNo,this.appNo).subscribe((res: any) => {
             this.tableData = res.vehicles;
             console.log('CB equipments', this.formData);
         });
@@ -385,6 +387,7 @@ export class CbMandatoryEquipmentComponent {
                 ).toISOString(),
                 firmType: 'certified-builder',
                 reason: this.selectedAction.remarks,
+                applicationID: this.formData.firmType.appNo,
             };
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
@@ -414,6 +417,7 @@ export class CbMandatoryEquipmentComponent {
                     : null,
                 firmType: 'certified-builder',
                 suspendDetails: this.selectedAction.remarks,
+                applicationID: this.formData.firmType.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({

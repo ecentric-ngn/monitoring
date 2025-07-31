@@ -53,7 +53,6 @@ export class PermanentEmployeesComponent {
         this.data = WorkDetail.data;
         this.licenseStatus = WorkDetail.data.licenseStatus;
         this.applicationStatus = WorkDetail.data.applicationStatus;
-        debugger
         this.tData = {
             hrFulfilled: '',
             resubmitDate: '',
@@ -69,7 +68,7 @@ export class PermanentEmployeesComponent {
     }
 
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.bctaNo, this.data.appNo).subscribe((res: any) => {
             this.tableData = res.hrCompliance;
             console.log('employee', this.formData);
         });
@@ -287,6 +286,7 @@ export class PermanentEmployeesComponent {
             consultantId: this.formData.firmType.consultantId,
             requestedBy: this.authService.getUsername(),
             downgradeEntries,
+            applicationID: this.formData.firmType.appNo,
         };
 
         console.log('Downgrade payload:', payload);
@@ -323,6 +323,7 @@ export class PermanentEmployeesComponent {
                 : null,
             firmType: 'Consultant',
             suspendDetails: this.selectedAction.remarks,
+            applicationID: this.formData.firmType.appNo,
         };
         this.service.suspendFirm(payload).subscribe({
             next: (res) => {

@@ -29,6 +29,7 @@ export class CbPermanentEmployeesComponent {
     today: string = new Date().toISOString().substring(0, 10);
     showErrorMessage: any;
     @Input() data: any
+    appNo: any;
     constructor(
         private service: CommonService,
         private router: Router,
@@ -46,6 +47,7 @@ export class CbPermanentEmployeesComponent {
         const WorkDetail = this.service.getData('BctaNo');
         this.formData.firmType = WorkDetail.data;
         this.bctaNo = WorkDetail.data.certifiedBuilderNo;
+        this.appNo = WorkDetail.data.appNo;
         this.licenseStatus = WorkDetail.data.licenseStatus;
          this.data = this.data || WorkDetail.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
@@ -84,7 +86,7 @@ export class CbPermanentEmployeesComponent {
         certifiedBuilderNo: '',
     };
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
             this.tableData = res.hrCompliance;
         });
     }
@@ -316,6 +318,7 @@ private forceDownload(blob: Blob, fileName: string) {
                 ).toISOString(),
                 firmType: 'certified-builder',
                 reason: this.selectedAction.remarks,
+                applicationID: this.formData.firmType.appNo,
             };
             ;
             // Call cancel API
@@ -346,6 +349,8 @@ private forceDownload(blob: Blob, fileName: string) {
                     : null,
                 firmType: 'certified-builder',
                 suspendDetails: this.selectedAction.remarks,
+                applicationID: this.formData.firmType.appNo,
+                
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({

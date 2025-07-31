@@ -1,0 +1,243 @@
+<div class="container m-5">
+  <!-- Company Information (Form Format) -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Company Information</h4>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Firm Name:</strong></label>
+            <p>{{ complianceEntities[0]?.firmName || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>CDB Number:</strong></label>
+            <p>{{ complianceEntities[0]?.cdbNo || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Office Location:</strong></label>
+            <p>{{ complianceEntities[0]?.officeLocation || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Dzongkhag:</strong></label>
+            <p>{{ complianceEntities[0]?.dzongkhagId || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Proprietor Name:</strong></label>
+            <p>{{ complianceEntities[0]?.proprietorName || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Ownership Type:</strong></label>
+            <p>{{ complianceEntities[0]?.ownershipType || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Classification:</strong></label>
+            <p>{{ complianceEntities[0]?.classification || 'N/A' }} - {{ complianceEntities[0]?.classificationDescription || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Mobile Number:</strong></label>
+            <p>{{ complianceEntities[0]?.mobileNo || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Office Signage and Documents</h4>
+    </div>
+    <div class="card-body">
+           <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Location:</strong></label>
+            <p>{{ formData?.location || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Location Review:</strong></label>
+            <p>{{ formData?.locationreview || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Location Remarks:</strong></label>
+            <p>{{ formData?.locationremarks || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Location Resubmit Deadline:</strong></label>
+            <p>{{ formData?.locationresubmitdeadline || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Filing System:</strong></label>
+             <button *ngIf="formData.filingsystem" class="btn btn-sm btn-outline-primary"
+          (click)="downloadFile(formData.filingsystem)">
+          View doc
+        </button>
+            <!-- <p>{{ formData?.filingsystem ? 'Uploaded' : 'Not Uploaded' }}</p> -->
+          </div>
+          <div class="form-group">
+            <label><strong>Filing System Review:</strong></label>
+            <p>{{ formData?.fsreview || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Filing System Remarks:</strong></label>
+            <p>{{ formData?.fsremarks || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>OHS Handbook:</strong></label>
+             <button *ngIf="formData.ohshandbook" class="btn btn-sm btn-outline-primary"
+          (click)="downloadFile(formData.ohshandbook)">
+          View doc
+        </button>
+            
+          </div>
+          <div class="form-group">
+            <label><strong>OHS Review:</strong></label>
+            <p>{{ formData?.ohsreview || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>OHS Remarks:</strong></label>
+            <p>{{ formData?.ohsremarks || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- HR Details (Table Format) -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>HR Details</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="">
+            <tr>
+              <th>Sl No.</th>
+              <th>Name</th>
+              <th>CID</th>
+              <th>Designation</th>
+              <th>Qualification</th>
+              <th>Trade</th>
+              <th>Joining Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let hr of hrCompliance; let i = index">
+              <td>{{ i+1}}</td>
+              <td>{{ hr.name }}</td>
+              <td>{{ hr.cId }}</td>
+              <td>{{ hr.designationName }}</td>
+              <td>{{ hr.qualification }}</td>
+              <td>{{ hr.tradeName }}</td>
+              <td>{{ hr.joiningDate || 'N/A' }}</td>
+            </tr>
+            <tr *ngIf="!hrCompliance || hrCompliance.length === 0">
+              <td colspan="6" class="text-center">No HR records found</td>
+            </tr>
+          </tbody>
+        </table>
+          <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>HR Fulfilled:</strong></label>
+            <p>{{ formData?.hrfulfilled || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>HR Remarks:</strong></label>
+            <p>{{ formData?.hrremarks || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>HR Resubmit Deadline:</strong></label>
+            <p>{{ formData?.hrresubmitdeadline || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Vehicle/Equipment Details (Table Format) -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Vehicle/Equipment Details</h4>
+    </div>
+    <div class="card-body">
+      <div class="table-responsive">
+        <table class="table table-bordered table-striped">
+          <thead class="">
+            <tr>
+              <th>Sl No.</th>
+              <th>Equipment Name</th>
+              <th>Type</th>
+              <th>Registration No</th>
+              <th>Quantity</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let vehicle of vehicles; let i = index">
+              <td>{{ i+1 }}</td>
+              <td>{{ vehicle.equipmentName }}</td>
+              <td>{{ vehicle.equipmentType }}</td>
+              <td>{{ vehicle.registrationNo === 'null' ? 'N/A' : vehicle.registrationNo }}</td>
+              <td>{{ vehicle.quantity }}</td>
+            </tr>
+            <tr *ngIf="!vehicles || vehicles.length === 0">
+              <td colspan="4" class="text-center">No vehicle/equipment records found</td>
+            </tr>
+          </tbody>
+        </table>
+           <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Equipment Fulfilled:</strong></label>
+            <p>{{ formData?.eqfulfilled || 'N/A' }}</p>
+          </div>
+          <div class="form-group">
+            <label><strong>Equipment Remarks:</strong></label>
+            <p>{{ formData?.eqremarks || 'N/A' }}</p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Equipment Resubmit Deadline:</strong></label>
+            <p>{{ formData?.eqresubmitdeadline || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Review Information -->
+  <div class="card mb-4">
+    <div class="card-header">
+      <h4>Review Information</h4>
+    </div>
+    <div class="card-body">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group">
+            <label><strong>Review Date:</strong></label>
+            <p>{{ formData?.reviewdate || 'N/A' }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer justify-content-center">
+  <button type="button" class="btn btn-warning" (click)="printCertificate()" data-bs-dismiss="modal">Download</button>
+</div>

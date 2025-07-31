@@ -61,34 +61,28 @@
             <tbody>
                 <tr *ngFor="let data of tableData; let i = index" class="table-row">
                     <td>{{ i+1 }}</td>
-                    <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted PFS'
-                        || data.applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'"
-                        (click)="navigate(data)">
+                    <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus === 'Submitted'"
+                        [class.text-primary]="
+      data.applicationStatus === 'Submitted' ||
+      data.applicationStatus === 'Resubmitted OS and PFS' ||
+      data.applicationStatus === 'Resubmitted PFS' ||
+      data.applicationStatus === 'Resubmitted HR and EQ' ||
+      data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
                         {{ data.contractorNo }}
                     </td>
+
                     <td>{{ data.nameOfFirm }}</td>
                     <td>{{ data.sentDate }}</td>
                     <td>
                         <span class="text-bold" [ngClass]="{
-          'text-secondary': data.applicationStatus === 'Not Submitted',
-          'text-warning': data.applicationStatus === 'In Process' || 
-                          data.applicationStatus === 'Suspension Request' || 
-                          data.applicationStatus === 'Cancel Request' || 
-                          data.applicationStatus === 'Downgrade Request' || 
-                          data.applicationStatus === 'Pending',
-          'text-success': data.applicationStatus === 'Verified' || 
-                          data.applicationStatus === 'Reinstated' || 
-                          data.applicationStatus === 'Suspension Approved' || 
-                          data.applicationStatus === 'Downgrade Approved' || 
-                          data.applicationStatus === 'Cancel Approved',
-          'text-primary': data.applicationStatus === 'Resubmitted OS and PFS' || 
-                          data.applicationStatus === 'Resubmitted HR and EQ' || 
-                          data.applicationStatus === 'Submitted' || 
-                          data.applicationStatus === 'Suspension Resubmission'
-        }">
+                            'text-secondary': data.applicationStatus === 'Not Submitted',
+                            'text-warning': ['In Process', 'Suspension Request', 'Cancel Request', 'Downgrade Request', 'Pending'].includes(data.applicationStatus),
+                            'text-success': ['Verified', 'Reinstated', 'Suspension Approved', 'Downgrade Approved', 'Cancel Approved'].includes(data.applicationStatus),
+                            'text-primary': ['Resubmitted OS and PFS', 'Resubmitted HR and EQ', 'Submitted', 'Suspension Resubmission'].includes(data.applicationStatus)
+                            }">
                             {{ data.applicationStatus }}
                         </span>
+
                     </td>
 
                     <!-- <td>{{ data.category }}</td> -->

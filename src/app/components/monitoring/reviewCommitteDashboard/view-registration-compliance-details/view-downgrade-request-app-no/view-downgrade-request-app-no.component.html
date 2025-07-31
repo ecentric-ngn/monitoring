@@ -1,0 +1,105 @@
+
+<div class="mt--5 p-6">
+<div class="row">
+  <div class="col d-flex align-items-center pl-4">
+    <p class="mb-0 mr-2 text-muted">Items Per Page</p>
+    <select class="form-control form-control-sm w-auto" (change)="setLimitValue($event.target.value)">
+      <option *ngFor="let limit of set_limit">{{ limit }}</option>
+    </select>
+  </div>
+  <div class="col-lg-7 d-flex justify-content-end align-items-center pr-2">
+    <p class="mb-0 mr-2 text-muted">Search By : </p>
+   <input type="text" placeholder="Contractor No" class="form-control form-control-sm w-50" 
+       id="search" [(ngModel)]="searchQuery" (input)="Searchfilter()">
+
+  </div>
+</div>
+
+<div class="container-fluid px-0">
+  <div class="table-responsive ml-2 mb-3">
+    <table class="table table-bordered table-sm table-hover">
+      <thead class="thead-dark">
+        <tr>
+          <th class="align-middle">Sl No.</th>
+          <th class="align-middle">Bcta No</th>
+          <th class="align-middle">Type</th>
+          <th class="align-middle">Work Category</th>
+          <th class="align-middle">From → To</th>
+          <th class="align-middle">Requested By</th>
+          <th class="align-middle">Date</th>
+          <th class="align-middle">Status</th>
+          <th class="align-middle">Action</th>
+          <th class="align-middle text-center">Select</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of filteredApplications; let i = index">
+          <td class="align-middle">{{ i+1 }}</td>
+          <td class="align-middle">{{ item.bctaNo }}</td>
+          <td class="align-middle">{{ item.firmType }}</td>
+          <td class="align-middle text-truncate" title="{{ item.workCategory }}">{{ item.workCategory }}</td>
+          <td class="align-middle">{{ item.oldClassification }} → {{ item.newClassification }}</td>
+          <td class="align-middle">{{ item.requestedBy }}</td>
+          <td class="align-middle">{{ item.requestedOn | date: 'yyyy-MM-dd' }}</td>
+          <td class="align-middle">{{ item.status }}</td>
+          <td class="align-middle">
+            <button class="btn btn-sm p-0" (click)="navigate(item)">View</button>
+          </td>
+          <td class="align-middle text-center">
+            <input type="checkbox" class="form-check-input" [(ngModel)]="item.selected" (change)="onCheckboxChange(item)">
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <nav class="mt-3">
+    <div class="d-flex justify-content-between align-items-center flex-wrap">
+      <p class="mb-0 text-muted">{{ calculateOffset() }}</p>
+      <ul class="pagination mb-0">
+        <li class="page-item" [class.disabled]="pageNo === 1">
+          <a class="page-link" (click)="goToPage(pageNo - 1)">Previous</a>
+        </li>
+        <li class="page-item" *ngFor="let page of getPages()" [class.active]="pageNo === page">
+          <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
+        </li>
+        <li class="page-item" [class.disabled]="pageNo === getTotalPages()">
+          <a class="page-link" (click)="goToPage(pageNo + 1)">Next</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="d-flex justify-content-end mt-3">
+    <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" 
+            (click)="activeAction='downgrade'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      Endorse
+    </button>
+    <button class="btn btn-danger" [disabled]="selectedIds.length === 0" 
+            (click)="activeAction='rejected'" data-bs-toggle="modal" data-bs-target="#exampleModal">
+      Reject
+    </button>
+  </div>
+</div>
+</div>
+  <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="background-color: #495f8a">
+          <h5 class="modal-title text-white" id="exampleModalLabel">Remarks</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <div class="col-md-12">
+            <label class="form-label font-size-12">Remarks:<span class="text-danger">*</span></label>
+            <textarea class="form-control" placeholder="Remarks" name="remarks" [(ngModel)]="formData.remarks" rows="4">
+          </textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" #closeRemarkButton class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+          <button type="button" class="btn btn-primary" (click)="submitAction()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>

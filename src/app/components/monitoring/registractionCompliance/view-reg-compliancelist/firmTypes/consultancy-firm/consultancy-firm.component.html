@@ -66,8 +66,7 @@
                             data.applicationStatus === 'Submitted' ||
                             data.applicationStatus === 'Resubmitted HR and EQ' ||
                             data.applicationStatus === 'Resubmitted OS and PFS' ||
-                            data.applicationStatus === 'Suspension Resubmission'"
-                            (click)="navigate(data)">
+                            data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
                         {{ data.consultantNo }}
                     </td>
 
@@ -75,15 +74,14 @@
                     <td>{{ data.sentDate }}</td>
                     <td>
                         <span class="text-bold" [ngClass]="{
-                            'text-secondary': data.applicationStatus== 'Not Submitted',
-                            'text-warning': data.applicationStatus== 'Pending' || data.applicationStatus== 'Suspension Request' || data.applicationStatus === 'Cancel Request',
-                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus =='Suspension Approved',
-                            'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Suspension Resubmission'
-                                            || data.applicationStatus === 'Resubmitted HR and EQ',
-                            }">
+                            'text-secondary': data.applicationStatus === 'Not Submitted',
+                            'text-warning': ['Pending','Suspension Request','Cancel Request','Forwarded TO RC'].includes(data.applicationStatus),
+                            'text-success': ['Verified','Suspension Approved'].includes(data.applicationStatus),
+                            'text-primary': ['Submitted','Resubmitted OS and PFS','Suspension Resubmission','Resubmitted HR and EQ'].includes(data.applicationStatus)}">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
+
                     <!-- <td>{{ data.licenseStatus }}</td> -->
                     <td>
                         <span class="text-bold "
@@ -96,10 +94,11 @@
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>
                     </td>
                     <td>
-                        <button *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'" class="btn btn-primary btn-sm me-2 mb-1"
-                            (click)="openActionModal(data)">Action</button>
+                        <button
+                            *ngIf="data.applicationStatus === 'Resubmitted HR and EQ' || data.applicationStatus === 'Resubmitted OS and PFS'"
+                            class="btn btn-primary btn-sm me-2 mb-1" (click)="openActionModal(data)">Action</button>
                     </td>
-                    
+
                     <!-- <div *ngIf="data.licenseStatus === 'Suspended'">
                             <button class="btn btn-danger btn-sm"
                                 (click)="getReinstateApplication(data.consultantNo)">View</button>
@@ -149,7 +148,7 @@
             <button class="btn btn-success" (click)="forwardToRC()">Forward to RC</button>
         </div> -->
 
-          <div class="d-flex justify-content-end mb-3" *ngIf="tableData">
+        <div class="d-flex justify-content-end mb-3" *ngIf="tableData">
             <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Forward the application?'"
                 (nzOnConfirm)="forwardToRC()" *ngIf="selectedIds.length !== 0">
                 <button class="btn btn-success">
