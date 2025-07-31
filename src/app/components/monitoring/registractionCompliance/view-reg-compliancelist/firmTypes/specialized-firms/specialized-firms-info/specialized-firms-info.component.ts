@@ -12,6 +12,7 @@ export class SpecializedFirmsInfoComponent {
   applicationStatus: string = '';
   activeTabId: string = 'sfemployee';
   licenseStatus: any;
+  appNo: any;
 
   constructor(private service: CommonService) { }
 
@@ -25,17 +26,15 @@ export class SpecializedFirmsInfoComponent {
     this.applicationStatus = WorkDetail.data.applicationStatus;
     this.formData.firmType = WorkDetail.data;
     this.bctaNo = WorkDetail.data.specializedFirmNo;
+    this.appNo = WorkDetail.data.appNo;
 
-    console.log('WorkDetail', WorkDetail);
-    console.log('bctaNo', this.bctaNo);
-
-    if (this.bctaNo) {
+    if (this.bctaNo && this.appNo) {
       this.fetchDataBasedOnBctaNo();
     }
   }
 
   fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+    this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
       this.formData = res.complianceEntities[0];
       // Set firm info in the service
       this.service.setFirmInfo({

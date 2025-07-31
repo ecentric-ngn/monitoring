@@ -7,6 +7,7 @@
   <span class="text-warning ml-3">Note:<i>Filter base on license status</i></span>
   <div class="col-md-4">
     <select class="form-select" (change)="onTabChange($event)" [value]="activeTab">
+      <option disabled>--select--</option>
       <option value="active">Active</option>
       <option value="suspend">Suspend</option>
       <option value="cancel">Cancel</option>
@@ -32,25 +33,26 @@
     <!-- Suspend Table -->
     <div class="table-responsive m-3">
       <table class="table table-bordered table-sm">
-        <thead class="thead-dark">
+        <thead class="">
           <tr>
-            <th>Contractor No</th>
+            <th>Bcta No</th>
             <th>Type</th>
             <th>Details</th>
-            <th>Initiated By</th>
+            <th>Subject</th>
             <th>Date</th>
             <th>Status</th>
             <th>Action</th>
+            <th>Select</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let action of tableData">
             <td>
 
-              {{ action.contractorNo || '-' }}
+              {{ action.bctaNo || '-' }}
 
             </td>
-            <td>{{ action.type }}</td>
+            <td>{{ action.firmType }}</td>
             <td>{{ action.details }}</td>
             <td>{{ action.subject }}</td>
             <td>{{ action.sentDate | date: 'yyyy-MM-dd' }}</td>
@@ -59,6 +61,13 @@
                 {{ action.applicationStatus }}
               </span>
             </td>
+             <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button  class="btn btn-primary btn-sm h-100"
+                                (click)="navigate(action)">View</button>
+                        </div>
+                    </td>
+
             <td class="text-center">
               <input type="checkbox" [(ngModel)]="action.selected" (change)="onCheckboxChange(action)">
             </td>
@@ -95,7 +104,8 @@
 
   </div>
   <div *ngIf="activeTab === 'suspend'">
-    <div class="row">
+    <app-view-suspend-request-app-no></app-view-suspend-request-app-no>
+    <!-- <div class="row">
       <div class="col d-flex pl-4">
         <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
         <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
@@ -108,10 +118,10 @@
         <input type="text" placeholder="Contractor No" class="form-control form-control-sm col-md-2"
           id="search " [(ngModel)]="searchQuery" (input)="Searchfilter('Suspend')" />
       </div>
-    </div>
-    <div class="ml-2 my--3 table-responsive">
+    </div> -->
+    <!-- <div class="ml-2 my--3 table-responsive">
       <table class="table table-bordered table-sm">
-        <thead class="thead-dark">
+        <thead class="">
           <tr>
             <th>SL No.</th>
             <th>Contractor No</th>
@@ -121,6 +131,7 @@
             <th>Date</th>
             <th>Status</th>
             <th>Action</th>
+            <th>Select</th>
           </tr>
         </thead>
         <tbody>
@@ -140,31 +151,37 @@
                 {{ action.status }}
               </span>
             </td>
+             <td class="text-center">
+                        <div class="d-flex justify-content-center gap-2">
+                            <button *ngIf="action.status ==='Suspension Request'" class="btn btn-primary btn-sm h-100"
+                               >View</button>
+                        </div>
+                    </td>
             <td class="text-center">
               <input type="checkbox" [(ngModel)]="action.selected" [disabled]="isCheckboxDisabled(action)"
                 (change)="onCheckboxChange(action)" />
 
               <!-- <input type="checkbox" [(ngModel)]="action.selected" (change)="onCheckboxChange(action)"> -->
-            </td>
+            <!-- </td>
           </tr>
           <tr *ngIf="tableData.length === 0 && !isLoading">
             <td colspan="8" class="text-center text-muted">No actions found</td>
           </tr>
         </tbody>
-      </table>
-    </div>
+      </table> -->
+    <!-- </div> --> 
     <!-- Loading Spinner -->
-    <div *ngIf="isLoading" class="text-center py-3">
+    <!-- <div *ngIf="isLoading" class="text-center py-3">
       <i class="fa fa-spinner fa-spin"></i> Loading...
-    </div>
-    <nav *ngIf="totalCount > pageSize" class="mt-3">
+    </div> -->
+    <!-- <nav *ngIf="totalCount > pageSize" class="mt-3">
       <div class="d-flex justify-content-between align-items-center flex-wrap">
 
         <!-- Left-aligned offset text -->
-        <p class="mb-0">{{ calculateOffset() }}</p>
+        <!-- <p class="mb-0">{{ calculateOffset() }}</p> -->
 
         <!-- Right-aligned pagination controls -->
-        <ul class="pagination mb-0">
+        <!-- <ul class="pagination mb-0">
           <li class="page-item" [class.disabled]="pageNo === 1">
             <a class="page-link" (click)="goToPage(pageNo - 1)">Previous</a>
           </li>
@@ -178,11 +195,12 @@
           </li>
         </ul>
       </div>
-    </nav>
+    </nav>  -->
+     </div>
 
 
 
-    <div class="d-flex justify-content-end mt-4">
+    <!-- <div class="d-flex justify-content-end mt-4">
       <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='Suspended'"
         data-bs-toggle="modal" data-bs-target="#exampleModal">
         Endorse
@@ -191,12 +209,16 @@
         data-bs-toggle="modal" data-bs-target="#exampleModal">
         Reject
       </button>
-    </div>
+    </div> -->
   </div>
+
   <!-- Cancel Tab -->
-  <div *ngIf="showCancelTable">
-    <div class="row">
-      <div class="col d-flex pl-4">
+   <div *ngIf="activeTab === 'cancel'">
+    <div class="table-responsive m-3">
+        <app-view-cancel-request-app-no></app-view-cancel-request-app-no>
+     </div>
+    <!-- <div class="row"> -->
+      <!-- <div class="col d-flex pl-4">
         <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
         <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
           style="border-color: #ced4da;">
@@ -207,12 +229,12 @@
         <p class="mr-1 p-1 text-gray-600">Search By : </p>
         <input type="text" placeholder="AppNo, BCTA No or Status" class="form-control form-control-sm col-md-4"
           id="search " [(ngModel)]="searchQuery" (input)="Searchfilter('Cancel')" />
-      </div>
-    </div>
-    <!-- Cancel Table -->
-    <div class="table-responsive ml-2 my--3">
+      </div> -->
+    <!-- </div> -->
+   
+    <!-- <div class="table-responsive ml-2 my--3">
       <table class="table table-bordered table-sm">
-        <thead class="thead-dark">
+        <thead class="">
           <tr>
             <th>Sl No.</th>
             <th>Firm No</th>
@@ -244,7 +266,7 @@
             <!-- <td class="text-center">
               <input type="checkbox" [(ngModel)]="app.selected" (change)="onCheckboxChange(app)">
             </td> -->
-          </tr>
+          <!-- </tr>
           <tr *ngIf="filteredApplications.length === 0 && !isLoading">
             <td colspan="8" class="text-center text-muted">No cancellation applications found</td>
           </tr>
@@ -254,16 +276,16 @@
                 <span class="sr-only">Loading...</span>
               </div>
             </td>
-          </tr>
-        </tbody>
+          </tr> -->
+        <!-- </tbody>
       </table>
        <nav *ngIf="totalCount > pageSize" class="mt-3">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
+      <div class="d-flex justify-content-between align-items-center flex-wrap"> -->
 
-        <!-- Left-aligned offset text -->
-        <p class="mb-0">{{ calculateOffset() }}</p>
+      
+        <!-- <p class="mb-0">{{ calculateOffset() }}</p>
 
-        <!-- Right-aligned pagination controls -->
+       
         <ul class="pagination mb-0">
           <li class="page-item" [class.disabled]="pageNo === 1">
             <a class="page-link" (click)="goToPage(pageNo - 1)">Previous</a>
@@ -276,11 +298,11 @@
           <li class="page-item" [class.disabled]="pageNo === getTotalPages()">
             <a class="page-link" (click)="goToPage(pageNo + 1)">Next</a>
           </li>
-        </ul>
-      </div>
+        </ul> -->
+      <!-- </div>
     </nav>
-    </div>
-    <div class="d-flex justify-content-end mt-3">
+    </div> -->
+    <!-- <div class="d-flex justify-content-end mt-3">
       <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='cancel'"
         data-bs-toggle="modal" data-bs-target="#exampleModal">
         Endorse
@@ -288,7 +310,7 @@
       <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
         data-bs-toggle="modal" data-bs-target="#exampleModal">
         Reject
-      </button>
+      </button> --> 
     </div>
     <!-- Cancel Button -->
     <!-- <div class="d-flex justify-content-end">
@@ -301,118 +323,13 @@
         Reject
       </button>
     </div> -->
-  </div>
+  <!-- </div> -->
 
   <!-- Downgrade Tab -->
   <div *ngIf="activeTab === 'downgrade'">
-    <div class="row">
-      <div class="col d-flex pl-4">
-        <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
-        <select class="form-control-sm itemPerPage ml-2 " (change)="setLimitValue($event.target.value)"
-          style="border-color: #ced4da;">
-          <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
-        </select>
-      </div>
-      <div class="col-lg-7 d-flex justify-content-end pr-2">
-        <p class="mr-1 p-1 text-gray-600">Search By : </p>
-        <input type="text" placeholder="Contractor No" class="form-control form-control-sm col-md-4"
-          id="search " [(ngModel)]="searchQuery" (input)="Searchfilter('downgrade')" />
-      </div>
-    </div>
-    <div class="container-fluid px-0">
-      <div class="table-responsive ml-2 my--3" style="overflow-x: auto; overflow-y: hidden;">
-        <table class="table table-bordered table-sm"
-          style="width: 100%; table-layout: fixed; border-collapse: collapse;">
-          <thead class="thead-dark">
-            <tr>
-              <th class="align-middle w-2rem">Sl No.</th>
-              <th class="align-middle">Bc No</th>
-              <th class="align-middle" style="width: 8%">Type</th>
-              <th class="align-middle" style="width: 15%">Work Category</th>
-              <th class="align-middle" style="width: 20%">From → To</th>
-              <th class="align-middle" style="width: 15%">Requested By</th>
-              <th class="align-middle" style="width: 15%">Date</th>
-              <th class="align-middle" style="width: 10%">Status</th>
-              <th class="align-middle text-center" style="width: 7%; border-right: 1px solid #dee2e6;">Select</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let item of filteredApplications;  let i = index">
-              <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ i+1 }}</td>
-              <td class="align-middle" style="border-right: 1px solid #dee2e6;">
-
-                {{ item.contractorNo|| '-' }}
-
-              </td>
-              <!-- <td class="align-middle text-truncate" style="border-right: 1px solid #dee2e6;">{{ item.contractorNo }} </td> -->
-              <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.type }}</td>
-              <td class="align-middle text-truncate" style="border-right: 1px solid #dee2e6;"
-                title="{{ item.details }}">{{ item.details }}</td>
-              <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.fromTo }}</td>
-              <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.initiatedBy }}</td>
-              <td class="align-middle" style="border-right: 1px solid #dee2e6;">{{ item.initiatedDate | date: 'yyyy-MM-dd' }}
-              </td>
-              <td class="text-wrap">
-                  {{ item.status }}
-                
-              </td>
-              <td class="align-middle text-center p-1" style="border-right: 1px solid #dee2e6;">
-                <input type="checkbox" class="form-check-input m-0" style="width: 18px; height: 18px;"
-                  [(ngModel)]="item.selected" (change)="onCheckboxChange(item)">
-              </td>
-            </tr>
-            <tr *ngIf="filteredApplications.length === 0 && !isLoading">
-              <td colspan="8" class="text-center text-muted py-3" style="border-right: 1px solid #dee2e6;">No actions
-                found</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-   <nav *ngIf="totalCount > pageSize" class="mt-3">
-      <div class="d-flex justify-content-between align-items-center flex-wrap">
-
-        <!-- Left-aligned offset text -->
-        <p class="mb-0">{{ calculateOffset() }}</p>
-
-        <!-- Right-aligned pagination controls -->
-        <ul class="pagination mb-0">
-          <li class="page-item" [class.disabled]="pageNo === 1">
-            <a class="page-link" (click)="goToPage(pageNo - 1)">Previous</a>
-          </li>
-
-          <li class="page-item" *ngFor="let page of getPages()" [class.active]="pageNo === page">
-            <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
-          </li>
-
-          <li class="page-item" [class.disabled]="pageNo === getTotalPages()">
-            <a class="page-link" (click)="goToPage(pageNo + 1)">Next</a>
-          </li>
-        </ul>
-      </div>
-    </nav>
-      <!-- Downgrade Button -->
-      <!-- <div class="d-flex justify-content-end">
-        <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='downgrade'"
-          data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Endorse
-        </button>
-        <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
-          data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Reject
-        </button>
-      </div> -->
-      <div class="d-flex justify-content-end mt-5">
-        <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='downgrade'"
-          data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Endorse
-        </button>
-        <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
-          data-bs-toggle="modal" data-bs-target="#exampleModal">
-          Reject
-        </button>
-      </div>
-    </div>
+    <app-view-downgrade-request-app-no></app-view-downgrade-request-app-no>
   </div>
+
 
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -12,7 +12,8 @@ formData: any = {};
   applicationStatus: string = '';
   activeTabId: string = '';
   licenseStatus: any;
-  data: string;
+  data: any = {};
+  appNo: any;
   constructor(@Inject(CommonService) private service: CommonService) { }
 
 ngOnInit(): void {
@@ -28,6 +29,7 @@ ngOnInit(): void {
   console.log('applicationStatus', this.applicationStatus);
   this.formData.firmType = WorkDetail.data;
   this.bctaNo = WorkDetail.data.certifiedBuilderNo;
+  this.appNo = WorkDetail.data.appNo;
 
   // Set default active tab based on status
   if (this.applicationStatus === 'Resubmitted OS and PFS') {
@@ -38,7 +40,7 @@ ngOnInit(): void {
     this.activeTabId = 'cbOffice'; // default tab
   }
 
-  if (this.bctaNo) {
+  if (this.bctaNo && this.appNo) {
     this.fetchDataBasedOnBctaNo();
   }
 }
@@ -62,7 +64,7 @@ isTabEnabled(tabId: string): boolean {
 
 
   fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+    this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
       this.formData = res.complianceEntities[0];
       console.log('this.formData', this.formData);
     })

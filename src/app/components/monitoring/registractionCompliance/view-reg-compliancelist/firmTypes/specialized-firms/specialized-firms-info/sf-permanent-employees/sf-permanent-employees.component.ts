@@ -124,7 +124,7 @@ export class SfPermanentEmployeesComponent {
      * Logs any errors that occur to the console.
      */
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.bctaNo,this.formData.firmType.appNo).subscribe((res: any) => {
             this.tableData = res.hrCompliance;
             console.log('sf employee', this.formData);
         });
@@ -443,6 +443,7 @@ export class SfPermanentEmployeesComponent {
                 specializedFirmId: this.bctaNo,
                 requestedBy: this.authService.getUsername(), // Replace with actual user/requestor if needed
                 downgradeEntries,
+                applicationID:this.selectedAction.target?.appNo,
             };
 
             this.service.downgradeSF(payload).subscribe({
@@ -487,6 +488,7 @@ export class SfPermanentEmployeesComponent {
                 ).toISOString(),
                 firmType: 'specialized-firm',
                 reason: this.selectedAction.remarks,
+                applicationID:this.selectedAction.target?.appNo,
             };
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
@@ -511,6 +513,7 @@ export class SfPermanentEmployeesComponent {
                     : null,
                 firmType: 'specialized-firm',
                 suspendDetails: this.selectedAction.remarks,
+                applicationID:this.selectedAction.target?.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({

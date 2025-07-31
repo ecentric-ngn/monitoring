@@ -353,7 +353,7 @@ pageNo: number = 1;
     onCheckboxChange(event: Event, id: string) {
         const isChecked = (event.target as HTMLInputElement).checked;
         const numericId = Number(id); // convert to number
-debugger
+
         if (isChecked) {
             if (!this.selectedIds.includes(numericId)) {
                 this.selectedIds.push(numericId);
@@ -377,10 +377,12 @@ debugger
                 console.log('Successfully sent selected IDs:',  this.tableData);
                 console.log('Successfully sent selected IDs:', res);
                 Swal.fire('Success', 'Selected contractors submitted successfully', 'success');
+                 this.fetchComplianceDetails()
             },
+           
             (error) => {
                  console.log('Successfully sent selected IDs:',  this.tableData);
-                Swal.fire('Success', 'Selected contractors submitted successfully', 'success');
+                Swal.fire('error', 'Something went wrong while forwarding', 'error');
             }
         );
     }
@@ -475,7 +477,8 @@ debugger
             const payload = {
                 specializedFirmId: this.selectedAction.target?.specializedFirmId,
                 requestedBy: this.authService.getUsername(), // Replace with actual user/requestor if needed
-                downgradeEntries
+                downgradeEntries,
+                applicationID:this.selectedAction.target?.appNo,
             };
 
             this.service.downgradeSF(payload).subscribe({
@@ -483,10 +486,13 @@ debugger
                     if (res && res.toLowerCase().includes('downgrade request submitted')) {
                         Swal.fire('Success', 'Forwarded to Review Committee', 'success');
                         this.closeModal();
+                        this.fetchComplianceDetails();
                     } else {
                         Swal.fire('Error', res || 'Something went wrong while forwarding.', 'error');
                         this.closeModal();
+                         this.fetchComplianceDetails();
                     }
+
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Something went wrong while forwarding.', 'error');
@@ -501,6 +507,7 @@ debugger
                 cancelledOn: new Date(this.selectedAction.actionDate).toISOString(),
                 firmType: "specialized-firm",
                 reason: this.selectedAction.remarks,
+                applicationID:this.selectedAction.target?.appNo,
             };
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
@@ -521,6 +528,7 @@ debugger
                     : null,
                 firmType: "specialized-firm",
                 suspendDetails: this.selectedAction.remarks,
+                applicationID:this.selectedAction.target?.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({

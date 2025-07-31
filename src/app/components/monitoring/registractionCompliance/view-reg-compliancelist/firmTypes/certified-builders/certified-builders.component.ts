@@ -400,13 +400,14 @@ export class CertifiedBuildersComponent {
                     'Selected firms submitted successfully',
                     'success'
                 );
+                this.fetchComplianceDetails();
             },
             (error) => {
                 console.log('Successfully sent selected IDs:', this.tableData);
                 Swal.fire(
-                    'Success',
-                    'Selected certified builders submitted successfully',
-                    'success'
+                    'Error',
+                    'Something went wrong while forwarding.',
+                    'error'
                 );
             }
         );
@@ -431,7 +432,7 @@ export class CertifiedBuildersComponent {
     }
 
     onActionTypeChange() {
-        if (this.selectedAction.actionType === 'downgrade') {
+        if (this.selectedAction.actionType === 'cancel') {
             const firmId = this.selectedAction.target?.certifiedBuilderId;
             const firmType = 'certified-builder';
 
@@ -530,6 +531,7 @@ export class CertifiedBuildersComponent {
                 ).toISOString(),
                 firmType: 'certified-builder',
                 reason: this.selectedAction.remarks,
+                applicationID: this.selectedAction.target?.appNo,
             };
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
@@ -558,6 +560,7 @@ export class CertifiedBuildersComponent {
                     : null,
                 firmType: 'certified-builder',
                 suspendDetails: this.selectedAction.remarks,
+                applicationID: this.selectedAction.target?.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({

@@ -35,10 +35,8 @@ import { ViewRegCompliancelistComponent } from './components/monitoring/registra
 import { ConsultencyFirmDetailsComponent } from './components/monitoring/reviewCommitteDashboard/consultency-firm-details/consultency-firm-details.component';
 import { SpecilizedFirmDetailsComponent } from './components/monitoring/reviewCommitteDashboard/specilized-firm-details/specilized-firm-details.component';
 import { CertifiedFirmDetailsComponent } from './components/monitoring/reviewCommitteDashboard/certified-firm-details/certified-firm-details.component';
-import { ViewConultencyDetailsComponent } from './components/monitoring/reviewCommitteDashboard/view-registration-compliance-details/view-conultency-details/view-conultency-details.component';
-import { ViewSpecializeDetailsComponent } from './components/monitoring/reviewCommitteDashboard/view-registration-compliance-details/view-specialize-details/view-specialize-details.component';
-import { ViewCertifiedDetailsComponent } from './components/monitoring/reviewCommitteDashboard/view-registration-compliance-details/view-certified-details/view-certified-details.component';
-
+import { ViewAppDetailsComponent } from './components/monitoring/reviewCommitteDashboard/view-registration-compliance-details/view-downgrade-request-app-no/view-app-details/view-app-details.component';
+import { ViewSuspendAppDetailsComponent } from './components/monitoring/reviewCommitteDashboard/view-registration-compliance-details/view-suspend-request-app-no/view-suspend-app-details/view-suspend-app-details.component';
 @NgModule({
   declarations: [
     AppComponent,
@@ -56,9 +54,9 @@ import { ViewCertifiedDetailsComponent } from './components/monitoring/reviewCom
     ConsultencyFirmDetailsComponent,
     SpecilizedFirmDetailsComponent,
     CertifiedFirmDetailsComponent,
-    ViewConultencyDetailsComponent,
-    ViewSpecializeDetailsComponent,
-    ViewCertifiedDetailsComponent
+    ViewAppDetailsComponent,
+    ViewSuspendAppDetailsComponent,
+    
   ],
   imports: [
     HttpClientModule,
@@ -81,7 +79,7 @@ import { ViewCertifiedDetailsComponent } from './components/monitoring/reviewCom
     CommonModule,
     BrowserAnimationsModule,
     MonitoringModule,
-    NzPopconfirmModule
+    NzPopconfirmModule,
   ],
   providers: [
     MessageService,

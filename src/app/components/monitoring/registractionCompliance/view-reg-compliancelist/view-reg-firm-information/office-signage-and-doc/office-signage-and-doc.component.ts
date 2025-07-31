@@ -238,8 +238,6 @@ export class OfficeSignageAndDocComponent implements OnInit {
     }
 
     if (this.selectedAction.actionType === 'downgrade') {
-        console.log('Processing downgrade action...');
-        
         const downgradeEntries = this.downgradeList
             .filter(entry => entry.newClass && entry.newClass !== '')
             .map(entry => {
@@ -266,15 +264,13 @@ export class OfficeSignageAndDocComponent implements OnInit {
         }
 
         const payload = {
-            bctaNo: this.selectedAction.target?.contractorNo,
-            firmId: this.selectedAction.target?.contractorId,
+            bctaNo: this.data.contractorNo,
+            firmId: this.data.contractorId,
             firmType: "Contractor",
             downgradeEntries,
-            requestedBy: this.authService.getUsername()
+            requestedBy: this.authService.getUsername(),
+            applicationID: this.data.appNo,
         };
-
-        console.log('Sending downgrade payload:', payload);
-
         this.service.downgradeFirm(payload).subscribe({
             next: (res: string) => {
                 console.log('Downgrade API response:', res);
@@ -297,8 +293,6 @@ export class OfficeSignageAndDocComponent implements OnInit {
         });
      
     } else if (this.selectedAction.actionType === 'suspend') {
-        console.log('Processing suspend action...');
-        
         const payload = {
             firmNo: this.WorkDetail.data.contractorNo,
             suspendedBy: this.authService.getUsername(),
@@ -307,13 +301,10 @@ export class OfficeSignageAndDocComponent implements OnInit {
                 : null,
             firmType: "Contractor",
             suspendDetails: this.selectedAction.remarks,
+              applicationID: this.data.appNo,
         };
-
-        console.log('Sending suspend payload:', payload);
-
         this.service.suspendFirm(payload).subscribe({
             next: (res) => {
-                console.log('Suspend API response:', res);
                 Swal.fire('Success', 'Forwarded to Review Committee', 'success');
                 this.router.navigate(['/monitoring/construction']);
                 this.closeModal();
@@ -340,6 +331,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
     this.licenseStatus = WorkDetail.data.licenseStatus;
     this.applicationStatus = WorkDetail.data.applicationStatus;
     this.bctaNo = WorkDetail.data.contractorNo;
+    
     // if (!WorkDetail?.data) {
     //   console.error('WorkDetail data not available');
     //   return;
@@ -347,7 +339,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
      if(this.applicationStatus === 'Suspension Resubmission' && this.WorkDetail.data.contractorNo){
       this.fetchSuspendDataBasedOnBctaNo();
        
-     }else if(this.WorkDetail.data.contractorNo && this.applicationStatus !== 'Suspension Resubmission'){
+     }else if(this.WorkDetail.data.contractorNo && this.WorkDetail.data.appNo && this.applicationStatus !== 'Suspension Resubmission'){
         this.fetchDataBasedOnBctaNo();
      }else{
         console.log('no data found:', WorkDetail);
@@ -357,7 +349,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
     this.applicationStatus = WorkDetail.data.applicationStatus;
   }
   fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNo(this.WorkDetail.data.contractorNo).subscribe(
+    this.service.getDatabasedOnBctaNos(this.WorkDetail.data.contractorNo, this.WorkDetail.data.appNo).subscribe(
       (res: any) => {
         if (res?.complianceEntities?.length) {
           this.formData = { ...this.formData, ...res.complianceEntities[0] };

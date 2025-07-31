@@ -1,64 +1,5 @@
-<div class="table-responsive text-center">
-  <!-- Add Button aligned to the right -->
-  <div class="d-flex justify-content-end mb-2">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
-      + Add
-    </button>
-  </div>
-
-  <table id="datatable-1" class="table table-bordered table-sm rounded-2">
-    <thead>
-      <tr>
-        <th>Sl No.</th>
-        <th>Owner Name</th>
-        <th>Current Address</th>
-        <th>Email</th>
-        <th>Project name</th>
-        <th>Contract Amount</th>
-        <th>Place</th>
-        <th>Start Date</th>
-        <th>Proposed Completion Date</th>
-        <th>Work Type</th>
-        <th>Dzongkhag</th>
-        <th>Verified By</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr *ngFor="let data of tableData; let i = index" class="table-row">
-        <td>{{ i + 1 }}</td>
-        <td>{{ data.ownerName }}</td>
-        <td>{{ data.Address }}</td>
-        <td>{{ data.Email }}</td>
-        <td>{{ data.projectName }}</td>
-        <td>{{ data.contractAmount }}</td>
-        <td>{{ data.place }}</td>
-        <td>{{ data.startDate }}</td>
-        <td>{{ data.proposed_completionDate }}</td>
-        <td>{{ data.workType }}</td>
-        <td>{{ data.is_draft ? 'Draft' : data.dzongkhag }}</td>
-        <td></td>
-        <td>{{ data.is_draft ? 'Draft' : '' }}</td>
-        <td>
-          <button class="btn btn-success btn-sm" (click)="navigateToEdit(data)">Resubmit</button>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-
-<div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
-  aria-labelledby="staticBackdropLabel" aria-hidden="true">
-  <div class="modal-dialog modal-lg">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-        <div class="container-fluid">
-          <form #form="ngForm">
+<div class="">
+   <form #form="ngForm">
             <div class="p-3 border">
               <div class="font-bold">Client Details</div>
               <hr>
@@ -214,8 +155,71 @@
               </div>
             </div>
           </form>
+  <!-- Add Button aligned to the right -->
+  <!-- <div class="d-flex justify-content-end mb-2">
+    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+      + Add
+    </button>
+  </div>
+
+  <table id="datatable-1" class="table table-bordered table-sm rounded-2">
+    <thead>
+      <tr>
+        <th>Sl No.</th>
+        <th>Owner Name</th>
+        <th>Current Address</th>
+        <th>Email</th>
+        <th>Project name</th>
+        <th>Contract Amount</th>
+        <th>Place</th>
+        <th>Start Date</th>
+        <th>Proposed Completion Date</th>
+        <th>Work Type</th>
+        <th>Dzongkhag</th>
+        <th>Verified By</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let data of tableData; let i = index" class="table-row">
+        <td>{{ i + 1 }}</td>
+        <td>{{ data.ownerName }}</td>
+        <td>{{ data.Address }}</td>
+        <td>{{ data.Email }}</td>
+        <td>{{ data.projectName }}</td>
+        <td>{{ data.contractAmount }}</td>
+        <td>{{ data.place }}</td>
+        <td>{{ data.startDate }}</td>
+        <td>{{ data.proposed_completionDate }}</td>
+        <td>{{ data.workType }}</td>
+        <td>{{ data.is_draft ? 'Draft' : data.dzongkhag }}</td>
+        <td></td>
+        <td>{{ data.is_draft ? 'Draft' : '' }}</td>
+        <td>
+          <button class="btn btn-success btn-sm" (click)="navigateToEdit(data)">Resubmit</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div> -->
+
+<!-- <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1"
+
+
+  aria-labelledby="staticBackdropLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="staticBackdropLabel">Modal title</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="container-fluid">
+         
         </div>
       </div>
     </div>
   </div>
-</div>
+</div> -->
+ </div>

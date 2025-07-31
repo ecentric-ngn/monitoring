@@ -264,7 +264,7 @@ export class ConsultancyFirmComponent {
         );
     }
 
-  onCheckboxChange(event: Event, id: string) {
+    onCheckboxChange(event: Event, id: string) {
         const isChecked = (event.target as HTMLInputElement).checked;
         const numericId = Number(id); // convert to number
 
@@ -287,20 +287,22 @@ export class ConsultancyFirmComponent {
             return;
         }
         const payload = this.selectedIds;
-        debugger
         this.service.forwardToReviewCommiteeConsultancy(payload).subscribe(
             (res) => {
-                console.log('Successfully sent selected IDs:', res);
                 Swal.fire(
                     'Success',
                     'Selected firms submitted successfully',
                     'success'
                 );
+                this.fetchComplianceDetails();
             },
             (error) => {
-                            console.log('Successfully sent selected IDs:',  this.tableData);
-                           Swal.fire('Success', 'Selected consultancy submitted successfully', 'success');
-                       }
+                Swal.fire(
+                    'error',
+                    'Something went wrong while forwarding.',
+                    'success'
+                );
+            }
         );
     }
 
@@ -333,6 +335,7 @@ export class ConsultancyFirmComponent {
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'cancel') {
             const firmId = this.selectedAction.target?.consultantId;
+            
             const firmType = 'consultant';
 
             if (!firmId) {
@@ -573,7 +576,7 @@ export class ConsultancyFirmComponent {
             return;
         }
 
-        if (this.selectedAction.actionType === 'cancel') {
+        if (this.selectedAction.actionType === 'cancelS') {
             // Collect all unchecked, previously pre-checked classifications
             const downgradeEntries: any[] = [];
             this.downgradeList.forEach((entry) => {
@@ -601,6 +604,7 @@ export class ConsultancyFirmComponent {
                 bctaNo: this.selectedAction.target?.consultantNo,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
+                applicationID: this.selectedAction.target?.appNo,
             };
 
             this.service.downgradeConsultancy(payload).subscribe({
@@ -625,7 +629,7 @@ export class ConsultancyFirmComponent {
                             'error'
                         );
                         this.closeModal();
-                           this.fetchComplianceDetails();
+                        this.fetchComplianceDetails();
                     }
                 },
                 error: (err) => {
@@ -636,7 +640,7 @@ export class ConsultancyFirmComponent {
                     );
                     console.error(err);
                     this.closeModal();
-                       this.fetchComplianceDetails();
+                    this.fetchComplianceDetails();
                 },
             });
         } else if (this.selectedAction.actionType === 'suspend') {
@@ -649,6 +653,7 @@ export class ConsultancyFirmComponent {
                     : null,
                 firmType: 'Consultant',
                 suspendDetails: this.selectedAction.remarks,
+                applicationID: this.selectedAction.target?.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({
@@ -659,7 +664,34 @@ export class ConsultancyFirmComponent {
                         'success'
                     );
                     this.closeModal();
-                       this.fetchComplianceDetails();
+                    this.fetchComplianceDetails();
+                },
+                error: (err) => {
+                    Swal.fire('Error', 'Failed to suspend contractor', 'error');
+                },
+            });
+        }else if (this.selectedAction.actionType === 'cancel') {
+            const payload = {
+                firmNo: this.selectedAction.target?.consultantNo,
+                // contractorId: this.selectedAction.target?.contractorId,
+                suspendedBy: this.authService.getUsername(),
+                suspensionDate: this.selectedAction.actionDate
+                    ? new Date(this.selectedAction.actionDate).toISOString()
+                    : null,
+                firmType: 'Consultant',
+                suspendDetails: this.selectedAction.remarks,
+                applicationID: this.selectedAction.target?.appNo,
+            };
+            // Call suspend API
+            this.service.cancelFirm(payload).subscribe({
+                next: (res) => {
+                    Swal.fire(
+                        'Success',
+                        'Forwarded to Review Committee',
+                        'success'
+                    );
+                    this.closeModal();
+                    this.fetchComplianceDetails();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend contractor', 'error');
@@ -697,7 +729,7 @@ export class ConsultancyFirmComponent {
                         'success'
                     );
                     this.closeModal();
-                       this.fetchComplianceDetails();
+                    this.fetchComplianceDetails();
                 } else {
                     Swal.fire(
                         'Warning',
@@ -707,7 +739,7 @@ export class ConsultancyFirmComponent {
                 }
                 this.router.navigate(['/monitoring/consultancy']);
                 this.closeModal();
-                   this.fetchComplianceDetails();
+                this.fetchComplianceDetails();
             },
             error: (err) => {
                 console.error('Reinstatement error:', err);
@@ -733,7 +765,6 @@ export class ConsultancyFirmComponent {
         this.fetchComplianceDetails();
     }
     goToNextPage() {
-        ;
         const totalPages = Math.ceil(this.totalCount / this.pageSize);
         if (this.pageNo < totalPages) {
             this.pageNo++;

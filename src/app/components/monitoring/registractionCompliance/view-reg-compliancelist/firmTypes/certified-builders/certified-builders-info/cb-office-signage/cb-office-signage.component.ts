@@ -79,7 +79,7 @@ export class CbOfficeSignageComponent {
     }
 
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.bctaNo,this.data.appNo).subscribe((res: any) => {
             Object.assign(this.formData, res.complianceEntities[0]);
         });
     }
@@ -246,6 +246,7 @@ export class CbOfficeSignageComponent {
                 ).toISOString(),
                 firmType: 'certified-builder',
                 reason: this.selectedAction.remarks,
+                applicationID: this.formData.firmType.appNo,
             };
             this.service.cancelFirm(payload).subscribe({
                 next: (res) => {
@@ -273,6 +274,7 @@ export class CbOfficeSignageComponent {
                     : null,
                 firmType: 'certified-builder',
                 suspendDetails: this.selectedAction.remarks,
+                applicationID: this.formData.firmType.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({

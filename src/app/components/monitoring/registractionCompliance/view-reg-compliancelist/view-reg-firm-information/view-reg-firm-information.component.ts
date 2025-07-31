@@ -15,6 +15,7 @@ export class ViewRegFirmInformationComponent implements OnInit {
 WorkDetail: any = {};
 licenseStatus: string = '';
   data: any = {};
+  appNo: any;
   constructor(private service: CommonService) { }
 
 ngOnInit(): void {
@@ -44,11 +45,9 @@ ngOnInit(): void {
       this.activeTabId = 'equipment';
     }
   }
-
   this.formData.firmType = WorkDetail.data;
   this.bctaNo = WorkDetail.data.contractorNo;
-
-  console.log('bctaNo', this.bctaNo);
+  this.appNo = WorkDetail.data.appNo;
 
   if (this.bctaNo) {
     this.fetchDataBasedOnBctaNo();
@@ -61,7 +60,7 @@ goBack() {
   window.history.back();
 }
   fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNo(this.bctaNo).subscribe((res: any) => {
+    this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
       this.formData = res.complianceEntities[0];
       console.log('this.formData', this.formData);
     })
@@ -88,7 +87,7 @@ goBack() {
     } else if (this.type === 'monitoring') {
       this.activeTabId = 'monitoring';
         this.data =event.data;
-        debugger
+        
     } else {
       this.activeTabId = 'office';
     }
@@ -111,7 +110,7 @@ goBack() {
     this.id = this.id
      const data = this.WorkDetail
      this.data = data
-     debugger
+     
     this.activeTabId = 'monitoring';
   }
 }

@@ -86,7 +86,7 @@ export class ConsultancyMandatoryEquipmentComponent {
         this.formData.firmType = WorkDetail.data || this.data || '';
         this.bctaNo = WorkDetail.data.consultantNo || this.data.consultantNo || '';
         this.applicationStatus = WorkDetail.data.applicationStatus || this.data.applicationStatus || '';
-        debugger
+        
         this.licenseStatus = WorkDetail.data.licenseStatus ||  this.data || '';
         this.tData = {
             eqFulfilled: '',
@@ -104,7 +104,7 @@ export class ConsultancyMandatoryEquipmentComponent {
        
     }
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNo(this.data.consultantNo).subscribe((res: any) => {
+        this.service.getDatabasedOnBctaNos(this.data.consultantNo,this.data.appNo).subscribe((res: any) => {
             this.tableData = res.vehicles;
         });
     }
@@ -425,6 +425,7 @@ createNotification(
                 consultantId: this.formData.firmType.consultantId,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
+                applicationID: this.formData.firmType.appNo,
             };
             this.service.downgradeConsultancy(payload).subscribe({
                 next: (res: string) => {

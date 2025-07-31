@@ -464,6 +464,7 @@ export class ViewRegCompliancelistComponent {
                 firmType: 'Contractor',
                 downgradeEntries,
                 requestedBy: this.authService.getUsername(),
+                applicationID: this.selectedAction.target?.appNo,
             };
 
             this.service.downgradeFirm(payload).subscribe({
@@ -500,29 +501,32 @@ export class ViewRegCompliancelistComponent {
                     this.closeModal();
                 },
             });
-        } else if (this.selectedAction.actionType === 'cancel') {
-            const payload = {
-                contractorNo: this.selectedAction.target?.contractorNo,
-                // contractorId: this.selectedAction.target?.contractorId,
-                contractorCancelledBy: this.authService.getUsername(),
-                contractorCancelledDate: this.selectedAction.actionDate,
-                contractorType: 'Contractor',
-                suspendDetails: this.selectedAction.remarks,
-            };
-            this.service.cancelFirm(payload).subscribe({
-                next: (res) => {
-                    Swal.fire(
-                        'Success',
-                        'Forwarded to Review Committee',
-                        'success'
-                    );
-                    this.closeModal();
-                },
-                error: (err) => {
-                    Swal.fire('Error', 'Failed to cancel contractor', 'error');
-                },
-            });
-        } else if (this.selectedAction.actionType === 'suspend') {
+        }
+        //  else if (this.selectedAction.actionType === 'cancel') {
+        //     const payload = {
+        //         contractorNo: this.selectedAction.target?.contractorNo,
+        //         // contractorId: this.selectedAction.target?.contractorId,
+        //         contractorCancelledBy: this.authService.getUsername(),
+        //         contractorCancelledDate: this.selectedAction.actionDate,
+        //         contractorType: 'Contractor',
+        //         suspendDetails: this.selectedAction.remarks,
+        //         applicationID: this.selectedAction.target?.appNo,
+        //     };
+        //     this.service.cancelFirm(payload).subscribe({
+        //         next: (res) => {
+        //             Swal.fire(
+        //                 'Success',
+        //                 'Forwarded to Review Committee',
+        //                 'success'
+        //             );
+        //             this.closeModal();
+        //         },
+        //         error: (err) => {
+        //             Swal.fire('Error', 'Failed to cancel contractor', 'error');
+        //         },
+        //     });
+        // } 
+        else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
                 firmNo: this.selectedAction.target?.contractorNo,
                 // contractorId: this.selectedAction.target?.contractorId,
@@ -532,7 +536,9 @@ export class ViewRegCompliancelistComponent {
                     : null,
                 firmType: 'Contractor',
                 suspendDetails: this.selectedAction.remarks,
+                applicationID: this.selectedAction.target?.appNo,
             };
+            
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {
                     Swal.fire(

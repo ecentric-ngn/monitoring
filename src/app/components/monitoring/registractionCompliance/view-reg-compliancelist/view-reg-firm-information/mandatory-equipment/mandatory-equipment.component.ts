@@ -49,7 +49,7 @@ export class MandatoryEquipmentComponent {
     ngOnInit() {
         this.data = this.data.data;
         this.WorkDetail = this.data;
-        debugger
+        
 
         const today = new Date();
         const yyyy = today.getFullYear();
@@ -86,7 +86,7 @@ export class MandatoryEquipmentComponent {
         this.licenseStatus = this.data.licenseStatus || '';
 
         if (
-            this.data.contractorNo &&
+            this.data.contractorNo && this.data.appNo &&
             this.data.applicationStatus !== 'Suspension Resubmission'
         ) {
             this.fetchDataBasedOnBctaNo();
@@ -97,7 +97,7 @@ export class MandatoryEquipmentComponent {
 
     fetchDataBasedOnBctaNo() {
         this.service
-            .getDatabasedOnBctaNo(this.data.contractorNo)
+            .getDatabasedOnBctaNos(this.data.contractorNo, this.data.appNo)
             .subscribe((res: any) => {
                 this.tableData = res.vehicles;
                 console.log('contractor equipment', this.formData);
@@ -282,10 +282,11 @@ createNotification(
             }
 
             const payload = {
-                firmId: this.selectedAction.target?.contractorId,
+                firmId: this.WorkDetail.data.contractorId,
                 firmType: 'Contractor',
                 downgradeEntries,
                 requestedBy: this.authService.getUsername(),
+                  applicationID: this.WorkDetail.data.appNo,
             };
 
             this.service.downgradeFirm(payload).subscribe({
@@ -332,6 +333,7 @@ createNotification(
                     : null,
                 firmType: 'Contractor',
                 suspendDetails: this.selectedAction.remarks,
+                  applicationID: this.WorkDetail.data.appNo,
             };
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {
@@ -447,7 +449,7 @@ createNotification(
                 console.log('res', res);
                 // this.service.setData(this.tableId, 'tableId', 'yourRouteValueHere');
                 this.activateTab.emit({ id: this.tableId,data:this.data, tab: 'monitoring' });
-                debugger
+                
             },
             (error) => {
                 this.isSaving = false;
