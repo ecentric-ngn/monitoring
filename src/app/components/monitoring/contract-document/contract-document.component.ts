@@ -243,19 +243,27 @@ export class ContractDocumentComponent {
             thirdPartyInsuranceStatus: this.formData.thirdPartyInsurance,
             approvedDrawingsAvailable: this.formData.approvedDrawings,
             billOfQuantitiesAvailable: this.formData.billofQuantities,
-            materialsQualityCertified:
-                this.formData.materialsQualityCertification,
+            materialsQualityCertified:this.formData.materialsQualityCertification,
             qualityAssurancePlanAvailable: this.formData.qualityAssurancePlan,
             qualityControlPlanAvailable: this.formData.qualityControlPlan,
             testsConductedAsPerStandards: this.formData.TestconductedasperQAP,
             testReportsDocumented: this.formData.testReportsDocumented,
-            hindranceRegisterMaintained:
-                this.formData.HindranceRegisterSelectmaintained,
+            hindranceRegisterMaintained:this.formData.HindranceRegisterSelectmaintained,
             dayWorkJournalMaintained: this.formData.journalMaintained,
             environmentManagementPlan: this.formData.envManagementPlan,
             workPlan: this.formData.workplan,
             meetingsConductedAndDocumented: this.formData.meetingsConducted,
+            insuranceType: this.formData.InsuranceType,
+            policyNoThirdParty: this.formData.thirdPartyInsurancePolicyNo,
+            policyNoWorkers: this.formData.WorkersInsurancePolicyNo,
+            thirdPartyInsurance: this.formData.thirdPartyInsurance,
+            policyNoWorkInsurance: this.formData.workInsurance,
+            workInsurance: this.formData.workInsurance,
+            policyNoWorkerInsurance: this.formData.WorkersInsurancePolicyNo,
+            workerInsurance: this.formData.workersInsurance,
+
         };
+        
         this.service.saveAsDraft(payload).subscribe({
             next: (response: any) => {
                 const parsedResponse =

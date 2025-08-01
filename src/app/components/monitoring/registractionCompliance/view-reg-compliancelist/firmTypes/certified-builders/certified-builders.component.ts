@@ -92,13 +92,14 @@ export class CertifiedBuildersComponent {
     sendMassMail() {
         this.loading = true;
         this.formData.deadline = this.calculatedDeadline;
-        this.service.sendMassEmail(this.formData).subscribe({
+        this.service.sendMassMailToCertifiedBuilders(this.formData).subscribe({
             next: (response) => {
                 this.loading = false;
                 this.handleSuccess(response);
                 this.resetForm();
                 this.closeFirmModal();
                 this.showSuccessNotification();
+                this.fetchComplianceDetails();
             },
             error: (error) => this.handleError(error),
         });

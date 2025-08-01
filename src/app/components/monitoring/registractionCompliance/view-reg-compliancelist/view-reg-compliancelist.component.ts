@@ -100,6 +100,7 @@ export class ViewRegCompliancelistComponent {
                 this.resetForm();
                 this.closeFirmModal();
                 this.showSuccessNotification();
+                this.fetchComplianceDetails();
             },
             error: (error) => this.handleError(error),
         });
