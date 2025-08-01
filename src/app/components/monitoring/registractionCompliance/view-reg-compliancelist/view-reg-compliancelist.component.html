@@ -63,11 +63,11 @@
                     <td>{{ i+1 }}</td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus === 'Submitted'"
                         [class.text-primary]="
-      data.applicationStatus === 'Submitted' ||
-      data.applicationStatus === 'Resubmitted OS and PFS' ||
-      data.applicationStatus === 'Resubmitted PFS' ||
-      data.applicationStatus === 'Resubmitted HR and EQ' ||
-      data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
+                            data.applicationStatus === 'Submitted' ||
+                            data.applicationStatus === 'Resubmitted OS and PFS' ||
+                            data.applicationStatus === 'Resubmitted PFS' ||
+                            data.applicationStatus === 'Resubmitted HR and EQ' ||
+                            data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
                         {{ data.contractorNo }}
                     </td>
 
@@ -77,7 +77,7 @@
                         <span class="text-bold" [ngClass]="{
                             'text-secondary': data.applicationStatus === 'Not Submitted',
                             'text-warning': ['In Process', 'Suspension Request', 'Cancel Request', 'Downgrade Request', 'Pending'].includes(data.applicationStatus),
-                            'text-success': ['Verified', 'Reinstated', 'Suspension Approved', 'Downgrade Approved', 'Cancel Approved'].includes(data.applicationStatus),
+                            'text-success': ['Verified', 'Reinstated', 'Suspension Approved', 'Downgrade Approved', 'Cancel Approved', 'APPROVED'].includes(data.applicationStatus),
                             'text-primary': ['Resubmitted OS and PFS', 'Resubmitted HR and EQ', 'Submitted', 'Suspension Resubmission'].includes(data.applicationStatus)
                             }">
                             {{ data.applicationStatus }}
