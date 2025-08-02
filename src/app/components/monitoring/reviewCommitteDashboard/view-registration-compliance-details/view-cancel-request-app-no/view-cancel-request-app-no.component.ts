@@ -217,59 +217,89 @@ navigate(bcta_no: any,) {
   //           },
   //       });
   //   }
-  submitAction(): void {
+//   submitAction(): void {
+//   if (this.selectedIds.length === 0) return;
+//   // Validate IDs
+//   const nonNumericIds = this.selectedIds.filter(id => isNaN(Number(id)));
+//   if (nonNumericIds.length > 0) {
+//     Swal.fire('Error', `Invalid IDs: ${nonNumericIds.join(', ')}`, 'error');
+//     return;
+//   }
+//   this.isLoading = true;
+//   // First payload for cancellation (Monitoring System)
+//   const cancelPayload = {
+//     cancellationIds: this.selectedIds,
+//     reviewedBy: this.userId ,
+//      status: this.activeAction
+//   };
+//   // Second payload for the other system (adjust according to your needs)
+//   const otherSystemPayload = {
+//     cdbNos: this.selectedContractorNumbers.map(item => item.toString()),
+//     firmType: this.firmTypes
+
+//   };
+//   // First API call - Cancel in Monitoring System
+//   this.service.CancelApplications(cancelPayload).subscribe({
+//     next: (cancelResponse: string) => {
+//       // Only proceed to second operation if first succeeds
+//       this.service.cancelApplications(otherSystemPayload).subscribe({
+//         next: (otherSystemResponse: any) => {
+//           // Both operations succeeded
+//           this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
+//           this.getCancelList();
+//           this.selectedIds = [];
+//           this.formData.remarks = '';
+//           this.selectedContractorNumbers = [];
+//           this.isLoading = false;
+//           this.closeRemarkButton.nativeElement.click();
+
+//           Swal.fire({
+//             icon: 'success',
+//             title: 'Success',
+//             text: `Cancelled: ${cancelResponse}\nOther System: ${otherSystemResponse.message || 'Success'}`,
+//             confirmButtonColor: '#3085d6'
+//           });
+//         },
+//         error: (otherSystemError) => {
+//           this.isLoading = false;
+//           this.handleError('Other System Operation Failed', otherSystemError);
+//         }
+//       });
+//     },
+//     error: (cancelError) => {
+//       this.isLoading = false;
+//       this.handleError('Cancellation Failed', cancelError);
+//     }
+//   });
+// }
+
+    submitAction(): void {
   if (this.selectedIds.length === 0) return;
   // Validate IDs
-  const nonNumericIds = this.selectedIds.filter(id => isNaN(Number(id)));
-  if (nonNumericIds.length > 0) {
-    Swal.fire('Error', `Invalid IDs: ${nonNumericIds.join(', ')}`, 'error');
+  if (this.selectedIds.some(id => id == null || isNaN(id))) {
+    Swal.fire('Error', 'Invalid ID(s) selected', 'error');
     return;
   }
+  const payload = {
+    downgradeIds: this.selectedIds,
+    reviewedBy: this.userId,
+    status: 'Downgraded',
+  };
   this.isLoading = true;
-  // First payload for cancellation (Monitoring System)
-  const cancelPayload = {
-    cancellationIds: this.selectedIds,
-    reviewedBy: this.userId ,
-     status: this.activeAction
-  };
-  // Second payload for the other system (adjust according to your needs)
-  const otherSystemPayload = {
-    cdbNos: this.selectedContractorNumbers.map(item => item.toString()),
-    firmType: this.firmTypes
-
-  };
-  // First API call - Cancel in Monitoring System
-  this.service.CancelApplications(cancelPayload).subscribe({
-    next: (cancelResponse: string) => {
-      // Only proceed to second operation if first succeeds
-      this.service.cancelApplications(otherSystemPayload).subscribe({
-        next: (otherSystemResponse: any) => {
-          // Both operations succeeded
-          this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
-          this.getCancelList();
-          this.selectedIds = [];
-          this.formData.remarks = '';
-          this.selectedContractorNumbers = [];
-          this.isLoading = false;
-          this.closeRemarkButton.nativeElement.click();
-
-          Swal.fire({
-            icon: 'success',
-            title: 'Success',
-            text: `Cancelled: ${cancelResponse}\nOther System: ${otherSystemResponse.message || 'Success'}`,
-            confirmButtonColor: '#3085d6'
-          });
-        },
-        error: (otherSystemError) => {
-          this.isLoading = false;
-          this.handleError('Other System Operation Failed', otherSystemError);
-        }
-      });
+  this.service.DownGradeApplications(payload).subscribe({
+    next: (response) => {
+      this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
+       this.getCancelList();
+      this.selectedIds = [];
+      this.formData.remarks = '';
+       this.closeRemarkButton.nativeElement.click();
+      Swal.fire('Success', 'Operation completed', 'success');
     },
-    error: (cancelError) => {
-      this.isLoading = false;
-      this.handleError('Cancellation Failed', cancelError);
-    }
+    error: (error) => {
+      const errorMsg = error.error?.message || error.message || 'Request failed';
+      Swal.fire('Error', errorMsg, 'error');
+    },
+    complete: () => this.isLoading = false
   });
 }
 

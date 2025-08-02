@@ -577,7 +577,7 @@ export class ConsultancyFirmComponent {
             return;
         }
 
-        if (this.selectedAction.actionType === 'cancelS') {
+        if (this.selectedAction.actionType === 'cancel') {
             // Collect all unchecked, previously pre-checked classifications
             const downgradeEntries: any[] = [];
             this.downgradeList.forEach((entry) => {
@@ -669,7 +669,7 @@ export class ConsultancyFirmComponent {
                     Swal.fire('Error', 'Failed to suspend contractor', 'error');
                 },
             });
-        }else if (this.selectedAction.actionType === 'cancel') {
+        }else if (this.selectedAction.actionType === 'cancelq') {
             const payload = {
                 firmNo: this.selectedAction.target?.consultantNo,
                 // contractorId: this.selectedAction.target?.contractorId,
