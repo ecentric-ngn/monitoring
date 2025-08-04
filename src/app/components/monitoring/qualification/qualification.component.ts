@@ -21,7 +21,7 @@ export class QualificationComponent {
     @Input() inspectionType: any;
     disableField: boolean = false;
     isFetching: boolean = false;
-        @Input() workId: any;
+    @Input() workId: any;
     @Output() SavedQualificationData = new EventEmitter<{
         tableId: any;
         data: any;
@@ -46,7 +46,7 @@ export class QualificationComponent {
         this.data = this.data;
         this.appNoStatus = this.data?.applicationStatus ?? null;
         this.inspectionType = this.inspectionType;
-        this.workId = this.data?.id || null;
+        this.workId = this.data?.id || this.workId;
         const userDetailsString = sessionStorage.getItem('userDetails');
         this.prevTableId = this.prevTableId || this.tableId;
         if (this.appNoStatus === 'REJECTED') {

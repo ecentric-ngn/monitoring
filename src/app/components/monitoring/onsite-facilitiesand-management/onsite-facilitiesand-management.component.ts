@@ -376,11 +376,6 @@ export class OnsiteFacilitiesandManagementComponent {
             apsMaintainedByAgency: this.formData.apsMaintained,
             meetingsConductedAndDocumented: this.formData.siteMeetingDocumented,
         };
-        // //
-        //   // Conditionally include egpTenderId only if workType is not 'OTHERSSSSSSSSS' and data exists
-        //   if (this.workType !== 'OTHERS' && this.data) {
-        //     payload.egpTenderId = parseInt(this.data.egpTenderId, 10);
-        //   }
         if (this.data) {
             if (this.workType === 'PRIVATE') {
                 payload.egpTenderId = this.data.BCTANo;

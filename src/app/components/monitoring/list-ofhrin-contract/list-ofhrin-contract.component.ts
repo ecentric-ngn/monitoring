@@ -679,7 +679,7 @@ export class ListOFHRinContractComponent {
         const finalPayload = {
             humanResources: this.savedData,
             id: this.tableId,
-            workID: this.workId || '',
+            workID: this.workId,
         };
 
         this.sendPayload(finalPayload);

@@ -816,7 +816,6 @@ saveOwnerInformationData(event: { workType: any,ownerId: any ,data:any}) {
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 0);
     this.moveToStep(0);
     this.workId = this.workId 
-    
   this.showonsiteForm = true;
   this.showonWorkInformationForm = false;
   this.onSiteCheckTabEnabled=true
@@ -825,13 +824,9 @@ saveOwnerInformationData(event: { workType: any,ownerId: any ,data:any}) {
    this.contractorPrevId = event.data.contractorId;
    this.workId = event.data.contractorId;
   this.ownerId = event.ownerId;	
-   
-  console.log('data', this.workInformationdata);
-  
   // Access the native element safely and click it
   setTimeout(() => {
     this.onsiteTab.nativeElement.click();
-    console.log('onsiteTab', this.onsiteTab);
   });
   
 }
@@ -843,8 +838,7 @@ occupationalHealthAndSaftyTabEnabled: boolean = false;
 
  onDataSaved(event: { tableId: any, data: any,inspectionType:any }) {
     this.moveToStep(1);
-    this.workId = this.workId || this.contractorPrevId
-    
+    this.workId = this.workId
     this.highestCompletedStep = Math.max(this.highestCompletedStep, 1);
     this.tableId = event.tableId;
     this.data = event.data;
@@ -889,8 +883,9 @@ SavedWorkProgressData(event: { tableId: any, data: any, inspectionType: any }) {
 }
 
 SavedQualificationData(event: { tableId: any, data: any, inspectionType: any }) {
-    this.moveToStep(4);
-    this.workId = this.workId 
+  this.moveToStep(4);
+  this.workId = this.workId 
+  debugger
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 4);
   this.tableId = event.tableId;
   this.data = event.data;
