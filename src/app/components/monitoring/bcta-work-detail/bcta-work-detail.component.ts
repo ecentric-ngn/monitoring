@@ -823,8 +823,9 @@ saveOwnerInformationData(event: { workType: any,ownerId: any ,data:any}) {
   this.workType = event.workType;	
   this.workInformationdata = event.data.data;
    this.contractorPrevId = event.data.contractorId;
+   this.workId = event.data.contractorId;
   this.ownerId = event.ownerId;	
-  
+   
   console.log('data', this.workInformationdata);
   
   // Access the native element safely and click it
@@ -842,7 +843,7 @@ occupationalHealthAndSaftyTabEnabled: boolean = false;
 
  onDataSaved(event: { tableId: any, data: any,inspectionType:any }) {
     this.moveToStep(1);
-    this.workId = this.workId 
+    this.workId = this.workId || this.contractorPrevId
     
     this.highestCompletedStep = Math.max(this.highestCompletedStep, 1);
     this.tableId = event.tableId;

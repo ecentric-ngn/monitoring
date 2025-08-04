@@ -51,6 +51,8 @@ export class OnsiteFacilitiesandManagementComponent {
     ) {}
 
     ngOnInit() {
+        this.workId= this.workId
+        
         // Get user details from session storage safely
         const userDetailsString = sessionStorage.getItem('userDetails');
         if (userDetailsString) {
