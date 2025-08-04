@@ -42,7 +42,7 @@ export class ReinforcementComponent {
         
         this.data = this.data;
         this.inspectionType = this.inspectionType;
-         this.workId = this.data?.id || null;
+         this.workId = this.data?.id || this.workId;
         this.appNoStatus = this.data?.applicationStatus ?? null;
         if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;

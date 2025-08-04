@@ -98,61 +98,7 @@ export class OccupationalHealthAndSaftyComponent {
         }
     }
 
-    // getDatabasedOnChecklistId() {
-    //     const payload: any = [
-    //         {
-    //             field: 'checklist_id',
-    //             value: this.prevTableId,
-    //             operator: 'AND',
-    //             condition: '=',
-    //         },
-    //     ];
-    //     this.service.fetchDetails(payload, 1, 10, 'ohs_view').subscribe(
-    //         (response: any) => {
-    //             const data = response.data[0];
-    //             this.formData = data;
-    //             this.formData.ohsInCharge = data.certified_ohs_in_charge;
-    //             this.formData.cidNo = data.ohs_cid_number;
-    //             this.formData.fullName = data.ohs_in_charge_full_name;
-    //             (this.formData.mobileNo = data.ohs_in_charge_mobile),
-    //             (this.formData.safetySignages =data.safety_signages_available),
-    //             (this.formData.fireExtinguisher =data.fire_extinguisher_available),
-    //             (this.formData.firstAidBox = data.first_aid_box_available),        
-    //             (this.formData.peripheralBoundaryFencing =data.peripheral_fencing_available);
-    //             this.formData.electricalSafety =data.electrical_safety_complied;
-    //             this.formData.safetyHelmet = data.safety_helmet_used;
-    //             this.formData.safetyBoots = data.safety_boots_used;
-    //             this.formData.reflectiveVest = data.reflective_vest_used;
-    //             this.formData.goggles = data.goggles_used;
-    //             this.formData.weldingMask = data.welding_mask_used;
-    //             this.formData.dustMask = data.dust_mask_used;
-    //             this.formData.safetyHarness = data.safety_harness_used;
-    //             (this.formData.earPlug = data.ear_plugs_used),
-    //             (this.formData.safetyGloves = data.safety_gloves_used);
-    //               // ✅ Extract file paths if available
-    //             if (data.file_path) {
-    //         this.formData.filePathList = data.file_path
-    //         .split(',')
-    //         .map(path => path.trim());
-
-    //         this.formData.fileIdList = data.file_id
-    //         .split(',')
-    //         .map(id => id.trim());
-
-    //         // 🔽 Add this line: Check if all paths are 'NO_PATH'
-    //         this.formData.allPathsNoFile = this.formData.filePathList.every(path => path === 'NO_PATH');
-
-    //         console.log('filePathList', this.formData.filePathList);
-    //         console.log('fileIdList', this.formData.fileIdList);
-    //         console.log('allPathsNoFile', this.formData.allPathsNoFile);
-    //     }
-    //     },
-    //         // Error handler
-    //         (error) => {
-    //             console.error('Error fetching contractor details:', error); // Log the error
-    //         }
-    //     );
-    // }
+  
     getDatabasedOnChecklistId() {
   const payload: any = [
     {

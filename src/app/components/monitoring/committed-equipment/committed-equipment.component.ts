@@ -47,7 +47,6 @@ export class CommittedEquipmentComponent {
     @Input() data: any;
     @Input() inspectionType: any;
     @Input() workId: any;
-    @Input() WorkId: any;
     fileAndRemark: any;
     humanResources: any;
     formType = '13';
@@ -66,7 +65,7 @@ export class CommittedEquipmentComponent {
         this.FetchEquipmentMasterData(); // Always fetch master data
         this.appStatus = this.data?.applicationStatus ?? null;
         this.inspectionType = this.inspectionType ?? null;
-        this.workId = this.data?.id || null;
+        this.workId = this.data?.id || this.workId;
         const userDetailsString = sessionStorage.getItem('userDetails');
         if (userDetailsString) {
             const userDetails = JSON.parse(userDetailsString);
@@ -810,7 +809,7 @@ export class CommittedEquipmentComponent {
         const payload = {
             committedEquipments: this.savedData,
             id: this.tableId,
-            workID: this.workId || '',
+            workID: this.workId,
         };
 
         this.service.saveAsDraft(payload).subscribe({
