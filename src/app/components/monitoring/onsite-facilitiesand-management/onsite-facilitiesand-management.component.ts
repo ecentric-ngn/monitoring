@@ -361,11 +361,7 @@ export class OnsiteFacilitiesandManagementComponent {
 
     private saveDraftPayload() {
         const payload: any = {
-<<<<<<< HEAD
-            workID: this.workId || null,
-=======
-            workID: this.workId || "",
->>>>>>> b459d1cac8b8d087269aaa395fec24a33fcbbb9b
+            workID: this.workId,
             inspectionId: this.userId,
             id: this.prevTableId,
             inspectionType: this.workType,
