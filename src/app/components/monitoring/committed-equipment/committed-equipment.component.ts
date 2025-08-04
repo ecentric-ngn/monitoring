@@ -336,8 +336,6 @@ export class CommittedEquipmentComponent {
                 },
             ],
         };
-
-        console.log('payload.....', payload);
         this.service.viewData(payload).subscribe(
             (response: any) => {
                 this.VehicleType = response.data[0].vehicleType;
@@ -380,7 +378,6 @@ export class CommittedEquipmentComponent {
                 (response: any) => {
                     const data = response.vehicleDetail;
                     this.VehicleDetails = data;
-                    console.log('VehicleDetails', this.VehicleDetails);
                     if (this.type !== 'Replaced') {
                         this.formData.registrationNo =
                             response.vehicleDetail.vehicleNumber;
@@ -594,11 +591,6 @@ export class CommittedEquipmentComponent {
             };
 
             this.equipmentList.push(verifiedPayload);
-            console.log(
-                'Verified Payload Added to equipmentList:',
-                verifiedPayload
-            );
-
             const replacedWithInfo =
                 this.formData.status === 'REPLACED'
                     ? {
@@ -639,9 +631,6 @@ export class CommittedEquipmentComponent {
                 number: this.formData.number,
                 status: this.formData.status,
             });
-
-            console.log('Added to equipmentForms:', this.equipmentForms);
-
             // Reset form fields
             this.formData = {
                 ...this.formData,

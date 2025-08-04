@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { api_url, web_service_url } from '../app.const/const';
+import { api_url, g2c_url, web_service_url } from '../app.const/const';
 import { fileUpload_api } from '../app.const/const';
 
 @Injectable({
@@ -74,14 +74,42 @@ uploadFile(file: File) {
    saveSuspendReregister(suspendRegisterDetail:any){
     return this.http.post<any>(`${api_url}/contractorSuspendedReregister`,suspendRegisterDetail);
   }
+
+  approveReinstatementIng2cSystem(payload: any) {
+  return this.http.post(`${g2c_url}/compliance/approved`, payload, {
+    responseType: 'text' as 'text'
+  });
+}
   //save suspend
   saveSuspendDetails(suspendDetail:any){
     return this.http.post<any>(`${api_url}/contractorSuspend`,suspendDetail);
   }
+
+  /**
+   * Suspends a contractor from the G2C system.
+   *
+   * @param suspendDetail The details of the contractor to be suspended.
+   * @returns A promise that resolves to a string if the suspension is successful.
+   */
+  suspendedIng2cSystem(suspendDetail: any) {
+    return this.http.post(`${g2c_url}/compliance/suspend`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
+
+
 //save cancelled
   saveCancelledDetails(cancelledDetail:any){
     return this.http.post<any>(`${api_url}/contractorCancel`,cancelledDetail);
   }
+  cancelledIng2cSystem(suspendDetail: any) {
+    return this.http.post(`${g2c_url}/compliance/cancel`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
+
+
+
  //getting the adverse record list
  saveRecord(records:any){
     return this.http.post<any>(`${api_url}/contractorAdverseCommentRecord`,records)

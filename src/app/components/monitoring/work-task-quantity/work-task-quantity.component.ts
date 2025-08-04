@@ -183,7 +183,7 @@ export class WorkTaskQuantityComponent {
     private saveDraftPayload() {
       const payload = {
        id: this.tableId,
-        workID: this.workId || '',
+        workID: this.workId,
        siteOrderBookAvailable: this.formData.bookAvailable,
        qualityControlActivitiesDocumented:
         this.formData.qualityInspectionsdocumented,

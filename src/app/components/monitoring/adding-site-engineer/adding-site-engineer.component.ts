@@ -176,7 +176,7 @@ saveAndNext(form: NgForm) {
     designation: item.designation,
     email: item.email
   }));
-  this.service.saveSiteEngineerData(payload, this.tableId,this.workId || '').subscribe(
+  this.service.saveSiteEngineerData(payload, this.tableId,this.workId).subscribe(
     (response: any) => {
       this.createNotification();
       this.siteEngineersData.emit({

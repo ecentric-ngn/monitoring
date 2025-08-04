@@ -397,87 +397,143 @@ Searchfilter() {
 showDowngradeMessage() {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Contractor downgraded successfully' });
   }
+
   savedSuspend() {
-    if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    }
-  
-    const suspendDetail = {
-      contractorType: this.formData.Type,
-      contractorSuspendDate:this.formData.Date,// Use formattedDate instead of overwriting formData.Date
-      suspendDetails: this.formData.Details,
-      contractorSuspendBy: this.uuid,
-      contractorNo: this.selectedContractorNo,
-      fileId: this.fileId
-    };
-    this.service.saveSuspendDetails(suspendDetail).subscribe({
-      next: (response: any) => {
-        this.closeButton.nativeElement.click();
-        this.showSuspendMessage();
-        setTimeout(() => {
-          this.getActiveContractorList();
-        }, 1000); // Adjust the delay (in milliseconds) if needed
-      },
-      error: (error: any) => {
-        this.errorMessage = error.error.error;
-      }
-    });
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
   }
+  const suspendDetail = {
+    contractorType: this.formData.Type,
+    contractorSuspendDate: this.formData.Date,
+    suspendDetails: this.formData.Details,
+    contractorSuspendBy: this.uuid,
+    contractorNo: this.selectedContractorNo,
+    fileId: this.fileId
+  };
+
+  this.service.saveSuspendDetails(suspendDetail).subscribe({
+    next: (response: any) => {
+      // Step 2: Call suspendApplications after saving details
+      const suspendPayload = {
+        cdbNos: [this.selectedContractorNo], // Assuming selected contractor IDs are stored here
+        firmType: 'Contractor'
+      };
+
+      this.service.suspendedIng2cSystem(suspendPayload).subscribe({
+        next: (suspendResponse: any) => {
+           this.closeButton.nativeElement.click();
+          this.showSuspendMessage();
+          setTimeout(() => {
+            this.getActiveContractorList();
+          }, 1000);
+        },
+        error: (err) => {
+          this.errorMessage = 'Suspension failed: ' + (err.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (error: any) => {
+      this.errorMessage = 'Save failed: ' + (error.error?.error || 'Unknown error');
+    }
+  });
+}
+
     
   
   showSuspendMessage() {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Contractor suspended successfully' });
   }
   //method to cancel the contractor
+  // savedCancelled() {
+  //   if (this.formData.Date) {
+  //     // Parse the selected date
+  //     const selectedDate = new Date(this.formData.Date);
+  //     // Get the current time in UTC
+  //     const nowUTC = new Date();
+  //     // Calculate Bhutan Time (UTC+6)
+  //     const bhutanOffset = 6; // Bhutan is UTC+6
+  //     const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+  //     // Attach the Bhutan time to the selected date
+  //     selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+  //     // Format the selected date to ISO string with timezone offset
+  //     this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
+  //   }
+  //   const cancelledDetail = {
+  //     contractorType: this.formData.Type,
+  //     contractorCancelledDate: this.formData.Date,
+  //     cancelledDetails: this.formData.Details,
+  //     contractorCancelledBy: this.uuid,
+  //     contractorNo: this.selectedContractorNo,
+  //     fileId:this.fileId
+  //   };
+  //   this.cancelledFormData= cancelledDetail
+  //   this.service.saveCancelledDetails(cancelledDetail).subscribe(
+  //     (response: any) => {
+  //       setTimeout(() => {
+  //         this.closeButton.nativeElement.click();
+  //         this.showCancelledMessage();
+  //         // Show the success message after the modal is closed
+  //         setTimeout(() => {
+  //           this.getActiveContractorList()
+  //         }, 1000);
+  //       },);
+  //     },
+  //     (error: any) => {
+  //       this.errorMessage = error.error.error;
+  //     }
+  //   );
+  // }
   savedCancelled() {
-    if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    }
-    const cancelledDetail = {
-      contractorType: this.formData.Type,
-      contractorCancelledDate: this.formData.Date,
-      cancelledDetails: this.formData.Details,
-      contractorCancelledBy: this.uuid,
-      contractorNo: this.selectedContractorNo,
-      fileId:this.fileId
-    };
-    this.cancelledFormData= cancelledDetail
-    this.service.saveCancelledDetails(cancelledDetail).subscribe(
-      (response: any) => {
-        setTimeout(() => {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
+  }
+
+  const cancelledDetail = {
+    contractorType: this.formData.Type,
+    contractorCancelledDate: this.formData.Date,
+    cancelledDetails: this.formData.Details,
+    contractorCancelledBy: this.uuid,
+    contractorNo: this.selectedContractorNo,
+    fileId: this.fileId
+  };
+  this.cancelledFormData = cancelledDetail;
+  // Step 1: Save cancellation details locally
+  this.service.saveCancelledDetails(cancelledDetail).subscribe({
+    next: (response: any) => {
+      // Step 2: Also cancel in G2C system
+      this.service.cancelledIng2cSystem({
+        cdbNos: [this.selectedContractorNo],  // ensure it's an array
+        firmType: 'Contractor'               // or use this.formData.Type if dynamic
+      }).subscribe({
+        next: () => {
+          // Both calls successful
           this.closeButton.nativeElement.click();
           this.showCancelledMessage();
-          // Show the success message after the modal is closed
           setTimeout(() => {
-            this.getActiveContractorList()
+            this.getActiveContractorList();
           }, 1000);
-        },);
-      },
-      (error: any) => {
-        this.errorMessage = error.error.error;
-      }
-    );
-  }
+        },
+        error: (g2cError: any) => {
+          this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (localError: any) => {
+      this.errorMessage = 'Local cancellation failed: ' + (localError.error?.error || 'Unknown error');
+    }
+  });
+}
+
   openModal(event: Event) {
     event.stopPropagation();
   }

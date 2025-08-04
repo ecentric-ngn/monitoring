@@ -199,34 +199,51 @@ UploadFileForSpecializedFirm() {
 ReinstateSuspendedSpecializedFirm() {
   if (this.formData.Date) {
     const selectedDate = new Date(this.formData.Date);
-    // Attach the current time to the selected date
-    selectedDate.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds());
-    this.formData.Date = selectedDate.toISOString(); // Format as 'YYYY-MM-DDTHH:MM:SS.000Z'
+    selectedDate.setHours(
+      new Date().getHours(),
+      new Date().getMinutes(),
+      new Date().getSeconds()
+    );
+    this.formData.Date = selectedDate.toISOString();
   }
-    const suspendRevoke = {
-      type: this.formData.Type,
-      revokedDate: this.formData.Date,
-      revokedDetails: this.formData.Details,
-      revokedBy:this.uuid,
-      specializedFirmNo: this.selectedspecializedFirmNo,
-      fileId:this.fileId
-     
-    };
-    this.service.saveSuspendReregister(suspendRevoke).subscribe((response: any) => {
+
+  const suspendRevoke = {
+    type: this.formData.Type,
+    revokedDate: this.formData.Date,
+    revokedDetails: this.formData.Details,
+    revokedBy: this.uuid,
+    specializedFirmNo: this.selectedspecializedFirmNo,
+    fileId: this.fileId
+  };
+
+  this.service.saveSuspendReregister(suspendRevoke).subscribe({
+    next: () => {
+      // Step 2: Call approveReinstatementIng2cSystem
+      const approvePayload = {
+        cdbNos: this.selectedspecializedFirmNo,
+        firmType: 'specialized-firm' // or use this.formData.Type if dynamic
+      };
+
+      this.service.approveReinstatementIng2cSystem(approvePayload).subscribe({
+        next: () => {
+          this.closeButton.nativeElement.click();
+          this.showReinstateMessage();
+
           setTimeout(() => {
-            this.closeButton.nativeElement.click();
-            this.showReinstateMessage();
-            // Show the success message after the modal is closed
-            setTimeout(() => {
-              this.getSuspendedList()
-            }, 1000);
-          },);
+            this.getSuspendedList();
+          }, 1000);
         },
-        (error: any) => {
-          this.errorMessage = error.error.error;
+        error: (g2cError) => {
+          this.errorMessage = 'G2C reinstatement failed: ' + (g2cError.error?.error || 'Unknown error');
         }
-      );
+      });
+    },
+    error: (localError) => {
+      this.errorMessage = 'Local reinstatement failed: ' + (localError.error?.error || 'Unknown error');
     }
+  });
+}
+
     showReinstateMessage() {
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm Reinstate successfully' });
     }

@@ -352,10 +352,8 @@ saveAndNext(form: NgForm) {
             remarks: this.formData.blastersRemarks || '',
         })),
     ];
-
-    console.log('payload..............', payload);
     this.service
-        .saveCertifiedSkillWorkerData(payload, this.tableId, this.workId || '').subscribe(
+        .saveCertifiedSkillWorkerData(payload, this.tableId, this.workId).subscribe(
             (response: any) => {
                 if (this.tableId) {
                     this.assignCheckListId();

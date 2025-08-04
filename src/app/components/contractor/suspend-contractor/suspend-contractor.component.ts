@@ -172,44 +172,103 @@ export class SuspendContractorComponent {
         // this.loading = false;
     });
   }
-  reinstateSuspendedContractor(){
-     if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
+//   reinstateSuspendedContractor(){
+//      if (this.formData.Date) {
+//       // Parse the selected date
+//       const selectedDate = new Date(this.formData.Date);
+//       // Get the current time in UTC
+//       const nowUTC = new Date();
+//       // Calculate Bhutan Time (UTC+6)
+//       const bhutanOffset = 6; // Bhutan is UTC+6
+//       const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+//       // Attach the Bhutan time to the selected date
+//       selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+//       // Format the selected date to ISO string with timezone offset
+//       this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
     
+//     }
+//     const suspendRegisterDetail = {
+//         revokedDate: this.formData.Date,
+//         revokedDetails: this.formData.Details,
+//         revokedBy: this.uuid,
+//         contractorNo: this.selectedContractorNo,
+//         fileId:this.fileId 
+//     };
+//         this.service.saveSuspendReregister(suspendRegisterDetail).subscribe(
+//             (response: any) => {
+//                     setTimeout(() => {
+//                     this.closeButton.nativeElement.click();
+//                      this.showReinstatmessage();
+//                     // Show the success message after the modal is closed
+//                     setTimeout(() => {
+//                         this.getSuspendContractorList()
+//                     }, 1000);
+//                     },);
+//                 },
+//                 (error: any) => {
+//                     this.errorMessage = error.error.error;
+//                 }
+//                 );
+//             }
+reinstateSuspendedContractor() {
+    if (this.formData.Date) {
+        // Parse the selected date
+        const selectedDate = new Date(this.formData.Date);
+        // Get the current time in UTC
+        const nowUTC = new Date();
+        // Calculate Bhutan Time (UTC+6)
+        const bhutanOffset = 6; // Bhutan is UTC+6
+        const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+        // Attach the Bhutan time to the selected date
+        selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+        // Format the selected date to ISO string with timezone offset
+        this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
     }
+    
     const suspendRegisterDetail = {
         revokedDate: this.formData.Date,
         revokedDetails: this.formData.Details,
         revokedBy: this.uuid,
         contractorNo: this.selectedContractorNo,
-        fileId:this.fileId 
+        fileId: this.fileId 
     };
-        this.service.saveSuspendReregister(suspendRegisterDetail).subscribe(
-            (response: any) => {
+
+      const reinstatedDetail = {
+        firmType: 'Contractor',
+        cdbNos: this.selectedContractorNo,
+    };
+    this.service.saveSuspendReregister(suspendRegisterDetail).subscribe(
+        (response: any) => {
+            // After successful save, call the G2C approval endpoint
+            this.service.approveReinstatementIng2cSystem(reinstatedDetail).subscribe(
+                (g2cResponse: any) => {
                     setTimeout(() => {
-                    this.closeButton.nativeElement.click();
-                     this.showReinstatmessage();
-                    // Show the success message after the modal is closed
-                    setTimeout(() => {
-                        this.getSuspendContractorList()
-                    }, 1000);
-                    },);
+                        this.closeButton.nativeElement.click();
+                        this.showReinstatmessage();
+                        // Show the success message after the modal is closed
+                        setTimeout(() => {
+                            this.getSuspendContractorList();
+                        }, 1000);
+                    });
                 },
-                (error: any) => {
-                    this.errorMessage = error.error.error;
+                (g2cError: any) => {
+                    // Handle G2C system error but still proceed with the UI updates
+                    console.error('G2C approval failed:', g2cError);
+                    setTimeout(() => {
+                        this.closeButton.nativeElement.click();
+                        this.showReinstatmessage();
+                        setTimeout(() => {
+                            this.getSuspendContractorList();
+                        }, 1000);
+                    });
                 }
-                );
-            }
+            );
+        },
+        (error: any) => {
+            this.errorMessage = error.error.error;
+        }
+    );
+}
         showErrorMessage:boolean=false
         showReinstatmessage() {
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Contractor reinstated successfully' });
