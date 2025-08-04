@@ -273,7 +273,7 @@ navigate(bcta_no: any,) {
 //   });
 // }
 
-    submitAction(): void {
+  submitAction(): void {
   if (this.selectedIds.length === 0) return;
   // Validate IDs
   if (this.selectedIds.some(id => id == null || isNaN(id))) {

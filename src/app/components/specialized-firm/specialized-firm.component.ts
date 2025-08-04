@@ -404,86 +404,102 @@ UploadFileForspecializedFirmN() {
   });
 }
     // //save savedSuspend  
-    savedSuspend() {
-       if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
-    }
-       const suspendDetail = {
-        type: this.formData.Type,
-        suspendDate: this.formData.Date,
-        suspendDetails: this.formData.Details,
-        suspendBy:this.uuid,
-        specializedFirmNo: this.selectedspecializedFirmNo,
-        fileId:this.fileId
-         };
-         this.service.saveSuspendDetails(suspendDetail).subscribe((response: any) => {
-        setTimeout(() => {
+ savedSuspend() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
+  }
+
+  const suspendDetail = {
+    type: this.formData.Type,
+    suspendDate: this.formData.Date,
+    suspendDetails: this.formData.Details,
+    suspendBy: this.uuid,
+    specializedFirmNo: this.selectedspecializedFirmNo,
+    fileId: this.fileId
+  };
+
+  this.service.saveSuspendDetails(suspendDetail).subscribe({
+    next: () => {
+      const suspendPayload = {
+        cdbNos: [this.selectedspecializedFirmNo],
+        firmType: 'Specialized-firm' // You can change this if dynamic
+      };
+      this.service.suspendedIng2cSystem(suspendPayload).subscribe({
+        next: () => {
           this.closeButton.nativeElement.click();
           this.showSuspendMessage();
-          // Show the success message after the modal is closed
+
           setTimeout(() => {
-            this.getSpecializedFirm()
+            this.getSpecializedFirm();
           }, 1000);
-        },);
-      },
-      (error: any) => {
-        this.errorMessage = error.error.error;
-      }
-    );
-  }
+        },
+        error: (g2cError) => {
+          this.errorMessage = 'G2C Suspension failed: ' + (g2cError.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (localError) => {
+      this.errorMessage = 'Local Suspension failed: ' + (localError.error?.error || 'Unknown error');
+    }
+  });
+}
+
   showSuspendMessage() {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm  Suspended successfully' });
   }
 
 //save cancelled
-     savedCancelled() {
-       if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
+   savedCancelled() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
+  }
+
+  const cancelledDetail = {
+    type: this.formData.Type,
+    cancelledDate: this.formData.Date,
+    cancelledDetails: this.formData.Details,
+    cancelledBy: this.uuid,
+    specializedFirmNo: this.selectedspecializedFirmNo,
+    fileId: this.fileId
+  };
+
+  this.service.saveCancelledDetails(cancelledDetail).subscribe({
+    next: () => {
+      const cancelPayload = {
+        cdbNos: [this.selectedspecializedFirmNo],
+        firmType: 'specialized-firm' // Can use this.formData.Type if dynamic
+      };
+
+      this.service.cancelledIng2cSystem(cancelPayload).subscribe({
+        next: () => {
+          this.closeButton.nativeElement.click();
+          this.showCancelledMessage();
+
+          setTimeout(() => {
+            this.getSpecializedFirm();
+          }, 1000);
+        },
+        error: (g2cError) => {
+          this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (localError) => {
+      this.errorMessage = 'Local cancellation failed: ' + (localError.error?.error || 'Unknown error');
     }
-       const cancelledDetail = {
-        type: this.formData.Type,
-        cancelledDate: this.formData.Date,
-        cancelledDetails: this.formData.Details,
-        cancelledBy:this.uuid,
-        specializedFirmNo: this.selectedspecializedFirmNo,
-        fileId:this.fileId
-         };
-         this.service.saveCancelledDetails(cancelledDetail).subscribe((response: any) => {
-           setTimeout(() => {
-             this.closeButton.nativeElement.click();
-            this.showCancelledMessage();
-             // Show the success message after the modal is closed
-             setTimeout(() => {
-               this.getSpecializedFirm()
-             }, 1000);
-           },);
-         },
-         (error: any) => {
-           this.errorMessage = error.error.error;
-         }
-       );
-     }
+  });
+}
+
      showCancelledMessage() {
        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm  Cancelled successfully' });
      }

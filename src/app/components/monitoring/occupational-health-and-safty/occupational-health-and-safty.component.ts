@@ -373,7 +373,7 @@ export class OccupationalHealthAndSaftyComponent {
     private saveDraftPayload() {
       const payload = {
             id: this.tableId,
-              workID: this.workId || '',
+            workID: this.workId,
             certifiedOhsInCharge: this.formData?.ohsInCharge,
             ohsCidNumber: this.formData.cidNo,
             ohsInChargeFullName: this.formData.fullName,

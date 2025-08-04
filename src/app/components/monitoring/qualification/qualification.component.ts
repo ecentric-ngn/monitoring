@@ -127,7 +127,6 @@ export class QualificationComponent {
                 },
             ],
         };
-        console.log(`Fetching from ${viewName}...`, request);
         this.service.viewData(request).subscribe(
             (response: any) => {
                 if (response.data?.length) {
@@ -248,7 +247,7 @@ export class QualificationComponent {
     private saveDraftPayload() {
         const payload = {
             id: this.tableId,
-            workID: this.workId || '',
+            workID: this.workId,
             subContractorExists: this.formData.contractorType,
             bctaRegistrationNo: this.formData.bctaRegistrationNo,
             registrationValidUntil: this.formData.expiryDate,

@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { api_url, fileUpload_api, web_service_url } from '../app.const/const';
+import { api_url, fileUpload_api, g2c_url, web_service_url } from '../app.const/const';
 
 export interface ConsultantData {
   workCategory: string;
@@ -66,6 +66,19 @@ return this.http.post<any>(`${api_url}/consultantAdverseCommentRecord`,deregiste
 saveSuspendDetails(suspendDetail:any){
 return this.http.post<any>(`${api_url}/consultantSuspend`,suspendDetail);
 }
+
+  /**
+   * Suspends a consultant from the G2C system.
+   *
+   * @param suspendDetail The details of the consultant to be suspended.
+   * @returns A promise that resolves to a string if the suspension is successful.
+   */
+  suspendedIng2cSystem(suspendDetail: any) {
+    // The 'as const' assertion is necessary to avoid a TS error.
+    return this.http.post(`${g2c_url}/compliance/suspend`, suspendDetail, {
+      responseType: 'text' as const
+    });
+  }
 //save cancelled
 saveCancelledDetails(cancelledDetail:any){
 return this.http.post<any>(`${api_url}/consultantCancel`,cancelledDetail);
@@ -74,6 +87,11 @@ return this.http.post<any>(`${api_url}/consultantCancel`,cancelledDetail);
 saveCancelledReregister(reRegisterDetail:any){
 return this.http.post<any>(`${api_url}/consultantCancelledReregister`,reRegisterDetail);
 }
+  cancelledIng2cSystem(suspendDetail: any) {
+    return this.http.post(`${g2c_url}/classification/downgrade/endorse`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
 //save deregisteredReregister consultant
 saveDeregisteredReregister(reRegisterDetail:any){
   return this.http.post<any>(`${api_url}/consultantDeregisteredReregister`,reRegisterDetail);

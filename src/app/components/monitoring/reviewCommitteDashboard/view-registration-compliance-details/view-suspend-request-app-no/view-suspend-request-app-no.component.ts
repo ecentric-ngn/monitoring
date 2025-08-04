@@ -194,9 +194,7 @@ export class ViewSuspendRequestAppNoComponent {
             );
             return;
         }
-
         this.isLoading = true;
-
         // First payload for the endorsement (Monitoring System)
         const endorsePayload = {
             suspensionIds: this.selectedIds,
@@ -210,7 +208,6 @@ export class ViewSuspendRequestAppNoComponent {
             ),
             firmType: this.firmTypesssss,
         };
-
         // First API call - Endorse in Monitoring System
         this.service.endorseApplications(endorsePayload).subscribe({
             next: (endorseResponse: string) => {

@@ -430,43 +430,54 @@ showDowngradeMessage() {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Consultant downgraded successfully' });
   } 
   // //save savedSuspend  
-  savedSuspend() {
-     if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    }
-    const suspendDetail = {
-      type: this.formData.Type,
-      suspendDate: this.formData.Date,
-      suspendDetails: this.formData.Details,
-      suspendBy: this.uuid,
-      consultantNo: this.selectedconsultantNo,
-      fileId:this.fileId
-
-    };
-    this.service.saveSuspendDetails(suspendDetail).subscribe({
-      next: (response: any) => {
-        this.closeButton.nativeElement.click();
-        this.showSuspendMessage();
-        setTimeout(() => {
-          this.getActiveConsultant();
-        }, 500); // Adjust the delay (in milliseconds) if needed
-      },
-      error: (error: any) => {
-        this.show500Message()
-        this.errorMessage = error.error.error;
-      }
-    });
+ savedSuspend() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
   }
+
+  const suspendDetail = {
+    type: this.formData.Type,
+    suspendDate: this.formData.Date,
+    suspendDetails: this.formData.Details,
+    suspendBy: this.uuid,
+    consultantNo: this.selectedconsultantNo,
+    fileId: this.fileId
+  };
+
+  // Step 1: Save suspension details locally
+  this.service.saveSuspendDetails(suspendDetail).subscribe({
+    next: () => {
+      // Step 2: Suspend in G2C system
+      const suspendPayload = {
+        cdbNos: [this.selectedconsultantNo],  // Must be an array
+        firmType: 'Consultant'               // Or use this.formData.Type if it's dynamic
+      };
+      this.service.suspendedIng2cSystem(suspendPayload).subscribe({
+        next: () => {
+          this.closeButton.nativeElement.click();
+          this.showSuspendMessage();
+          setTimeout(() => {
+            this.getActiveConsultant();
+          }, 500);
+        },
+        error: (g2cError) => {
+          this.show500Message();
+          this.errorMessage = 'G2C suspend failed: ' + (g2cError.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (localError) => {
+      this.show500Message();
+      this.errorMessage = 'Save failed: ' + (localError.error?.error || 'Unknown error');
+    }
+  });
+}
+
 
   showSuspendMessage() {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Consultant suspended successfully' });
@@ -475,42 +486,52 @@ showDowngradeMessage() {
     this.messageService.add({ severity: 'error', summary: 'error', detail: 'Something went wrong.Please try again later' });
   }
   //save cancelled
-  savedCancelled() {
-     if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    }
-    const cancelledDetail = {
-      type:this.formData.Type,
-      cancelledDate: this.formData.Date,
-      cancelledDetails: this.formData.Details,
-      cancelledBy: this.uuid,
-      consultantNo: this.selectedconsultantNo,
-      fileId:this.fileId
-    };
-    this.service.saveCancelledDetails(cancelledDetail).subscribe({
-      next: (response: any) => {
-        this.closeButton.nativeElement.click();
-        this.showCanceldMessage();
-        setTimeout(() => {
-          this.getActiveConsultant();
-        }, 500); 
-      },
-      error: (error: any) => {
-        this.show500Message()
-        this.errorMessage = error.error.error;
-      }
-    });
+ savedCancelled() {
+  if (this.formData.Date) {
+    // Convert the selected date to Bhutan time
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString(); // Still in UTC format
   }
+
+  const cancelledDetail = {
+    type: this.formData.Type,
+    cancelledDate: this.formData.Date,
+    cancelledDetails: this.formData.Details,
+    cancelledBy: this.uuid,
+    consultantNo: this.selectedconsultantNo,
+    fileId: this.fileId
+  };
+
+  this.service.saveCancelledDetails(cancelledDetail).subscribe({
+    next: () => {
+      // Call G2C cancel API after local cancellation succeeds
+      this.service.cancelledIng2cSystem({
+        cdbNos: [this.selectedconsultantNo],
+        firmType: 'consultant'
+      }).subscribe({
+        next: () => {
+          this.closeButton.nativeElement.click();
+          this.showCanceldMessage();
+          setTimeout(() => {
+            this.getActiveConsultant();
+          }, 500);
+        },
+        error: (g2cError: any) => {
+          this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (error: any) => {
+      this.show500Message();
+      this.errorMessage = 'Local cancellation failed: ' + (error.error?.error || 'Unknown error');
+    }
+  });
+}
+
 
 showCanceldMessage() {
   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Consultant cancelled successfully' });
