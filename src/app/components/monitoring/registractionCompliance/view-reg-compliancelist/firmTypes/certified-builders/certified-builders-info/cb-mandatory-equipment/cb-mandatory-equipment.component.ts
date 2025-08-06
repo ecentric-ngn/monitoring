@@ -100,13 +100,49 @@ export class CbMandatoryEquipmentComponent {
         const dd = String(today.getDate()).padStart(2, '0');
         this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
     }
-    fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNos(this.bctaNo || this.data.certifiedBuilderNo,this.appNo).subscribe((res: any) => {
-            this.tableData = res.vehicles;
-            console.log('CB equipments', this.formData);
-        });
+    // fetchDataBasedOnBctaNo() {
+    //     this.service.getDatabasedOnBctaNos(this.bctaNo || this.data.certifiedBuilderNo,this.appNo).subscribe((res: any) => {
+    //         this.tableData = res.vehicles;
+    //         console.log('CB equipments', this.formData);
+    //     });
+    // }
+ fetchDataBasedOnBctaNo() {
+        this.service.getDatabasedOnBctaNos(this.bctaNo || this.data.certifiedBuilderNo,this.appNo).subscribe(
+        (res1: any) => {
+        this.tableData = res1.vehicles;
+        const payload = [
+            {
+            field: 'bctaNo',
+            value: this.bctaNo || this.data.certifiedBuilderNo,
+            condition: 'LIKE',
+            operator: 'AND'
+            },
+            {
+            field: 'application_number',
+            value: this.appNo,
+            condition: 'LIKE',
+            operator: 'AND'
+            }
+        ];
+        this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+            (res2: any) => {
+            if (res2?.data?.length) {
+                this.formData = { ...this.formData, ...res2.data[0] };
+                // Map review/remark fields
+                this.tData.fulfillsRequirement = this.formData.eqfulfilled;
+                this.tData.finalRemarks = this.formData.eqremarks;
+            }
+            },
+            (error) => {
+            console.error('Error fetching additional contractor details:', error);
+            }
+        );
+        },
+        (error) => {
+        console.error('Error fetching HR compliance data:', error);
+        }
+    );
     }
-
     // For date validation (optional)
     minResubmitDate: string = this.getMinDate();
 
@@ -116,7 +152,7 @@ export class CbMandatoryEquipmentComponent {
         return today.toISOString().split('T')[0];
     }
 
-    onSubmit() {}
+ 
 
     tableId: any;
     saveAndNext() {

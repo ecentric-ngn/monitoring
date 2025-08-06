@@ -171,7 +171,7 @@ removeEntry(index: number) {
                 this.getPrivateHrLists();
                 break;
             case 'OTHERS':
-                this.getHrListsFromCRPS();
+                // this.getHrListsFromCRPS();
                 break;
             default:
                 console.warn('Unknown inspection type:', this.inspectionType);

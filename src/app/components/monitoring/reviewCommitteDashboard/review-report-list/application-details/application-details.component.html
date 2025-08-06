@@ -1,31 +1,81 @@
 <div class="container-fluid">
-  <!-- <div *ngIf="disableSaveButton">
-    <div class="row p-3">
-      <div class="col-md-6">
-        <label class="form-label me-2 font-size-12">Review Date:<span class="text-danger">*</span></label>
-        <input type="date" class="form-control form-control-sm border" [(ngModel)]="formData.reviewDate" name="reviewDate"
-          required #reviewDate="ngModel">
-      </div>
-      <div class="col-md-6">
-        <label class="form-label me-2 font-size-12">Remarks:<span class="text-danger">*</span></label>
-        <textarea class="form-control form-control-sm border" placeholder="Enter remarks" [(ngModel)]="formData.remarks"
-          name="remarks" required #remarks="ngModel"></textarea>
-      </div>
-    </div>
 
-    <div class="d-flex justify-content-end">
-      <button *ngIf="appNoStatus !== 'REVIEWED'" type="submit" class="btn text-white save-next-btn"
-        (click)="saveReviewedData()">
-        Save
-      </button>
-    </div>
-  </div> -->
  <!-- back-button.component.html -->
 <button class="back-button btn-primary btn pi-arrow-circle-left pi" (click)="goBack()">
   <i class="">Back</i>
 </button>
   <p class=" m-2 font-bold font-size-18"><strong>Work Information</strong></p>
   <div class="p-3">
+    <div class="p-3" *ngIf="inspectionType === 'OTHERS'">
+  <span class="font-bold font-size-12">Client Details and Work Details</span>
+  <hr>
+  <form *ngIf="inspectionType === 'OTHERS'">
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Owner Name:</label>
+        <span class="font-size-12"> {{ formData.client_owner_name }}</span>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Current Address:</label>
+        <span class="font-size-12"> {{ formData.clientAddress }}</span>
+      </div>
+
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Mobile No:</label>
+        <span class="font-size-12"> {{ formData.clientMobileNumber }}</span>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-md-4 d-flex">
+        <label class="form-label me-2 font-size-12">Email Address:</label>
+        <span class="font-size-12"> {{ formData.clientEmail }}</span>
+      </div>
+    </div>
+  </form>
+</div>
+
+    <form>
+      <div class="row mb-3">
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">Project Name:</label>
+          <span class="font-size-12"> {{ formData.project_name }}</span>
+
+        </div>
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">Client:</label>
+          <span class="font-size-12"> {{ formData.client }}</span>
+
+        </div>
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">Contract Amount</label>
+          <span class="font-size-12"> {{ formData.contract_amount }}</span>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">dzongkhag:</label>
+          <span class="font-size-12"> {{ formData.dzongkhag }}</span>
+        </div>
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">place:</label>
+          <span class="font-size-12"> {{ formData.place}}</span>
+        </div>
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">start_date:</label>
+          <span class="font-size-12"> {{ formData.start_date }}</span>
+        </div>
+      </div>
+
+      <div class="row mb-3">
+        <div class="col-md-4 d-flex">
+          <label class="form-label me-2 font-size-12">Proposed Completion Date:</label>
+          <span class="font-size-12"> {{ formData.proposed_completion_date }}</span>
+        </div>
+      </div>
+    </form>
     <span class=" font-bold font-size-12">Onsite Facilities and management</span>
     <hr>
     <form>

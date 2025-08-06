@@ -85,12 +85,47 @@ export class CbPermanentEmployeesComponent {
         certifiedBuilderId: '',
         certifiedBuilderNo: '',
     };
-    fetchDataBasedOnBctaNo() {
+    // fetchDataBasedOnBctaNo() {
+    //     this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
+    //         this.tableData = res.hrCompliance;
+    //     });
+    // } 
+     fetchDataBasedOnBctaNo() {
         this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
-            this.tableData = res.hrCompliance;
-        });
+        this.tableData = res.hrCompliance;
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.data.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+            this.tData.hrFulfilled =  this.formData.hrfulfilled;
+            // this.tData.resubmitDate =  this.formData.resubmitDate;
+            this.tData.remarksNo =  this.formData.remarksNo;
+          }
+        },
+        (error) => {
+          console.error('Error fetching additional contractor details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching HR compliance data:', error);
     }
-
+  );
+}
     openActionModal(row: any) {
         this.selectedAction = {
             actionType: '',

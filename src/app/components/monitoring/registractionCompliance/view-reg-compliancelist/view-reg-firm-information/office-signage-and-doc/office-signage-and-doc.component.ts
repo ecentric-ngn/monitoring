@@ -1,4 +1,4 @@
-import { Component, EventEmitter, OnInit, Output } from '@angular/core';
+import { ApplicationRef, Component, EventEmitter, OnInit, Output } from '@angular/core';
 import { CommonService } from '../../../../../../service/common.service';
 import { AuthServiceService } from '../../../../../../auth.service';
 import { Router } from '@angular/router';
@@ -77,8 +77,6 @@ export class OfficeSignageAndDocComponent implements OnInit {
             newClassification: '',
             target: row
         };
-        console.log('Row passed to modal:', row);
-
         // Get the modal element and show it
         const modalEl = document.getElementById('actionModal');
         this.bsModal = new bootstrap.Modal(modalEl, {
@@ -141,64 +139,64 @@ export class OfficeSignageAndDocComponent implements OnInit {
               this.downgradeList = [];
           }
       }
-        saveAndForward() {
-        this.isSaving = true;
-        const payload = {
-      registrationReview: {
-        bctaNo: this.data.contractorNo,
-        firmName: this.formData.firmName,
-        contactNo: this.formData.mobileNo,
-        email: this.formData.emailAddress,
-        classification: this.formData.classification,
-        applicationStatus: this.data.status,
-        officeSignboard: this.formData.officeSignboardPath,
-        osresubmitDeadline: this.formData.signboardResubmitDate,
-        filingSystem: this.formData.properFillingPath,
-        ohsHandbook: this.formData.ohsHandBook,
-        ohsReview: this.formData.ohsReview,
-        ohsRemarks: this.formData.generalRemarks,
-        reviewDate: this.formData.reviewDate,
-        fsreview: this.formData.filingReview,
-        fsremarks: this.formData.filingRemarks,
-        fsresubmitDeadline: this.formData.filingResubmitDate,
-        oslocation: this.formData.officeLocation,
-        osreview: this.formData.signboardReview,
-        osremarks: this.formData.signboardRemarks,
-      }
-    };
+//         saveAndForward() {
+//         this.isSaving = true;
+//         const payload = {
+//       registrationReview: {
+//         bctaNo: this.data.contractorNo,
+//         firmName: this.formData.firmName,
+//         contactNo: this.formData.mobileNo,
+//         email: this.formData.emailAddress,
+//         classification: this.formData.classification,
+//         applicationStatus: this.data.status,
+//         officeSignboard: this.formData.officeSignboardPath,
+//         osresubmitDeadline: this.formData.signboardResubmitDate,
+//         filingSystem: this.formData.properFillingPath,
+//         ohsHandbook: this.formData.ohsHandBook,
+//         ohsReview: this.formData.ohsReview,
+//         ohsRemarks: this.formData.generalRemarks,
+//         reviewDate: this.formData.reviewDate,
+//         fsreview: this.formData.filingReview,
+//         fsremarks: this.formData.filingRemarks,
+//         fsresubmitDeadline: this.formData.filingResubmitDate,
+//         oslocation: this.formData.officeLocation,
+//         osreview: this.formData.signboardReview,
+//         osremarks: this.formData.signboardRemarks,
+//       }
+//     };
 
-  this.service.saveOfficeSignageAndDoc(payload).subscribe(
-  (response: any) => {
-    this.isSaving = false;
-    try {
-      const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
-      this.id = parsedResponse.registrationReview?.id;
-      this.activateTab.emit({ id: this.id, tab: 'employee' });
-    } catch (e) {
-      console.error('Error parsing response:', e);
-    }
-  },
-  (error) => {
-    this.isSaving = false;
+//   this.service.saveOfficeSignageAndDoc(payload).subscribe(
+//   (response: any) => {
+//     this.isSaving = false;
+//     try {
+//       const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
+//       this.id = parsedResponse.registrationReview?.id;
+//       this.activateTab.emit({ id: this.id, tab: 'employee' });
+//     } catch (e) {
+//       console.error('Error parsing response:', e);
+//     }
+//   },
+//   (error) => {
+//     this.isSaving = false;
 
-    if (error.status === 500) {
-      this.createNotification(
-        'error',
-        'Server Error',
-        'A server error occurred (500). Please try again later.'
-      );
-    } else {
-      this.createNotification(
-        'error',
-        'Error',
-        'Something went wrong while sending the list.'
-      );
-    }
+//     if (error.status === 500) {
+//       this.createNotification(
+//         'error',
+//         'Server Error',
+//         'A server error occurred (500). Please try again later.'
+//       );
+//     } else {
+//       this.createNotification(
+//         'error',
+//         'Error',
+//         'Something went wrong while sending the list.'
+//       );
+//     }
 
-    console.error('Error saving data:', error);
-  }
-);
-  }
+//     console.error('Error saving data:', error);
+//   }
+// );
+//   }
 
    rejectApplication() {
           this.service.rejectApplication('Contractor',this.data.contractorNo).subscribe(
@@ -331,39 +329,62 @@ export class OfficeSignageAndDocComponent implements OnInit {
     this.licenseStatus = WorkDetail.data.licenseStatus;
     this.applicationStatus = WorkDetail.data.applicationStatus;
     this.bctaNo = WorkDetail.data.contractorNo;
-    
-    // if (!WorkDetail?.data) {
-    //   console.error('WorkDetail data not available');
-    //   return;
-    // }
      if(this.applicationStatus === 'Suspension Resubmission' && this.WorkDetail.data.contractorNo){
       this.fetchSuspendDataBasedOnBctaNo();
        
      }else if(this.WorkDetail.data.contractorNo && this.WorkDetail.data.appNo && this.applicationStatus !== 'Suspension Resubmission'){
         this.fetchDataBasedOnBctaNo();
      }else{
-        console.log('no data found:', WorkDetail);
      }
     this.data = WorkDetail.data;
     //
     this.applicationStatus = WorkDetail.data.applicationStatus;
   }
-  fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNos(this.WorkDetail.data.contractorNo, this.WorkDetail.data.appNo).subscribe(
-      (res: any) => {
-        if (res?.complianceEntities?.length) {
-          this.formData = { ...this.formData, ...res.complianceEntities[0] };
-        }
-      },
-      (error) => {
-        console.error('Error fetching data:', error);
+fetchDataBasedOnBctaNo() {
+  this.service.getDatabasedOnBctaNos(this.WorkDetail.data.contractorNo, this.WorkDetail.data.appNo).subscribe(
+    (res1: any) => {
+      if (res1?.complianceEntities?.length) {
+        this.formData = { ...this.formData, ...res1.complianceEntities[0] };
       }
-    );
-  }
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.WorkDetail.data.contractorNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.WorkDetail.data.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+             this.formData.signboardReview =  this.formData.os_review;
+             this.formData.filingReview =  this.formData.fsreview;
+             this.formData.ohsReview =  this.formData.ohsreview;
+             this.formData.ohsReview =  this.formData.ohsreview;
+             this.formData.generalRemarks =  this.formData.ohsRemarks;
+          }
+        },
+        (error) => {
+          console.error('Error fetching contractor details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching data:', error);
+    }
+  );
+}
+
 
   fetchSuspendDataBasedOnBctaNo() {
     this.bctaNo = this.WorkDetail.data.contractorNo;
-    console.log('fetchSuspendDataBasedOnBctaNo',this.WorkDetail.data.contractorNo);
     this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
       (res: any) => {
         if (res?.complianceEntities?.length) {
@@ -377,7 +398,6 @@ export class OfficeSignageAndDocComponent implements OnInit {
   }
   onReviewChange() {
     if (!this.formData) return;
-
     this.formData = {
       ...this.formData,
       signboardResubmitDate: this.formData.signboardReview === 'No' ? null : this.formData.signboardResubmitDate,
@@ -580,6 +600,7 @@ clearErrorMessage() {
         oslocation: this.formData.officeLocation,
         osreview: this.formData.signboardReview,
         osremarks: this.formData.signboardRemarks,
+        applicationNumber:this.WorkDetail.data.appNo
       }
     };
 

@@ -59,7 +59,6 @@ export class ConsultancyMandatoryEquipmentComponent {
          this.data = this.data;
           this.applicationStatus = this.data.applicationStatus;
          this.fetchDataBasedOnBctaNo();
-         console.log('this.data', this.data);
         const today = new Date();
         const yyyy = today.getFullYear();
         const mm = String(today.getMonth() + 1).padStart(2, '0');
@@ -103,11 +102,52 @@ export class ConsultancyMandatoryEquipmentComponent {
         }
        
     }
+    // fetchDataBasedOnBctaNo() {
+    //     this.service.getDatabasedOnBctaNos(this.data.consultantNo,this.data.appNo).subscribe((res: any) => {
+    //         this.tableData = res.vehicles;
+    //     });
+    // }
+
     fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNos(this.data.consultantNo,this.data.appNo).subscribe((res: any) => {
-            this.tableData = res.vehicles;
-        });
+    this.service.getDatabasedOnBctaNos(this.data.consultantNo,this.data.appNo).subscribe(
+        (res1: any) => {
+        this.tableData = res1.vehicles;
+        console.log('employee', this.formData);
+
+        const payload = [
+            {
+            field: 'bctaNo',
+            value: this.bctaNo,
+            condition: 'LIKE',
+            operator: 'AND'
+            },
+            {
+            field: 'application_number',
+            value: this.data.appNo,
+            condition: 'LIKE',
+            operator: 'AND'
+            }
+        ];
+        this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+            (res2: any) => {
+            if (res2?.data?.length) {
+                this.formData = { ...this.formData, ...res2.data[0] };
+                // Map review/remark fields
+                this.tData.fulfillsRequirement = this.formData.eqfulfilled;
+                this.tData.finalRemarks = this.formData.eqremarks;
+            }
+            },
+            (error) => {
+            console.error('Error fetching additional contractor details:', error);
+            }
+        );
+        },
+        (error) => {
+        console.error('Error fetching HR compliance data:', error);
+        }
+    );
     }
+
 
     fetchSuspendDataBasedOnBctaNo() {
         //this.bctaNo = this.WorkDetail.data.contractorNo;

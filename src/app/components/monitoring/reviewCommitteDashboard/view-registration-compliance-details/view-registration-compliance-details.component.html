@@ -104,7 +104,7 @@
 
   </div>
   <div *ngIf="activeTab === 'suspend'">
-    <app-view-suspend-request-app-no></app-view-suspend-request-app-no>
+    <app-view-suspend-request-app-no [activeTab]="activeTab"></app-view-suspend-request-app-no>
     <!-- <div class="row">
       <div class="col d-flex pl-4">
         <p class="mr-1 p-1 text-gray-600">Items Per Page</p>
@@ -215,7 +215,7 @@
   <!-- Cancel Tab -->
    <div *ngIf="activeTab === 'cancel'">
     <div class="table-responsive m-3">
-        <app-view-cancel-request-app-no></app-view-cancel-request-app-no>
+        <app-view-cancel-request-app-no [activeTab]="activeTab"></app-view-cancel-request-app-no>
      </div>
     <!-- <div class="row"> -->
       <!-- <div class="col d-flex pl-4">
@@ -326,10 +326,9 @@
   <!-- </div> -->
 
   <!-- Downgrade Tab -->
-  <div *ngIf="activeTab === 'downgrade'">
-    <app-view-downgrade-request-app-no></app-view-downgrade-request-app-no>
-  </div>
-
+ <div *ngIf="activeTab === 'downgrade'">
+  <app-view-downgrade-request-app-no [activeTab]="activeTab"></app-view-downgrade-request-app-no>
+</div>
 
   <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
     <div class="modal-dialog">

@@ -3,7 +3,8 @@ import { CommonService } from '../../../../../../service/common.service';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
-
+import { Location } from '@angular/common';
+import { Router } from '@angular/router';
 @Component({
   selector: 'app-view-app-details',
   templateUrl: './view-app-details.component.html',
@@ -20,31 +21,40 @@ bctaNo: string = '';
   pageSize: any;
   formData: any={};
   showErrorMessage: any;
-  constructor(private service: CommonService) {}
-
-
+  activeTab: any={};
+  workdata: any;
+  constructor(private service: CommonService,private router: Router) {}
 
 ngOnInit() {
  const WorkDetail = this.service.getData('BctaNo');
-    this.WorkDetail = WorkDetail.data;
-    console.log('WorkDetail', WorkDetail);
-    
-    if(this.WorkDetail.bctaNo
+    this.workdata = WorkDetail.data || {};
+    this.activeTab= WorkDetail.activeTab;
+    if(this.workdata.bctaNo
 ){
       this.getAppDetailsByBcNo();
     }
 }
+// goBack() {
+//   this.router.navigate(['monitoring/viewRegComplianceDetails']);
+// }
 
-
+goBack() {
+  const employeeDetail = {
+      activeTab:this.activeTab
+  };
+  this.service.setData(
+      employeeDetail,
+      'BctaNo',
+      'viewRegComplianceDetails'
+  );
+}
 getAppDetailsByBcNo() {
   this.service.getDatabasedOnBctaNos(this.WorkDetail.bctaNo
 ,this.WorkDetail.applicationID).subscribe((res: any) => {
    this.complianceEntities = res.complianceEntities || [];
       this.vehicles = res.vehicles || [];
       this.hrCompliance = res.hrCompliance || [];
-
       this.fetchComplianceDetails();
-
   });
 }
 
@@ -67,7 +77,6 @@ getAppDetailsByBcNo() {
             }
         );
 }
-
 downloadFile(filePath: string): void {
   const sanitizedPath = filePath.replace(/\s+/g, ' ');
   this.service.downloadFileFirm(sanitizedPath).subscribe(

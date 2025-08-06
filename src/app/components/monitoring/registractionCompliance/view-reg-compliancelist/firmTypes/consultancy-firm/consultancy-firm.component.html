@@ -74,12 +74,16 @@
                     <td>{{ data.sentDate }}</td>
                     <td>
                         <span class="text-bold" [ngClass]="{
-                            'text-secondary': data.applicationStatus === 'Not Submitted',
-                            'text-warning': ['Pending','Suspension Request','Cancel Request','Forwarded TO RC'].includes(data.applicationStatus),
-                            'text-success': ['Verified','Suspension Approved'].includes(data.applicationStatus),
-                            'text-primary': ['Submitted','Resubmitted OS and PFS','Suspension Resubmission','Resubmitted HR and EQ'].includes(data.applicationStatus)}">
+                        'text-secondary': data.applicationStatus === 'Not Submitted',
+                        'text-warning': ['Pending','Suspension Request','Cancel Request','Forwarded TO RC'].includes(data.applicationStatus),
+                        'text-success': ['Verified','Suspension Approved'].includes(data.applicationStatus),
+                        'text-primary': ['Submitted','Resubmitted OS and PFS','Suspension Resubmission','Resubmitted HR and EQ'].includes(data.applicationStatus),
+                        'text-danger': ['Suspension Rejected','Cancellation Rejected','Downgrade Rejected'].includes(data.applicationStatus)
+                    }">
                             {{ data.applicationStatus }}
                         </span>
+
+
                     </td>
 
                     <!-- <td>{{ data.licenseStatus }}</td> -->

@@ -196,7 +196,7 @@ export class ViewRegCompliancelistComponent {
     if (searchQuery) {
         payload.push(
             {
-            field: 'contractorNo',
+            field: 'contractor_no',
             value: `%${searchQuery}%`,
             condition: 'LIKE',
             operator: 'AND'

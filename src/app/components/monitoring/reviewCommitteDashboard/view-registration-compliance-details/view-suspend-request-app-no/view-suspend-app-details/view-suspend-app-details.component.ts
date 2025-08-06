@@ -20,6 +20,7 @@ bctaNo: string = '';
   pageSize: any;
   formData: any={};
   showErrorMessage: any;
+  activeTab: any={};
 constructor(private service: CommonService) {}
 
 
@@ -27,12 +28,21 @@ constructor(private service: CommonService) {}
 ngOnInit() {
  const WorkDetail = this.service.getData('BctaNo');
     this.WorkDetail = WorkDetail.data;
-    console.log('WorkDetail', WorkDetail);
+     this.activeTab= WorkDetail.activeTab;
     if(this.WorkDetail.firmId){
       this.getAppDetailsByBcNo();
     }
 }
-
+goBack() {
+  const employeeDetail = {
+      activeTab:this.activeTab
+  };
+  this.service.setData(
+      employeeDetail,
+      'BctaNo',
+      'viewRegComplianceDetails'
+  );
+}
 getAppDetailsByBcNo() {
   this.service.getDatabasedOnBctaNos(this.WorkDetail.firmId,this.WorkDetail.applicationID).subscribe((res: any) => {
    this.complianceEntities = res.complianceEntities || [];

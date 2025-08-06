@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { CommonService } from '../../../../../service/common.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import Swal from 'sweetalert2';
@@ -16,6 +16,7 @@ isLoading = false;
   pageSize: number= 10;
   pageNo: number= 1;
   searchQuery: any;
+  @Input() activeTab: any;
   set_limit = [10, 25, 50, 100];
   selectedIds: number[] = [];
     selectedApplicationNo: number[] = [];
@@ -34,6 +35,7 @@ constructor(private service: CommonService,  private notification: NzNotificatio
 activeAction: 'cancel' | 'downgrade' | 'Suspended' | 'rejected' | null = null;
   ngOnInit() {
     this.getDownGradeList();
+    this.activeTab = this.activeTab;
     this.getCategoryList();
       const userDetailsString = sessionStorage.getItem('userDetails');
         if (userDetailsString) {
@@ -83,6 +85,7 @@ Searchfilter() {
 navigate(bcta_no: any,) {
   const employeeDetail = {
       data: bcta_no,
+      activeTab:this.activeTab
   };
   this.service.setData(
       employeeDetail,

@@ -1,7 +1,3 @@
-
-
-
-
 <div class="container p-4 border rounded bg-white shadow-sm">
   <div class="table-responsive">
 
@@ -30,7 +26,7 @@
               <div class="input-group">
                 <input type="number" class="form-control form-control-sm" [(ngModel)]="formData.cidNo" id="cidNo{{ i }}"
                   name="cidNo{{ i }}" placeholder="CID No" (ngModelChange)="onCidChange(formData)"
-                (input)="clearErrorMessage(formData)" />
+                  (input)="clearErrorMessage(formData)" />
 
                 <span *ngIf="isLoading" class="input-group-text bg-white border-0">
                   <div class="spinner-border spinner-border-sm text-secondary" role="status">
@@ -49,7 +45,8 @@
 
             <td>
               <input type="text" class="form-control form-control-sm" [(ngModel)]="formData.fullName"
-                id="fullName{{ i }}" name="fullName{{ i }}" placeholder="Full Name" (input)="clearErrorMessage(formData)" />
+                id="fullName{{ i }}" name="fullName{{ i }}" placeholder="Full Name"
+                (input)="clearErrorMessage(formData)" />
             </td>
 
             <td>
@@ -90,19 +87,15 @@
   <div class="justify-content-end d-flex mt-6">
     <button *ngIf="appNoStatus !== 'REJECTED'" class="btn mr-1 text-white prev-btn" (click)="onPreviousClick()"
       type="submit">Prev</button>
-    <!-- <button class="btn text-white save-next-btn" [disabled]="!(appNoStatus === 'REJECTED' || isOtpValid)"
+    <!-- <button class="btn text-white save-next-btn" *ngIf="dataList.length > 0"
+      [disabled]="!(appNoStatus === 'REJECTED' || isOtpValid || inspectionType === 'OTHERS')"
       (click)="saveAndNext(form)" type="submit">
       Save & Next
     </button> -->
-<button class="btn text-white save-next-btn"
-  *ngIf="dataList.length > 0"
-  [disabled]="!isSaveNextEnabled"
-  (click)="saveAndNext(form)"
-  type="submit">
-  Save & Next
-</button>
-
-
+      <button class="btn text-white save-next-btn" [disabled]="!(appNoStatus === 'REJECTED' || isOtpValid || inspectionType === 'OTHERS')"
+      (click)="saveAndNext(form)" type="submit">
+      Save & Next
+    </button>
 
   </div>
 </div>

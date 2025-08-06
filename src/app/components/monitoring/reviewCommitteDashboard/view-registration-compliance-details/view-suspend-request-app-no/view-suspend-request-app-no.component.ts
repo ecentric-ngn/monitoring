@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { CommonService } from '../../../../../service/common.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import Swal from 'sweetalert2';
@@ -21,6 +21,7 @@ export class ViewSuspendRequestAppNoComponent {
     searchQuery: string;
     set_limit: number[] = [10, 15, 25, 100];
     userId: any;
+      @Input() activeTab: any;
     userName: any;
     formData: any = {};
     @ViewChild('closeRemarkButton') closeRemarkButton: any;
@@ -30,6 +31,7 @@ export class ViewSuspendRequestAppNoComponent {
     ) {}
 
     ngOnInit(): void {
+        this.activeTab = this.activeTab;
         this.getReportList();
         const userDetailsString = sessionStorage.getItem('userDetails');
         if (userDetailsString) {
@@ -73,6 +75,7 @@ export class ViewSuspendRequestAppNoComponent {
     navigate(bcta_no: any) {
         const employeeDetail = {
             data: bcta_no,
+            activeTab:this.activeTab
         };
         this.service.setData(
             employeeDetail,
@@ -223,7 +226,7 @@ export class ViewSuspendRequestAppNoComponent {
                         this.isLoading = false;
                         this.formData.remarks = '';
                         this.closeRemarkButton.nativeElement.click();
-
+                        this.getReportList(this.searchQuery);
                         Swal.fire({
                             icon: 'success',
                             title: 'Success',

@@ -84,7 +84,6 @@ export class MandatoryEquipmentComponent {
         this.data = data; // update this.data safely
         this.WorkDetail = WorkDetail ?? {}; // ensure it's at least an object
         this.licenseStatus = this.data.licenseStatus || '';
-
         if (
             this.data.contractorNo && this.data.appNo &&
             this.data.applicationStatus !== 'Suspension Resubmission'
@@ -95,14 +94,56 @@ export class MandatoryEquipmentComponent {
         }
     }
 
+    // fetchDataBasedOnBctaNo() {
+    //     this.service
+    //         .getDatabasedOnBctaNos(this.data.contractorNo, this.data.appNo)
+    //         .subscribe((res: any) => {
+    //             this.tableData = res.vehicles;
+    //         });
+    // }
+
     fetchDataBasedOnBctaNo() {
-        this.service
-            .getDatabasedOnBctaNos(this.data.contractorNo, this.data.appNo)
-            .subscribe((res: any) => {
-                this.tableData = res.vehicles;
-                console.log('contractor equipment', this.formData);
-            });
+  this.service.getDatabasedOnBctaNos(this.data.contractorNo, this.data.appNo).subscribe(
+    (res1: any) => {
+    this.tableData = res1.vehicles;
+      // Prepare payload for second API call
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.data.contractorNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.data.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+
+      // Second API: fetchDetails
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+            // Map review/remark fields
+            this.tData.fulfillsRequirement = this.formData.eqfulfilled;
+            this.tData.finalRemarks = this.formData.eqremarks;
+
+            
+          }
+        },
+        (error) => {
+          console.error('Error fetching contractor details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching data:', error);
     }
+  );
+}
 
     fetchSuspendDataBasedOnBctaNo() {
         this.bctaNo = this.data.contractorNo;

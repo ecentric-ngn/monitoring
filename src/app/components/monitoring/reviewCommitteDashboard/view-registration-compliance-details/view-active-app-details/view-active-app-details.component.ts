@@ -1,7 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
 import { CommonService } from '../../../../../service/common.service';
-import { NzNotificationService } from 'ng-zorro-antd/notification';
-import Swal from 'sweetalert2';
 import { HttpErrorResponse, HttpResponse } from '@angular/common/http';
 import html2canvas from 'html2canvas';
 import jsPDF from 'jspdf';
@@ -22,18 +20,27 @@ bctaNo: string = '';
   pageSize: any;
   formData: any={};
   showErrorMessage: any;
+  activeTab: any={};
 constructor(private service: CommonService) {}
-
-
 
 ngOnInit() {
  const WorkDetail = this.service.getData('BctaNo');
     this.WorkDetail = WorkDetail.data;
-    console.log('WorkDetail', WorkDetail);
+      this.activeTab= WorkDetail.activeTab;
     if(this.WorkDetail.bctaNo){
       
       this.getAppDetailsByBcNo();
     }
+}
+goBack() {
+  const employeeDetail = {
+      activeTab:this.activeTab
+  };
+  this.service.setData(
+      employeeDetail,
+      'BctaNo',
+      'viewRegComplianceDetails'
+  );
 }
 
 getAppDetailsByBcNo() {

@@ -136,7 +136,7 @@ export class CommittedEquipmentComponent {
         } else if (this.inspectionType === 'PRIVATE') {
             this.getPrivateEqLists();
         } else if (this.inspectionType === 'OTHERS') {
-            this.getOtherWorkEqLists();
+            // this.getOtherWorkEqLists();
         }
     }
 
