@@ -202,33 +202,57 @@ onFileChanged(event: any) {
 reInstateSuspendedCertifiedVuilder() {
   if (this.formData.Date) {
     const selectedDate = new Date(this.formData.Date);
-    // Attach the current time to the selected date
-    selectedDate.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds());
-    this.formData.Date = selectedDate.toISOString(); // Format as 'YYYY-MM-DDTHH:MM:SS.000Z'
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
   }
-    const suspendRevoke = {
-      type: this.formData.Type,
-      revokedDate: this.formData.Date,
-      revokedDetails: this.formData.Details,
-      revokedBy:this.uuid,
-      certifiedBuilderNo: this.selectedcertifiedBuilderNo,
-      fileId:this.fileId
-    };
-    this.service.saveSuspendReregister(suspendRevoke).subscribe((response: any) => {
-      setTimeout(() => {
-      this.closeButton.nativeElement.click();
-      this.showCancelMessage();
-      // Show the success message after the modal is closed
-      setTimeout(() => {
-          this.getSuspendedList()
-      }, 1000);
-      },);
-  },
-  (error: any) => {
-      this.errorMessage = error.error.error;
-  }
-  );
-  }
+
+  const suspendRevoke = {
+    type: this.formData.Type,
+    revokedDate: this.formData.Date,
+    revokedDetails: this.formData.Details,
+    revokedBy: this.uuid,
+    certifiedBuilderNo: this.selectedcertifiedBuilderNo,
+    fileId: this.fileId
+  };
+
+  const reinstatedDetail = {
+    firmType: 'Certified-builder',
+    cdbNos: this.selectedcertifiedBuilderNo
+  };
+
+  this.service.saveSuspendReregister(suspendRevoke).subscribe({
+    next: () => {
+      this.service.approveReinstatementIng2cSystem(reinstatedDetail).subscribe({
+        next: () => {
+          setTimeout(() => {
+            this.closeButton.nativeElement.click();
+            this.showCancelMessage();
+            setTimeout(() => {
+              this.getSuspendedList();
+            }, 1000);
+          });
+        },
+        error: (g2cError) => {
+          console.error('G2C approval failed:', g2cError);
+          setTimeout(() => {
+            this.closeButton.nativeElement.click();
+            this.showCancelMessage();
+            setTimeout(() => {
+              this.getSuspendedList();
+            }, 1000);
+          });
+        }
+      });
+    },
+    error: (error) => {
+      this.errorMessage = error.error?.error || 'Local reinstatement failed';
+    }
+  });
+}
+
   showCancelMessage() {
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Certified Builder reinstated successfully' });
   }

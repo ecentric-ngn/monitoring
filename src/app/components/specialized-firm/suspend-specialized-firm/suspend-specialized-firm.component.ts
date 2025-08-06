@@ -223,7 +223,6 @@ ReinstateSuspendedSpecializedFirm() {
         cdbNos: this.selectedspecializedFirmNo,
         firmType: 'specialized-firm' // or use this.formData.Type if dynamic
       };
-
       this.service.approveReinstatementIng2cSystem(approvePayload).subscribe({
         next: () => {
           this.closeButton.nativeElement.click();

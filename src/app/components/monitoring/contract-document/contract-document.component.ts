@@ -41,7 +41,6 @@ export class ContractDocumentComponent {
     ) {}
 
     ngOnInit() {
-        console.log('contractDoc');
         const userDetailsString = sessionStorage.getItem('userDetails');
         if (userDetailsString) {
             const userDetails = JSON.parse(userDetailsString);
