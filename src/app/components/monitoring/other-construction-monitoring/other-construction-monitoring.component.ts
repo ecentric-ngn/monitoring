@@ -14,7 +14,7 @@ export class OtherConstructionMonitoringComponent {
     displayMessage: string;
     dzongkhagList: any;
     tableData: any;
-   @ViewChild('closeModal', { static: false }) closeModal: ElementRef;
+    @ViewChild('closeModal', { static: false }) closeModal: ElementRef;
     constructor(private router: Router, private service: CommonService) {}
 
     ngOnInit() {
@@ -26,46 +26,51 @@ export class OtherConstructionMonitoringComponent {
     }
 
     navigateToEdit(data: any) {
-        const workDetail = { data: data.work_information_id, checklistid: data.id, workType: this.workType,otherWorkType:data.workType };
+        const workDetail = {
+            data: data.work_information_id,
+            checklistid: data.id,
+            workType: this.workType,
+            otherWorkType: data.workType,
+        };
         this.service.setData(workDetail, 'BctaNo', 'monitoring/WorkDetail');
     }
-pageNo:number = 1;
-pageSize:number = 10;
-   fetchOtherConstructionDetails(searchQuery?: string) {
-    const payload: any[] = [];
-    // Add search condition if searchQuery is provided
-    if (searchQuery) {
-        payload.push(
-            {
-            field: 'contractorNo',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
-        },
-         {
-            field: 'applicationStatus',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
-        },
-    );
+    pageNo: number = 1;
+    pageSize: number = 10;
+    fetchOtherConstructionDetails(searchQuery?: string) {
+        const payload: any[] = [];
+        // Add search condition if searchQuery is provided
+        if (searchQuery) {
+            payload.push(
+                {
+                    field: 'contractorNo',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                },
+                {
+                    field: 'applicationStatus',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                }
+            );
+        }
+        this.service
+            .fetchDetails(
+                payload,
+                this.pageNo,
+                this.pageSize,
+                't_otherconstruction_view'
+            )
+            .subscribe(
+                (response: any) => {
+                    this.tableData = response.data;
+                },
+                (error) => {
+                    console.error('Error fetching contractor details:', error);
+                }
+            );
     }
-    this.service
-        .fetchDetails(
-            payload,
-            this.pageNo,
-            this.pageSize,
-            't_otherconstruction_view'
-        )
-        .subscribe(
-            (response: any) => {
-                this.tableData = response.data;
-            },
-            (error) => {
-                console.error('Error fetching contractor details:', error);
-            }
-        );
-}
 
     searchBasedOnBCTANo() {
         const contractor = {
@@ -98,8 +103,8 @@ pageSize:number = 10;
     clearErrorMessage() {
         this.displayMessage = '';
     }
+    clientDetails: any = {};
     saveCrpsDetails(form: NgForm) {
-        
         if (form.invalid) {
             Object.keys(form.controls).forEach((field) => {
                 const control = form.controls[field];
@@ -112,19 +117,20 @@ pageSize:number = 10;
             ownerName: this.formData.ownerDetails,
             specializedFirmName: this.formData.nameOfFirm,
             specializedClass: this.formData.workClassification,
-            address: this.formData.establishmentAddress ,
+            address: this.formData.establishmentAddress,
             mobileNumber: this.formData.mobileNo,
             email: this.formData.email,
-            clientOwnerName: this.formData.ClientOwnerName,
-            clientAddress: this.formData.clientCurrentAddress,
-            clientMobileNumber: this.formData.clientMobileNo,
-            clientEmail: this.formData.clientEmailAddress,
-
+            clientOwnerName: this.clientDetails.ClientOwnerName,
+            clientAddress: this.clientDetails.clientCurrentAddress,
+            clientMobileNumber: this.clientDetails.clientMobileNo,
+            clientEmail: this.clientDetails.clientEmailAddress,
         };
-        this.service.saveNewContractorInformationData(contractorDetails).subscribe(
+        this.service
+            .saveNewContractorInformationData(contractorDetails)
+            .subscribe(
                 (response: any) => {
                     // Success handler
-                     this.closeModal.nativeElement.click() 
+                    this.closeModal.nativeElement.click();
                     const idMatch = response.match(/\d+/); // extract digits from string
                     this.newContractorId = idMatch
                         ? parseInt(idMatch[0], 10)
@@ -141,7 +147,7 @@ pageSize:number = 10;
                         'BctaNo',
                         'monitoring/WorkDetail'
                     );
-                 },
+                },
                 (error: any) => {
                     console.error('Error saving work information', error);
                     // Optionally show error toast or message

@@ -27,9 +27,9 @@ formData: any = {};
 
   ngOnInit() {
     this.data = this.data
-       this.applicationStatus = this.data.applicationStatus;
+    this.applicationStatus = this.data.applicationStatus;
     this.username = this.authService.getUsername() || 'NA';
-        const WorkDetail = this.service.getData('BctaNo');
+    const WorkDetail = this.service.getData('BctaNo');
    this.applicationStatus = WorkDetail.data.applicationStatus
     this.service.bctaNo$.subscribe(bctaNo => {
         this.bctaNo = bctaNo;

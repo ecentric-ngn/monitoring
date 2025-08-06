@@ -1,4 +1,4 @@
-import { Component, ViewChild } from '@angular/core';
+import { Component, Input, ViewChild } from '@angular/core';
 import { CommonService } from '../../../../../service/common.service';
 import { NzNotificationService } from 'ng-zorro-antd/notification';
 import Swal from 'sweetalert2';
@@ -21,6 +21,7 @@ filteredApplications: any[] = [];
   tableData: any;
   pageNo: number;
   userId: any;
+    @Input() activeTab: any;
     @ViewChild('closeRemarkButton') closeRemarkButton: any;
   userName: any;
   formData: any={};
@@ -140,6 +141,7 @@ onCheckboxChange(changedAction: any): void {
 navigate(bcta_no: any,) {
   const employeeDetail = {
       data: bcta_no,
+       activeTab:this.activeTab
   };
   this.service.setData(
       employeeDetail,

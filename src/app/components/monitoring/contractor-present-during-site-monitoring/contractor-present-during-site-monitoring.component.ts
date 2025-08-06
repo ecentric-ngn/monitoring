@@ -50,9 +50,11 @@ export class ContractorPresentDuringSiteMonitoringComponent {
 
     ngOnInit() {
         this.inspectionType = this.inspectionType;
+        console.log('inspectionType',this.inspectionType);
         this.tableId = this.tableId;
         this.data = this.data;
         this.appNoStatus = this.data.applicationStatus;
+        
         this.prevTableId = this.prevTableId;
         if (this.appNoStatus === 'REJECTED') {
             this.prevTableId = this.tableId;
@@ -103,9 +105,7 @@ export class ContractorPresentDuringSiteMonitoringComponent {
 }
 
     isLoading = false;
-  get isSaveNextEnabled(): boolean {
-  return (this.appNoStatus === 'REJECTED' || this.isOtpValid) || this.inspectionType === 'OTHERS';
-}
+
 
 
 otpSent = false;
@@ -195,17 +195,17 @@ getCidDetails(formData): void {
     notFound: '',
     server: ''
   };
-
-  this.service.getBaseOnEid(formData.cidNo).subscribe(
+  this.service.getCitizenDetails(formData.cidNo).subscribe(
     (response: any) => {
-      if (response?.employeedetails?.employeedetail?.length) {
-        const employeeDetail = response.employeedetails.employeedetail[0];
-        const name = `${employeeDetail.firstName} ${employeeDetail.middleName} ${employeeDetail.lastName}`;
+      const citizenList = response?.citizenDetailsResponse?.citizenDetail;
+      if (citizenList?.length) {
+        const citizen = citizenList[0];
+        const name = [citizen.firstName, citizen.middleName, citizen.lastName]
+          .filter(part => part)
+          .join(' ');
         formData.fullName = name;
-        formData.mobileNo = employeeDetail.MobileNo;
-        formData.email = employeeDetail.Email;
       } else {
-        formData.errorMessages.notFound = 'Not Registered in RCSC';
+        formData.errorMessages.notFound = 'CID not found';
       }
       this.isLoading = false;
     },
@@ -218,6 +218,7 @@ getCidDetails(formData): void {
     }
   );
 }
+
 saveAndNext(form: NgForm): void {
   // Skip validation if inspectionType is 'OTHERS'
   if (this.inspectionType !== 'OTHERS' && form.invalid) {

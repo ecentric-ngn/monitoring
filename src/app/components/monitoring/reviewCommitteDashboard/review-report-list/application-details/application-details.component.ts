@@ -26,6 +26,7 @@ export class ApplicationDetailsComponent {
     appNoStatus: any;
     dzongkhagName: any;
     awardedBctaNo: any;
+    inspectionType: any;
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
@@ -56,6 +57,8 @@ export class ApplicationDetailsComponent {
         }
         const data = this.service.getData('applicationNumber');
         this.data = data;
+        this.inspectionType = this.data.inspection_type;
+        debugger
         this.appNoStatus = data.applicationStatus;
         this.checklistId = data.checklist_id;
         if(this.checklistId){
@@ -67,6 +70,7 @@ export class ApplicationDetailsComponent {
             this.getSiteMonitoringTeamList();
             this.getCommitedEquipmentList();
             this.getSkilledWorkerList();
+            this.getclientList();
         }
     }
     gethumanResourceList() {
@@ -87,7 +91,25 @@ export class ApplicationDetailsComponent {
                 }
             );
     }
-
+  getclientList() {
+        const payload: any = [
+            {
+                field: 'checklist_id',
+                value:this.checklistId,
+                operator: 'AND',
+                condition: '=',
+            },
+        ];
+        this.service.fetchDetails(payload, 1, 100, 'work_with_contractor_view').subscribe(
+                (response: any) => {
+                    this.formData = response.data[0];
+                    
+                },
+                (error) => {
+                    console.error('Error fetching contractor details:', error);
+                }
+            );
+    }
     getReinforcementList() {
         const payload: any = [
             {

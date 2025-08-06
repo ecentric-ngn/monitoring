@@ -424,9 +424,9 @@ saveSiteEngineerData(payload: any, tableId: any, workId: any) {
     return this.http.get(`${web_service_url}/getCitizenDetails/${cid}`);
   }
 
-  getBaseOnEid(eidnumber: number): Observable<any> {
-    return this.http.get(`${web_service_url}/getEmployeeDetails/${eidnumber}`)
-  }
+  // getBaseOnEid(eidnumber: number): Observable<any> {
+  //   return this.http.get(`${web_service_url}/getEmployeeDetails/${eidnumber}`)
+  // }
 
 
   fetchComplianceData() {

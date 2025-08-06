@@ -153,11 +153,6 @@
           [disabled]="applicationStatus !== 'Resubmitted OS and PFS' || (formData.filingReview !== 'No' && formData.signboardReview !== 'No')">
           Action
         </button>
-
-
-
-
-
         <!-- Reinstate Button -->
         <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reject the application?'"
           (nzOnConfirm)="rejectApplication(bctaNo)" *ngIf="applicationStatus === 'Suspension Resubmission'">

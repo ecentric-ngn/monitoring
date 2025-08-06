@@ -47,11 +47,9 @@ export class CbOfficeSignageComponent {
     ngOnInit() {
         const WorkDetail = this.service.getData('BctaNo');
         if (!WorkDetail || !WorkDetail.data) {
-            console.error('WorkDetail or WorkDetail.data is undefined');
             return;
         }
         this.date();
-
         this.formData.firmType = WorkDetail.data;
         this.data = WorkDetail.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
@@ -74,15 +72,62 @@ export class CbOfficeSignageComponent {
         const dd = String(today.getDate()).padStart(2, '0');
         this.selectedAction = this.selectedAction || {};
         this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
-
-        console.log('Action Date set to:', this.selectedAction.actionDate);
     }
 
-    fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNos(this.bctaNo,this.data.appNo).subscribe((res: any) => {
-            Object.assign(this.formData, res.complianceEntities[0]);
-        });
+    // fetchDataBasedOnBctaNo() {
+    //     this.service.getDatabasedOnBctaNos(this.bctaNo,this.data.appNo).subscribe((res: any) => {
+    //         Object.assign(this.formData, res.complianceEntities[0]);
+    //     });
+    // }
+
+fetchDataBasedOnBctaNo() {
+  console.log('BCTA No:', this.bctaNo, 'App No:', this.data.appNo);
+
+  this.service.getDatabasedOnBctaNos(this.bctaNo, this.data.appNo).subscribe(
+    (res1: any) => {
+      if (res1?.complianceEntities?.length) {
+        Object.assign(this.formData, res1.complianceEntities[0]);
+      }
+
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.data.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = {
+              ...this.formData,
+              ...res2.data[0]
+            };
+
+            this.formData.signboardReview = this.formData.os_review || '';
+            this.formData.filingReview = this.formData.fsreview || '';
+            this.formData.ohsReview = this.formData.ohsreview || '';
+            this.formData.generalRemarks = this.formData.ohsRemarks || '';
+          }
+        },
+        (error) => {
+          console.error('Error fetching contractor details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching data:', error);
     }
+  );
+}
     rejectApplication() {
         this.service
             .rejectApplication(

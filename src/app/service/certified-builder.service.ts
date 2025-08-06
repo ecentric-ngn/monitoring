@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs'; // Import Observable
-import { api_url, fileUpload_api, web_service_url } from '../app.const/const';
+import { api_url, fileUpload_api, g2c_url, web_service_url } from '../app.const/const';
 
 @Injectable({
   providedIn: 'root'
@@ -52,9 +52,31 @@ saveDeregisterdetails( certifiedBuilder:any){
 saveSuspendDetails(suspendDetail:any){
   return this.http.post<any>(`${api_url}/certifiedBuilderSuspend`,suspendDetail);
 }
+ /**
+   * Suspends a contractor from the G2C system.
+   *
+   * @param suspendDetail The details of the contractor to be suspended.
+   * @returns A promise that resolves to a string if the suspension is successful.
+   */
+  suspendedIng2cSystem(suspendDetail: any) {
+    return this.http.post(`${g2c_url}/compliance/suspend`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
 //save cancelled
 saveCancelledDetails(cancelledDetail:any){
   return this.http.post<any>(`${api_url}/certifiedBuilderCancel`,cancelledDetail);
+}
+  cancelledIng2cSystem(suspendDetail: any) {
+    return this.http.post(`${g2c_url}/compliance/cancel`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
+  
+  approveReinstatementIng2cSystem(payload: any) {
+  return this.http.post(`${g2c_url}/compliance/approved`, payload, {
+    responseType: 'text' as 'text'
+  });
 }
 //reregister deregister certified builder
 saveReregisterdetails(reRegisterDetail:any){

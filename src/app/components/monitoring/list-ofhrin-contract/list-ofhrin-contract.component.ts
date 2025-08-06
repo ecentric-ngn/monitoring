@@ -86,7 +86,9 @@ export class ListOFHRinContractComponent {
         this.getdeginationList();
         this.getQualificationList();
     }
-
+removeEntry(index: number) {
+  this.entryList.splice(index, 1);
+}
     getDatabasedOnChecklistId() {
         const payload: any = [
             {
@@ -169,7 +171,7 @@ export class ListOFHRinContractComponent {
                 this.getPrivateHrLists();
                 break;
             case 'OTHERS':
-                this.getHrListsFromCRPS();
+                // this.getHrListsFromCRPS();
                 break;
             default:
                 console.warn('Unknown inspection type:', this.inspectionType);
@@ -617,6 +619,7 @@ export class ListOFHRinContractComponent {
             const finalPayload = {
                 humanResources: this.entryList,
                 id: this.tableId,
+                workID:this.workId
             };
             this.sendPayload(finalPayload);
             return;
@@ -679,12 +682,14 @@ export class ListOFHRinContractComponent {
         const finalPayload = {
             humanResources: this.savedData,
             id: this.tableId,
-            workID: this.workId,
+            workID:this.workId,
         };
-
+console.log('finalPayload',finalPayload);
         this.sendPayload(finalPayload);
     }
+    
     private sendPayload(finalPayload: any) {
+        
         this.service.saveAsDraft(finalPayload).subscribe({
             next: (response: any) => {
                 if (this.tableId) {

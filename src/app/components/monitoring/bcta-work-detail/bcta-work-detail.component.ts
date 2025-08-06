@@ -885,7 +885,7 @@ SavedWorkProgressData(event: { tableId: any, data: any, inspectionType: any }) {
 SavedQualificationData(event: { tableId: any, data: any, inspectionType: any }) {
   this.moveToStep(4);
   this.workId = this.workId 
-  debugger
+  
   this.highestCompletedStep = Math.max(this.highestCompletedStep, 4);
   this.tableId = event.tableId;
   this.data = event.data;

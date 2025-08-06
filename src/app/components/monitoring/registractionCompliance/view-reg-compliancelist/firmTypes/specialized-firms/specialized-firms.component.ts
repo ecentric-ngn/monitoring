@@ -10,10 +10,9 @@ import { AuthServiceService } from '../../../../../../auth.service';
 @Component({
     selector: 'app-specialized-firms',
     templateUrl: './specialized-firms.component.html',
-    styleUrls: ['./specialized-firms.component.scss']
+    styleUrls: ['./specialized-firms.component.scss'],
 })
 export class SpecializedFirmsComponent {
-
     filteredData: any[] = [];
     displayedData: any[] = [];
     currentPage: number = 1;
@@ -31,7 +30,7 @@ export class SpecializedFirmsComponent {
         remarks: '',
         newClassification: '',
         specializedFirmId: '',
-        specializedFirmNo: ''
+        specializedFirmNo: '',
     };
 
     downgradeList: any[] = [];
@@ -42,10 +41,29 @@ export class SpecializedFirmsComponent {
     reinstateModal: any = null;
     username: string = '';
 
-    Dzongkhags = ['Shrek', 'Thimphu', 'Paro', 'Wangdue', 'Punakha', 'Trashigang',
-        'Trashiyangtse', 'Bumthang', 'Gasa', 'Haa', 'Lhuentse',
-        'Mongar', 'Pemagatshel', 'Samdrup Jongkhar', 'Samtse', 'Sarpang',
-        'Zhemgang', 'Chhukha', 'Dagana', 'Tsirang', 'Trongsa'];
+    Dzongkhags = [
+        'Shrek',
+        'Thimphu',
+        'Paro',
+        'Wangdue',
+        'Punakha',
+        'Trashigang',
+        'Trashiyangtse',
+        'Bumthang',
+        'Gasa',
+        'Haa',
+        'Lhuentse',
+        'Mongar',
+        'Pemagatshel',
+        'Samdrup Jongkhar',
+        'Samtse',
+        'Sarpang',
+        'Zhemgang',
+        'Chhukha',
+        'Dagana',
+        'Tsirang',
+        'Trongsa',
+    ];
 
     today: string = new Date().toISOString().substring(0, 10);
     total_records: any;
@@ -57,7 +75,7 @@ export class SpecializedFirmsComponent {
         private notification: NzNotificationService,
         private router: Router,
         private authService: AuthServiceService
-    ) { }
+    ) {}
 
     searchTerm: string = '';
     statusFilter: string = 'All';
@@ -78,7 +96,7 @@ export class SpecializedFirmsComponent {
                 this.showSuccessNotification();
                 this.fetchComplianceDetails();
             },
-            error: (error) => this.handleError(error)
+            error: (error) => this.handleError(error),
         });
     }
 
@@ -92,7 +110,7 @@ export class SpecializedFirmsComponent {
                 modalEl.style.display = 'none';
                 document.body.classList.remove('modal-open');
                 const backdrops = document.querySelectorAll('.modal-backdrop');
-                backdrops.forEach(el => el.remove());
+                backdrops.forEach((el) => el.remove());
             }
         }
     }
@@ -112,11 +130,13 @@ export class SpecializedFirmsComponent {
                 // Cleanup before closing
                 document.body.classList.remove('swal2-shown');
                 document.body.style.overflow = '';
-            }
+            },
         }).then(() => {
             // Force cleanup
-            const backdrops = document.querySelectorAll('.swal2-backdrop, .modal-backdrop');
-            backdrops.forEach(el => el.remove());
+            const backdrops = document.querySelectorAll(
+                '.swal2-backdrop, .modal-backdrop'
+            );
+            backdrops.forEach((el) => el.remove());
             document.body.classList.remove('modal-open', 'swal2-no-backdrop');
             document.body.style.paddingRight = '';
         });
@@ -131,7 +151,7 @@ export class SpecializedFirmsComponent {
             title: 'Error!',
             text: 'Failed to send mass email. Please try again.',
             icon: 'error',
-            confirmButtonText: 'OK'
+            confirmButtonText: 'OK',
         });
     }
 
@@ -166,54 +186,56 @@ export class SpecializedFirmsComponent {
                 break;
         }
     }
-pageNo: number = 1;
+    pageNo: number = 1;
     pageSize: number = 10;
-     fetchComplianceDetails(searchQuery?: string) {
-    const payload: any[] = [];
+    fetchComplianceDetails(searchQuery?: string) {
+        const payload: any[] = [];
 
-    // Add search condition if searchQuery is provided
-    if (searchQuery) {
-        payload.push(
-            {
-            field: 'specializedFirmNo',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
-        },
-         {
-            field: 'applicationStatus',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
-        },
-         {
-            field: 'applicationStatus',
-            value: `%${searchQuery}%`,
-            condition: 'LIKE',
-            operator: 'AND'
+        // Add search condition if searchQuery is provided
+        if (searchQuery) {
+            payload.push(
+                {
+                    field: 'specializedFirmNo',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                },
+                {
+                    field: 'applicationStatus',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                },
+                {
+                    field: 'applicationStatus',
+                    value: `%${searchQuery}%`,
+                    condition: 'LIKE',
+                    operator: 'AND',
+                }
+            );
         }
-    );
-    }
 
-    this.service
-        .fetchDetails(
-            payload,
-            this.pageNo,
-            this.pageSize,
-            'emailed_specialized_firm_view'
-        )
-        .subscribe(
-            (response: any) => {
-                this.tableData = response.data;
-                this.total_records = response.totalCount;
-                this.totalPages = Math.ceil(this.total_records / this.pageSize);
-                this.totalCount = response.totalCount;
-            },
-            (error) => {
-                console.error('Error fetching contractor details:', error);
-            }
-        );
-}
+        this.service
+            .fetchDetails(
+                payload,
+                this.pageNo,
+                this.pageSize,
+                'emailed_specialized_firm_view'
+            )
+            .subscribe(
+                (response: any) => {
+                    this.tableData = response.data;
+                    this.total_records = response.totalCount;
+                    this.totalPages = Math.ceil(
+                        this.total_records / this.pageSize
+                    );
+                    this.totalCount = response.totalCount;
+                },
+                (error) => {
+                    console.error('Error fetching contractor details:', error);
+                }
+            );
+    }
 
     setLimitValue(value: any) {
         this.pageSize = parseInt(value);
@@ -311,7 +333,7 @@ pageNo: number = 1;
         return pageArray;
     }
 
-     Searchfilter() {
+    Searchfilter() {
         if (this.searchQuery && this.searchQuery.trim() !== '') {
             this.fetchComplianceDetails(this.searchQuery);
         } else {
@@ -328,9 +350,15 @@ pageNo: number = 1;
     // In your component class
     navigate(data: any) {
         // Only proceed if status is "Submitted"
-        if (data.applicationStatus === 'Submitted' || data.applicationStatus === 'Resubmitted PFS' 
-            || data.applicationStatus === 'Resubmitted OS and PFS' || data.applicationStatus === 'Resubmitted OS'
-            || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Resubmitted EQ' || data.applicationStatus === 'Suspension Resubmission') {
+        if (
+            data.applicationStatus === 'Submitted' ||
+            data.applicationStatus === 'Resubmitted PFS' ||
+            data.applicationStatus === 'Resubmitted OS and PFS' ||
+            data.applicationStatus === 'Resubmitted OS' ||
+            data.applicationStatus === 'Resubmitted HR' ||
+            data.applicationStatus === 'Resubmitted EQ' ||
+            data.applicationStatus === 'Suspension Resubmission'
+        ) {
             const workId = data.specializedFirmNo;
             this.prepareAndNavigate(data, workId);
         }
@@ -339,16 +367,12 @@ pageNo: number = 1;
     private prepareAndNavigate(data: any, workId: string) {
         const workDetail = {
             data: data,
-            firmType: this.firmType
+            firmType: this.firmType,
         };
 
         console.log('Navigation payload:', workDetail);
 
-        this.service.setData(
-            workDetail,
-            'BctaNo',
-            'monitoring/sf-info'
-        );
+        this.service.setData(workDetail, 'BctaNo', 'monitoring/sf-info');
     }
 
     onCheckboxChange(event: Event, id: string) {
@@ -360,7 +384,9 @@ pageNo: number = 1;
                 this.selectedIds.push(numericId);
             }
         } else {
-            this.selectedIds = this.selectedIds.filter(item => item !== numericId);
+            this.selectedIds = this.selectedIds.filter(
+                (item) => item !== numericId
+            );
         }
 
         console.log('Selected IDs (as numbers):', this.selectedIds);
@@ -371,19 +397,27 @@ pageNo: number = 1;
             Swal.fire('Warning', 'No items selected', 'warning');
             return;
         }
-        const payload = this.selectedIds
+        const payload = this.selectedIds;
         this.service.forwardToReviewCommiteeSF(payload).subscribe(
             (res) => {
-                this.tableData = res
-                console.log('Successfully sent selected IDs:',  this.tableData);
+                this.tableData = res;
+                console.log('Successfully sent selected IDs:', this.tableData);
                 console.log('Successfully sent selected IDs:', res);
-                Swal.fire('Success', 'Selected contractors submitted successfully', 'success');
-                 this.fetchComplianceDetails()
+                Swal.fire(
+                    'Success',
+                    'Selected contractors submitted successfully',
+                    'success'
+                );
+                this.fetchComplianceDetails();
             },
-           
+
             (error) => {
-                 console.log('Successfully sent selected IDs:',  this.tableData);
-                Swal.fire('error', 'Something went wrong while forwarding', 'error');
+                console.log('Successfully sent selected IDs:', this.tableData);
+                Swal.fire(
+                    'error',
+                    'Something went wrong while forwarding',
+                    'error'
+                );
             }
         );
     }
@@ -394,14 +428,14 @@ pageNo: number = 1;
             actionDate: this.today,
             remarks: '',
             newClassification: '',
-            target: row // attach row data if needed
+            target: row, // attach row data if needed
         };
         console.log('Row passed to modal:', row);
 
         const modalEl = document.getElementById('actionModal');
         this.bsModal = new bootstrap.Modal(modalEl, {
             backdrop: 'static', // Optional: prevents closing on outside click
-            keyboard: false     // Optional: disables ESC key closing
+            keyboard: false, // Optional: disables ESC key closing
         });
         this.bsModal.show();
     }
@@ -418,7 +452,10 @@ pageNo: number = 1;
 
             forkJoin({
                 categoryData: this.service.getWorkCategory('specializedfirm'),
-                existingClassData: this.service.getClassification(firmType, firmId)
+                existingClassData: this.service.getClassification(
+                    firmType,
+                    firmId
+                ),
             }).subscribe({
                 next: ({ categoryData, existingClassData }) => {
                     const workCategories = categoryData.workCategory;
@@ -426,20 +463,27 @@ pageNo: number = 1;
                     // Only pre-check categories with a non-null specializedFirmWorkCategoryId
                     const preCheckedSet = new Set(
                         (existingClassData || [])
-                            .filter((item: any) => item.specializedFirmWorkCategoryId)
+                            .filter(
+                                (item: any) =>
+                                    item.specializedFirmWorkCategoryId
+                            )
                             .map((item: any) => item.workCategory)
                     );
 
-                    this.downgradeList = workCategories.map((category: any) => ({
-                        workCategory: category.workCategory,
-                        workCategoryId: category.id,
-                        checked: preCheckedSet.has(category.workCategory),
-                        preChecked: preCheckedSet.has(category.workCategory)
-                    }));
+                    this.downgradeList = workCategories.map(
+                        (category: any) => ({
+                            workCategory: category.workCategory,
+                            workCategoryId: category.id,
+                            checked: preCheckedSet.has(category.workCategory),
+                            preChecked: preCheckedSet.has(
+                                category.workCategory
+                            ),
+                        })
+                    );
                 },
                 error: (err) => {
                     console.error('Error fetching downgrade data:', err);
-                }
+                },
             });
         } else {
             this.downgradeList = [];
@@ -457,68 +501,99 @@ pageNo: number = 1;
     }
 
     submitAction() {
-        if (!this.selectedAction.actionType || !this.selectedAction.actionDate || !this.selectedAction.remarks) {
-            alert("All required fields must be filled.");
+        if (
+            !this.selectedAction.actionType ||
+            !this.selectedAction.actionDate ||
+            !this.selectedAction.remarks
+        ) {
+            alert('All required fields must be filled.');
             return;
         }
-
         if (this.selectedAction.actionType === 'downgrade') {
             // Collect all unchecked, previously pre-checked categories
             const downgradeEntries = this.downgradeList
-                .filter(entry => entry.preChecked && !entry.checked)
-                .map(entry => ({
-                    workCategoryId: entry.workCategoryId
+                .filter((entry) => entry.preChecked && !entry.checked)
+                .map((entry) => ({
+                    workCategoryId: entry.workCategoryId,
                 }));
 
             if (downgradeEntries.length === 0) {
-                Swal.fire('Error', 'Please uncheck at least one existing category to downgrade.', 'error');
+                Swal.fire(
+                    'Error',
+                    'Please uncheck at least one existing category to downgrade.',
+                    'error'
+                );
                 return;
             }
 
             const payload = {
-                specializedFirmId: this.selectedAction.target?.specializedFirmId,
+                specializedFirmId:
+                    this.selectedAction.target?.specializedFirmId,
                 requestedBy: this.authService.getUsername(), // Replace with actual user/requestor if needed
                 downgradeEntries,
-                applicationID:this.selectedAction.target?.appNo,
+                applicationID: this.selectedAction.target?.appNo,
             };
 
             this.service.downgradeSF(payload).subscribe({
                 next: (res: string) => {
-                    if (res && res.toLowerCase().includes('downgrade request submitted')) {
-                        Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                    if (
+                        res &&
+                        res
+                            .toLowerCase()
+                            .includes('downgrade request submitted')
+                    ) {
+                        Swal.fire(
+                            'Success',
+                            'Forwarded to Review Committee',
+                            'success'
+                        );
                         this.closeModal();
                         this.fetchComplianceDetails();
                     } else {
-                        Swal.fire('Error', res || 'Something went wrong while forwarding.', 'error');
+                        Swal.fire(
+                            'Error',
+                            res || 'Something went wrong while forwarding.',
+                            'error'
+                        );
                         this.closeModal();
-                         this.fetchComplianceDetails();
+                        this.fetchComplianceDetails();
                     }
-
+                    this.fetchComplianceDetails();
                 },
                 error: (err) => {
-                    Swal.fire('Error', 'Something went wrong while forwarding.', 'error');
+                    Swal.fire(
+                        'Error',
+                        'Something went wrong while forwarding.',
+                        'error'
+                    );
                     console.error(err);
                     this.closeModal();
-                }
+                },
             });
         } else if (this.selectedAction.actionType === 'cancel') {
             const payload = {
                 firmNo: this.selectedAction.target?.specializedFirmNo,
                 cancelledBy: this.authService.getUsername(),
-                cancelledOn: new Date(this.selectedAction.actionDate).toISOString(),
-                firmType: "specialized-firm",
+                cancelledOn: new Date(
+                    this.selectedAction.actionDate
+                ).toISOString(),
+                firmType: 'specialized-firm',
                 reason: this.selectedAction.remarks,
-                applicationID:this.selectedAction.target?.appNo,
+                applicationID: this.selectedAction.target?.appNo,
             };
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
                 next: (res) => {
-                    Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                    Swal.fire(
+                        'Success',
+                        'Forwarded to Review Committee',
+                        'success'
+                    );
                     this.closeModal();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to cancel firm', 'error');
-                }
+                },
             });
         } else if (this.selectedAction.actionType === 'suspend') {
             const payload = {
@@ -527,19 +602,23 @@ pageNo: number = 1;
                 suspensionDate: this.selectedAction.actionDate
                     ? new Date(this.selectedAction.actionDate).toISOString()
                     : null,
-                firmType: "specialized-firm",
+                firmType: 'specialized-firm',
                 suspendDetails: this.selectedAction.remarks,
-                applicationID:this.selectedAction.target?.appNo,
+                applicationID: this.selectedAction.target?.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({
                 next: (res) => {
-                    Swal.fire('Success', 'Forwarded to Review Committee', 'success');
+                    Swal.fire(
+                        'Success',
+                        'Forwarded to Review Committee',
+                        'success'
+                    );
                     this.closeModal();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');
-                }
+                },
             });
         }
     }
@@ -553,25 +632,38 @@ pageNo: number = 1;
     reinstate(row: any) {
         const payload = {
             firmNo: row,
-            firmType: "specialized-firm",
-            licenseStatus: "Active"
+            firmType: 'specialized-firm',
+            licenseStatus: 'Active',
         };
 
         const approvePayload = {
-            firmType: "SpecializedFirm",
-            cdbNos: row
+            firmType: 'SpecializedFirm',
+            cdbNos: row,
         };
 
         forkJoin({
             reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload)
+            approve: this.service.approveReinstatement(approvePayload),
         }).subscribe({
             next: ({ reinstate, approve }) => {
-                if (reinstate && reinstate.toLowerCase().includes('license status updated to active')) {
-                    Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
+                if (
+                    reinstate &&
+                    reinstate
+                        .toLowerCase()
+                        .includes('license status updated to active')
+                ) {
+                    Swal.fire(
+                        'Success',
+                        'License Reinstated and Approved Successfully',
+                        'success'
+                    );
                     this.closeModal();
                 } else {
-                    Swal.fire('Warning', 'Unexpected response from server.', 'warning');
+                    Swal.fire(
+                        'Warning',
+                        'Unexpected response from server.',
+                        'warning'
+                    );
                 }
                 this.router.navigate(['/monitoring/special']);
                 this.closeModal();
@@ -579,8 +671,12 @@ pageNo: number = 1;
             error: (err) => {
                 console.error('Reinstatement error:', err);
                 this.closeModal();
-                Swal.fire('Success', 'License Reinstated and Approved Successfully', 'success');
-            }
+                Swal.fire(
+                    'Success',
+                    'License Reinstated and Approved Successfully',
+                    'success'
+                );
+            },
         });
     }
 }

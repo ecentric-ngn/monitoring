@@ -346,7 +346,7 @@
           <td class="text-center bg-white">{{ item.schmidt_hammer_test_result }}</td>
           <td class="text-center bg-white">{{ item.remarks }}</td>
           <td class="text-center bg-white">
-            <a [href]="item.file_path" *ngIf="item.file_path">
+            <a  *ngIf="item.file_path" (click)="viewFile(item.file_path)">
               <i class="pi pi-download"></i>
             </a>
           </td>
@@ -378,7 +378,7 @@
           <td class="text-center bg-white">{{ item.stirrup_spacing_design }}</td>
           <td class="text-center bg-white">{{ item.remarks }}</td>
           <td class="text-center bg-white">
-            <a [href]="item.file_path" *ngIf="item.file_path">
+            <a (click)="viewFile(item.file_path)" *ngIf="item.file_path">
               <i class="pi pi-download"></i>
             </a>
           </td>

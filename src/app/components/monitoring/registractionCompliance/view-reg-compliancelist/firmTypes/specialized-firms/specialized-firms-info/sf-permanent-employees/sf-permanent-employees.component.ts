@@ -123,12 +123,50 @@ export class SfPermanentEmployeesComponent {
      * Subscribes to the data service and assigns the response to tableData.
      * Logs any errors that occur to the console.
      */
-    fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNos(this.bctaNo,this.formData.firmType.appNo).subscribe((res: any) => {
-            this.tableData = res.hrCompliance;
-            console.log('sf employee', this.formData);
-        });
+    // fetchDataBasedOnBctaNo() {
+    //     this.service.getDatabasedOnBctaNos(this.bctaNo,this.formData.firmType.appNo).subscribe((res: any) => {
+    //         this.tableData = res.hrCompliance;
+    //         console.log('sf employee', this.formData);
+    //     });
+    // }
+
+  fetchDataBasedOnBctaNo() {
+     this.service.getDatabasedOnBctaNos(this.bctaNo,this.formData.firmType.appNo).subscribe(
+    (res1: any) => {
+     this.tableData = res1.hrCompliance;
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.formData.firmType.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+            this.tData.hrFulfilled =  this.formData.hrfulfilled;
+            this.tData.resubmitDate =  this.formData.resubmitDate;
+            this.tData.remarksNo =  this.formData.remarksNo;
+          }
+        },
+        (error) => {
+          console.error('Error fetching additional contractor details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching HR compliance data:', error);
     }
+  );
+}
     rejectApplication() {
         this.service
             .rejectApplication('specialized-Firm', this.bctaNo)
@@ -184,7 +222,6 @@ export class SfPermanentEmployeesComponent {
             }).subscribe({
                 next: ({ categoryData, existingClassData }) => {
                     const workCategories = categoryData.workCategory;
-
                     // Only pre-check categories with a non-null specializedFirmWorkCategoryId
                     const preCheckedSet = new Set(
                         (existingClassData || [])

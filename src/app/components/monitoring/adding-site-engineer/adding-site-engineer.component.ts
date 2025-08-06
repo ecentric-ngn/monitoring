@@ -112,16 +112,17 @@ getCidDetails(formData): void {
     server: ''
   };
 
-  this.service.getBaseOnEid(formData.cidNo).subscribe(
-    (response: any) => {
-      if (response?.employeedetails?.employeedetail?.length) {
-        const employeeDetail = response.employeedetails.employeedetail[0];
-        const name = `${employeeDetail.firstName} ${employeeDetail.middleName} ${employeeDetail.lastName}`;
+  this.service.getCitizenDetails(formData.cidNo).subscribe(
+     (response: any) => {
+      const citizenList = response?.citizenDetailsResponse?.citizenDetail;
+      if (citizenList?.length) {
+        const citizen = citizenList[0];
+        const name = [citizen.firstName, citizen.middleName, citizen.lastName]
+          .filter(part => part)
+          .join(' ');
         formData.fullName = name;
-        formData.mobileNo = employeeDetail.MobileNo;
-        formData.email = employeeDetail.Email;
       } else {
-        formData.errorMessages.notFound = 'Not Registered in RCSC';
+        formData.errorMessages.notFound = 'CID not found';
       }
       this.isLoading = false;
     },

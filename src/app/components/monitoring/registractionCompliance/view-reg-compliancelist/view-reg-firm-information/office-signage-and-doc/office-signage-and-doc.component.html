@@ -28,7 +28,6 @@
         <label class="form-label">Review (Office signboard):<span class="text-danger font-size-12">*</span></label>
         <select class="form-select form-control-sm" [(ngModel)]="formData.signboardReview" (input)="clearErrorMessage()"
           name="signboardReview"
-          [disabled]="!isFieldEditable('signboardReview') || (licenseStatus !== 'Suspended' && licenseStatus !== 'Active')"
           required #signboardReview="ngModel" (change)="onReviewChange()">
           <option value="">-- Select --</option>
           <option value="Yes">Yes</option>
@@ -92,17 +91,8 @@
       </div>
 
       <!-- Resubmission Fields (Conditional) -->
-      <div *ngIf="formData.filingReview === 'No' && applicationStatus === 'Submitted'">
+      <div *ngIf="formData.filingReview === 'No' && (applicationStatus === 'Submitted' || applicationStatus === 'Resubmitted OS and PFS')">
         <div class="row d-flex justify-content-between mb-3">
-          <!-- <div class="col-md-6 mb-3">
-            <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
-            <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.filingResubmitDate"
-              name="filingResubmitDate" required #filingResubmitDate="ngModel"
-              [disabled]="licenseStatus !== 'Suspended' && licenseStatus !== 'Active'">
-            <div *ngIf="filingResubmitDate.invalid && filingResubmitDate.touched" class="text-danger font-size-12">
-              Please provide a date
-            </div>
-          </div> -->
           <div class="col-md-6 mb-3">
             <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
             <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.filingResubmitDate"
@@ -152,7 +142,7 @@
     <div class="row m-4">
       <div class="col-md-12 mb-3">
         <label class="form-label">Remarks:</label>
-        <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.generalRemarks"
+        <textarea rows="2" class="form-control form-control-sm" name="generalRemarks" [(ngModel)]="formData.generalRemarks"
           name="generalRemarks"></textarea>
       </div>
     </div>
@@ -183,7 +173,7 @@
 
           <!-- Save and Forward -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and forward this application?'"
-            [nzOkText]="'Yes, Forward'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndForward()" *ngIf="applicationStatus === 'Submitted' 
+            [nzOkText]="'Yes, Forward'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndNext()" *ngIf="applicationStatus === 'Submitted' 
           && (formData.signboardReview === 'No' || formData.filingReview === 'No')">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
               <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>

@@ -89,6 +89,11 @@
                 <option value="REPLACED">Replaced</option>
               </select>
             </td>
+            <td>
+        <button class="btn btn-outline-danger btn-sm" (click)="removeEntry(i)" *ngIf="entryList.length > 1">
+          Remove
+        </button>
+      </td>
           </tr>
         </ng-container>
       </tbody>

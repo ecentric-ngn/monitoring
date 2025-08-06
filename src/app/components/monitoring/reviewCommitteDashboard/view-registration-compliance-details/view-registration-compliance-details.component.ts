@@ -56,7 +56,8 @@ export class ViewRegistrationComplianceDetailsComponent implements OnInit {
   firmType: string;
   ActionItem: any;
   items: any;
-activeTab = 'active';
+  // activeTab = 'active';
+  activeTab: string ;
   selectedFilter: string;
     currentFilter: string = '';
     filteredTableData: any[] = [];
@@ -74,6 +75,8 @@ activeTab = 'active';
 
   ngOnInit(): void {
     this.getActiveList();
+     const WorkDetail = this.service.getData('BctaNo');
+    this.activeTab= WorkDetail.activeTab;
     const userDetailsString = sessionStorage.getItem('userDetails');
     if (userDetailsString) {
         try {
@@ -87,6 +90,7 @@ activeTab = 'active';
   }
 onTabChange(event: any) {
   this.activeTab = event.target.value;
+  console.log('activeTab', this.activeTab);
   if(this.activeTab == 'active'){
     this.getActiveList();
   }

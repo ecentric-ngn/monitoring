@@ -112,20 +112,69 @@ export class OfficeSignageComponent {
         });
     }
 
-    fetchSuspendDataBasedOnBctaNo() {
-        //this.bctaNo = this.WorkDetail.data.contractorNo;
+    // fetchSuspendDataBasedOnBctaNo() {
+    //     //this.bctaNo = this.WorkDetail.data.contractorNo;
+    //     this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+    //         (res: any) => {
+    //             this.formData = {
+    //                 ...this.formData, // Keep initialized values
+    //                 ...res.complianceEntities[0], // Add API data
+    //             };
+    //         },
+    //         (error) => {
+    //             console.error('Error fetching data:', error);
+    //         }
+    //     );
+    // }
+
+  fetchSuspendDataBasedOnBctaNo() {
         this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-            (res: any) => {
-                this.formData = {
-                    ...this.formData, // Keep initialized values
-                    ...res.complianceEntities[0], // Add API data
-                };
-            },
-            (error) => {
-                console.error('Error fetching data:', error);
-            }
-        );
+    (res1: any) => {
+      if (res1?.complianceEntities?.length) {
+        this.formData = {
+          ...this.formData,
+          ...res1.complianceEntities[0]
+        };
+      }
+
+      const payload = [
+        {
+          field: 'bctaNo',
+          value:  this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.data.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = {
+              ...this.formData,
+              ...res2.data[0]
+            };
+            this.formData.signboardReview = this.formData.os_review;
+            this.formData.filingReview = this.formData.fsreview;
+            this.formData.ohsReview = this.formData.ohsreview;
+            this.formData.generalRemarks = this.formData.ohsRemarks;
+          }
+        },
+        (error) => {
+          console.error('Error fetching contractor details (suspend):', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching suspended data:', error);
     }
+  );
+}
+
 
     downloadFile(filePath: string): void {
         const sanitizedPath = filePath.replace(/\s+/g, ' ');
