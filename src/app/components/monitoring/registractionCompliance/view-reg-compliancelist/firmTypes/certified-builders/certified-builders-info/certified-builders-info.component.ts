@@ -20,13 +20,11 @@ ngOnInit(): void {
   const WorkDetail = this.service.getData('BctaNo');
 
   if (!WorkDetail || !WorkDetail.data) {
-    console.error('WorkDetail or WorkDetail.data is undefined');
     return;
   }
 
   this.licenseStatus = WorkDetail.data.licenseStatus;
   this.applicationStatus = WorkDetail.data.applicationStatus;
-  console.log('applicationStatus', this.applicationStatus);
   this.formData.firmType = WorkDetail.data;
   this.bctaNo = WorkDetail.data.certifiedBuilderNo;
   this.appNo = WorkDetail.data.appNo;
@@ -47,7 +45,7 @@ ngOnInit(): void {
 isTabEnabled(tabId: string): boolean {
   const status = this.applicationStatus;
 
-  if (status === 'Submitted' || status === 'Suspension Resubmission') {
+  if (status === 'Submitted' || status === 'Suspension Resubmission' || status === 'Rejected') {
     return true; // Enable all tabs
   }
 

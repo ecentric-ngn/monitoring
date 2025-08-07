@@ -114,17 +114,45 @@ export class PermanentEmployeesComponent {
 }
 
 
-    fetchSuspendDataBasedOnBctaNo() {
-    //this.bctaNo = this.WorkDetail.data.contractorNo;
-    this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-      (res: any) => {
-         this.tableData = res.hrCompliance;
-      },
-      (error) => {
-        console.error('Error fetching data:', error);
-      }
-    );
-  }
+ fetchSuspendDataBasedOnBctaNo() {
+  // Ensure bctaNo is set (you can uncomment below if needed)
+  // this.bctaNo = this.WorkDetail.data.contractorNo;
+
+  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+    (res1: any) => {
+      this.tableData = res1.hrCompliance;
+
+      // Prepare payload for additional details
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+            // Optional: Map specific fields
+             this.tData.hrFulfilled =  this.formData.hrfulfilled;
+            this.tData.resubmitDate =  this.formData.resubmitDate;
+            this.tData.remarksNo =  this.formData.remarksNo;
+          }
+        },
+        (error) => {
+          console.error('Error fetching additional firm details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching suspended data:', error);
+    }
+  );
+}
+
     fetchTdsHcPension() {}
  
     bsModal: any;
@@ -215,66 +243,58 @@ export class PermanentEmployeesComponent {
         forkJoin({
             categoryData: this.service.getWorkCategory('consultant'),
             existingClassData: this.service.getClassification(firmType, firmId),
-        }).subscribe({
+    }).subscribe({
             next: ({ categoryData, existingClassData }) => {
                 const workCategories = categoryData.workCategory;
                 const workClassifications = categoryData.workClassification;
 
-                // Build a map: workCategory -> Set of existing classification IDs
-                const existingMap: { [cat: string]: Set<string> } = {};
+                // Create a set of existing classification IDs for quick lookup
+                const existingClassificationIds = new Set<string>();
                 for (const item of existingClassData) {
-                    if (item.workCategory && item.consultantWorkClassificationId) {
-                        const key = String(item.workCategory).trim();
-                        if (!existingMap[key]) {
-                            existingMap[key] = new Set();
-                        }
-                        existingMap[key].add(
+                    if (item.consultantWorkClassificationId) {
+                        existingClassificationIds.add(
                             String(item.consultantWorkClassificationId).trim()
                         );
                     }
                 }
 
                 this.downgradeList = workCategories
-                        .map((category: any) => {
-                            const prefix = this.getPrefix(
-                                category.workCategory
-                            );
-                            const categoryKey = String(
-                                category.workCategory
-                            ).trim();
+                    .map((category: any) => {
+                        const prefix = this.getPrefix(
+                            category.workCategory
+                        );
+                        const categoryKey = String(
+                            category.workCategory
+                        ).trim();
 
-                            const possibleClassifications = workClassifications
-                                .filter(
-                                    (cls: any) =>
-                                        cls.type === 'consultant' &&
-                                        cls.workClassification.startsWith(
-                                            prefix
-                                        ) &&
-                                        existingMap[categoryKey] &&
-                                        existingMap[categoryKey].has(
-                                            String(cls.id).trim()
-                                        )
-                                )
-                                .map((cls: any) => ({
-                                    id: cls.id,
-                                    name: cls.workClassification,
-                                    checked: true,
-                                    preChecked: true,
-                                }));
+                        // Filter classifications that belong to this category
+                        const possibleClassifications = workClassifications
+                            .filter(
+                                (cls: any) =>
+                                    cls.type === 'consultant' &&
+                                    cls.workClassification.startsWith(
+                                        prefix
+                                    )
+                            )
+                            .map((cls: any) => ({
+                                id: cls.id,
+                                name: cls.workClassification,
+                                checked: existingClassificationIds.has(String(cls.id).trim()),
+                                preChecked: existingClassificationIds.has(String(cls.id).trim())
+                            }));
 
-                            // Return null if no classification matches
-                            if (possibleClassifications.length === 0) {
-                                return null;
-                            }
-
+                        // Only include categories that have at least one checked classification
+                        if (possibleClassifications.some(cls => cls.checked)) {
                             return {
                                 workCategory: category.workCategory,
                                 workCategoryId: category.id,
                                 classifications: possibleClassifications,
                             };
-                        })
-                        .filter((item: any) => item !== null); // Remove nulls
-                },
+                        }
+                        return null;
+                    })
+                    .filter((item: any) => item !== null);
+            },
             error: (err) => {
                 console.error('Error fetching downgrade data:', err);
             },
@@ -284,8 +304,8 @@ export class PermanentEmployeesComponent {
     }
 }
 
+
   submitAction() {
-    console.log('Submit Action triggered with:', this.selectedAction);
     if (
         !this.selectedAction.actionType ||
         !this.selectedAction.actionDate ||
@@ -294,10 +314,7 @@ export class PermanentEmployeesComponent {
         alert('All required fields must be filled.');
         return;
     }
-
     if (this.selectedAction.actionType === 'cancel') {
-        console.log('Cancel action initiated.');
-
         // Collect all unchecked, previously pre-checked classifications
         const downgradeEntries: any[] = [];
         this.downgradeList.forEach((entry) => {
@@ -310,9 +327,6 @@ export class PermanentEmployeesComponent {
                 }
             });
         });
-
-        console.log('Downgrade entries:', downgradeEntries);
-
         if (downgradeEntries.length === 0) {
             Swal.fire(
                 'Error',
@@ -326,7 +340,7 @@ export class PermanentEmployeesComponent {
             consultantId: this.formData.firmType.consultantId,
             requestedBy: this.authService.getUsername(),
             downgradeEntries,
-            applicationID: this.formData.firmType.appNo,
+            applicationNumber: this.formData.firmType.appNo,
         };
 
         console.log('Downgrade payload:', payload);

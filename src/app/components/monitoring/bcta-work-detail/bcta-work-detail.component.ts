@@ -59,7 +59,7 @@ ngOnInit() {
   this.bctaNo = WorkDetail.data.BCTANo || WorkDetail.data.awardedBctaNo || WorkDetail.data.bctaregNumber || WorkDetail.data.awardedBctaNo || WorkDetail.data.other_bcta_no;
   this.workType = WorkDetail.workType;
   this.data = WorkDetail.data;
-  debugger
+  
   this.tableId = WorkDetail.data.checklist_id || WorkDetail.checklistid;
   this.workId = WorkDetail.data.id || WorkDetail.data.workid;
   this.newContractorId = WorkDetail.newContractorId;

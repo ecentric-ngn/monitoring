@@ -58,7 +58,7 @@ export class ApplicationDetailsComponent {
         const data = this.service.getData('applicationNumber');
         this.data = data;
         this.inspectionType = this.data.inspection_type;
-        debugger
+        
         this.appNoStatus = data.applicationStatus;
         this.checklistId = data.checklist_id;
         if(this.checklistId){

@@ -172,9 +172,9 @@ export class ViewRegCompliancelistComponent {
     onChangeFirmType(firmType: string) {
         this.firmType = firmType;
         switch (firmType) {
-            // case 'constructionFirm':
-            //     this.router.navigate(['/reg-compliance/construction']);
-            //     break;
+            case 'constructionFirm':
+                this.router.navigate(['/reg-compliance/construction']);
+                break;
             case 'consultancyFirm':
                 this.router.navigate(['/monitoring/consultancy']);
                 break;
@@ -189,46 +189,40 @@ export class ViewRegCompliancelistComponent {
         }
     }
     totalData: number = 0;
-   fetchComplianceDetails(searchQuery?: string) {
+fetchComplianceDetails(searchQuery?: string) {
+    this.loading = true;
     const payload: any[] = [];
-
-    // Add search condition if searchQuery is provided
-    if (searchQuery) {
-        payload.push(
-            {
-            field: 'contractor_no',
+   if (searchQuery) {
+    payload.push(
+        {
+            field: 'contractorNo',
             value: `%${searchQuery}%`,
             condition: 'LIKE',
             operator: 'AND'
         },
-         {
+        {
             field: 'applicationStatus',
             value: `%${searchQuery}%`,
             condition: 'LIKE',
-            operator: 'AND'
-        },
+            operator: 'OR'
+        }
     );
-    }
-
-    this.service
-        .fetchDetails(
-            payload,
-            this.pageNo,
-            this.pageSize,
-            'contractor_email_view'
-        )
-        .subscribe(
+}
+    this.service.fetchDetails(payload,this.pageNo,this.pageSize,'contractor_email_view').subscribe(
             (response: any) => {
                 this.tableData = response.data;
                 this.total_records = response.totalCount;
                 this.totalPages = Math.ceil(this.total_records / this.pageSize);
                 this.totalCount = response.totalCount;
+                this.loading = false;
             },
             (error) => {
                 console.error('Error fetching contractor details:', error);
+                this.loading = false;
             }
         );
 }
+
 
      Searchfilter() {
         if (this.searchQuery && this.searchQuery.trim() !== '') {
@@ -257,6 +251,7 @@ export class ViewRegCompliancelistComponent {
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
             data.applicationStatus === 'Suspension Rejected' ||
+            data.applicationStatus === 'Rejected' ||
             data.applicationStatus === 'Suspension Resubmission'
         ) {
             const workId = data.contractorNo;
@@ -483,6 +478,7 @@ export class ViewRegCompliancelistComponent {
                             'success'
                         );
                         this.closeModal();
+                         this.fetchComplianceDetails();
                     } else {
                         Swal.fire(
                             'Error',

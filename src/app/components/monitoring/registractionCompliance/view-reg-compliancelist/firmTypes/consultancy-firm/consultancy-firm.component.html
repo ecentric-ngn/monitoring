@@ -9,7 +9,7 @@
                 (ngModelChange)="onChangeFirmType($event)" required #firmType="ngModel">
                 <option value="" class="text-muted">Select Firm Type</option>
                 <option value="constructionFirm">CONSTRUCTION FIRMS</option>
-                <!-- <option value="consultancyFirm">CONSULTANCY FIRMS</option> -->
+                 <option value="consultancyFirm">CONSULTANCY FIRMS</option>
                 <option value="specializedFirm">SPECIALIZED FIRMS</option>
                 <option value="certifiedBuilders">CERTIFIED BUILDERS</option>
             </select>
@@ -66,6 +66,7 @@
                             data.applicationStatus === 'Submitted' ||
                             data.applicationStatus === 'Resubmitted HR and EQ' ||
                             data.applicationStatus === 'Resubmitted OS and PFS' ||
+                            data.applicationStatus === 'Rejected' ||
                             data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
                         {{ data.consultantNo }}
                     </td>
@@ -76,9 +77,9 @@
                         <span class="text-bold" [ngClass]="{
                         'text-secondary': data.applicationStatus === 'Not Submitted',
                         'text-warning': ['Pending','Suspension Request','Cancel Request','Forwarded TO RC'].includes(data.applicationStatus),
-                        'text-success': ['Verified','Suspension Approved'].includes(data.applicationStatus),
+                        'text-success': ['Verified','Suspension Approved','Cancellation Approved'].includes(data.applicationStatus),
                         'text-primary': ['Submitted','Resubmitted OS and PFS','Suspension Resubmission','Resubmitted HR and EQ'].includes(data.applicationStatus),
-                        'text-danger': ['Suspension Rejected','Cancellation Rejected','Downgrade Rejected'].includes(data.applicationStatus)
+                        'text-danger': ['Suspension Rejected',' Rejected','Downgrade Rejected','Rejected'].includes(data.applicationStatus)
                     }">
                             {{ data.applicationStatus }}
                         </span>
@@ -363,4 +364,4 @@
             </form>
         </div>
     </div>
-</div>
+</div>Cancellation

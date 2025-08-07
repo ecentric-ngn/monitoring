@@ -61,7 +61,6 @@ export class OfficeSignageComponent {
         this.data = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
         this.applicationStatus = WorkDetail.data.applicationStatus;
-        console.log('applicationStatusin consultancy', this.applicationStatus);
         if (
             this.applicationStatus === 'Suspension Resubmission' &&
             this.bctaNo
@@ -96,36 +95,56 @@ export class OfficeSignageComponent {
 
     onReviewChange() {
         if (this.formData.signboardReview === 'No') {
-            // Initialize resubmit fields when 'No' is selected
             this.formData.resubmitDate = null;
             this.formData.signboardRemarks = '';
         }
     }
 
-    fetchDataBasedOnBctaNo() {
-        this.service.getDatabasedOnBctaNos(this.bctaNo,this.data.appNo).subscribe((res: any) => {
-            // Merge API response with initialized formData
+fetchDataBasedOnBctaNo() {
+  this.service.getDatabasedOnBctaNos(this.bctaNo, this.data.appNo).subscribe(
+    (res1: any) => {
+      if (res1?.complianceEntities?.length) {
+        Object.assign(this.formData, res1.complianceEntities[0]);
+      }
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.data.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
             this.formData = {
-                ...this.formData, // Keep initialized values
-                ...res.complianceEntities[0], // Add API data
+              ...this.formData,
+              ...res2.data[0]
             };
-        });
-    }
 
-    // fetchSuspendDataBasedOnBctaNo() {
-    //     //this.bctaNo = this.WorkDetail.data.contractorNo;
-    //     this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-    //         (res: any) => {
-    //             this.formData = {
-    //                 ...this.formData, // Keep initialized values
-    //                 ...res.complianceEntities[0], // Add API data
-    //             };
-    //         },
-    //         (error) => {
-    //             console.error('Error fetching data:', error);
-    //         }
-    //     );
-    // }
+            // Map specific fields to user-friendly form keys
+            this.formData.signboardReview = this.formData.os_review || '';
+            this.formData.filingReview = this.formData.fsreview || '';
+            this.formData.ohsReview = this.formData.ohsreview || '';
+            this.formData.generalRemarks = this.formData.ohsRemarks || '';
+          }
+        },
+        (error) => {
+          console.error('Error fetching contractor details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching data:', error);
+    }
+  );
+}
 
   fetchSuspendDataBasedOnBctaNo() {
         this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
@@ -310,7 +329,7 @@ export class OfficeSignageComponent {
                 bctaNo: this.data.consultantNo || null,
                 officeSignboard: this.formData.officeSignboardPath || null,
                 signageResubmitDeadline:
-                    this.formData.signboardResubmitDate || null,
+                this.formData.signboardResubmitDate || null,
                 osreview: this.formData.signboardReview || null,
                 osremarks: this.formData.signboardRemarks || null,
                 filingSystem: this.formData.properFillingPath || null,
@@ -371,9 +390,7 @@ export class OfficeSignageComponent {
                 email: this.formData.emailAddress,
                 classification: this.formData.classification,
                 officeSignboard: this.formData.officeSignboardPath,
-                // osNotificationDate: this.formData.createdAt,  faced an issue with date format
                 osResubmitDeadline: this.formData.resubmitDate,
-                // osResubmitted: true,
                 filingSystem: this.formData.properFillingPath,
                 fsreview: this.formData.filingReview,
                 oslocation: this.formData.officeLocation,
@@ -381,6 +398,7 @@ export class OfficeSignageComponent {
                 osremarks: this.formData.signboardRemarks,
                 fsremarks: this.formData.filingRemarks,
                 fsresubmitDeadline: this.formData.filingResubmitDate,
+                applicationNO: this.data.appNo
             },
         };
 
@@ -451,7 +469,7 @@ export class OfficeSignageComponent {
                 consultantId: this.formData.firmType.consultantId,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
-                  applicationID: this.formData.firmType.appNo,
+                  applicationNumber: this.formData.firmType.appNo,
             };
             
             this.service.downgradeConsultancy(payload).subscribe({
@@ -565,72 +583,65 @@ createNotification(
                     firmType,
                     firmId
                 ),
-            }).subscribe({
-                next: ({ categoryData, existingClassData }) => {
-                    const workCategories = categoryData.workCategory;
-                    const workClassifications = categoryData.workClassification;
+       }).subscribe({
+            next: ({ categoryData, existingClassData }) => {
+                const workCategories = categoryData.workCategory;
+                const workClassifications = categoryData.workClassification;
 
-                    // Build a map: workCategory -> Set of existing classification IDs
-                    const existingMap: { [cat: string]: Set<string> } = {};
-                    for (const item of existingClassData) {
-                        if (
-                            item.workCategory &&
-                            item.consultantWorkClassificationId
-                        ) {
-                            const key = String(item.workCategory).trim();
-                            if (!existingMap[key]) {
-                                existingMap[key] = new Set();
-                            }
-                            existingMap[key].add(
-                                String(
-                                    item.consultantWorkClassificationId
-                                ).trim()
-                            );
-                        }
+                // Create a set of existing classification IDs for quick lookup
+                const existingClassificationIds = new Set<string>();
+                for (const item of existingClassData) {
+                    if (item.consultantWorkClassificationId) {
+                        existingClassificationIds.add(
+                            String(item.consultantWorkClassificationId).trim()
+                        );
                     }
+                }
 
-                    this.downgradeList = workCategories
-                        .map((category: any) => {
-                            const prefix = this.getPrefix(
-                                category.workCategory
-                            );
-                            const categoryKey = String(
-                                category.workCategory
-                            ).trim();
+                this.downgradeList = workCategories
+                    .map((category: any) => {
+                        const prefix = this.getPrefix(
+                            category.workCategory
+                        );
+                        const categoryKey = String(
+                            category.workCategory
+                        ).trim();
 
-                            const matchedClassifications = workClassifications
-                                .filter(
-                                    (cls: any) =>
-                                        cls.type === 'consultant' &&
-                                        cls.workClassification.startsWith(
-                                            prefix
-                                        ) &&
-                                        existingMap[categoryKey]?.has(
-                                            String(cls.id).trim()
-                                        )
-                                )
-                                .map((cls: any) => ({
-                                    id: cls.id,
-                                    name: cls.workClassification,
-                                    checked: true,
-                                    preChecked: true,
-                                }));
+                        // Filter classifications that belong to this category
+                        const possibleClassifications = workClassifications
+                            .filter(
+                                (cls: any) =>
+                                    cls.type === 'consultant' &&
+                                    cls.workClassification.startsWith(
+                                        prefix
+                                    )
+                            )
+                            .map((cls: any) => ({
+                                id: cls.id,
+                                name: cls.workClassification,
+                                checked: existingClassificationIds.has(String(cls.id).trim()),
+                                preChecked: existingClassificationIds.has(String(cls.id).trim())
+                            }));
 
+                        // Only include categories that have at least one checked classification
+                        if (possibleClassifications.some(cls => cls.checked)) {
                             return {
                                 workCategory: category.workCategory,
                                 workCategoryId: category.id,
-                                classifications: matchedClassifications,
+                                classifications: possibleClassifications,
                             };
-                        })
-                        // Only include if there is at least one matched classification
-                        .filter((item) => item.classifications.length > 0);
-                },
-                error: (err) => {
-                    console.error('Error fetching downgrade data:', err);
-                },
-            });
-        } else {
-            this.downgradeList = [];
-        }
+                        }
+                        return null;
+                    })
+                    .filter((item: any) => item !== null);
+            },
+            error: (err) => {
+                console.error('Error fetching downgrade data:', err);
+            },
+        });
+    } else {
+        this.downgradeList = [];
     }
+}
+
 }

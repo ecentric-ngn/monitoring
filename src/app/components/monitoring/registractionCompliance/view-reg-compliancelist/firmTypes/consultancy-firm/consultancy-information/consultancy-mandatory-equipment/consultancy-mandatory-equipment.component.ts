@@ -149,16 +149,39 @@ export class ConsultancyMandatoryEquipmentComponent {
     }
 
 
-    fetchSuspendDataBasedOnBctaNo() {
-        //this.bctaNo = this.WorkDetail.data.contractorNo;
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-            (res: any) => {
-                this.tableData = res.hrCompliance;
-            },
-            (error) => {
-            }
-        );
+  fetchSuspendDataBasedOnBctaNo() {
+  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+    (res1: any) => {
+      this.tableData = res1.hrCompliance;
+      // Now fetch additional firm details
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+            // Map extra fields if available
+           this.tData.fulfillsRequirement = this.formData.eqfulfilled;
+           this.tData.finalRemarks = this.formData.eqremarks;
+          }
+        },
+        (error) => {
+          console.error('Error fetching additional firm details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching suspended data:', error);
     }
+  );
+}
+
     minResubmitDate: string = this.getMinDate();
 
     getMinDate(): string {
@@ -349,81 +372,67 @@ createNotification(
                     firmType,
                     firmId
                 ),
-            }).subscribe({
-                next: ({ categoryData, existingClassData }) => {
-                    const workCategories = categoryData.workCategory;
-                    const workClassifications = categoryData.workClassification;
+       }).subscribe({
+            next: ({ categoryData, existingClassData }) => {
+                const workCategories = categoryData.workCategory;
+                const workClassifications = categoryData.workClassification;
 
-                    // Build a map: workCategory -> Set of existing classification IDs
-                    const existingMap: { [cat: string]: Set<string> } = {};
-                    for (const item of existingClassData) {
-                        if (
-                            item.workCategory &&
-                            item.consultantWorkClassificationId
-                        ) {
-                            const key = String(item.workCategory).trim();
-                            if (!existingMap[key]) {
-                                existingMap[key] = new Set();
-                            }
-                            existingMap[key].add(
-                                String(
-                                    item.consultantWorkClassificationId
-                                ).trim()
-                            );
-                        }
+                // Create a set of existing classification IDs for quick lookup
+                const existingClassificationIds = new Set<string>();
+                for (const item of existingClassData) {
+                    if (item.consultantWorkClassificationId) {
+                        existingClassificationIds.add(
+                            String(item.consultantWorkClassificationId).trim()
+                        );
                     }
+                }
 
-                      this.downgradeList = workCategories
-                        .map((category: any) => {
-                            const prefix = this.getPrefix(
-                                category.workCategory
-                            );
-                            const categoryKey = String(
-                                category.workCategory
-                            ).trim();
+                this.downgradeList = workCategories
+                    .map((category: any) => {
+                        const prefix = this.getPrefix(
+                            category.workCategory
+                        );
+                        const categoryKey = String(
+                            category.workCategory
+                        ).trim();
 
-                            const possibleClassifications = workClassifications
-                                .filter(
-                                    (cls: any) =>
-                                        cls.type === 'consultant' &&
-                                        cls.workClassification.startsWith(
-                                            prefix
-                                        ) &&
-                                        existingMap[categoryKey] &&
-                                        existingMap[categoryKey].has(
-                                            String(cls.id).trim()
-                                        )
-                                )
-                                .map((cls: any) => ({
-                                    id: cls.id,
-                                    name: cls.workClassification,
-                                    checked: true,
-                                    preChecked: true,
-                                }));
+                        // Filter classifications that belong to this category
+                        const possibleClassifications = workClassifications
+                            .filter(
+                                (cls: any) =>
+                                    cls.type === 'consultant' &&
+                                    cls.workClassification.startsWith(
+                                        prefix
+                                    )
+                            )
+                            .map((cls: any) => ({
+                                id: cls.id,
+                                name: cls.workClassification,
+                                checked: existingClassificationIds.has(String(cls.id).trim()),
+                                preChecked: existingClassificationIds.has(String(cls.id).trim())
+                            }));
 
-                            // Return null if no classification matches
-                            if (possibleClassifications.length === 0) {
-                                return null;
-                            }
-
+                        // Only include categories that have at least one checked classification
+                        if (possibleClassifications.some(cls => cls.checked)) {
                             return {
                                 workCategory: category.workCategory,
                                 workCategoryId: category.id,
-/*************  ✨ Windsurf Command 🌟  *************/
                                 classifications: possibleClassifications,
                             };
-                        })
-      
-                        .filter((item: any) => item !== null); // Remove nulls
-                },
-                error: (err) => {
-                    console.error('Error fetching downgrade data:', err);
-                },
-            });
-        } else {
-            this.downgradeList = [];
-        }
+                        }
+                        return null;
+                    })
+                    .filter((item: any) => item !== null);
+            },
+            error: (err) => {
+                console.error('Error fetching downgrade data:', err);
+            },
+        });
+    } else {
+        this.downgradeList = [];
     }
+}
+
 
     submitAction() {
         console.log('Submit Action triggered with:', this.selectedAction);
@@ -460,12 +469,11 @@ createNotification(
                 );
                 return;
             }
-
             const payload = {
                 consultantId: this.formData.firmType.consultantId,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
-                applicationID: this.formData.firmType.appNo,
+                applicationNumber: this.formData.firmType.appNo,
             };
             this.service.downgradeConsultancy(payload).subscribe({
                 next: (res: string) => {

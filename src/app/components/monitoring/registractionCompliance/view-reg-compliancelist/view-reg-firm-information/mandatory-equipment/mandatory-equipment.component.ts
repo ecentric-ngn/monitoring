@@ -129,7 +129,7 @@ export class MandatoryEquipmentComponent {
             this.formData = { ...this.formData, ...res2.data[0] };
             // Map review/remark fields
             this.tData.fulfillsRequirement = this.formData.eqfulfilled;
-            this.tData.finalRemarks = this.formData.eqremarks;
+            this.formData.finalRemarks = this.formData.eqremarks;
 
             
           }
@@ -145,17 +145,42 @@ export class MandatoryEquipmentComponent {
   );
 }
 
-    fetchSuspendDataBasedOnBctaNo() {
-        this.bctaNo = this.data.contractorNo;
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-            (res: any) => {
-                this.tableData = res.vehicles;
-            },
-            (error) => {
-                console.error('Error fetching data:', error);
-            }
-        );
+   fetchSuspendDataBasedOnBctaNo() {
+  this.bctaNo = this.data.contractorNo;
+
+  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+    (res1: any) => {
+      this.tableData = res1.vehicles;
+      // Prepare payload for next fetch
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      // Call fetchDetails with the payload
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+            // Map additional review fields
+             this.tData.fulfillsRequirement = this.formData.eqfulfilled;
+            this.formData.finalRemarks = this.formData.eqremarks;
+          }
+        },
+        (error) => {
+          console.error('Error fetching additional firm details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching suspended data:', error);
     }
+  );
+}
+
     onClick() {}
 
     // For date validation (optional)
@@ -327,7 +352,7 @@ createNotification(
                 firmType: 'Contractor',
                 downgradeEntries,
                 requestedBy: this.authService.getUsername(),
-                  applicationID: this.WorkDetail.data.appNo,
+                  applicationNumber: this.WorkDetail.data.appNo,
             };
 
             this.service.downgradeFirm(payload).subscribe({

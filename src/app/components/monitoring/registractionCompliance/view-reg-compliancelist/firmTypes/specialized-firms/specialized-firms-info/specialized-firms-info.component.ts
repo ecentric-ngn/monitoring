@@ -20,7 +20,6 @@ export class SpecializedFirmsInfoComponent {
     const WorkDetail = this.service.getData('BctaNo');
     this.licenseStatus = WorkDetail.data.licenseStatus;
     if (!WorkDetail || !WorkDetail.data) {
-      console.error('WorkDetail or WorkDetail.data is undefined');
       return;
     }
     this.applicationStatus = WorkDetail.data.applicationStatus;
@@ -58,20 +57,16 @@ export class SpecializedFirmsInfoComponent {
   onActivateTab(event: { id: string, tab: string }) {
     this.type = event.tab;
     this.id = event.id
-
-    console.log('id', this.id);
     if (this.type === 'sfmonitoring') {
       this.activeTabId = 'sfmonitoring';
     } else {
       this.activeTabId = 'sfemployee'; // Default to employee tab if no match
     }
   }
-
   specializedFirmForm() {
     this.id = this.id
     this.activeTabId = 'sfemployee';
   }
-
   monitoringTeam() {
     this.id = this.id
     this.activeTabId = 'sfmonitoring';

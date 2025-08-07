@@ -130,7 +130,7 @@ export class PermanentEmployeeComponent {
             this.formData = { ...this.formData, ...res2.data[0] };
             this.tData.hrFulfilled =  this.formData.hrfulfilled;
             this.tData.resubmitDate =  this.formData.resubmitDate;
-            this.tData.remarksNo =  this.formData.remarksNo;
+            this.formData.remarksYes = this.formData.hrremarks;
           }
         },
         (error) => {
@@ -144,18 +144,44 @@ export class PermanentEmployeeComponent {
   );
 }
 
+  fetchSuspendDataBasedOnBctaNo() {
+  this.bctaNo = this.WorkDetail.data.contractorNo;
 
-    fetchSuspendDataBasedOnBctaNo() {
-        this.bctaNo = this.WorkDetail.data.contractorNo;
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-            (res: any) => {
-                this.tableData = res.hrCompliance;
-            },
-            (error) => {
-                console.error('Error fetching data:', error);
-            }
-        );
+  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+    (res1: any) => {
+      this.tableData = res1.hrCompliance;
+
+      // Prepare payload for second call
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+      // Fetch additional details
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+            // Optional: Map specific fields
+            this.tData.hrFulfilled =  this.formData.hrfulfilled;
+            this.tData.resubmitDate =  this.formData.resubmitDate;
+            this.formData.remarksYes = this.formData.hrremarks;
+          }
+        },
+        (error) => {
+          console.error('Error fetching additional firm details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching suspended data:', error);
     }
+  );
+}
+
     // Close reinstatement modal
     closeReinstateModal() {
         if (this.reinstateModal) {
@@ -332,15 +358,13 @@ export class PermanentEmployeeComponent {
                 );
                 return;
             }
-
             const payload = {
                 firmId: this.WorkDetail.data.contractorId,
                 firmType: 'Contractor',
                 downgradeEntries,
-                 applicationID: this.WorkDetail.data.appNo,
+                 applicationNumber: this.WorkDetail.data.appNo,
                 requestedBy: this.authService.getUsername(),
             };
-
             this.service.downgradeFirm(payload).subscribe({
                 next: (res: string) => {
                     if (

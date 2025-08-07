@@ -686,33 +686,25 @@ rejectApplication(category: string, bctaNo: string) {
   getCancelApplication() {
     return this.http.get<any>(`${api_url_Monitoring_siteEngineer}/classification/cancellations`);
   }
-  CancelApplications(payload: { cancellationIds: number[], reviewedBy: string }): Observable<string> {
-    return this.http.post(
-      `${api_url_Monitoring_siteEngineer}/classification/endorse-cancellations`,
-      payload,
-      {
-        responseType: 'text' as const,  // Expect text response
-        observe: 'response'  // Get full response object
-      }
-    ).pipe(
-      map(response => {
-        // Return the response body text or default success message
-        return response.body || 'Applications downgraded successfully';
-      }),
-      catchError(error => {
-        // Convert HttpErrorResponse to error message string
-        let errorMessage = 'Failed to downgrade applications';
-        if (error.error instanceof ErrorEvent) {
-          // Client-side error (network issues, etc.)
-          errorMessage = `Client error: ${error.error.message}`;
-        } else {
-          // Server-side error (4xx, 5xx responses)
-          errorMessage = error.error || error.message || `Server error: ${error.status} ${error.statusText}`;
-        }
-        return throwError(errorMessage);
-      })
-    );
-  }
+CancelApplications(payload) {
+  return this.http.post(
+    `${api_url_Monitoring_siteEngineer}/classification/endorse-cancellations`,
+    payload,
+    { responseType: 'text' as const }
+  );
+}
+
+// CancelApplications(payload: { cancellationIds: number[], reviewedBy: string }): Observable<HttpResponse<string>> {
+//   return this.http.post<HttpResponse<string>>(
+//     `${api_url_Monitoring_siteEngineer}/classification/endorse-cancellations`,
+//     payload,
+//     {
+//       responseType: 'text' as const,
+//       observe: 'response'
+//     }
+//   );
+// }
+
   suspendApplications(payload: { cdbNos: string[]; firmType: string }): Observable<string> {
     return this.http.post(
       `${g2c_url}/compliance/suspend`,
@@ -740,7 +732,8 @@ rejectApplication(category: string, bctaNo: string) {
       })
     );
   }
-  cancelApplications(payload: { cdbNos: string[]; firmType: string }): Observable<string> {
+  
+  cancelApplications(payload: { cdbNos: any; firmType: any , reason: any}): Observable<string> {
     return this.http.post(
       `${g2c_url}/compliance/cancel`,
       payload,

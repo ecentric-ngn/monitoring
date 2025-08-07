@@ -639,63 +639,7 @@ get modalTitle(): string {
   }
 }
 
-// cancelAppNo(): void {
-//   if (this.selectedIds.length === 0) return;
-//   // Validate IDs
-//   const nonNumericIds = this.selectedIds.filter(id => isNaN(Number(id)));
-//   if (nonNumericIds.length > 0) {
-//     Swal.fire('Error', `Invalid IDs: ${nonNumericIds.join(', ')}`, 'error');
-//     return;
-//   }
-//   this.isLoading = true;
-//   // First payload for cancellation (Monitoring System)
-//   const cancelPayload = {
-//     cancellationIds: this.selectedIds,
-//     reviewedBy: this.userId ,
-//      status: this.activeAction
-//   };
-//   // Second payload for the other system (adjust according to your needs)
-//   const otherSystemPayload = {
-//     cdbNos: this.selectedContractorNumbers.map(item => item.toString()),
-//     firmType: this.firmTypesssss
-
-//   };
-//   // First API call - Cancel in Monitoring System
-//   this.service.CancelApplications(cancelPayload).subscribe({
-//     next: (cancelResponse: string) => {
-//       // Only proceed to second operation if first succeeds
-//       this.service.cancelApplications(otherSystemPayload).subscribe({
-//         next: (otherSystemResponse: any) => {
-//           // Both operations succeeded
-//           this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
-//           this.getCancelList();
-//           this.selectedIds = [];
-//           this.formData.remarks = '';
-//           this.selectedContractorNumbers = [];
-//           this.isLoading = false;
-//           this.closeRemarkButton.nativeElement.click();
-
-//           Swal.fire({
-//             icon: 'success',
-//             title: 'Success',
-//             text: `Cancelled: ${cancelResponse}\nOther System: ${otherSystemResponse.message || 'Success'}`,
-//             confirmButtonColor: '#3085d6'
-//           });
-//         },
-//         error: (otherSystemError) => {
-//           this.isLoading = false;
-//           this.handleError('Other System Operation Failed', otherSystemError);
-//         }
-//       });
-//     },
-//     error: (cancelError) => {
-//       this.isLoading = false;
-//       this.handleError('Cancellation Failed', cancelError);
-//     }
-//   });
-// }
 filterByType(firmType: string) {
-
   // If no firmType is selected (or 'all' is selected), show all data
   if (!firmType || firmType === this.firmTypesssss) {
     this.filteredApplications = [...this.tableData];
@@ -703,7 +647,6 @@ filterByType(firmType: string) {
     // Filter the data based on the selected firmType
     this.filteredApplications = this.tableData.filter(item => item.firmType === firmType);
   }
-  
   // Update the total count
   this.totalCount = this.filteredApplications.length;
 }
@@ -724,20 +667,29 @@ submitAction(): void {
     firmType: this.firmType,
     reviewedBy: this.userId,
     licenseStatus: 'Active',
-    applicationStatus: 'APPROVED',
+    applicationStatus: this.activeAction,
   };
+
   this.service.approveActiveApplications(endorsePayload).subscribe({
     next: (endorseResponse: any) => {
       this.selectedIds = [];
       this.isLoading = false;
       this.formData.remarks = '';
       this.closeRemarkButton.nativeElement.click();
+
+      const action = this.activeAction?.toLowerCase();
+      const message =
+        action === 'rejected'
+          ? 'Application(s) rejected successfully.'
+          : 'Application(s) endorsed successfully.';
+
       Swal.fire({
         icon: 'success',
         title: 'Success',
-        text: `Endorsed: ${endorseResponse.body || 'Success'}`,
+        text: message,
         confirmButtonColor: '#3085d6',
       });
+
       this.getActiveList();
     },
     error: (endorseError) => {
@@ -746,6 +698,7 @@ submitAction(): void {
     },
   });
 }
+
 
 
  

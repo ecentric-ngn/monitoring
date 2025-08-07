@@ -29,7 +29,7 @@ ngOnInit() {
   this.formData.firmType = WorkDetail.data;
   this.bctaNo = WorkDetail.data.consultantNo;
   this.appNo = WorkDetail.data.appNo;
-  if (this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Resubmission') {
+  if (this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Resubmission' || this.applicationStatus === 'Rejected') {
     this.activeTabId = 'consultancyOffice';
   }
   // Set activeTabId based on applicationStatus only if license is not suspended

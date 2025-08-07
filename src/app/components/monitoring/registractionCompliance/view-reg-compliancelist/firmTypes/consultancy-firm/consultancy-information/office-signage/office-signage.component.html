@@ -122,7 +122,7 @@
           <!-- Save and Forward Button with Popup -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and forward this application?'"
             [nzOkText]="'Yes, Forward'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndNext()"
-            *ngIf="(formData.filingReview === 'No' || formData.signboardReview === 'No') && applicationStatus === 'Submitted' && applicationStatus !== 'Resubmitted OS and PFS'">
+            *ngIf="(formData.filingReview === 'No' || formData.signboardReview === 'No') && applicationStatus === 'Submitted' && applicationStatus !== 'Resubmitted OS and PFS' && applicationStatus !== 'Rejected'">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
               <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
               {{ isSaving ? 'Forwarding...' : 'Save and Forward' }}
@@ -131,7 +131,7 @@
           <!-- Save and Next Button with Popup -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and proceed to the next step?'"
             [nzOkText]="'Yes, Continue'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndNext()"
-            *ngIf="(formData.filingReview === 'Yes' || formData.signboardReview === 'Yes' || formData.filingFulfilled === 'Yes') && applicationStatus !== 'Resubmitted OS and PFS'">
+            *ngIf="(formData.filingReview === 'Yes' || formData.signboardReview === 'Yes' || formData.filingFulfilled === 'Yes') && applicationStatus !== 'Resubmitted OS and PFS' || applicationStatus !== 'Rejected'">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
               <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
               {{ isSaving ? 'Saving...' : 'Save and Next' }}
@@ -140,7 +140,7 @@
         </ng-container>
         <!-- Update Button -->
         <button type="button" class="btn btn-success" (click)="update()"
-          *ngIf="applicationStatus !== 'Suspension Resubmission'"
+          *ngIf="applicationStatus !== 'Suspension Resubmission' || applicationStatus !== 'Submitted'"
           [disabled]="isSaving || applicationStatus !== 'Resubmitted OS and PFS' || (formData.filingReview !== 'Yes' && formData.signboardReview !== 'Yes')">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
           {{ isSaving ? 'Saving...' : 'Update' }}
