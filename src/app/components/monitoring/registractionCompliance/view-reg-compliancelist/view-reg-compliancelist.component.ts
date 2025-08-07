@@ -256,6 +256,7 @@ export class ViewRegCompliancelistComponent {
             data.applicationStatus === 'Submitted' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
+            data.applicationStatus === 'Suspension Rejected' ||
             data.applicationStatus === 'Suspension Resubmission'
         ) {
             const workId = data.contractorNo;
