@@ -162,7 +162,7 @@
           </a>
           <!-- Save & Next -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and proceed to the next step?'"
-            (nzOnConfirm)="saveAndNext()" *ngIf="(applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Suspension Rejected') 
+            (nzOnConfirm)="saveAndNext()" *ngIf="(applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Suspension Rejected' || applicationStatus === 'Rejected') 
           && formData.signboardReview === 'Yes' 
           && formData.filingReview === 'Yes'">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
@@ -184,7 +184,7 @@
           <!-- Update Button -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to update this application?'"
             [nzOkText]="'Yes, Update'" [nzCancelText]="'Cancel'" (nzOnConfirm)="update()"
-            *ngIf="applicationStatus !== 'Submitted' && applicationStatus !== 'Suspension Resubmission' && applicationStatus !== 'Suspension Rejected'">
+            *ngIf="applicationStatus !== 'Submitted' && applicationStatus !== 'Suspension Resubmission' && applicationStatus !== 'Suspension Rejected' && applicationStatus !== 'Rejected'">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
               <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
               {{ isSaving ? 'Saving...' : 'Update' }}

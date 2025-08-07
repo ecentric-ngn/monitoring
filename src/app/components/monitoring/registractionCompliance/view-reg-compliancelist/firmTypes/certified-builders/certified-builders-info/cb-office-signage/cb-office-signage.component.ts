@@ -80,15 +80,61 @@ export class CbOfficeSignageComponent {
     //     });
     // }
 
-fetchDataBasedOnBctaNo() {
-  console.log('BCTA No:', this.bctaNo, 'App No:', this.data.appNo);
+// fetchDataBasedOnBctaNo() {
+//   console.log('BCTA No:', this.bctaNo, 'App No:', this.data.appNo);
 
+//   this.service.getDatabasedOnBctaNos(this.bctaNo, this.data.appNo).subscribe(
+//     (res1: any) => {
+//       if (res1?.complianceEntities?.length) {
+//         Object.assign(this.formData, res1.complianceEntities[0]);
+//       }
+
+//       const payload = [
+//         {
+//           field: 'bctaNo',
+//           value: this.bctaNo,
+//           condition: 'LIKE',
+//           operator: 'AND'
+//         },
+//         {
+//           field: 'application_number',
+//           value: this.data.appNo,
+//           condition: 'LIKE',
+//           operator: 'AND'
+//         }
+//       ];
+
+//       this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+//         (res2: any) => {
+//           if (res2?.data?.length) {
+//             this.formData = {
+//               ...this.formData,
+//               ...res2.data[0]
+//             };
+
+//             this.formData.signboardReview = this.formData.os_review || '';
+//             this.formData.filingReview = this.formData.fsreview || '';
+//             this.formData.ohsReview = this.formData.ohsreview || '';
+//             this.formData.generalRemarks = this.formData.ohsRemarks || '';
+//           }
+//         },
+//         (error) => {
+//           console.error('Error fetching contractor details:', error);
+//         }
+//       );
+//     },
+//     (error) => {
+//       console.error('Error fetching data:', error);
+//     }
+//   );
+// }
+
+fetchDataBasedOnBctaNo() {
   this.service.getDatabasedOnBctaNos(this.bctaNo, this.data.appNo).subscribe(
     (res1: any) => {
       if (res1?.complianceEntities?.length) {
         Object.assign(this.formData, res1.complianceEntities[0]);
       }
-
       const payload = [
         {
           field: 'bctaNo',
@@ -112,6 +158,7 @@ fetchDataBasedOnBctaNo() {
               ...res2.data[0]
             };
 
+            // Map specific fields to user-friendly form keys
             this.formData.signboardReview = this.formData.os_review || '';
             this.formData.filingReview = this.formData.fsreview || '';
             this.formData.ohsReview = this.formData.ohsreview || '';
@@ -128,6 +175,7 @@ fetchDataBasedOnBctaNo() {
     }
   );
 }
+
     rejectApplication() {
         this.service
             .rejectApplication(
@@ -319,7 +367,7 @@ fetchDataBasedOnBctaNo() {
                     : null,
                 firmType: 'certified-builder',
                 suspendDetails: this.selectedAction.remarks,
-                applicationID: this.formData.firmType.appNo,
+                applicationNO: this.formData.firmType.appNo,
             };
             // Call suspend API
             this.service.suspendFirm(payload).subscribe({
@@ -451,6 +499,7 @@ fetchDataBasedOnBctaNo() {
                 fsreview: this.formData.filingReview || null,
                 fsremarks: this.formData.filingRemarks || null,
                 fsresubmitDeadline: this.formData.filingResubmitDate || null,
+                applicationNO: this.data.appNo,
             },
         };
 
@@ -515,6 +564,7 @@ fetchDataBasedOnBctaNo() {
                 fsreview: this.formData.filingReview,
                 fsremarks: this.formData.fsRemarks,
                 reviewDate: this.formData.reviewDate,
+                applicationNO: this.data.appNo
             },
         };
         this.service.saveOfficeSignageAndDocCB(payload).subscribe(

@@ -267,7 +267,7 @@ export class OfficeSignageAndDocComponent implements OnInit {
             firmType: "Contractor",
             downgradeEntries,
             requestedBy: this.authService.getUsername(),
-            applicationID: this.data.appNo,
+            applicationNumber: this.data.appNo,
         };
         this.service.downgradeFirm(payload).subscribe({
             next: (res: string) => {
@@ -368,7 +368,7 @@ fetchDataBasedOnBctaNo() {
              this.formData.filingReview =  this.formData.fsreview;
              this.formData.ohsReview =  this.formData.ohsreview;
              this.formData.ohsReview =  this.formData.ohsreview;
-             this.formData.generalRemarks =  this.formData.ohsRemarks;
+             this.formData.generalRemarks =  this.formData.ohsremarks;
           }
         },
         (error) => {
@@ -383,19 +383,49 @@ fetchDataBasedOnBctaNo() {
 }
 
 
-  fetchSuspendDataBasedOnBctaNo() {
-    this.bctaNo = this.WorkDetail.data.contractorNo;
-    this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
-      (res: any) => {
-        if (res?.complianceEntities?.length) {
-          this.formData = { ...this.formData, ...res.complianceEntities[0] };
-        }
-      },
-      (error) => {
-        console.error('Error fetching data:', error);
+fetchSuspendDataBasedOnBctaNo() {
+  this.bctaNo = this.WorkDetail.data.contractorNo;
+
+  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+    (res1: any) => {
+      if (res1?.complianceEntities?.length) {
+        this.formData = { ...this.formData, ...res1.complianceEntities[0] };
       }
-    );
-  }
+
+      // Build payload for second service call
+      const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+
+      // Second service call - like fetchDetails
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = { ...this.formData, ...res2.data[0] };
+
+            // Map specific fields
+            this.formData.signboardReview = this.formData.os_review;
+            this.formData.filingReview = this.formData.fsreview;
+            this.formData.ohsReview = this.formData.ohsreview;
+            this.formData.generalRemarks = this.formData.ohsremarks;
+          }
+        },
+        (error) => {
+          console.error('Error fetching firm details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching suspended data:', error);
+    }
+  );
+}
+
   onReviewChange() {
     if (!this.formData) return;
     this.formData = {

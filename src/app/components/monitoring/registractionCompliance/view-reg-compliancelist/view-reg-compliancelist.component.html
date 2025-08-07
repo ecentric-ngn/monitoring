@@ -8,6 +8,7 @@
             <select class="form-select" name="firmType" [(ngModel)]="formData.firmType"
                 (ngModelChange)="onChangeFirmType($event)" required #firmType="ngModel">
                 <option value="" class="text-muted">Select Firm Type</option>
+                <option value="constructionFirm">CONSTRUCTION FIRMS</option>
                 <option value="consultancyFirm">CONSULTANCY FIRMS</option>
                 <option value="specializedFirm">SPECIALIZED FIRMS</option>
                 <option value="certifiedBuilders">CERTIFIED BUILDERS</option>
@@ -68,7 +69,9 @@
                             data.applicationStatus === 'Resubmitted PFS' ||
                             data.applicationStatus === 'Resubmitted HR and EQ' ||
                             data.applicationStatus === 'Suspension Rejected' ||
-                            data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
+                            data.applicationStatus === 'Suspension Resubmission' ||
+                            data.applicationStatus === 'Rejected'" 
+                             (click)="navigate(data)">
                         {{ data.contractorNo }}
                     </td>
 
@@ -78,9 +81,9 @@
                         <span class="text-bold" [ngClass]="{
                             'text-secondary': data.applicationStatus === 'Not Submitted',
                             'text-warning': ['In Process', 'Suspension Request', 'Cancel Request', 'Downgrade Request', 'Pending'].includes(data.applicationStatus),
-                            'text-success': ['Verified', 'Reinstated', 'Suspension Approved', 'Downgrade Approved', 'Cancel Approved', 'APPROVED'].includes(data.applicationStatus),
+                            'text-success': ['Verified', 'Reinstated', 'Suspension Approved', 'Downgrade Approved', 'Cancel Approved', 'APPROVED','Forwarded TO RC'].includes(data.applicationStatus),
                             'text-primary': ['Resubmitted OS and PFS', 'Resubmitted HR and EQ', 'Submitted', 'Suspension Resubmission',].includes(data.applicationStatus),
-                            'text-danger': ['Suspension Rejected', 'Cancellation Rejected', 'Downgrade Rejected'].includes(data.applicationStatus)
+                            'text-danger': ['Suspension Rejected', 'Cancellation Rejected', 'Downgrade Rejected','Rejected'].includes(data.applicationStatus)
                             }">
                             {{ data.applicationStatus }}
                         </span>

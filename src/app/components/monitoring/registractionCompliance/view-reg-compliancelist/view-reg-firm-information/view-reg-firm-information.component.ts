@@ -32,7 +32,7 @@ ngOnInit(): void {
 
   // Set activeTabId depending on applicationStatus
   const status = this.applicationStatus;
-  if (this.applicationStatus === 'Suspension Resubmission' || this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Rejected') {
+  if (this.applicationStatus === 'Suspension Resubmission' || this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Rejected' || this.applicationStatus === 'Rejected') {
     // Show all tabs enabled, so no change to activeTabId needed here
     this.activeTabId = this.activeTabId || 'office';  // default to office if undefined
   } else {

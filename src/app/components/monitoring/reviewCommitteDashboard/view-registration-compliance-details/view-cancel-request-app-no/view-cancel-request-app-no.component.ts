@@ -150,133 +150,11 @@ navigate(bcta_no: any,) {
   );
 }
 
-  // submitAction(): void {
-  //       if (this.selectedIds.length === 0) {
-  //           return;
-  //       }
-  //       const nonNumericIds = this.selectedIds.filter((id) =>
-  //           isNaN(Number(id))
-  //       );
-  //       if (nonNumericIds.length > 0) {
-  //           Swal.fire(
-  //               'Error',
-  //               `Invalid IDs: ${nonNumericIds.join(', ')}`,
-  //               'error'
-  //           );
-  //           return;
-  //       }
+ 
 
-  //       this.isLoading = true;
-
-  //       // First payload for the endorsement (Monitoring System)
-  //       const endorsePayload = {
-  //           suspensionIds: this.selectedIds,
-  //           reviewedBy: this.userId,
-  //           status: this.activeAction,
-  //       };
-  //       // Second payload for the suspension (G2C System)
-  //       const suspendPayload = {
-  //           cdbNos: this.selectedContractorNumbers.map((item) =>
-  //               item.toString()
-  //           ),
-  //           firmType: this.firmTypes,
-  //       };
-
-  //       // First API call - Endorse in Monitoring System
-  //       this.service.endorseApplications(endorsePayload).subscribe({
-  //           next: (endorseResponse: string) => {
-  //               // Only proceed to suspend if endorse succeeds
-  //               this.service.suspendApplications(suspendPayload).subscribe({
-  //                   next: (suspendResponse: any) => {
-  //                       // Both operations succeeded
-  //                       this.tableData = this.tableData.filter(
-  //                           (item) => !this.selectedIds.includes(item.id)
-  //                       );
-  //                       this.selectedIds = [];
-  //                       this.selectedContractorNumbers = [];
-  //                       this.isLoading = false;
-  //                       this.formData.remarks = '';
-  //                       this.closeRemarkButton.nativeElement.click();
-
-  //                       Swal.fire({
-  //                           icon: 'success',
-  //                           title: 'Success',
-  //                           text: `Endorsed: ${endorseResponse}\nSuspended: ${
-  //                               suspendResponse.message || 'Success'
-  //                           }`,
-  //                           confirmButtonColor: '#3085d6',
-  //                       });
-  //                   },
-  //                   error: (suspendError) => {
-  //                       this.isLoading = false;
-  //                       this.handleError('Suspension Failed', suspendError);
-  //                   },
-  //               });
-  //           },
-  //           error: (endorseError) => {
-  //               this.isLoading = false;
-  //               this.handleError('Endorsement Failed', endorseError);
-  //           },
-  //       });
-  //   }
-//   submitAction(): void {
-//   if (this.selectedIds.length === 0) return;
-//   // Validate IDs
-//   const nonNumericIds = this.selectedIds.filter(id => isNaN(Number(id)));
-//   if (nonNumericIds.length > 0) {
-//     Swal.fire('Error', `Invalid IDs: ${nonNumericIds.join(', ')}`, 'error');
-//     return;
-//   }
-//   this.isLoading = true;
-//   // First payload for cancellation (Monitoring System)
-//   const cancelPayload = {
-//     cancellationIds: this.selectedIds,
-//     reviewedBy: this.userId ,
-//      status: this.activeAction
-//   };
-//   // Second payload for the other system (adjust according to your needs)
-//   const otherSystemPayload = {
-//     cdbNos: this.selectedContractorNumbers.map(item => item.toString()),
-//     firmType: this.firmTypes
-
-//   };
-//   // First API call - Cancel in Monitoring System
-//   this.service.CancelApplications(cancelPayload).subscribe({
-//     next: (cancelResponse: string) => {
-//       // Only proceed to second operation if first succeeds
-//       this.service.cancelApplications(otherSystemPayload).subscribe({
-//         next: (otherSystemResponse: any) => {
-//           // Both operations succeeded
-//           this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
-//           this.getCancelList();
-//           this.selectedIds = [];
-//           this.formData.remarks = '';
-//           this.selectedContractorNumbers = [];
-//           this.isLoading = false;
-//           this.closeRemarkButton.nativeElement.click();
-
-//           Swal.fire({
-//             icon: 'success',
-//             title: 'Success',
-//             text: `Cancelled: ${cancelResponse}\nOther System: ${otherSystemResponse.message || 'Success'}`,
-//             confirmButtonColor: '#3085d6'
-//           });
-//         },
-//         error: (otherSystemError) => {
-//           this.isLoading = false;
-//           this.handleError('Other System Operation Failed', otherSystemError);
-//         }
-//       });
-//     },
-//     error: (cancelError) => {
-//       this.isLoading = false;
-//       this.handleError('Cancellation Failed', cancelError);
-//     }
-//   });
-// }
-
-  submitAction(): void {
+submitAction(): void {
   if (this.selectedIds.length === 0) return;
+
   // Validate IDs
   if (this.selectedIds.some(id => id == null || isNaN(id))) {
     Swal.fire('Error', 'Invalid ID(s) selected', 'error');
@@ -285,23 +163,37 @@ navigate(bcta_no: any,) {
   const payload = {
     downgradeIds: this.selectedIds,
     reviewedBy: this.userId,
-    status: 'Downgraded',
+    status: this.activeAction, // use dynamic action
   };
   this.isLoading = true;
   this.service.DownGradeApplications(payload).subscribe({
     next: (response) => {
       this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
-       this.getCancelList();
+      this.getCancelList();
       this.selectedIds = [];
       this.formData.remarks = '';
-       this.closeRemarkButton.nativeElement.click();
-      Swal.fire('Success', 'Operation completed', 'success');
+      this.closeRemarkButton.nativeElement.click();
+      // Dynamic message based on status
+      const action = this.activeAction?.toLowerCase();
+      let message = 'Operation completed successfully.';
+      if (action === 'rejected') {
+        message = 'Application(s) rejected successfully.';
+      } else if (action === 'cancelled' || action === 'canceled') {
+        message = 'Application(s) cancelled successfully.';
+      }
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        confirmButtonColor: '#3085d6',
+      });
     },
     error: (error) => {
       const errorMsg = error.error?.message || error.message || 'Request failed';
       Swal.fire('Error', errorMsg, 'error');
     },
-    complete: () => this.isLoading = false
+    complete: () => this.isLoading = false,
   });
 }
 

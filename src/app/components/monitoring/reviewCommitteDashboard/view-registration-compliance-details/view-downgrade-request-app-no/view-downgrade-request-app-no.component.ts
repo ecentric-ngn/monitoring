@@ -32,7 +32,7 @@ isLoading = false;
     classificationList: any;
     fullApplications: any=[];
 constructor(private service: CommonService,  private notification: NzNotificationService,) { }
-activeAction: 'cancel' | 'downgrade' | 'Suspended' | 'rejected' | null = null;
+activeAction: 'cancel' | 'Downgraded' | 'Suspended' | 'rejected' | null = null;
   ngOnInit() {
     this.getDownGradeList();
     this.activeTab = this.activeTab;
@@ -215,107 +215,55 @@ getClassificationList() {
   );
 }
 
-
-    // submitAction(): void {
-    //     if (this.selectedIds.length === 0) {
-    //         return;
-    //     }
-    //     const nonNumericIds = this.selectedIds.filter((id) =>
-    //         isNaN(Number(id))
-    //     );
-    //     if (nonNumericIds.length > 0) {
-    //         Swal.fire(
-    //             'Error',
-    //             `Invalid IDs: ${nonNumericIds.join(', ')}`,
-    //             'error'
-    //         );
-    //         return;
-    //     }
-
-    //     this.isLoading = true;
-
-    //     // First payload for the endorsement (Monitoring System)
-    //     const endorsePayload = {
-    //         suspensionIds: this.selectedIds,
-    //         reviewedBy: this.userId,
-    //         status: this.activeAction,
-    //     };
-    //     // Second payload for the suspension (G2C System)
-    //     const suspendPayload = {
-    //         cdbNos: this.selectedContractorNumbers.map((item) =>
-    //             item.toString()
-    //         ),
-    //         firmType: this.type,
-    //     };
-
-    //     // First API call - Endorse in Monitoring System
-    //     this.service.DownGradeApplications(endorsePayload).subscribe({
-    //         next: (endorseResponse: string) => {
-    //             // Only proceed to suspend if endorse succeeds
-    //             this.service.suspendApplications(suspendPayload).subscribe({
-    //                 next: (suspendResponse: any) => {
-    //                     // Both operations succeeded
-    //                     this.tableData = this.tableData.filter(
-    //                         (item) => !this.selectedIds.includes(item.id)
-    //                     );
-    //                     this.selectedIds = [];
-    //                     this.selectedContractorNumbers = [];
-    //                     this.isLoading = false;
-    //                     this.formData.remarks = '';
-    //                     this.closeRemarkButton.nativeElement.click();
-
-    //                     Swal.fire({
-    //                         icon: 'success',
-    //                         title: 'Success',
-    //                         text: `Endorsed: ${endorseResponse}\nSuspended: ${
-    //                             suspendResponse.message || 'Success'
-    //                         }`,
-    //                         confirmButtonColor: '#3085d6',
-    //                     });
-    //                 },
-    //                 error: (suspendError) => {
-    //                     this.isLoading = false;
-    //                     this.handleError('Suspension Failed', suspendError);
-    //                 },
-    //             });
-    //         },
-    //         error: (endorseError) => {
-    //             this.isLoading = false;
-    //             this.handleError('Endorsement Failed', endorseError);
-    //         },
-    //     });
-    // }
-
-
-    submitAction(): void {
+submitAction(): void {
   if (this.selectedIds.length === 0) return;
+
   // Validate IDs
   if (this.selectedIds.some(id => id == null || isNaN(id))) {
     Swal.fire('Error', 'Invalid ID(s) selected', 'error');
     return;
   }
+
   const payload = {
     downgradeIds: this.selectedIds,
     reviewedBy: this.userId,
-    status: 'Downgraded',
+    status: this.activeAction,
   };
+
   this.isLoading = true;
+
   this.service.DownGradeApplications(payload).subscribe({
     next: (response) => {
       this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
-       this.getDownGradeList();
+      this.getDownGradeList();
       this.selectedIds = [];
       this.formData.remarks = '';
-       this.closeRemarkButton.nativeElement.click();
-      Swal.fire('Success', 'Operation completed', 'success');
+      this.closeRemarkButton.nativeElement.click();
+
+      // Determine message based on action
+      const action = this.activeAction?.toLowerCase();
+      const message =
+        action === 'rejected'
+          ? 'Application(s) rejected successfully.'
+          : action === 'downgraded'
+          ? 'Application(s) downgraded successfully.'
+          : 'Operation completed successfully.';
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        confirmButtonColor: '#3085d6',
+      });
     },
     error: (error) => {
       const errorMsg = error.error?.message || error.message || 'Request failed';
       Swal.fire('Error', errorMsg, 'error');
     },
-    complete: () => this.isLoading = false
+    complete: () => (this.isLoading = false),
   });
 }
+
     private handleError(operation: string, error: any): void {
         let errorMessage = 'Operation failed';
 

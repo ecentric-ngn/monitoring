@@ -176,9 +176,9 @@ export class SpecializedFirmsComponent {
             case 'consultancyFirm':
                 this.router.navigate(['/monitoring/consultancy']);
                 break;
-            // case 'specializedFirm':
-            //     this.router.navigate(['/monitoring/specialized']);
-            //     break;
+            case 'specializedFirm':
+                this.router.navigate(['/monitoring/specialized']);
+                break;
             case 'certifiedBuilders':
                 this.router.navigate(['/monitoring/certified']);
                 break;
@@ -190,7 +190,6 @@ export class SpecializedFirmsComponent {
     pageSize: number = 10;
     fetchComplianceDetails(searchQuery?: string) {
         const payload: any[] = [];
-
         // Add search condition if searchQuery is provided
         if (searchQuery) {
             payload.push(
@@ -204,25 +203,11 @@ export class SpecializedFirmsComponent {
                     field: 'applicationStatus',
                     value: `%${searchQuery}%`,
                     condition: 'LIKE',
-                    operator: 'AND',
-                },
-                {
-                    field: 'applicationStatus',
-                    value: `%${searchQuery}%`,
-                    condition: 'LIKE',
-                    operator: 'AND',
+                    operator: 'OR',
                 }
             );
         }
-
-        this.service
-            .fetchDetails(
-                payload,
-                this.pageNo,
-                this.pageSize,
-                'emailed_specialized_firm_view'
-            )
-            .subscribe(
+        this.service.fetchDetails(payload,this.pageNo,this.pageSize,'emailed_specialized_firm_view').subscribe(
                 (response: any) => {
                     this.tableData = response.data;
                     this.total_records = response.totalCount;
@@ -352,11 +337,9 @@ export class SpecializedFirmsComponent {
         // Only proceed if status is "Submitted"
         if (
             data.applicationStatus === 'Submitted' ||
-            data.applicationStatus === 'Resubmitted PFS' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
-            data.applicationStatus === 'Resubmitted OS' ||
             data.applicationStatus === 'Resubmitted HR' ||
-            data.applicationStatus === 'Resubmitted EQ' ||
+            data.applicationStatus === 'Rejected' ||
             data.applicationStatus === 'Suspension Resubmission'
         ) {
             const workId = data.specializedFirmNo;
@@ -568,6 +551,7 @@ export class SpecializedFirmsComponent {
                     );
                     console.error(err);
                     this.closeModal();
+                    this.fetchComplianceDetails();
                 },
             });
         } else if (this.selectedAction.actionType === 'cancel') {
@@ -615,6 +599,7 @@ export class SpecializedFirmsComponent {
                         'success'
                     );
                     this.closeModal();
+                    this.fetchComplianceDetails();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');

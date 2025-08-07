@@ -10,7 +10,7 @@
                 <option value="" class="text-muted">Select Firm Type</option>
                 <option value="constructionFirm">CONSTRUCTION FIRMS</option>
                 <option value="consultancyFirm">CONSULTANCY FIRMS</option>
-                <!-- <option value="specializedFirm">SPECIALIZED FIRMS</option> -->
+                 <option value="specializedFirm">SPECIALIZED FIRMS</option> 
                 <option value="certifiedBuilders">CERTIFIED BUILDERS</option>
             </select>
             <div *ngIf="firmType.invalid && firmType.touched" class="text-danger font-size-12">
@@ -66,7 +66,7 @@
                 <tr *ngFor="let data of tableData; let i = index" class="table-row">
                     <td>{{i+1}}</td>
                     <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus== 'Submitted'"
-                        [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Suspension Resubmission'"
+                        [class.text-primary]="data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR' || data.applicationStatus === 'Suspension Resubmission' || data.applicationStatus === 'Rejected'"
                         (click)="navigate(data)">
                         {{ data.specializedFirmNo }}
                     </td>
@@ -76,7 +76,7 @@
                         <span class="text-bold" [ngClass]="{
                             'text-secondary': data.applicationStatus== 'Not Submitted',
                             'text-warning': data.applicationStatus== 'Pending' || data.applicationStatus === 'Suspension Request'|| data.applicationStatus === 'Cancel Request' ,
-                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus === 'Forwarded TO RC' ,
+                            'text-success': data.applicationStatus== 'Verified' || data.applicationStatus== 'Suspension Approved' || data.applicationStatus === 'Forwarded TO RC' || data.applicationStatus === 'Reinstated' || data.applicationStatus === 'Downgrade Approved' || data.applicationStatus === 'Cancel Approved' || data.applicationStatus === 'APPROVED',
                             'text-danger': data.applicationStatus== 'Rejected',
                             'text-primary': data.applicationStatus== 'Submitted' || data.applicationStatus === 'Resubmitted HR'|| data.applicationStatus === 'Suspension Resubmission'
                             }">

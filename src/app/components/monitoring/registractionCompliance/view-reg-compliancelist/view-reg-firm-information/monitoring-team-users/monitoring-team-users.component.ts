@@ -29,10 +29,8 @@ applicationStatus : any;
     this.data = this.data;
     this.username = this.authService.getUsername() || 'NA';
     this.id = this.id;
-    //  const WorkDetail = this.service.getData('BctaNo');
+    //   WorkDetail = this.service.getData('BctaNo');
     this.applicationStatus = this.data.applicationStatus;
-     console.log('this.applicationStatus', this.applicationStatus);
-     
     this.service.bctaNo$.subscribe(bctaNo => {
         this.bctaNo = bctaNo;
     });
@@ -45,12 +43,10 @@ applicationStatus : any;
             licenseStatus: 'Active',
              applicationStatus: 'Reinstated',
         };
-
         const approvePayload = {
             firmType: 'Contractor',
             cdbNos: this.data.contractorNo,
         };
-
         forkJoin({
             reinstate: this.service.reinstateLicense(payload),
            approve: this.service.approveReinstatement(approvePayload),

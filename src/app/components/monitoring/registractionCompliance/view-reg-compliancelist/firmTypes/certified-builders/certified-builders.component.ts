@@ -184,9 +184,9 @@ export class CertifiedBuildersComponent {
             case 'specializedFirm':
                 this.router.navigate(['/monitoring/specialized']);
                 break;
-            //   case 'certifiedBuilders':
-            //       this.router.navigate(['/monitoring/certified']);
-            //       break;
+              case 'certifiedBuilders':
+                  this.router.navigate(['/monitoring/certified']);
+                  break;
             default:
                 break;
         }
@@ -196,12 +196,11 @@ export class CertifiedBuildersComponent {
     pageSize: number = 10;
     fetchComplianceDetails(searchQuery?: string) {
         const payload: any[] = [];
-
         // Add search condition if searchQuery is provided
         if (searchQuery) {
             payload.push(
                 {
-                    field: 'specializedFirmNo',
+                    field: 'certifiedBuilderNo',
                     value: `%${searchQuery}%`,
                     condition: 'LIKE',
                     operator: 'AND',
@@ -210,25 +209,11 @@ export class CertifiedBuildersComponent {
                     field: 'applicationStatus',
                     value: `%${searchQuery}%`,
                     condition: 'LIKE',
-                    operator: 'AND',
+                    operator: 'OR',
                 },
-                {
-                    field: 'applicationStatus',
-                    value: `%${searchQuery}%`,
-                    condition: 'LIKE',
-                    operator: 'AND',
-                }
             );
         }
-
-        this.service
-            .fetchDetails(
-                payload,
-                this.pageNo,
-                this.pageSize,
-                'emailed_certified_builder_view'
-            )
-            .subscribe(
+        this.service.fetchDetails(payload,this.pageNo,this.pageSize,'emailed_certified_builder_view').subscribe(
                 (response: any) => {
                     this.tableData = response.data;
                     this.total_records = response.totalCount;
@@ -352,6 +337,7 @@ export class CertifiedBuildersComponent {
             data.applicationStatus === 'Submitted' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
+            data.applicationStatus === 'Rejected' ||
             data.applicationStatus === 'Suspension Resubmission'
         ) {
             const workId = data.certifiedBuilderNo;
@@ -543,6 +529,7 @@ export class CertifiedBuildersComponent {
                         'success'
                     );
                     this.closeModal();
+                    this.fetchComplianceDetails();
                 },
                 error: (err) => {
                     Swal.fire(
@@ -572,6 +559,7 @@ export class CertifiedBuildersComponent {
                         'success'
                     );
                     this.closeModal();
+                    this.fetchComplianceDetails();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');

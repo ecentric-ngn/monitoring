@@ -41,6 +41,7 @@ export class ConsultancyFirmComponent {
     dzongkhagList: any;
     total_records: any;
     totalPages: number;
+    applicationNo: any;
 
     constructor(
         private service: CommonService,
@@ -170,9 +171,9 @@ export class ConsultancyFirmComponent {
             case 'constructionFirm':
                 this.router.navigate(['/monitoring/construction']);
                 break;
-            // case 'consultancyFirm':
-            //     this.router.navigate(['/monitoring/consultancy']);
-            //     break;
+            case 'consultancyFirm':
+                this.router.navigate(['/monitoring/consultancy']);
+                break;
             case 'specializedFirm':
                 this.router.navigate(['/monitoring/specialized']);
                 break;
@@ -186,63 +187,55 @@ export class ConsultancyFirmComponent {
     totalCount: number = 0;
     pageNo: number = 1;
     pageSize: number = 10;
-    fetchComplianceDetails() {
-        const payload: any = [];
-        this.service
-            .fetchDetails(
-                payload,
-                this.pageNo,
-                this.pageSize,
-                'consultant_email_view'
-            )
-            .subscribe(
-                (response: any) => {
-                    this.tableData = response.data;
-                    this.total_records = response.totalCount;
-                    this.totalPages = Math.ceil(
-                        this.total_records / this.pageSize
-                    );
-                    this.totalCount = response.totalCount;
-                },
-                // Error handler
-                (error) => {
-                    console.error('Error fetching contractor details:', error); // Log the error
-                }
-            );
-    }
-
-    Searchfilter() {
-        const query = (this.searchQuery || '').toLowerCase();
-        this.filteredData = this.tableData.filter(
-            (item) =>
-                (item.consultantNo &&
-                    item.consultantNo
-                        .toString()
-                        .toLowerCase()
-                        .includes(query)) ||
-                (item.nameOfFirm &&
-                    item.nameOfFirm.toLowerCase().includes(query)) ||
-                (item.applicationStatus &&
-                    item.applicationStatus.toLowerCase().includes(query)) ||
-                (item.licenseStatus &&
-                    item.licenseStatus.toLowerCase().includes(query))
+  fetchComplianceDetails(searchQuery?: string) {
+    this.loading = true;
+    const payload: any[] = [];
+    // Add search filters if a search query is provided
+    if (searchQuery) {
+        payload.push(
+            {
+                field: 'consultantNo',
+                value: `%${searchQuery}%`,
+                condition: 'LIKE',
+                operator: 'AND'
+            },
+            {
+                field: 'applicationStatus',
+                value: `%${searchQuery}%`,
+                condition: 'LIKE',
+                operator: 'OR'
+            }
         );
-        this.currentPage = 1; // Reset to first page on new search
-        this.updateDisplayedData();
     }
+    this.service.fetchDetails(payload,this.pageNo,this.pageSize,'consultant_email_view').subscribe(
+            (response: any) => {
+                this.tableData = response.data;
+                this.total_records = response.totalCount;
+                this.totalPages = Math.ceil(this.total_records / this.pageSize);
+                this.totalCount = response.totalCount;
+                this.loading = false;
+            },
+            (error) => {
+                console.error('Error fetching consultant details:', error);
+                this.loading = false;
+            }
+        );
+}
 
-    updateDisplayedData() {
-        const start = (this.currentPage - 1) * this.itemsPerPage;
-        const end = start + this.itemsPerPage;
-        this.displayedData = this.filteredData.slice(start, end);
+      Searchfilter() {
+        if (this.searchQuery && this.searchQuery.trim() !== '') {
+            this.fetchComplianceDetails(this.searchQuery);
+        } else {
+            this.fetchComplianceDetails(this.searchQuery);
+        }
     }
-
     navigate(data: any) {
         // Only proceed if status is "Submitted"
         if (
             data.applicationStatus === 'Submitted' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
+            data.applicationStatus === 'Rejected' ||
             data.applicationStatus === 'Suspension Resubmission'
         ) {
             const workId = data.consultantNo;
@@ -255,20 +248,12 @@ export class ConsultancyFirmComponent {
             data: data,
             firmType: this.firmType,
         };
-
-        console.log('Navigation payload:', workDetail);
-
-        this.service.setData(
-            workDetail,
-            'BctaNo',
-            'monitoring/consultancy-information'
-        );
+        this.service.setData(workDetail,'BctaNo','monitoring/consultancy-information');
     }
 
     onCheckboxChange(event: Event, id: string) {
         const isChecked = (event.target as HTMLInputElement).checked;
         const numericId = Number(id); // convert to number
-
         if (isChecked) {
             if (!this.selectedIds.includes(numericId)) {
                 this.selectedIds.push(numericId);
@@ -278,36 +263,35 @@ export class ConsultancyFirmComponent {
                 (item) => item !== numericId
             );
         }
-
-        console.log('Selected IDs (as numbers):', this.selectedIds);
     }
 
-    forwardToRC() {
-        if (this.selectedIds.length === 0) {
-            Swal.fire('Warning', 'No items selected', 'warning');
-            return;
-        }
-        const payload = this.selectedIds;
-        this.service.forwardToReviewCommiteeConsultancy(payload).subscribe(
-            (res) => {
-                Swal.fire(
-                    'Success',
-                    'Selected firms submitted successfully',
-                    'success'
-                );
-                this.fetchComplianceDetails();
-            },
-            (error) => {
-                Swal.fire(
-                    'error',
-                    'Something went wrong while forwarding.',
-                    'success'
-                );
-            }
-        );
+  forwardToRC() {
+  if (this.selectedIds.length === 0) {
+    Swal.fire('Warning', 'No items selected', 'warning');
+    return;
+  }
+  const payload = this.selectedIds;
+  this.service.forwardToReviewCommiteeConsultancy(payload).subscribe(
+    (res) => {
+      Swal.fire(
+        'Success',
+        'Selected firms submitted successfully',
+        'success'
+      );
+      this.fetchComplianceDetails();
+    },
+    (error) => {
+      Swal.fire(
+        'Error',
+        'Something went wrong while forwarding.',
+        'error'  // ✅ Corrected this line
+      );
     }
+  );
+}
 
     openActionModal(row: any) {
+        this.applicationNo = row.appNo;
         this.selectedAction = {
             actionType: '',
             actionDate: this.today,
@@ -315,8 +299,6 @@ export class ConsultancyFirmComponent {
             newClassification: '',
             target: row, // attach row data if needed
         };
-        console.log('Row passed to modal:', row);
-
         const modalEl = document.getElementById('actionModal');
         this.bsModal = new bootstrap.Modal(modalEl, {
             backdrop: 'static', // Optional: prevents closing on outside click
@@ -333,107 +315,89 @@ export class ConsultancyFirmComponent {
         return '';
     }
 
-    onActionTypeChange() {
-        if (this.selectedAction.actionType === 'cancel') {
-            const firmId = this.selectedAction.target?.consultantId;
-            
-            const firmType = 'consultant';
+   onActionTypeChange() {
+    if (this.selectedAction.actionType === 'cancel') {
+        const firmId = this.selectedAction.target?.consultantId;
+        const firmType = 'consultant';
 
-            if (!firmId) {
-                console.error(
-                    'firmId is undefined. Check if the selected row has consultantNo.'
-                );
-                return;
-            }
+        if (!firmId) {
+            console.error(
+                'firmId is undefined. Check if the selected row has consultantNo.'
+            );
+            return;
+        }
+        forkJoin({
+            categoryData: this.service.getWorkCategory('consultant'),
+            existingClassData: this.service.getClassification(
+                firmType,
+                firmId
+            ),
+        }).subscribe({
+            next: ({ categoryData, existingClassData }) => {
+                const workCategories = categoryData.workCategory;
+                const workClassifications = categoryData.workClassification;
 
-            forkJoin({
-                categoryData: this.service.getWorkCategory('consultant'),
-                existingClassData: this.service.getClassification(
-                    firmType,
-                    firmId
-                ),
-            }).subscribe({
-                next: ({ categoryData, existingClassData }) => {
-                    const workCategories = categoryData.workCategory;
-                    const workClassifications = categoryData.workClassification;
-
-                    // Build a map: workCategory -> Set of existing classification IDs
-                    const existingMap: { [cat: string]: Set<string> } = {};
-                    for (const item of existingClassData) {
-                        if (
-                            item.workCategory &&
-                            item.consultantWorkClassificationId
-                        ) {
-                            const key = String(item.workCategory).trim();
-                            if (!existingMap[key]) {
-                                existingMap[key] = new Set();
-                            }
-                            existingMap[key].add(
-                                String(
-                                    item.consultantWorkClassificationId
-                                ).trim()
-                            );
-                        }
+                // Create a set of existing classification IDs for quick lookup
+                const existingClassificationIds = new Set<string>();
+                for (const item of existingClassData) {
+                    if (item.consultantWorkClassificationId) {
+                        existingClassificationIds.add(
+                            String(item.consultantWorkClassificationId).trim()
+                        );
                     }
+                }
+                this.downgradeList = workCategories
+                    .map((category: any) => {
+                        const prefix = this.getPrefix(
+                            category.workCategory
+                        );
+                        const categoryKey = String(
+                            category.workCategory
+                        ).trim();
 
-                    this.downgradeList = workCategories
-                        .map((category: any) => {
-                            const prefix = this.getPrefix(
-                                category.workCategory
-                            );
-                            const categoryKey = String(
-                                category.workCategory
-                            ).trim();
+                        // Filter classifications that belong to this category
+                        const possibleClassifications = workClassifications
+                            .filter(
+                                (cls: any) =>
+                                    cls.type === 'consultant' &&
+                                    cls.workClassification.startsWith(
+                                        prefix
+                                    )
+                            )
+                            .map((cls: any) => ({
+                                id: cls.id,
+                                name: cls.workClassification,
+                                checked: existingClassificationIds.has(String(cls.id).trim()),
+                                preChecked: existingClassificationIds.has(String(cls.id).trim())
+                            }));
 
-                            const possibleClassifications = workClassifications
-                                .filter(
-                                    (cls: any) =>
-                                        cls.type === 'consultant' &&
-                                        cls.workClassification.startsWith(
-                                            prefix
-                                        ) &&
-                                        existingMap[categoryKey] &&
-                                        existingMap[categoryKey].has(
-                                            String(cls.id).trim()
-                                        )
-                                )
-                                .map((cls: any) => ({
-                                    id: cls.id,
-                                    name: cls.workClassification,
-                                    checked: true,
-                                    preChecked: true,
-                                }));
-
-                            // Return null if no classification matches
-                            if (possibleClassifications.length === 0) {
-                                return null;
-                            }
-
+                        // Only include categories that have at least one checked classification
+                        if (possibleClassifications.some(cls => cls.checked)) {
                             return {
                                 workCategory: category.workCategory,
                                 workCategoryId: category.id,
                                 classifications: possibleClassifications,
                             };
-                        })
-                        .filter((item: any) => item !== null); // Remove nulls
-                },
-                error: (err) => {
-                    console.error('Error fetching downgrade data:', err);
-                },
-            });
-        } else {
-            this.downgradeList = [];
-        }
+                        }
+                        return null;
+                    })
+                    .filter((item: any) => item !== null);
+            },
+            error: (err) => {
+                console.error('Error fetching downgrade data:', err);
+            },
+        });
+    } else {
+        this.downgradeList = [];
     }
+}
 
     getClassOptions(existingClass: string, workCategory: string) {
         const allOptions = this.getOptionsByCategory(workCategory);
-
         if (!existingClass) return allOptions;
 
         const existingMatch = existingClass.match(/^([A-Z])(\d+)-/);
         if (!existingMatch) return allOptions;
-
         const [_, prefix, numberStr] = existingMatch;
         const existingNumber = parseInt(numberStr, 10);
 
@@ -603,10 +567,10 @@ export class ConsultancyFirmComponent {
             const payload = {
                 consultantId: this.selectedAction.target?.consultantId,
                 bctaNo: this.selectedAction.target?.consultantNo,
+                 applicationNumber: this.selectedAction.target?.appNo,
                 requestedBy: this.authService.getUsername(),
                 downgradeEntries,
             };
-
             this.service.downgradeConsultancy(payload).subscribe({
                 next: (res: string) => {
                     if (

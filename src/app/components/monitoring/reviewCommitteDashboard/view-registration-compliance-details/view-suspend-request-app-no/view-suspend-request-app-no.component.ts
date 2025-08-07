@@ -182,72 +182,75 @@ export class ViewSuspendRequestAppNoComponent {
         }
     }
 
-    submitAction(): void {
-        if (this.selectedIds.length === 0) {
-            return;
-        }
-        const nonNumericIds = this.selectedIds.filter((id) =>
-            isNaN(Number(id))
-        );
-        if (nonNumericIds.length > 0) {
-            Swal.fire(
-                'Error',
-                `Invalid IDs: ${nonNumericIds.join(', ')}`,
-                'error'
-            );
-            return;
-        }
-        this.isLoading = true;
-        // First payload for the endorsement (Monitoring System)
-        const endorsePayload = {
-            suspensionIds: this.selectedIds,
-            reviewedBy: this.userId,
-            status: this.activeAction,
-        };
-        // Second payload for the suspension (G2C System)
-        const suspendPayload = {
-            cdbNos: this.selectedContractorNumbers.map((item) =>
-                item.toString()
-            ),
-            firmType: this.firmTypesssss,
-        };
-        // First API call - Endorse in Monitoring System
-        this.service.endorseApplications(endorsePayload).subscribe({
-            next: (endorseResponse: string) => {
-                // Only proceed to suspend if endorse succeeds
-                this.service.suspendApplications(suspendPayload).subscribe({
-                    next: (suspendResponse: any) => {
-                        // Both operations succeeded
-                        this.tableData = this.tableData.filter(
-                            (item) => !this.selectedIds.includes(item.id)
-                        );
-                        this.selectedIds = [];
-                        this.selectedContractorNumbers = [];
-                        this.isLoading = false;
-                        this.formData.remarks = '';
-                        this.closeRemarkButton.nativeElement.click();
-                        this.getReportList(this.searchQuery);
-                        Swal.fire({
-                            icon: 'success',
-                            title: 'Success',
-                            text: `Endorsed: ${endorseResponse}\nSuspended: ${
-                                suspendResponse.message || 'Success'
-                            }`,
-                            confirmButtonColor: '#3085d6',
-                        });
-                    },
-                    error: (suspendError) => {
-                        this.isLoading = false;
-                        this.handleError('Suspension Failed', suspendError);
-                    },
-                });
-            },
-            error: (endorseError) => {
-                this.isLoading = false;
-                this.handleError('Endorsement Failed', endorseError);
-            },
-        });
-    }
+ submitAction(): void {
+  if (this.selectedIds.length === 0) {
+    return;
+  }
+  const nonNumericIds = this.selectedIds.filter((id) =>
+    isNaN(Number(id))
+  );
+  if (nonNumericIds.length > 0) {
+    Swal.fire(
+      'Error',
+      `Invalid IDs: ${nonNumericIds.join(', ')}`,
+      'error'
+    );
+    return;
+  }
+
+  this.isLoading = true;
+
+  const endorsePayload = {
+    suspensionIds: this.selectedIds,
+    reviewedBy: this.userId,
+    status: this.activeAction,
+  };
+
+  const suspendPayload = {
+    cdbNos: this.selectedContractorNumbers.map((item) => item.toString()),
+    firmType: this.firmTypesssss,
+  };
+
+  this.service.endorseApplications(endorsePayload).subscribe({
+    next: (endorseResponse: string) => {
+      this.service.suspendApplications(suspendPayload).subscribe({
+        next: (suspendResponse: any) => {
+          this.tableData = this.tableData.filter(
+            (item) => !this.selectedIds.includes(item.id)
+          );
+          this.selectedIds = [];
+          this.selectedContractorNumbers = [];
+          this.isLoading = false;
+          this.formData.remarks = '';
+          this.closeRemarkButton.nativeElement.click();
+          this.getReportList(this.searchQuery);
+
+          const action = this.activeAction?.toLowerCase();
+          const message =
+            action === 'rejected'
+              ? 'Application(s) rejected successfully.'
+              : `Application(s) endorsed and suspended successfully.\n${suspendResponse.message || ''}`;
+
+          Swal.fire({
+            icon: 'success',
+            title: 'Success',
+            text: message,
+            confirmButtonColor: '#3085d6',
+          });
+        },
+        error: (suspendError) => {
+          this.isLoading = false;
+          this.handleError('Suspension Failed', suspendError);
+        },
+      });
+    },
+    error: (endorseError) => {
+      this.isLoading = false;
+      this.handleError('Endorsement Failed', endorseError);
+    },
+  });
+}
+
 
     private handleError(operation: string, error: any): void {
         let errorMessage = 'Operation failed';

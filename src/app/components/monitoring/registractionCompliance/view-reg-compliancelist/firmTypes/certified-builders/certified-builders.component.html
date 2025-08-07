@@ -11,7 +11,7 @@
                 <option value="constructionFirm">CONSTRUCTION FIRMS</option>
                 <option value="consultancyFirm">CONSULTANCY FIRMS</option>
                 <option value="specializedFirm">SPECIALIZED FIRMS</option>
-                <!-- <option value="certifiedBuilders">CERTIFIED BUILDERS</option> -->
+                <option value="certifiedBuilders">CERTIFIED BUILDERS</option>
             </select>
             <div *ngIf="firmType.invalid && firmType.touched" class="text-danger font-size-12">
                 Please select a firm type
@@ -68,6 +68,7 @@
                         [class.text-primary]="data.applicationStatus === 'Submitted'
         || data.applicationStatus === 'Resubmitted HR and EQ'
         || data.applicationStatus === 'Resubmitted OS and PFS'
+        || data.applicationStatus === 'Rejected'
         || data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
                         {{ data.certifiedBuilderNo }}
                     </td>
@@ -87,20 +88,17 @@
                                 || data.applicationStatus === 'Suspension Rejected'
                                 || data.applicationStatus === 'Downgrade Rejected'
                                 || data.applicationStatus === 'Cancellation Rejected'
+                                || data.applicationStatus === 'Rejected'
                             }">
                             {{ data.applicationStatus }}
                         </span>
-
-
                     </td>
-
                     <td>
                         <span class="text-bold"
                             [ngClass]="{'text-danger': data.licenseStatus== 'Suspended' || data.licenseStatus== 'Cancelled' || data.licenseStatus== 'Downgraded', 'text-primary': data.licenseStatus== 'Active'}">
                             {{ data.licenseStatus }}
                         </span>
                     </td>
-
                     <td>
                         <span *ngIf="data.applicationStatus === 'Verified'">{{username}}</span>
                         <span *ngIf="data.applicationStatus !== 'Verified'">N/A</span>

@@ -1,26 +1,21 @@
 <div class="container-fluid">
   <!-- Search and Page Controls Section -->
-<!-- Search and Page Controls Section -->
-<div class="row align-items-center mb-3">
-  <div class="col-md-6 d-flex align-items-center pl-4">
-    <p class="mb-0 mr-2 text-gray-600">Items Per Page</p>
-    <select class="form-control-sm itemPerPage ml-2" 
-            (change)="setLimitValue($event.target.value)" 
-            style="border-color: #ced4da; width: auto;">
-      <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
-    </select>
-  </div>
+  <!-- Search and Page Controls Section -->
+  <div class="row align-items-center mb-3">
+    <div class="col-md-6 d-flex align-items-center pl-4">
+      <p class="mb-0 mr-2 text-gray-600">Items Per Page</p>
+      <select class="form-control-sm itemPerPage ml-2" (change)="setLimitValue($event.target.value)"
+        style="border-color: #ced4da; width: auto;">
+        <option class="page-item" *ngFor="let limit of set_limit">{{ limit }}</option>
+      </select>
+    </div>
 
-  <div class="col-md-6 d-flex justify-content-end align-items-center pr-2">
-    <p class="mb-0 mr-2 text-gray-600">Search By:</p>
-    <input type="text" 
-           class="form-control form-control-sm mr-2" 
-           style="width: auto; min-width: 250px;" 
-           placeholder="AppNo, BCTA No or Status" 
-           [(ngModel)]="searchQuery" 
-           (input)="Searchfilter('Cancel')" />
+    <div class="col-md-6 d-flex justify-content-end align-items-center pr-2">
+      <p class="mb-0 mr-2 text-gray-600">Search By:</p>
+      <input type="text" class="form-control form-control-sm mr-2" style="width: auto; min-width: 250px;"
+        placeholder="AppNo, BCTA No or Status" [(ngModel)]="searchQuery" (input)="Searchfilter('Cancel')" />
+    </div>
   </div>
-</div>
 
 
   <!-- Main Table Section -->
@@ -85,9 +80,7 @@
           <li class="page-item" [class.disabled]="pageNo === 1">
             <a class="page-link" (click)="goToPage(pageNo - 1)">Previous</a>
           </li>
-          <li class="page-item" 
-              *ngFor="let page of getPages()" 
-              [class.active]="pageNo === page">
+          <li class="page-item" *ngFor="let page of getPages()" [class.active]="pageNo === page">
             <a class="page-link" (click)="goToPage(page)">{{ page }}</a>
           </li>
           <li class="page-item" [class.disabled]="pageNo === getTotalPages()">
@@ -100,18 +93,12 @@
 
   <!-- Action Buttons Section -->
   <div class="d-flex justify-content-end mt-3">
-    <button class="btn btn-success me-2" 
-            [disabled]="selectedIds.length === 0" 
-            (click)="activeAction='cancel'" 
-            data-bs-toggle="modal" 
-            data-bs-target="#cancelModal">
+    <button class="btn btn-success me-2" [disabled]="selectedIds.length === 0" (click)="activeAction='Cancelled'"
+      data-bs-toggle="modal" data-bs-target="#cancelModal">
       Endorse
     </button>
-    <button class="btn btn-danger" 
-            [disabled]="selectedIds.length === 0" 
-            (click)="activeAction='rejected'" 
-            data-bs-toggle="modal" 
-            data-bs-target="#cancelModal">
+    <button class="btn btn-danger" [disabled]="selectedIds.length === 0" (click)="activeAction='rejected'"
+      data-bs-toggle="modal" data-bs-target="#cancelModal">
       Reject
     </button>
   </div>
@@ -122,7 +109,7 @@
   <div class="modal-dialog">
     <div class="modal-content">
       <div class="modal-header" style="background-color: #495f8a">
-        <h5 class="modal-title text-white" id="exampleModalLabel">Remasssssssrks</h5>
+        <h5 class="modal-title text-white" id="exampleModalLabel">Remarks</h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
       <div class="modal-body">
@@ -133,7 +120,8 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button type="button" #closeRemarkButton (click)="resetForm()" class="btn btn-danger" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" #closeRemarkButton (click)="resetForm()" class="btn btn-danger"
+          data-bs-dismiss="modal">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="submitAction()">Save</button>
       </div>
     </div>
