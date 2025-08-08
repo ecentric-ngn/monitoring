@@ -9,8 +9,8 @@
   </div>
   <div class="col-lg-7 d-flex justify-content-end align-items-center pr-2">
     <p class="mb-0 mr-2 text-muted">Search By : </p>
-   <input type="text" placeholder="Contractor No" class="form-control form-control-sm w-50" 
-       id="search" [(ngModel)]="searchQuery" (input)="Searchfilter()">
+   <input type="text" placeholder="BCTA No" class="form-control form-control-sm w-50 col-4" 
+       id="search" [(ngModel)]="searchQuery" (input)="Searchfilter(searchQuery)">
 
   </div>
 </div>
@@ -43,7 +43,7 @@
           <td class="align-middle">{{ item.requestedOn | date: 'yyyy-MM-dd' }}</td>
           <td class="align-middle">{{ item.status }}</td>
           <td class="align-middle">
-             <button class="btn btn-link btn-sm p-0" (click)="navigate(app)">View</button>
+             <button class="btn btn-link btn-sm p-0" (click)="navigate(item)">View</button>
           </td>
           <td class="align-middle text-center">
             <input type="checkbox" class="form-check-input" [(ngModel)]="item.selected" (change)="onCheckboxChange(item)">

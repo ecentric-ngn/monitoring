@@ -16,6 +16,7 @@ WorkDetail: any = {};
 licenseStatus: string = '';
   data: any = {};
   appNo: any;
+  formTPN: any;
   constructor(private service: CommonService) { }
 
 ngOnInit(): void {
@@ -46,6 +47,7 @@ ngOnInit(): void {
     }
   }
   this.formData.firmType = WorkDetail.data;
+  this.formTPN = WorkDetail.data.tpnNumber;
   this.bctaNo = WorkDetail.data.contractorNo;
   this.appNo = WorkDetail.data.appNo;
 

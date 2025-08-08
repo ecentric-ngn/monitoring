@@ -49,19 +49,16 @@ getCancelList(searchQuery?: string) {
   this.service.getCancelApplication().subscribe(
     (response: any[]) => {
       this.tableData=[];
-      console.log('API Response:', response); // Debugging line
       this.filteredApplications = response
-      console.log('Filtered Applications:', this.filteredApplications);
        // Apply filter if searchQuery is provided
-      if (searchQuery && searchQuery.trim() !== '') {
+  if (searchQuery && searchQuery.trim() !== '') {
         const query = searchQuery.trim().toLowerCase();
         this.filteredApplications = this.filteredApplications.filter(item => 
-          (item.firmId?.toString().toLowerCase().includes(query)) || 
-          (item.firmType?.toString().toLowerCase().includes(query))
+          item.bctaNo?.toString().toLowerCase().includes(query)
         );
       }
-      this.setPageData(this.pageNo);
       this.totalCount = this.filteredApplications.length;
+        this.setPageData(this.pageNo);
       this.isLoading = false;
     },
     (error) => {
@@ -76,10 +73,10 @@ setPageData(page: number): void {
   this.tableData = this.tableData.slice(startIndex, endIndex);
   console.log('Table Data:', this.tableData);
 }
-Searchfilter(type: any) {
-
-
+  Searchfilter(query: string) {
+  this.getCancelList(query);
 }
+
  setLimitValue(value: any) {
     this.pageSize = value;
   }
@@ -161,12 +158,12 @@ submitAction(): void {
     return;
   }
   const payload = {
-    downgradeIds: this.selectedIds,
+    cancellationIds: this.selectedIds,
     reviewedBy: this.userId,
     status: this.activeAction, // use dynamic action
   };
   this.isLoading = true;
-  this.service.DownGradeApplications(payload).subscribe({
+  this.service.CancelApplications(payload).subscribe({
     next: (response) => {
       this.tableData = this.tableData.filter(item => !this.selectedIds.includes(item.id));
       this.getCancelList();

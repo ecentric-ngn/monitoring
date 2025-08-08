@@ -79,7 +79,7 @@
                         <span class="text-bold" [ngClass]="{
                                 'text-secondary': data.applicationStatus === 'Not Submitted',
                                 'text-warning': data.applicationStatus === 'Pending' || data.applicationStatus === 'Cancel Request' || data.applicationStatus === 'Downgrade Request' || data.applicationStatus === 'Suspension Request',
-                                'text-success': data.applicationStatus === 'Verified' || data.applicationStatus === 'Reinstated' || data.applicationStatus === 'Suspension Approved' || data.applicationStatus === 'Forwarded TO RC',
+                                'text-success': data.applicationStatus === 'Verified' || data.applicationStatus === 'Reinstated' || data.applicationStatus === 'Suspension Approved' || data.applicationStatus === 'Forwarded TO RC'|| data.applicationStatus === 'Cancellation Approved',
                                 'text-danger': data.applicationStatus === 'Rejected',
                                 'text-danger': data.applicationStatus === 'Submitted' 
                                 || data.applicationStatus === 'Resubmitted HR and EQ' 

@@ -15,6 +15,7 @@ WorkDetail: any={};
 licenseStatus: string = '';
   data: string;
   appNo: any;
+  formTPN: any;
   constructor( private service: CommonService) { }
 
 ngOnInit() {
@@ -27,6 +28,7 @@ ngOnInit() {
   this.licenseStatus = WorkDetail.data.licenseStatus;
   this.applicationStatus = WorkDetail.data.applicationStatus;
   this.formData.firmType = WorkDetail.data;
+   this.formTPN = WorkDetail.data.tpnNumber;
   this.bctaNo = WorkDetail.data.consultantNo;
   this.appNo = WorkDetail.data.appNo;
   if (this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Resubmission' || this.applicationStatus === 'Rejected') {

@@ -23,16 +23,21 @@ bctaNo: string = '';
   showErrorMessage: any;
   activeTab: any={};
   workdata: any;
+  applicationId: any;
   constructor(private service: CommonService,private router: Router) {}
 
 ngOnInit() {
  const WorkDetail = this.service.getData('BctaNo');
     this.workdata = WorkDetail.data || {};
     this.activeTab= WorkDetail.activeTab;
-    if(this.workdata.bctaNo
-){
+    this.bctaNo = this.workdata.bctaNo;
+    this.applicationId = this.workdata.applicationID;
+    debugger
       this.getAppDetailsByBcNo();
-    }
+//     if(this.workdata.bctaNo
+// ){
+//       this.getAppDetailsByBcNo();
+//     }
 }
 // goBack() {
 //   this.router.navigate(['monitoring/viewRegComplianceDetails']);
@@ -49,9 +54,10 @@ goBack() {
   );
 }
 getAppDetailsByBcNo() {
-  this.service.getDatabasedOnBctaNos(this.WorkDetail.bctaNo
-,this.WorkDetail.applicationID).subscribe((res: any) => {
+  debugger
+  this.service.getDatabasedOnBctaNos(this.workdata.bctaNo,this.workdata.applicationID).subscribe((res: any) => {
    this.complianceEntities = res.complianceEntities || [];
+   
       this.vehicles = res.vehicles || [];
       this.hrCompliance = res.hrCompliance || [];
       this.fetchComplianceDetails();
