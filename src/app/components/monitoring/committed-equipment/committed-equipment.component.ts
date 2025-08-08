@@ -497,7 +497,8 @@ export class CommittedEquipmentComponent {
                 break;
 
             case 'PRIVATE':
-                this.tblId = equipmentData.contractorEquipmentId;
+                this.tblId = equipmentData.contractorEquipmentId
+                this.contractorEquipmentId = equipmentData.id;
                 break;
 
             case 'OTHERS':
@@ -546,21 +547,13 @@ export class CommittedEquipmentComponent {
                 matchedIndex = this.TableData?.findIndex(
                     (data) => data.id === this.tblId
                 );
-                console.log(
-                    'Inspection Type: PUBLIC, Matched Index:',
-                    matchedIndex
-                );
+               
                 break;
 
             case 'PRIVATE':
                 matchedIndex = this.TableData?.findIndex(
                     (data) =>
-                        data.contractorEquipmentId ===
-                        this.contractorEquipmentId
-                );
-                console.log(
-                    'Inspection Type: PRIVATE, Matched Index:',
-                    matchedIndex
+                        data.id === this.contractorEquipmentId
                 );
                 break;
             case 'OTHERS':
@@ -568,10 +561,6 @@ export class CommittedEquipmentComponent {
                     (data) =>
                         data.contractorEquipmentId ||
                         data.id === this.contractorEquipmentId
-                );
-                console.log(
-                    'Inspection Type: OTHERS, Matched Index:',
-                    matchedIndex
                 );
                 break;
 

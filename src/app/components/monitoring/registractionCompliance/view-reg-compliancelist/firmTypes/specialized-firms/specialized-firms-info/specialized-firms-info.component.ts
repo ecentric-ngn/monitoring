@@ -13,6 +13,7 @@ export class SpecializedFirmsInfoComponent {
   activeTabId: string = 'sfemployee';
   licenseStatus: any;
   appNo: any;
+  formTPN: any;
 
   constructor(private service: CommonService) { }
 
@@ -24,6 +25,7 @@ export class SpecializedFirmsInfoComponent {
     }
     this.applicationStatus = WorkDetail.data.applicationStatus;
     this.formData.firmType = WorkDetail.data;
+     this.formTPN = WorkDetail.data.tpnNumber;
     this.bctaNo = WorkDetail.data.specializedFirmNo;
     this.appNo = WorkDetail.data.appNo;
 

@@ -47,31 +47,30 @@ export class ViewSuspendRequestAppNoComponent {
             }
         }
     }
-    getReportList(searchQuery?: string) {
-        this.isLoading = true;
-        this.service.getDatabasedOnReviewAction().subscribe(
-            (response: any[]) => {
-                // Store full data
-                this.fullTableData = response;
-                // Apply filter if searchQuery is provided
-                 if (searchQuery && searchQuery.trim() !== '') {
-                    const query = searchQuery.trim().toLowerCase();
-                    this.fullTableData = this.fullTableData.filter(item => 
-                    (item.firmId?.toString().toLowerCase().includes(query)) || 
-                    (item.firmType?.toString().toLowerCase().includes(query))
-                    );
-                }
-                this.setPageData(this.pageNo);
-                this.totalCount = this.fullTableData.length;
-                this.pageNo = 1; // reset to first page
-                this.isLoading = false;
-            },
-            (error) => {
-                this.isLoading = false;
-                this.notification.error('Error', 'Failed to load action items');
-            }
+  getReportList(searchQuery?: string) {
+  this.isLoading = true;
+  this.service.getDatabasedOnReviewAction().subscribe(
+    (response: any[]) => {
+      this.fullTableData = response;
+
+      if (searchQuery && searchQuery.trim() !== '') {
+        const query = searchQuery.trim().toLowerCase();
+        this.fullTableData = this.fullTableData.filter(item => 
+          item.firmId?.toString().toLowerCase().includes(query)
         );
+      }
+      this.totalCount = this.fullTableData.length;
+      this.pageNo = 1; // reset to first page
+      this.setPageData(this.pageNo);
+      this.isLoading = false;
+    },
+    (error) => {
+      this.isLoading = false;
+      this.notification.error('Error', 'Failed to load action items');
     }
+  );
+}
+
     navigate(bcta_no: any) {
         const employeeDetail = {
             data: bcta_no,
@@ -132,12 +131,12 @@ export class ViewSuspendRequestAppNoComponent {
         }
     }
 
-    Searchfilter(type: any) {}
+  Searchfilter(query: string) {
+  this.getReportList(query);
+}
 
-    activeAction: 'cancel' | 'downgrade' | 'Suspended' | 'rejected' | null =
-        null;
-
-    isCheckboxDisabled(action: any): boolean {
+    activeAction: string | null = null;
+        isCheckboxDisabled(action: any): boolean {
         // Disable if a firmType is selected and it doesn't match this row's firmType
         return (
             this.selectedFirmType !== null &&
@@ -146,13 +145,12 @@ export class ViewSuspendRequestAppNoComponent {
         );
     }
 
-    setPageData(page: number): void {
-        const startIndex = (page - 1) * this.pageSize;
-        const endIndex = startIndex + this.pageSize;
-        this.tableData = this.fullTableData.slice(startIndex, endIndex);
-        console.log('Table Data:', this.tableData);
-    }
-
+setPageData(page: number): void {
+  const startIndex = (page - 1) * this.pageSize;
+  const endIndex = startIndex + this.pageSize;
+  this.tableData = this.fullTableData.slice(startIndex, endIndex);
+  console.log('Table Data:', this.tableData);
+}
     setLimitValue(value: any) {
         this.pageSize = Number(value);
         this.pageNo = 1;

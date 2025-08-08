@@ -113,9 +113,9 @@ onTabChange(event: any) {
 //             break;
 //     }
 // }
-getActiveList() {
+getActiveList(searchQuery?: string) {
   this.isLoading = true;
-  this.showCancelTable = false;
+
   this.service.fetchActiveLicenseList().subscribe(
     (response: any) => {
       const contractorList = (response.emailedContractorList || []).map((item: any) => ({
@@ -123,31 +123,44 @@ getActiveList() {
         bctaNo: item.contractorNo,  // assuming contractorNo exists
         firmType: 'Contractor'
       }));
-
       const builderList = (response.emailedCertifiedBuilderList || []).map((item: any) => ({
         ...item,
         bctaNo: item.certifiedBuilderNo,
         firmType: 'certified-builder'
       }));
-
       const specializedFirmList = (response.emailedSpecializedFirmList || []).map((item: any) => ({
         ...item,
         bctaNo: item.specializedFirmNo,
         firmType: 'specialized-firm'
       }));
-
       const consultantList = (response.emailedConsultantList || []).map((item: any) => ({
         ...item,
         bctaNo: item.consultantNo,  // assuming consultantNo exists
         firmType: 'Consultant'
       }));
 
-      this.tableData = [
+      // Combine all lists into fullTableData
+      this.fullTableData = [
         ...contractorList,
         ...builderList,
         ...specializedFirmList,
         ...consultantList
       ];
+
+      // Filter fullTableData if search query exists
+      let filteredData = this.fullTableData;
+      if (searchQuery && searchQuery.trim() !== '') {
+        const query = searchQuery.trim().toLowerCase();
+        filteredData = this.fullTableData.filter(item => 
+          item.bctaNo?.toString().toLowerCase().includes(query)
+        );
+      }
+
+      // Set filtered data as source for pagination and display
+      this.tableData = filteredData;
+      this.totalCount = filteredData.length;
+      this.pageNo = 1; // reset to first page
+      this.setPageData(this.pageNo);
 
       this.isLoading = false;
       this.showCancelTable = false;
@@ -165,16 +178,15 @@ fullTableData: any[] = [];
 
 
 
-// Searchfilter() {
-//   this.getReportList(this.searchQuery);
-// }
+
 
 
 setPageData(page: number): void {
+  this.pageNo = page; // update current page number
   const startIndex = (page - 1) * this.pageSize;
   const endIndex = startIndex + this.pageSize;
-  this.tableData = this.fullTableData.slice(startIndex, endIndex);
-  console.log('Table Data:', this.tableData);
+  this.fullTableData = this.fullTableData.slice(startIndex, endIndex);
+  console.log(`Displaying page ${page} with items`, this.fullTableData);
 }
 
    calculateOffset(): string {
@@ -420,37 +432,9 @@ navigate(bcta_no: any,) {
     }
   }
 
-
-
-  // Searchfilter() {
-
-  //   // if(this.activeAction =='Suspended'){
-  //   //   this.endorse();
-  //   // }else if (this.activeAction == 'cancel') {
-  //   //   this.cancelAppNo();
-  //   // }else if (this.activeAction == 'downgrade') {
-  //   //   this.DownGrade();
-  //   // }else{
-  //   //  this.pageNo = 1;
-  //   // this.applySearchFilter();
-  //   // }
-    
-  // }
-     Searchfilter(type: any) {
-      console.log('type', type);
-        // if (this.searchQuery && this.searchQuery.trim() !== '') {
-        //   if(type == 'Suspend'){
-        //      this.getReportList(this.searchQuery);
-        //   }else if (type == 'Cancel'){
-        //     this.getCancelList(this.searchQuery);
-        //   }else if (type == 'downgrade'){
-        //     this.getDownGradeList(this.searchQuery);
-        //   }
-           
-        // } else {
-        //     this.getReportList(this.searchQuery);
-        // }
-    }
+  Searchfilter(query: string) {
+  this.getActiveList(query);
+}
 
   setLimitValue(value: any) {
     this.pageSize = Number(value);

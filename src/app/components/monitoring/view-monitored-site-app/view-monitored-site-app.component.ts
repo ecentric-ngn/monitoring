@@ -287,14 +287,22 @@ export class ViewMonitoredSiteAppComponent {
         };
         this.service.savecomplianceAndNonCompliance(payload, this.checkListId).subscribe(
             (response: any) => {
-                console.log('Data saved successfully:', response);
                 this.resetForm();
                 this.createNotificationss();
                 this.getReportList();
                 this.closeModalButton.nativeElement.click();
             },
-            (error: any) => { }
-        );
+            (error: any) => {
+        if (error.status === 500) {
+            // Display error message, e.g. using alert or a toast notification
+            alert('Something went wrong. Please try again later.');
+            // Or if you have a toast/notification system, call it here instead
+        } else {
+            // Handle other errors if needed
+            console.error('Error:', error);
+        }
+    }
+);
     }
 
 

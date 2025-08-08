@@ -14,6 +14,7 @@ formData: any = {};
   licenseStatus: any;
   data: any = {};
   appNo: any;
+  formTPN: any;
   constructor(@Inject(CommonService) private service: CommonService) { }
 
 ngOnInit(): void {
@@ -26,6 +27,7 @@ ngOnInit(): void {
   this.licenseStatus = WorkDetail.data.licenseStatus;
   this.applicationStatus = WorkDetail.data.applicationStatus;
   this.formData.firmType = WorkDetail.data;
+   this.formTPN = WorkDetail.data.tpnNumber;
   this.bctaNo = WorkDetail.data.certifiedBuilderNo;
   this.appNo = WorkDetail.data.appNo;
 

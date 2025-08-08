@@ -51,8 +51,8 @@ export class OnsiteFacilitiesandManagementComponent {
     ) {}
 
     ngOnInit() {
-        this.workId= this.workId
-        
+        this.workId = this.workId;
+
         // Get user details from session storage safely
         const userDetailsString = sessionStorage.getItem('userDetails');
         if (userDetailsString) {
@@ -224,6 +224,18 @@ export class OnsiteFacilitiesandManagementComponent {
                         .onClick.subscribe(() => {
                             console.log('notification clicked!');
                         });
+                } else if (error.status === 0) {
+                    debugger
+                    console.error('File size too large', error);
+                    this.notification
+                        .error(
+                            'Error',
+                            'File size too large. Please upload a smaller file.',
+                            { nzDuration: 3000 }
+                        )
+                        .onClick.subscribe(() => {
+                            console.log('notification clicked!');
+                        });
                 } else {
                     // Handle other errors
                     this.notification.error(
@@ -386,7 +398,7 @@ export class OnsiteFacilitiesandManagementComponent {
 
         // Conditionally include workId only if workType is 'OTHERSSSSSSSSS'
         if (this.workType === 'OTHERS') {
-            payload.workInformationId = this.ownerId ;
+            payload.workInformationId = this.ownerId;
         }
         this.service.saveAsDraft(payload).subscribe({
             next: (response: any) => {
@@ -406,53 +418,66 @@ export class OnsiteFacilitiesandManagementComponent {
                 }
             },
             error: (error) => {
-            console.error('Error saving draft:', error);
-            if (error.status === 500) {
-                this.createNotification('error', 'Failed to save data');
-            } else {
-                this.createNotification('error', error.message || 'An error occurred while saving data');
-            }
-        },
-    });
-}
+                console.error('Error saving draft:', error);
+                if (error.status === 500) {
+                    this.createNotification('error', 'Failed to save data');
+                } else {
+                    this.createNotification(
+                        'error',
+                        error.message || 'An error occurred while saving data'
+                    );
+                }
+            },
+        });
+    }
 
     /**
      * Assigns the uploaded file to the given checklist ID.
      * The method sends a request to save the checklist ID and
      * logs the result upon success or error.
      */
-assignCheckListId() {
-    const payload = this.fileId;
-    this.service
-        .saveCheckListId(this.tableId, this.workId, payload)
-        .subscribe(
-            (response) => {
-                this.createNotification('success');
-            },
-            (error) => {
-                console.error('Error assigning File ID:', error);
-                if (error.status === 500) {
-                    this.createNotification('error', 'Failed to save checklist data');
-                } else {
-                    this.createNotification('error', error.message || 'An error occurred while saving checklist data');
+    assignCheckListId() {
+        const payload = this.fileId;
+        this.service
+            .saveCheckListId(this.tableId, this.workId, payload)
+            .subscribe(
+                (response) => {
+                    this.createNotification('success');
+                },
+                (error) => {
+                    console.error('Error assigning File ID:', error);
+                    if (error.status === 500) {
+                        this.createNotification(
+                            'error',
+                            'Failed to save checklist data'
+                        );
+                    } else {
+                        this.createNotification(
+                            'error',
+                            error.message ||
+                                'An error occurred while saving checklist data'
+                        );
+                    }
                 }
-            }
-        );
-}
-
-   createNotification(type: 'success' | 'error', message?: string): void {
-    if (type === 'success') {
-        this.notification
-            .success('Success', message || 'The data has been saved successfully')
-            .onClick.subscribe(() => {
-                console.log('notification clicked!');
-            });
-    } else {
-        this.notification
-            .error('Error', message || 'Failed to save data')
-            .onClick.subscribe(() => {
-                console.log('error notification clicked!');
-            });
+            );
     }
-}
+
+    createNotification(type: 'success' | 'error', message?: string): void {
+        if (type === 'success') {
+            this.notification
+                .success(
+                    'Success',
+                    message || 'The data has been saved successfully'
+                )
+                .onClick.subscribe(() => {
+                    console.log('notification clicked!');
+                });
+        } else {
+            this.notification
+                .error('Error', message || 'Failed to save data')
+                .onClick.subscribe(() => {
+                    console.log('error notification clicked!');
+                });
+        }
+    }
 }

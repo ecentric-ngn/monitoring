@@ -61,26 +61,11 @@ activeAction: 'cancel' | 'Downgraded' | 'Suspended' | 'rejected' | null = null;
     if (!type) return '-';
     return type.charAt(0).toUpperCase() + type.slice(1).toLowerCase();
   }
-Searchfilter() {
-  const query = this.searchQuery?.trim().toLowerCase() || '';
-
-  if (query) {
-    this.filteredApplications = this.fullApplications.filter(item =>
-      item.bctaNo?.toLowerCase().includes(query)
-    );
-  } else {
-    this.filteredApplications = [...this.fullApplications]; // reset to full list
-  }
-
-  this.totalCount = this.filteredApplications.length;
-  this.setPageData(this.pageNo);
+  Searchfilter(query: string) {
+  this.getDownGradeList(query);
 }
 
-  private formatActionType(actionType: string): string {
-    if (!actionType) return '-';
-    return actionType.charAt(0).toUpperCase() + actionType.slice(1).toLowerCase();
-  }
-
+ 
 
 navigate(bcta_no: any,) {
   const employeeDetail = {
@@ -144,14 +129,16 @@ navigate(bcta_no: any,) {
   this.service.getDownGradeDetails().subscribe(
     (response: any[]) => {
       this.filteredApplications =response;
-      
-      if(this.filteredApplications){
-        this.getCategoryList();
+       this.getCategoryList();
         this.getClassificationList();
+      if (searchQuery && searchQuery.trim() !== '') {
+        const query = searchQuery.trim().toLowerCase();
+        this.filteredApplications = this.filteredApplications.filter(item => 
+          item.bctaNo?.toString().toLowerCase().includes(query)
+        );
       }
       this.totalCount = this.filteredApplications.length;
         this.setPageData(this.pageNo);
-      console.log('Filtered Applications:', this.totalCount);
       this.isLoading = false;
       this.pageNo = 1;
     },
