@@ -205,38 +205,45 @@ export class OccupationalHealthAndSaftyComponent {
                 ? "Contact number can't be more than 8 digits."
                 : '';
     }
-
-    getCidDetails(cidNo: number): void {
-        this.isLoading = true;
-        this.service.getCitizenDetails(cidNo).subscribe(
-            (response: any) => {
-                if (response?.citizenDetailsResponse?.citizenDetail?.length) {
-                    const citizen =
-                        response.citizenDetailsResponse.citizenDetail[0];
-                    const name = [
-                        citizen.firstName,
-                        citizen.middleName,
-                        citizen.lastName,
-                    ]
-                        .filter((part) => part)
-                        .join(' ');
-                    this.formData.fullName = name;
-                    this.isLoading = false;
-                } else {
-                    this.errorMessages.notFound = 'Not Registered in DCRC';
-                    this.isLoading = false;
-                }
-                console.log(response);
-            },
-            (error) => {
-                if (error.status === 500) {
-                    this.isLoading = false;
-                    this.errorMessages.server = 'Something went wrong';
-                    console.error('Something went wrong:', error);
-                }
+isFullNameDisabled:boolean=false
+  getCidDetails(cidNo: number): void {
+    this.isLoading = true;
+    this.service.getCitizenDetails(cidNo).subscribe(
+        (response: any) => {
+            if (response?.citizenDetailsResponse?.citizenDetail?.length) {
+                const citizen =
+                    response.citizenDetailsResponse.citizenDetail[0];
+                const name = [
+                    citizen.firstName,
+                    citizen.middleName,
+                    citizen.lastName,
+                ]
+                    .filter((part) => part)
+                    .join(' ');
+                this.formData.fullName = name;
+                this.isFullNameDisabled = true; // disable the field
+            } else {
+                this.errorMessages.notFound = 'Not Registered in DCRC';
+                this.isFullNameDisabled = false; // allow manual entry
             }
-        );
-    }
+            this.isLoading = false;
+        },
+        (error) => {
+            if (error.status === 500) {
+                this.isLoading = false;
+                this.errorMessages.server = 'Something went wrong';
+                console.error('Something went wrong:', error);
+                this.isFullNameDisabled = false;
+            }
+        }
+    );
+}
+
+cleardata() {
+    this.formData.fullName = '',
+    this.formData.cidNo=0;
+    this.isFullNameDisabled = false;
+}
     addFileInput() {
         this.fileInputs.push(this.fileInputs.length);
         this.fileErrors.push('');

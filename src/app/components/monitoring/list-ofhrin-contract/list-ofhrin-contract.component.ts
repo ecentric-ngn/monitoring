@@ -424,6 +424,10 @@ removeEntry(index: number) {
      * Displays error messages if the citizen is not found or if there's a server error.
      * @param cidNo The CID number of the citizen.
      */
+
+    clearData() {
+        this.formData.replacementName = '';
+    }
     getCidDetails(cidNo: number, index: number): void {
         this.isLoading = true; // Show loading indicator
         this.service.getCitizenDetails(cidNo).subscribe(
