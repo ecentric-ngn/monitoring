@@ -191,6 +191,9 @@
                 <button type="button" class="btn btn-primary" style="max-height: 37px" (click)="getCidDetails(formData.cidNo)">
                   Fetch
                 </button>
+                 <button type="button" class="btn btn-secondary ml-2" style="max-height: 37px" (click)="clearData()">
+                  Clear
+                </button>
               </div>
 
               <div *ngIf="cidNo.invalid && cidNo.touched" class="text-danger mt-1">
@@ -212,7 +215,7 @@
             <div class="col-md-6">
               <label class="form-label">Full Name: <span class="text-danger">*</span></label>
               <input type="text" class="form-control form-control-sm " name="replacementName"
-                [(ngModel)]="formData.replacementName" required readonly #replacementName="ngModel" />
+                [(ngModel)]="formData.replacementName" required  #replacementName="ngModel" />
               <div *ngIf="replacementName.invalid && replacementName.touched" class="text-danger">
                 Full Name is required.
               </div>
