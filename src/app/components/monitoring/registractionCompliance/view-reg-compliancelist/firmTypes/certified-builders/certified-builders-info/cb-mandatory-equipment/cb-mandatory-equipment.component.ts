@@ -218,16 +218,7 @@ export class CbMandatoryEquipmentComponent {
         const eq = this.tableData.map((item: any) => ({
             equipmentDescription: null,
             requiredEquipment: null,
-
-            //  "isRegistered": item.equipmentType,
-            // "vehicleType": item.vehicleType,
-            // "registrationNo": item.registrationNo,
-            // "ownerName": item.ownerName,
-            // "ownerCid": item.ownerCid,
-            // "equipmentType": item.equipmentName,
-            // "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
         }));
-
         const payload = {
             cbReviewDto: {
                 bctaNo:this.data.certifiedBuilderNo,
@@ -307,94 +298,51 @@ export class CbMandatoryEquipmentComponent {
         });
     }
 
-    // update() {
-    //     this.isSaving = true;
-    //     const payload = {
-    //         cbReviewDto: {
-    //             bctaNo: this.bctaNo,
-    //             eqFulfilled: this.tData.fulfillsRequirement,
-    //             eqResubmitDeadline: this.tData.resubmitDate,
-    //             eqRemarks: this.tData.remarks,
-    //         },
-    //     };
 
-    //     this.service.saveOfficeSignageAndDocCB(payload).subscribe({
-    //         next: (res: any) => {
-    //             this.isSaving = false;
-    //             Swal.fire({
-    //                 icon: 'success',
-    //                 title: 'Updated successfully!',
-    //                 showConfirmButton: false,
-    //                 timer: 2000,
-    //             }).then(() => {
-    //                 this.router.navigate(['monitoring/certified']);
-    //             });
-    //         },
-    //         error: (err) => {
-    //             this.isSaving = false;
-    //             Swal.fire({
-    //                 icon: 'error',
-    //                 title: 'Update failed!',
-    //                 text:
-    //                     err?.error?.message ||
-    //                     'Something went wrong. Please try again.',
-    //                 confirmButtonText: 'OK',
-    //             });
-    //         },
-    //     });
-    // }
+ update() {
+    this.isSaving = true;
+    const table = this.service.setData(
+        this.tableId,
+        'tableId',
+        'office-signage'
+    );
+    this.tableId = this.id;
 
-      update() {
-        this.isSaving = true;
-        const table = this.service.setData(
-            this.tableId,
-            'tableId',
-            'office-signage'
-        );
-        this.tableId = this.id;
+    const eq = this.tableData.map((item: any) => ({
+        equipmentDescription: null,
+        requiredEquipment: null,
+    }));
 
-        const eq = this.tableData.map((item: any) => ({
-            equipmentDescription: null,
-            requiredEquipment: null,
-
-            //  "isRegistered": item.equipmentType,
-            // "vehicleType": item.vehicleType,
-            // "registrationNo": item.registrationNo,
-            // "ownerName": item.ownerName,
-            // "ownerCid": item.ownerCid,
-            // "equipmentType": item.equipmentName,
-            // "mandatoryEquipmentFulfilled": this.formData.fulfillsRequirement,
-        }));
-
-        const payload = {
-            cbReviewDto: {
-                bctaNo:this.data.certifiedBuilderNo,
-                eqFulfilled: this.tData.fulfillsRequirement,
-                eqResubmitDeadline: this.tData.resubmitDate,
-                eqRemarks: this.tData.remarks,
-            },
-            cbEquipmentReviewDto: eq,
-        };
-        this.service.saveOfficeSignageAndDocCB(payload).subscribe(
-            (res: any) => {
-                this.isSaving = false;
-                // this.activateTab.emit({
-                //     id: this.tableId,
-                //     data: this.data,
-                //     tab: 'cbMonitoring',
-                // });
-                 this.router.navigate(['monitoring/certified']);
-            },
-            (error) => {
-                this.isSaving = false;
-                Swal.fire({
-                    title: 'Error',
-                    text: 'Failed to save',
-                    icon: 'error',
-                });
-            }
-        );
-    }
+    const payload = {
+        cbReviewDto: {
+            bctaNo: this.data.certifiedBuilderNo,
+            eqFulfilled: this.tData.fulfillsRequirement,
+            eqResubmitDeadline: this.tData.resubmitDate,
+            eqRemarks: this.tData.remarks,
+        },
+        cbEquipmentReviewDto: eq,
+    };
+    this.service.saveOfficeSignageAndDocCB(payload).subscribe(
+        (res: any) => {
+            this.isSaving = false;
+            Swal.fire({
+                title: 'Success',
+                text: 'Saved successfully',
+                icon: 'success',
+            }).then(() => {
+                this.router.navigate(['monitoring/certified']);
+            });
+        },
+        (error) => {
+            this.isSaving = false;
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to save',
+                icon: 'error',
+            });
+        }
+    );
+}
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'downgrade') {
             const firmId = this.selectedAction.target?.certifiedBuilderId;

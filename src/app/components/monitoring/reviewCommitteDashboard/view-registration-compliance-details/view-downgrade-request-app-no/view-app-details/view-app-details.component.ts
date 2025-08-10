@@ -32,7 +32,7 @@ ngOnInit() {
     this.activeTab= WorkDetail.activeTab;
     this.bctaNo = this.workdata.bctaNo;
     this.applicationId = this.workdata.applicationID;
-    debugger
+    
       this.getAppDetailsByBcNo();
 //     if(this.workdata.bctaNo
 // ){
@@ -54,7 +54,7 @@ goBack() {
   );
 }
 getAppDetailsByBcNo() {
-  debugger
+  
   this.service.getDatabasedOnBctaNos(this.workdata.bctaNo,this.workdata.applicationID).subscribe((res: any) => {
    this.complianceEntities = res.complianceEntities || [];
    

@@ -225,7 +225,7 @@ export class OnsiteFacilitiesandManagementComponent {
                             console.log('notification clicked!');
                         });
                 } else if (error.status === 0) {
-                    debugger
+                    
                     console.error('File size too large', error);
                     this.notification
                         .error(
