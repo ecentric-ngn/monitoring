@@ -116,12 +116,11 @@
 
         <!-- Save & Next -->
         <button type="submit" class="btn btn-success"
-          *ngIf="((tData.fulfillsRequirement === 'Yes') || applicationStatus === 'Rejected' || applicationStatus === 'Cancellation Request Rejected') && applicationStatus !== 'Resubmitted HR and EQ'"
+          *ngIf="((tData.fulfillsRequirement === 'Yes') || applicationStatus === 'Rejected' || applicationStatus === 'Submitted') && applicationStatus !== 'Resubmitted HR and EQ'"
           (click)="saveAndNext()" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Next
         </button>
-
         <!-- Update -->
         <button type="submit" class="btn btn-success"
           *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'Yes'"
