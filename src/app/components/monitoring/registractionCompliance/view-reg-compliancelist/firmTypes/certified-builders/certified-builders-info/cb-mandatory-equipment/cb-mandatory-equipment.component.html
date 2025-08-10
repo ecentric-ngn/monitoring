@@ -123,10 +123,8 @@
       Save & Next
     </button>
 
-
-
         <!-- Update -->
-        <button type="submit" class="btn btn-success" *ngIf="applicationStatus === 'Resubmitted HR and EQ'"
+        <button type="submit" class="btn btn-success" *ngIf="applicationStatus === 'Resubmitted HR and EQ' && tData.fulfillsRequirement === 'Yes'"
           (click)="update()" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Update
