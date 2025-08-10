@@ -105,8 +105,15 @@ export class ContractDocumentComponent {
                         (this.formData.testReportsDocumented =
                             data.day_work_journal_maintained),
                         (this.formData.remarks = data.remarks),
-                        (this.formData.HindranceRegisterSelectmaintained =
-                            data.hindrance_register_maintained);
+                        (this.formData.HindranceRegisterSelectmaintained =data.hindrance_register_maintained);
+                        (this.formData.InsuranceType = data.insurance_type);
+                         (this.formData.policyNo = data.policy_no_work_insurance);
+                         (this.formData.work_insurance = data.workInsurance);
+                         (this.formData.workInsuranceRemarks = data.policy_no_work_insurance);
+                         (this.formData.thirdPartyInsurancePolicyNo = data.policy_no_third_party);
+                         (this.formData.thirdPartyInsurance = data.third_party_insurance);
+                        (this.formData.WorkersInsurancePolicyNo = data.policy_no_worker_insurance);
+                        (this.formData.workersInsurance = data.worker_insurance);
                     this.formData.workplan = data.work_plan;
                     if (data.file_path) {
                         this.formData.filePathList = data.file_path

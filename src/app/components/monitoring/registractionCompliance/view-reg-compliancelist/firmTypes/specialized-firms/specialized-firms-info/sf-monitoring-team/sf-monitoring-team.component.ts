@@ -80,57 +80,62 @@ export class SfMonitoringTeamComponent {
     });
   }
 
-    reinstate(row: any) {
-        const payload = {
-            firmNo: this.data.specializedFirmNo ,
-            firmType: 'specialized-firm',
-            licenseStatus: 'Active',
-             applicationStatus: 'Reinstated',
-        };
-        const approvePayload = {
-            firmType: 'SpecializedFirm',
-            cdbNos: this.data.specializedFirmNo,
-        };
-        forkJoin({
-            reinstate: this.service.reinstateLicense(payload),
-            approve: this.service.approveReinstatement(approvePayload),
-        }).subscribe({
-            next: ({ reinstate, approve }) => {
-                if (
-                    reinstate &&
-                    reinstate
-                        .toLowerCase()
-                        .includes('license status updated to active')
-                ) {
-                    Swal.fire(
-                        'Success',
-                        'License Reinstated and Approved Successfully',
-                        'success'
-                    );
+  reinstate(row: any) {
+    const payload = {
+        firmNo: this.data.specializedFirmNo,
+        firmType: 'specialized-firm',
+        licenseStatus: 'Active',
+        applicationStatus: 'Reinstated',
+    };
+    const approvePayload = {
+        firmType: 'SpecializedFirm',
+        cdbNos: this.data.specializedFirmNo,
+    };
+
+    forkJoin({
+        reinstate: this.service.reinstateLicense(payload),
+        approve: this.service.approveReinstatement(approvePayload),
+    }).subscribe({
+        next: ({ reinstate, approve }) => {
+            if (
+                reinstate &&
+                reinstate.toLowerCase().includes('license status updated to active')
+            ) {
+                Swal.fire({
+                    icon: 'success',
+                    title: 'Success',
+                    text: 'License Reinstated and Approved Successfully',
+                    confirmButtonText: 'OK'
+                }).then(() => {
                     this.closeModal();
-                      this.router.navigate(['/monitoring/specialized']);
-                } else {
-                    Swal.fire(
-                        'Warning',
-                        'Unexpected response from server.',
-                        'warning'
-                    );
-                }
-                this.router.navigate(['/monitoring/special']);
+                    this.router.navigate(['/monitoring/specialized']);
+                });
+            } else {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Warning',
+                    text: 'Unexpected response from server.',
+                    confirmButtonText: 'OK'
+                }).then(() => {
+                    this.closeModal();
+                    this.router.navigate(['/monitoring/specialized']);
+                });
+            }
+        },
+        error: (err) => {
+            console.error('Reinstatement error:', err);
+            Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Something went wrong during reinstatement. Please try again.',
+                confirmButtonText: 'OK'
+            }).then(() => {
                 this.closeModal();
-            },
-            error: (err) => {
-                console.error('Reinstatement error:', err);
-                this.closeModal();
-                  this.router.navigate(['/monitoring/specialized']);
-                Swal.fire(
-                    'Success',
-                    'License Reinstated and Approved Successfully',
-                    'success'
-                );
-            },
-        });
-    }
+                this.router.navigate(['/monitoring/specialized']);
+            });
+        },
+    });
+}
 
         closeModal() {
         if (this.bsModal) {

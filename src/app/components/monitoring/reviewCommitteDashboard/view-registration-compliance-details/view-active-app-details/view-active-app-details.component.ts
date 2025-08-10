@@ -27,6 +27,7 @@ ngOnInit() {
  const WorkDetail = this.service.getData('BctaNo');
     this.WorkDetail = WorkDetail.data;
       this.activeTab= WorkDetail.activeTab;
+      
     if(this.WorkDetail.bctaNo){
       
       this.getAppDetailsByBcNo();
@@ -46,7 +47,6 @@ goBack() {
 getAppDetailsByBcNo() {
   this.service.getDatabasedOnBctaNos(this.WorkDetail.bctaNo,this.WorkDetail.applicationNumber).subscribe((res: any) => {
    this.complianceEntities = res.complianceEntities || [];
-   
       this.vehicles = res.vehicles || [];
       this.hrCompliance = res.hrCompliance || [];
       this.fetchComplianceDetails();

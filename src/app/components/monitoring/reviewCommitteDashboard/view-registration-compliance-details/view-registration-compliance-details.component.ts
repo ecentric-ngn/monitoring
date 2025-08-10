@@ -172,14 +172,7 @@ getActiveList(searchQuery?: string) {
   );
 }
 
-
-
 fullTableData: any[] = [];
-
-
-
-
-
 
 setPageData(page: number): void {
   this.pageNo = page; // update current page number
@@ -403,6 +396,7 @@ private handleError(operation: string, error: any): void {
 navigate(bcta_no: any,) {
   const employeeDetail = {
       data: bcta_no,
+      activeTab:this.activeTab
   };
   this.service.setData(
       employeeDetail,

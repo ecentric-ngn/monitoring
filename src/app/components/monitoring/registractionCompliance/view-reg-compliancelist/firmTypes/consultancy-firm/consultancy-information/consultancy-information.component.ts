@@ -31,7 +31,7 @@ ngOnInit() {
    this.formTPN = WorkDetail.data.tpnNumber;
   this.bctaNo = WorkDetail.data.consultantNo;
   this.appNo = WorkDetail.data.appNo;
-  if (this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Resubmission' || this.applicationStatus === 'Rejected') {
+  if (this.applicationStatus === 'Submitted' || this.applicationStatus === 'Suspension Resubmission' || this.applicationStatus === 'Rejected' || this.applicationStatus === 'Cancellation Request Rejected') {
     this.activeTabId = 'consultancyOffice';
   }
   // Set activeTabId based on applicationStatus only if license is not suspended
@@ -55,7 +55,9 @@ ngOnInit() {
     this.fetchDataBasedOnBctaNo();
   }
 }
-
+goBack() {
+  window.history.back();
+}
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {

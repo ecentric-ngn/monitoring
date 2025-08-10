@@ -67,7 +67,7 @@
                             data.applicationStatus === 'Resubmitted HR and EQ' ||
                             data.applicationStatus === 'Resubmitted OS and PFS' ||
                             data.applicationStatus === 'Rejected' ||
-                            data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
+                            data.applicationStatus === 'Suspension Resubmission' || data.applicationStatus === 'Cancellation Request Rejected'" (click)="navigate(data)">
                         {{ data.consultantNo }}
                     </td>
 
@@ -77,9 +77,9 @@
                         <span class="text-bold" [ngClass]="{
                         'text-secondary': data.applicationStatus === 'Not Submitted',
                         'text-warning': ['Pending','Suspension Request','Cancel Request','Forwarded TO RC'].includes(data.applicationStatus),
-                        'text-success': ['Verified','Suspension Approved','Cancellation Approved'].includes(data.applicationStatus),
+                        'text-success': ['Verified','Suspension Approved','Cancellation Approved','Reinstated'].includes(data.applicationStatus),
                         'text-primary': ['Submitted','Resubmitted OS and PFS','Suspension Resubmission','Resubmitted HR and EQ'].includes(data.applicationStatus),
-                        'text-danger': ['Suspension Rejected',' Rejected','Downgrade Rejected','Rejected'].includes(data.applicationStatus)
+                        'text-danger': ['Suspension Rejected',' Rejected','Downgrade Rejected','Rejected','Cancellation Request Rejected'].includes(data.applicationStatus)
                     }">
                             {{ data.applicationStatus }}
                         </span>
@@ -89,8 +89,8 @@
 
                     <!-- <td>{{ data.licenseStatus }}</td> -->
                     <td>
-                        <span class="text-bold "
-                            [ngClass]="{'text-danger': data.licenseStatus== 'Suspended', 'text': data.licenseStatus== 'Active'}">
+                         <span class="text-bold"
+                            [ngClass]="{'text-danger': data.licenseStatus== 'Suspended' || data.licenseStatus== 'Cancelled' || data.licenseStatus== 'Downgraded', 'text-primary': data.licenseStatus== 'Active'}">
                             {{ data.licenseStatus }}
                         </span>
                     </td>

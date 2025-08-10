@@ -99,7 +99,7 @@
 
                 <!-- Save and Next -->
                 <button
-                    *ngIf="(applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Rejected')  && tData.hrFulfilled === 'Yes'"
+                    *ngIf="(applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Rejected' || applicationStatus === 'Cancellation Request Rejected')  && tData.hrFulfilled === 'Yes'"
                     type="button" class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                     <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                     {{ isSaving ? 'Saving...' : 'Save and Next' }}
@@ -172,7 +172,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" (click)="closeModal()"
+                    <button type="button"  class="btn btn-danger" (click)="closeModal()"
                         data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
                 </div>

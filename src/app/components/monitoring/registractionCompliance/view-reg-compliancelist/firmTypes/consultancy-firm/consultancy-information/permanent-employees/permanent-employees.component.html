@@ -105,7 +105,7 @@
                     </button>
 
                     <button
-                        *ngIf="tData.hrFulfilled === 'Yes' && (applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission')"
+                        *ngIf="tData.hrFulfilled === 'Yes' && (applicationStatus === 'Resubmitted HR and EQ' || applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Cancellation Request Rejected')"
                         type="button" class="btn btn-success" (click)="saveAndNext()" [disabled]="isSaving">
                         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
                         {{ isSaving ? 'Saving...' : 'Save and Next' }}

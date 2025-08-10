@@ -47,7 +47,7 @@ ngOnInit(): void {
 isTabEnabled(tabId: string): boolean {
   const status = this.applicationStatus;
 
-  if (status === 'Submitted' || status === 'Suspension Resubmission' || status === 'Rejected') {
+  if (status === 'Submitted' || status === 'Suspension Resubmission' || status === 'Rejected' || status === 'Cancellation Request Rejected') {
     return true; // Enable all tabs
   }
 
@@ -61,7 +61,9 @@ isTabEnabled(tabId: string): boolean {
 
   return false; // Disable by default
 }
-
+goBack() {
+  window.history.back();
+}
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
@@ -82,14 +84,13 @@ isTabEnabled(tabId: string): boolean {
   onActivateTab(event: { id: string, data: string, tab: string }) {
     this.type = event.tab;
     this.id = event.id
-
-    console.log('id', this.id);
     if (this.type === 'cbEmployee') {
       this.activeTabId = 'cbEmployee';
       this.data = event.data
     } else if (this.type === 'cbEquipment') {
       this.activeTabId = 'cbEquipment';
          this.data = event.data
+         
     } else if (this.type === 'cbMonitoring') {
       this.activeTabId = 'cbMonitoring';
          this.data = event.data

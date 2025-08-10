@@ -338,7 +338,8 @@ export class CertifiedBuildersComponent {
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
             data.applicationStatus === 'Rejected' ||
-            data.applicationStatus === 'Suspension Resubmission'
+            data.applicationStatus === 'Suspension Resubmission',
+            data.applicationStatus === 'Cancellation Request Rejected'
         ) {
             const workId = data.certifiedBuilderNo;
             this.prepareAndNavigate(data, workId);

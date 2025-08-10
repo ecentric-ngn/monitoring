@@ -222,7 +222,6 @@ setPageData(page: number): void {
           this.formData.remarks = '';
           this.closeRemarkButton.nativeElement.click();
           this.getReportList(this.searchQuery);
-
           const action = this.activeAction?.toLowerCase();
           const message =
             action === 'rejected'

@@ -212,15 +212,49 @@ fetchDataBasedOnBctaNo() {
     }
 
     fetchSuspendDataBasedOnBctaNo() {
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo,).subscribe(
             (res: any) => {
                 Object.assign(this.formData, res.complianceEntities[0]);
-            },
-            (error) => {
-                console.error('Error fetching data:', error);
-            }
-        );
+            const payload = [
+        {
+          field: 'bctaNo',
+          value: this.bctaNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        },
+        {
+          field: 'application_number',
+          value: this.data.appNo,
+          condition: 'LIKE',
+          operator: 'AND'
+        }
+      ];
+
+      this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
+        (res2: any) => {
+          if (res2?.data?.length) {
+            this.formData = {
+              ...this.formData,
+              ...res2.data[0]
+            };
+
+            // Map specific fields to user-friendly form keys
+            this.formData.signboardReview = this.formData.os_review || '';
+            this.formData.filingReview = this.formData.fsreview || '';
+            this.formData.ohsReview = this.formData.ohsreview || '';
+            this.formData.generalRemarks = this.formData.ohsRemarks || '';
+          }
+        },
+        (error) => {
+          console.error('Error fetching contractor details:', error);
+        }
+      );
+    },
+    (error) => {
+      console.error('Error fetching data:', error);
     }
+  );
+}
     onReviewChange() {
         if (this.formData.signboardReview === 'No') {
             this.formData.resubmitDate = '';

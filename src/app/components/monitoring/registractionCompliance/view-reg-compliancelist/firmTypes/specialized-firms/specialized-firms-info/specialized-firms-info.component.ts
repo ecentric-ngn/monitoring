@@ -33,6 +33,9 @@ export class SpecializedFirmsInfoComponent {
       this.fetchDataBasedOnBctaNo();
     }
   }
+goBack() {
+  window.history.back();
+}
 
   fetchDataBasedOnBctaNo() {
     this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {

@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonService } from '../../../../../../../../service/common.service';
 import Swal from 'sweetalert2';
@@ -16,6 +16,7 @@ declare var bootstrap: any;
 export class CbMandatoryEquipmentComponent {
     formData: any = {};
     @Output() activateTab = new EventEmitter<{ id: string;data:string, tab: string }>();
+     @ViewChild('closeActionModal', { static: false }) closeActionModal!: ElementRef;
     firmType: any;
     bctaNo: any;
     tableData: any = [];
@@ -82,18 +83,6 @@ export class CbMandatoryEquipmentComponent {
         }
     }
 
-    // fetchSuspendDataBasedOnBctaNo() {
-    //     this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo || this.data.certifiedBuilderNo).subscribe(
-    //         (res: any) => {
-    //             this.tableData = res.vehicles;
-    //         },
-    //         (error) => {
-    //             // Log error if fetching data fails
-    //             console.error('Error fetching data:', error);
-    //         }
-    //     );
-    // }
-
     fetchSuspendDataBasedOnBctaNo() {
     this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo || this.data.certifiedBuilderNo).subscribe(
         (res: any) => {
@@ -149,12 +138,7 @@ export class CbMandatoryEquipmentComponent {
         const dd = String(today.getDate()).padStart(2, '0');
         this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
     }
-    // fetchDataBasedOnBctaNo() {
-    //     this.service.getDatabasedOnBctaNos(this.bctaNo || this.data.certifiedBuilderNo,this.appNo).subscribe((res: any) => {
-    //         this.tableData = res.vehicles;
-    //         console.log('CB equipments', this.formData);
-    //     });
-    // }
+
  fetchDataBasedOnBctaNo() {
         this.service.getDatabasedOnBctaNos(this.bctaNo || this.data.certifiedBuilderNo,this.appNo).subscribe(
         (res1: any) => {
@@ -415,7 +399,7 @@ export class CbMandatoryEquipmentComponent {
         }
         if (this.selectedAction.actionType === 'cancel') {
             const payload = {
-                firmNo: this.formData.firmType.certifiedBuilderNo,
+                firmNo: this.formData.firmType.certifiedBuilderNo || this.data.certifiedBuilderNo,
                 cancelledBy: this.authService.getUsername(),
                 cancelledOn: new Date(
                     this.selectedAction.actionDate
@@ -474,12 +458,10 @@ export class CbMandatoryEquipmentComponent {
 
     bsModal: any;
 
-    closeModal() {
-        if (this.bsModal) {
-            this.bsModal.hide();
-        }
-    }
+   closeModal() {
+  this.closeActionModal.nativeElement.click();
 
+}
     rejectApplication() {
         this.service
             .rejectApplication('certified-Builder', this.bctaNo)
