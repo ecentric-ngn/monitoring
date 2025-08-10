@@ -30,7 +30,7 @@
             <span class="font-size-12"> {{ formData.clientEmail }}</span>
           </div>
         </div>
-           <div class="row mb-3">
+        <div class="row mb-3">
           <div class="col-md-4 d-flex">
             <label class="form-label me-2 font-size-12">BCTA Registration Number:</label>
             <span class="font-size-12"> {{ formData.client_owner_name }}</span>
@@ -47,7 +47,7 @@
             <label class="form-label me-2 font-size-12">Specialized Class:</label>
             <span class="font-size-12"> {{ formData.clientMobileNumber }}</span>
           </div>
-           <div class="col-md-4 d-flex">
+          <div class="col-md-4 d-flex">
             <label class="form-label me-2 font-size-12">Address:</label>
             <span class="font-size-12"> {{ formData.clientMobileNumber }}</span>
           </div>
@@ -55,7 +55,7 @@
             <label class="form-label me-2 font-size-12">Mobile No:</label>
             <span class="font-size-12"> {{ formData.clientMobileNumber }}</span>
           </div>
-           <div class="col-md-4 d-flex">
+          <div class="col-md-4 d-flex">
             <label class="form-label me-2 font-size-12">Email Address:</label>
             <span class="font-size-12"> {{ formData.clientMobileNumber }}</span>
           </div>
@@ -754,7 +754,31 @@
         </div>
       </div>
     </form>
-
+    <span class=" font-bold font-size-12">Contractor Present During Site Monitoring</span>
+    <hr>
+    <form>
+      <table class="table table-bordered border-1 overflow-hidden">
+        <thead>
+          <tr>
+            <th>SL No.</th>
+            <th scope="col">CID No / Work Permit No</th>
+            <th scope="col">Full Name</th>
+            <th scope="col">Mobile No</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngIf="contractorsList?.length === 0">
+            <td colspan="10" class="text-center">No data found</td>
+          </tr>
+          <tr *ngFor="let item of contractorsList; let i = index">
+            <td class="text-center bg-white">{{ i+1}}</td>
+            <td class="text-center bg-white">{{ item.cid_no }}</td>
+            <td class="text-center bg-white">{{ item.full_name }}</td>
+            <td class="text-center bg-white">{{ item.mobile_no }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </form>
     <span class=" font-bold font-size-12">view doc name of client site engineers present during the site
       monitoring</span>
     <hr>
