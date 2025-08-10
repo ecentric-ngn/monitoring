@@ -22,8 +22,9 @@
         Please select Yes or No
       </div>
     </div>
+  </div>
 
-  <!-- General Remarks -->
+  <!-- General Remarks Section -->
   <div class="row m-4">
     <div class="col-md-12 mb-3">
       <label class="form-label">Remarks:</label>
@@ -32,9 +33,10 @@
     </div>
   </div>
 
-  <!-- Action Buttons -->
+  <!-- Action Buttons Section -->
   <div class="row m-4">
     <div class="col-12 d-flex justify-content-end align-items-center gap-2 mt-3">
+      <!-- Update Button -->
       <button type="submit" class="btn btn-success"
         *ngIf="applicationStatus === 'Resubmitted OS and PFS' && formData.reviewLocation === 'Yes'" (click)="update()"
         [disabled]="isSaving">
@@ -42,6 +44,7 @@
         {{ isSaving ? 'Saving...' : 'Update' }}
       </button>
 
+      <!-- Save & Next Button -->
       <button type="submit" class="btn btn-success" *ngIf="(
           applicationStatus === 'Submitted' ||
           applicationStatus === 'Suspension Resubmission' 
@@ -53,9 +56,22 @@
         {{ isSaving ? 'Saving...' : 'Save & Next' }}
       </button>
 
-      <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted OS and PFS'"
-      data-bs-toggle="modal" data-bs-target="#exampleModal">Action</button>
+       <button type="submit" class="btn btn-success" *ngIf="(
+          applicationStatus === 'Submitted' ||
+          applicationStatus === 'Suspension Resubmission' 
+          || applicationStatus === 'Rejected'
+        ) && (
+          formData.reviewLocation === 'No'
+        )" (click)="saveAndNext()" [disabled]="isSaving">
+        <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
+        {{ isSaving ? 'Saving...' : 'Save & Forward' }}
+      </button>
 
+      <!-- Action Button -->
+      <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted OS and PFS'"
+        data-bs-toggle="modal" data-bs-target="#exampleModal">Action</button>
+
+      <!-- Reject Button -->
       <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
         [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
         <button class="btn btn-danger"
@@ -93,7 +109,6 @@
               <input type="date" class="form-control h-3rem" [(ngModel)]="selectedAction.actionDate" name="actionDate"
                 [disabled]="true" required />
             </div>
-
           </div>
 
           <div class="mb-3">
