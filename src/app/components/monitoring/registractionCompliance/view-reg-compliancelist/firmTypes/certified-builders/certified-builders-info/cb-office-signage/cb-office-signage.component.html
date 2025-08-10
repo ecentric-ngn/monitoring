@@ -23,91 +23,6 @@
       </div>
     </div>
 
-    <!-- Conditional Resubmit Fields (Location) -->
-    <div *ngIf="formData.reviewLocation === 'No' && applicationStatus === 'Submitted'" class="row m-0">
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Last Date to Resubmit:<span class="text-danger font-size-12">*</span></label>
-        <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.resubmitDate" name="resubmitDate"
-          required #resubmitDate="ngModel" />
-        <div *ngIf="resubmitDate.invalid && resubmitDate.touched" class="text-danger font-size-12">
-          Please provide a date
-        </div>
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Remarks:</label>
-        <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.resubmitRemarks"
-          name="resubmitRemarks"></textarea>
-      </div>
-    </div>
-  </div>
-
-  <!-- Filing System Section -->
-  <div class="row m-4">
-    <div class="col-md-6 mb-3">
-      <label class="form-label">Proper filing system:<span class="text-danger font-size-12">*</span></label>
-      <button *ngIf="formData.properFillingPath" class="btn btn-sm btn-outline-primary"
-        (click)="downloadFile(formData.properFillingPath)">
-        View doc
-      </button>
-    </div>
-
-    <div class="col-md-6 mb-3">
-      <label class="form-label">Review:<span class="text-danger font-size-12">*</span></label>
-      <select class="form-select form-control-sm" [(ngModel)]="formData.filingReview" name="filingReview" required
-        #filingReview="ngModel" (change)="onFilingReviewChange()">
-        <option value="">-- Select --</option>
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-      </select>
-      <div *ngIf="filingReview.invalid && filingReview.touched" class="text-danger font-size-12">
-        Please select Yes or No
-      </div>
-    </div>
-
-    <!-- Conditional Resubmit Fields (Filing) -->
-    <div *ngIf="formData.filingReview === 'No' && applicationStatus === 'Submitted'" class="row m-0">
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Resubmit Date:<span class="text-danger font-size-12">*</span></label>
-        <input type="date" class="form-control form-control-sm" [(ngModel)]="formData.fsresubmitDeadline"
-          name="fsresubmitDeadline" required #fsresubmitDeadline="ngModel">
-        <div *ngIf="fsresubmitDeadline?.invalid && fsresubmitDeadline?.touched" class="text-danger font-size-12">
-          Please provide a resubmission date
-        </div>
-      </div>
-
-      <div class="col-md-6 mb-3">
-        <label class="form-label">Remarks:<span class="text-danger font-size-12">*</span></label>
-        <textarea rows="2" class="form-control form-control-sm" [(ngModel)]="formData.fsRemarks" name="fsRemarks"
-          required #fsRemarks="ngModel"></textarea>
-        <div *ngIf="fsRemarks?.invalid && fsRemarks?.touched" class="text-danger font-size-12">
-          Remarks are required
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- OHS Handbook Section -->
-  <div class="row m-4">
-    <div class="col-md-6 mb-3">
-      <label class="form-label">OHS Handbook:<span class="text-danger font-size-12">*</span></label>
-      <button *ngIf="formData.ohsHandBook" class="btn btn-sm btn-outline-primary"
-        (click)="downloadFile(formData.ohsHandBook)">
-        View doc
-      </button>
-    </div>
-
-    <div class="col-md-6 mb-3">
-      <label class="form-label">Review (OHS Handbook):<span class="text-danger font-size-12">*</span></label>
-      <select class="form-select form-control-sm" [(ngModel)]="formData.ohsReview" name="ohsReview" required
-        #ohsReview="ngModel">
-        <option value="">-- Select --</option>
-        <option value="Yes">Yes</option>
-        <option value="No">No</option>
-      </select>
-    </div>
-  </div>
-
   <!-- General Remarks -->
   <div class="row m-4">
     <div class="col-md-12 mb-3">
@@ -121,7 +36,7 @@
   <div class="row m-4">
     <div class="col-12 d-flex justify-content-end align-items-center gap-2 mt-3">
       <button type="submit" class="btn btn-success"
-        *ngIf="applicationStatus === 'Resubmitted OS and PFS' && formData.filingReview === 'Yes'" (click)="update()"
+        *ngIf="applicationStatus === 'Resubmitted OS and PFS' && formData.reviewLocation === 'Yes'" (click)="update()"
         [disabled]="isSaving">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
         {{ isSaving ? 'Saving...' : 'Update' }}
@@ -132,9 +47,7 @@
           applicationStatus === 'Suspension Resubmission' 
           || applicationStatus === 'Rejected'
         ) && (
-          formData.filingReview === 'Yes' ||
-          formData.ohsReview === 'Yes' ||
-          formData.signboardReview === 'Yes'
+          formData.reviewLocation === 'Yes'
         )" (click)="saveAndNext()" [disabled]="isSaving">
         <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
         {{ isSaving ? 'Saving...' : 'Save & Next' }}
@@ -146,7 +59,7 @@
       <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to reject this application?'"
         [nzOkText]="'Yes, Reject'" [nzCancelText]="'Cancel'" (nzOnConfirm)="rejectApplication()">
         <button class="btn btn-danger"
-          *ngIf="applicationStatus === 'Suspension Resubmission' && (formData.filingReview === 'No' || formData.ohsReview === 'No' || formData.signboardReview === 'No')">
+          *ngIf="applicationStatus === 'Suspension Resubmission' && (formData.reviewLocation === 'No')">
           Reject
         </button>
       </a>
