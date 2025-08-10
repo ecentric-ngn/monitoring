@@ -236,7 +236,8 @@ export class ConsultancyFirmComponent {
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
             data.applicationStatus === 'Rejected' ||
-            data.applicationStatus === 'Suspension Resubmission'
+            data.applicationStatus === 'Suspension Resubmission' ||
+            data.applicationStatus === 'Cancellation Request Rejected'
         ) {
             const workId = data.consultantNo;
             this.prepareAndNavigate(data, workId);

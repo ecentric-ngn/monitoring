@@ -46,10 +46,10 @@ export class CbPermanentEmployeesComponent {
         this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
         const WorkDetail = this.service.getData('BctaNo');
         this.formData.firmType = WorkDetail.data;
+        this.data = WorkDetail.data ||  this.data;
         this.bctaNo = WorkDetail.data.certifiedBuilderNo;
         this.appNo = WorkDetail.data.appNo;
         this.licenseStatus = WorkDetail.data.licenseStatus;
-         this.data = this.data || WorkDetail.data;
         this.applicationStatus = WorkDetail.data.applicationStatus;
         this.tData = {
             hrFulfilled: '',

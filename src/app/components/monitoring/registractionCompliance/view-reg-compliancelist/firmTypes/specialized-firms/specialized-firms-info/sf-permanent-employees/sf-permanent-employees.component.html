@@ -120,13 +120,11 @@
                     </button>
                 </a>
                 <!-- Action Button -->
-                <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR'" class="btn btn-primary"
-                    (click)="openActionModal(tData)">
+                <button class="btn btn-primary" *ngIf="applicationStatus === 'Resubmitted HR' && tData.hrFulfilled === 'No'" class="btn btn-primary"
+                   data-bs-toggle="modal"
+                        data-bs-target="#actionModal">
                     Action
                 </button>
-
-                <!-- Reinstate Button -->
-                
             </div>
         </div>
     </form>
@@ -149,7 +147,7 @@
                             <select class="form-select h-50" [(ngModel)]="selectedAction.actionType" name="actionType"
                                 required (change)="onActionTypeChange()">
                                 <option value="">-- Select --</option>
-                                <option value="downgrade">Cancel</option>
+                                <option value="cancel">Cancel</option>
                                 <option value="suspend">Suspend</option>
                             </select>
                         </div>
@@ -167,7 +165,7 @@
                     </div>
 
                     <!-- Downgrade Table -->
-                    <div *ngIf="selectedAction.actionType === 'downgrade'" class="table-responsive">
+                    <div *ngIf="selectedAction.actionType === 'cancel'" class="table-responsive">
                         <table class="table table-bordered">
                             <thead>
                                 <tr>
@@ -191,7 +189,7 @@
                 </div>
 
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-danger" (click)="closeModal()"
+                    <button type="button" #closeActionModal class="btn btn-danger" (click)="closeModal()"
                         data-bs-dismiss="modal">Cancel</button>
                     <button type="submit" class="btn btn-primary" (click)="submitAction()">Submit</button>
                 </div>

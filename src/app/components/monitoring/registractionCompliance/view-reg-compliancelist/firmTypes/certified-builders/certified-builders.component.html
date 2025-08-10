@@ -69,7 +69,8 @@
         || data.applicationStatus === 'Resubmitted HR and EQ'
         || data.applicationStatus === 'Resubmitted OS and PFS'
         || data.applicationStatus === 'Rejected'
-        || data.applicationStatus === 'Suspension Resubmission'" (click)="navigate(data)">
+        || data.applicationStatus === 'Suspension Resubmission'
+        || data.applicationStatus === 'Cancellation Request Rejected'" (click)="navigate(data)">
                         {{ data.certifiedBuilderNo }}
                     </td>
 
@@ -77,22 +78,30 @@
                     <td>{{ data.sentDate }}</td>
                     <td>
                         <span class="text-bold" [ngClass]="{
-                                'text-secondary': data.applicationStatus === 'Not Submitted',
-                                'text-warning': data.applicationStatus === 'Pending' || data.applicationStatus === 'Cancel Request' || data.applicationStatus === 'Downgrade Request' || data.applicationStatus === 'Suspension Request',
-                                'text-success': data.applicationStatus === 'Verified' || data.applicationStatus === 'Reinstated' || data.applicationStatus === 'Suspension Approved' || data.applicationStatus === 'Forwarded TO RC'|| data.applicationStatus === 'Cancellation Approved',
-                                'text-danger': data.applicationStatus === 'Rejected',
-                                'text-danger': data.applicationStatus === 'Submitted' 
-                                || data.applicationStatus === 'Resubmitted HR and EQ' 
-                                || data.applicationStatus === 'Resubmitted OS and PFS' 
-                                || data.applicationStatus === 'Suspension Resubmission'
-                                || data.applicationStatus === 'Suspension Rejected'
-                                || data.applicationStatus === 'Downgrade Rejected'
-                                || data.applicationStatus === 'Cancellation Rejected'
-                                || data.applicationStatus === 'Rejected'
-                            }">
+      'text-secondary': data.applicationStatus === 'Not Submitted',
+      'text-warning': 
+        data.applicationStatus === 'Pending' || 
+        data.applicationStatus === 'Cancel Request' || 
+        data.applicationStatus === 'Suspension Request',
+      'text-success': 
+        data.applicationStatus === 'Verified' || 
+        data.applicationStatus === 'Reinstated' || 
+        data.applicationStatus === 'Suspension Approved' || 
+        data.applicationStatus === 'Forwarded TO RC' || 
+        data.applicationStatus === 'Submitted' || 
+           data.applicationStatus === 'Resubmitted HR and EQ' || 
+        data.applicationStatus === 'Resubmitted OS and PFS' || 
+        data.applicationStatus === 'Cancellation Approved',
+      'text-danger': 
+        data.applicationStatus === 'Rejected' ||
+        data.applicationStatus === 'Suspension Resubmission' ||
+        data.applicationStatus === 'Suspension Rejected' ||
+        data.applicationStatus === 'Cancellation Request Rejected',
+    }">
                             {{ data.applicationStatus }}
                         </span>
                     </td>
+
                     <td>
                         <span class="text-bold"
                             [ngClass]="{'text-danger': data.licenseStatus== 'Suspended' || data.licenseStatus== 'Cancelled' || data.licenseStatus== 'Downgraded', 'text-primary': data.licenseStatus== 'Active'}">

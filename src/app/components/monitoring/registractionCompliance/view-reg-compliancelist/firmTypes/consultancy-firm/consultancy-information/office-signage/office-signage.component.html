@@ -131,7 +131,7 @@
           <!-- Save and Next Button with Popup -->
           <a nz-popconfirm [nzPopconfirmTitle]="'Are you sure you want to save and proceed to the next step?'"
             [nzOkText]="'Yes, Continue'" [nzCancelText]="'Cancel'" (nzOnConfirm)="saveAndNext()"
-            *ngIf="(formData.filingReview === 'Yes' || formData.signboardReview === 'Yes' || formData.filingFulfilled === 'Yes') && applicationStatus !== 'Resubmitted OS and PFS' || applicationStatus !== 'Rejected'">
+            *ngIf="(formData.filingReview === 'Yes' || formData.signboardReview === 'Yes' || formData.filingFulfilled === 'Yes') && applicationStatus !== 'Resubmitted OS and PFS' || applicationStatus !== 'Rejected' || applicationStatus === 'Cancellation Request Rejected' ">
             <button type="button" class="btn btn-success" [disabled]="isSaving">
               <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2"></span>
               {{ isSaving ? 'Saving...' : 'Save and Next' }}

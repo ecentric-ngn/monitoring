@@ -117,7 +117,7 @@
             Save & Forward
           </button>
           <button (click)="saveAndNext()" type="submit" class="btn btn-success"
-            *ngIf="tData.fulfillsRequirement === 'Yes' && (applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission')"
+            *ngIf="tData.fulfillsRequirement === 'Yes' && (applicationStatus === 'Submitted' || applicationStatus === 'Suspension Resubmission' || applicationStatus === 'Cancellation Request Rejected')"
             [disabled]="isSaving">
             <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status"
               aria-hidden="true"></span>

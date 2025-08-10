@@ -55,59 +55,58 @@ export class OnSiteQualityCheckComponent {
             this.userName = userDetails.username;
         }
     }
-    getDatabasedOnChecklistId() {
-        const payload: any = [
-            {
-                field: 'checklist_id',
-                value: this.prevTableId,
-                operator: 'AND',
-                condition: '=',
-            },
-             {
-        field: 'workid',
-        value: this.workId,
-        operator: 'AND',
-        condition: '=',
+  getDatabasedOnChecklistId() {
+    const payload: any = [
+        {
+            field: 'checklist_id',
+            value: this.prevTableId,
+            operator: 'AND',
+            condition: '=',
         },
-        ];
-        this.service
-            .fetchDetails(payload, 1, 100, 'oq_confirmation_view')
-            .subscribe(
-                (response: any) => {
-                    const data = response.data;
-                    this.formSections = data.map((item: any) => {
-                        // Split and remove all 'NO_PATH' entries
-                        let filePaths = item.file_path
-                            ? item.file_path
-                                  .split(',')
-                                  .map((path: string) => path.trim())
-                                  .filter((path: string) => path !== 'NO_PATH')
-                            : [];
+        {
+            field: 'workid',
+            value: this.workId,
+            operator: 'AND',
+            condition: '=',
+        },
+    ];
 
-                        return {
-                            id: item.id,
-                            checklistId: item.checklist_id,
-                            buildingComponents: item.building_components,
-                            concreteAge: item.concrete_age,
-                            concreteGrade: item.concrete_grade_contract,
-                            schmidtTestHammertest:
-                                item.schmidt_hammer_test_result,
-                            remarks: item.remarks,
-                            filePaths: filePaths,
-                        };
-                    });
+    this.service
+        .fetchDetails(payload, 1, 100, 'oq_confirmation_view')
+        .subscribe(
+            (response: any) => {
+                const data = response.data;
+                this.formSections = data.map((item: any) => {
+                    let filePaths = item.file_path
+                        ? item.file_path
+                              .split(',')
+                              .map((path: string) => path.trim())
+                              .filter((path: string) => path !== 'NO_PATH')
+                        : [];
 
-                    // ✅ Add this console to check the results
-                    console.log(
-                        'Fetched formSections with file paths:',
-                        this.formSections
-                    );
-                },
-                (error) => {
-                    console.error('Error fetching contractor details:', error);
+                    return {
+                        id: item.id,
+                        checklistId: item.checklist_id,
+                        buildingComponents: item.building_components,
+                        concreteAge: item.concrete_age,
+                        concreteGrade: item.concrete_grade_contract,
+                        schmidtTestHammertest: item.schmidt_hammer_test_result,
+                        remarks: item.remarks,
+                        filePaths: filePaths,
+                    };
+                });
+
+                // If no sections returned, add one
+                if (this.formSections.length === 0) {
+                    this.addMoreSection();
                 }
-            );
-    }
+            },
+            (error) => {
+                console.error('Error fetching contractor details:', error);
+            }
+        );
+}
+
     formSections = [
         {
             id: '',

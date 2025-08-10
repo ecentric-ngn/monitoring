@@ -47,7 +47,8 @@
       <!-- Save & Next Button -->
       <button type="submit" class="btn btn-success" *ngIf="(
           applicationStatus === 'Submitted' ||
-          applicationStatus === 'Suspension Resubmission' 
+          applicationStatus === 'Suspension Resubmission' ||
+          applicationStatus === 'Cancellation Request Rejected'
           || applicationStatus === 'Rejected'
         ) && (
           formData.reviewLocation === 'Yes'
@@ -59,6 +60,7 @@
        <button type="submit" class="btn btn-success" *ngIf="(
           applicationStatus === 'Submitted' ||
           applicationStatus === 'Suspension Resubmission' 
+          || applicationStatus === 'Cancellation Request Rejected'
           || applicationStatus === 'Rejected'
         ) && (
           formData.reviewLocation === 'No'

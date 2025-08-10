@@ -34,18 +34,17 @@
       </div>
       <!-- Save Button -->
       <div class="d-flex justify-content-end mt-4">
+        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reject the application?'"
+          (nzOnConfirm)="reinstate(bctaNo)">
+          <button class="btn btn-danger h-100 me-2" *ngIf="applicationStatus === 'Suspension Resubmission'">
+            Reinstate
+          </button>
+        </a>
         <button type="submit" class="btn btn-success" [disabled]="monitoringForm.invalid || isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save
         </button>
-     
-      <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to Reject the application?'"
-          (nzOnConfirm)="reinstate(bctaNo)">
-          <button class="btn btn-danger h-100" *ngIf="applicationStatus === 'Suspension Resubmission'">
-            Reinstate
-          </button>
-        </a>
+      </div>
     </div>
-     </div>
   </form>
 </div>

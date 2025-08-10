@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Inject, Input, Output } from '@angular/core';
+import { Component, ElementRef, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { forkJoin } from 'rxjs';
 import { CommonService } from '../../../../../../../../service/common.service';
@@ -15,6 +15,7 @@ import { NzNotificationService } from 'ng-zorro-antd/notification';
 export class SfPermanentEmployeesComponent {
     formData: any = {};
     @Output() activateTab = new EventEmitter<{ id: string; tab: string }>();
+      @ViewChild('closeActionModal', { static: false }) closeActionModal!: ElementRef;
     bctaNo: any;
     tableData: any;
     applicationStatus: string = '';
@@ -206,7 +207,8 @@ export class SfPermanentEmployeesComponent {
      */
 
     onActionTypeChange() {
-        if (this.selectedAction.actionType === 'downgrade') {
+        if (this.selectedAction.actionType === 'cancel') {
+            debugger
             const firmId = this.formData.firmType.specializedFirmId; // Use the correct property for firmId
             const firmType = 'specializedfirm';
             if (!firmId) {
@@ -338,43 +340,45 @@ export class SfPermanentEmployeesComponent {
         }, 100);
     }
 
-    update() {
-        this.isSaving = true;
-        const payload = {
-            sfReviewDto: {
-                bctaNo: this.bctaNo,
-                hrFulfilled: this.tData.hrFulfilled,
-                hrResubmitDeadline: this.tData.resubmitDate,
-                hrRemarks: this.tData.remarks,
-            },
-        };
+   update() {
+    this.isSaving = true;
+    const payload = {
+        sfReviewDto: {
+            bctaNo: this.bctaNo,
+            hrFulfilled: this.tData.hrFulfilled,
+            hrResubmitDeadline: this.tData.resubmitDate,
+            hrRemarks: this.tData.remarks,
+        },
+    };
 
-        this.service.saveOfficeSignageAndDocSF(payload).subscribe({
-            next: (res: any) => {
-                this.isSaving = false;
-                Swal.fire({
-                    icon: 'success',
-                    title: 'Updated successfully!',
-                    showConfirmButton: false,
-                    timer: 2000,
-                }).then(() => {
-                    this.router.navigate(['monitoring/specialized']);
-                });
-            },
-            error: (err) => {
-                this.isSaving = false;
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Update failed!',
-                    text:
-                        err?.error?.message ||
-                        'Something went wrong. Please try again.',
-                    confirmButtonText: 'OK',
-                });
+    this.service.saveOfficeSignageAndDocSF(payload).subscribe({
+        next: (res: any) => {
+            this.isSaving = false;
+            Swal.fire({
+                icon: 'success',
+                title: 'Updated successfully!',
+                text: 'Your changes have been saved.',
+                showConfirmButton: true,
+                confirmButtonText: 'OK',
+            }).then(() => {
                 this.router.navigate(['monitoring/specialized']);
-            },
-        });
-    }
+            });
+        },
+        error: (err) => {
+            this.isSaving = false;
+            Swal.fire({
+                icon: 'error',
+                title: 'Update failed!',
+                text:
+                    err?.error?.message ||
+                    'Something went wrong. Please try again.',
+                confirmButtonText: 'OK',
+            });
+            this.router.navigate(['monitoring/specialized']);
+        },
+    });
+}
+
 
     tableId: any;
 
@@ -446,9 +450,7 @@ export class SfPermanentEmployeesComponent {
     }
 
     closeModal() {
-        if (this.bsModal) {
-            this.bsModal.hide();
-        }
+        this.closeActionModal.nativeElement.click();
     }
 
     submitAction() {
@@ -480,7 +482,7 @@ export class SfPermanentEmployeesComponent {
                 specializedFirmId: this.bctaNo,
                 requestedBy: this.authService.getUsername(), // Replace with actual user/requestor if needed
                 downgradeEntries,
-                applicationID:this.selectedAction.target?.appNo,
+                applicationID:this.formData.firmType.appNo
             };
 
             this.service.downgradeSF(payload).subscribe({
@@ -497,6 +499,7 @@ export class SfPermanentEmployeesComponent {
                             'success'
                         );
                         this.closeModal();
+                          this.router.navigate(['monitoring/specialized']);
                     } else {
                         Swal.fire(
                             'Error',
@@ -504,6 +507,7 @@ export class SfPermanentEmployeesComponent {
                             'error'
                         );
                         this.closeModal();
+                          this.router.navigate(['monitoring/specialized']);
                     }
                 },
                 error: (err) => {
@@ -525,7 +529,7 @@ export class SfPermanentEmployeesComponent {
                 ).toISOString(),
                 firmType: 'specialized-firm',
                 reason: this.selectedAction.remarks,
-                applicationID:this.selectedAction.target?.appNo,
+                applicationID:this.formData.firmType.appNo
             };
             // Call cancel API
             this.service.cancelFirm(payload).subscribe({
@@ -536,6 +540,7 @@ export class SfPermanentEmployeesComponent {
                         'success'
                     );
                     this.closeModal();
+                      this.router.navigate(['monitoring/specialized']);
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to cancel firm', 'error');
@@ -561,6 +566,7 @@ export class SfPermanentEmployeesComponent {
                         'success'
                     );
                     this.closeModal();
+                      this.router.navigate(['monitoring/specialized']);
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to suspend firm', 'error');

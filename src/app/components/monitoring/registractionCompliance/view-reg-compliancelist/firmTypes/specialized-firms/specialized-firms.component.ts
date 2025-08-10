@@ -340,7 +340,8 @@ export class SpecializedFirmsComponent {
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR' ||
             data.applicationStatus === 'Rejected' ||
-            data.applicationStatus === 'Suspension Resubmission'
+            data.applicationStatus === 'Suspension Resubmission' ||
+            data.applicationStatus === 'Cancellation Request Rejected'
         ) {
             const workId = data.specializedFirmNo;
             this.prepareAndNavigate(data, workId);
@@ -574,6 +575,7 @@ export class SpecializedFirmsComponent {
                         'success'
                     );
                     this.closeModal();
+                      this.fetchComplianceDetails();
                 },
                 error: (err) => {
                     Swal.fire('Error', 'Failed to cancel firm', 'error');
