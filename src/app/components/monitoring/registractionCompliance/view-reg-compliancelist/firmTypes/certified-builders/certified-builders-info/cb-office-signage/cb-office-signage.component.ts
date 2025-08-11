@@ -153,7 +153,7 @@ fetchDataBasedOnBctaNo() {
     }
 
     fetchSuspendDataBasedOnBctaNo() {
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo,).subscribe(
+        this.service.getSuspendedDatabasedOnBctaNo(this.data.appNo).subscribe(
             (res: any) => {
                 Object.assign(this.formData, res.complianceEntities[0]);
             const payload = [
@@ -170,7 +170,6 @@ fetchDataBasedOnBctaNo() {
           operator: 'AND'
         }
       ];
-
       this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
         (res2: any) => {
           if (res2?.data?.length) {
@@ -178,12 +177,8 @@ fetchDataBasedOnBctaNo() {
               ...this.formData,
               ...res2.data[0]
             };
-
             // Map specific fields to user-friendly form keys
-            this.formData.signboardReview = this.formData.os_review || '';
-            this.formData.filingReview = this.formData.fsreview || '';
-            this.formData.ohsReview = this.formData.ohsreview || '';
-            this.formData.generalRemarks = this.formData.ohsRemarks || '';
+             this.formData.reviewLocation = this.formData.locationreview || '';
           }
         },
         (error) => {

@@ -84,7 +84,7 @@ export class CbMandatoryEquipmentComponent {
     }
 
     fetchSuspendDataBasedOnBctaNo() {
-    this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo || this.data.certifiedBuilderNo).subscribe(
+    this.service.getSuspendedDatabasedOnBctaNo(this.data.appNo).subscribe(
         (res: any) => {
             this.tableData = res.vehicles;
             // Then call the second fetch

@@ -150,7 +150,7 @@ export class ConsultancyMandatoryEquipmentComponent {
 
 
   fetchSuspendDataBasedOnBctaNo() {
-  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+  this.service.getSuspendedDatabasedOnBctaNo(this.data.appNo).subscribe(
     (res1: any) => {
       this.tableData = res1.hrCompliance;
       // Now fetch additional firm details

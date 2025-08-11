@@ -144,7 +144,7 @@
                             <label for="Type" class="font-size-14">Action Type <span class="mandatory">*</span></label>
                             <select #TypeInput="ngModel" class="form-select form-control-sm" id="Type" name="Type" [(ngModel)]="formData.Type" required (change)="onActionTypeChange($event)">
                               <option value="" hidden>Select Type</option>
-                              <option value="Downgrade" *ngIf="!hideDowngradeOption">Downgrade</option>
+                              <!-- <option value="Downgrade" *ngIf="!hideDowngradeOption">Downgrade</option> -->
                               <option value="Suspend" *ngIf="!hideSuspendOption">Suspend</option>
                               <option value="Cancel" *ngIf="!hideCancelOption">Cancel</option>
                             </select>

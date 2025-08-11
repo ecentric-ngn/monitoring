@@ -146,11 +146,9 @@ export class PermanentEmployeeComponent {
 
   fetchSuspendDataBasedOnBctaNo() {
   this.bctaNo = this.WorkDetail.data.contractorNo;
-
-  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+  this.service.getSuspendedDatabasedOnBctaNo(this.WorkDetail.data.appNo).subscribe(
     (res1: any) => {
       this.tableData = res1.hrCompliance;
-
       // Prepare payload for second call
       const payload = [
         {

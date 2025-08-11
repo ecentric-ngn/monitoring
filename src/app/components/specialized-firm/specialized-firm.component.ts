@@ -72,7 +72,7 @@ formData: any = {
 
     //fetching list of work classification base on contractorNo
     onActionTypeChange(event: any): void {
-      this.isDowngradeSelected = event.target.value === 'Downgrade';
+      this.isDowngradeSelected = event.target.value === 'Cancel';
 
       if (this.isDowngradeSelected) {
         this.getWorkClassification(this.selectedspecializedFirmId);
@@ -225,9 +225,7 @@ navigate(data:any){
   }
    //  Method to handle the "Save" button click event
 Savedata() {
-if (this.formData.Type === 'Downgrade') {
-this.saveDowngrade();
-} else if (this.formData.Type === 'Suspend') {
+  if (this.formData.Type === 'Suspend') {
   this.savedSuspend();
  } else if (this.formData.Type === 'Cancel') {
   this.savedCancelled();
@@ -314,7 +312,7 @@ this.saveDowngrade();
     );
   }
     //save deregister
-    saveDowngrade()  {
+    savedCancelled()  {
        if (this.formData.Date) {
       // Parse the selected date
       const selectedDate = new Date(this.formData.Date);
@@ -363,7 +361,7 @@ this.saveDowngrade();
     }
     
     showDowngradeMessage() {
-      this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm downgraded successfully' });
+      this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm cancelled successfully' });
     }
     
  // Method to reload the page
@@ -427,7 +425,7 @@ UploadFileForspecializedFirmN() {
     next: () => {
       const suspendPayload = {
         cdbNos: [this.selectedspecializedFirmNo],
-        firmType: 'Specialized-firm' // You can change this if dynamic
+        firmType: 'specialized-firm' // You can change this if dynamic
       };
       this.service.suspendedIng2cSystem(suspendPayload).subscribe({
         next: () => {
@@ -454,55 +452,55 @@ UploadFileForspecializedFirmN() {
   }
 
 //save cancelled
-   savedCancelled() {
-  if (this.formData.Date) {
-    const selectedDate = new Date(this.formData.Date);
-    const nowUTC = new Date();
-    const bhutanOffset = 6;
-    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-    this.formData.Date = selectedDate.toISOString();
-  }
+//    savedCancelled() {
+//   if (this.formData.Date) {
+//     const selectedDate = new Date(this.formData.Date);
+//     const nowUTC = new Date();
+//     const bhutanOffset = 6;
+//     const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+//     selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+//     this.formData.Date = selectedDate.toISOString();
+//   }
 
-  const cancelledDetail = {
-    type: this.formData.Type,
-    cancelledDate: this.formData.Date,
-    cancelledDetails: this.formData.Details,
-    cancelledBy: this.uuid,
-    specializedFirmNo: this.selectedspecializedFirmNo,
-    fileId: this.fileId
-  };
+//   const cancelledDetail = {
+//     type: this.formData.Type,
+//     cancelledDate: this.formData.Date,
+//     cancelledDetails: this.formData.Details,
+//     cancelledBy: this.uuid,
+//     specializedFirmNo: this.selectedspecializedFirmNo,
+//     fileId: this.fileId
+//   };
 
-  this.service.saveCancelledDetails(cancelledDetail).subscribe({
-    next: () => {
-      const cancelPayload = {
-        cdbNos: [this.selectedspecializedFirmNo],
-        firmType: 'specialized-firm' // Can use this.formData.Type if dynamic
-      };
+//   this.service.saveCancelledDetails(cancelledDetail).subscribe({
+//     next: () => {
+//       const cancelPayload = {
+//         cdbNos: [this.selectedspecializedFirmNo],
+//         firmType: 'specialized-firm' // Can use this.formData.Type if dynamic
+//       };
 
-      this.service.cancelledIng2cSystem(cancelPayload).subscribe({
-        next: () => {
-          this.closeButton.nativeElement.click();
-          this.showCancelledMessage();
+//       this.service.cancelledIng2cSystem(cancelPayload).subscribe({
+//         next: () => {
+//           this.closeButton.nativeElement.click();
+//           this.showCancelledMessage();
 
-          setTimeout(() => {
-            this.getSpecializedFirm();
-          }, 1000);
-        },
-        error: (g2cError) => {
-          this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
-        }
-      });
-    },
-    error: (localError) => {
-      this.errorMessage = 'Local cancellation failed: ' + (localError.error?.error || 'Unknown error');
-    }
-  });
-}
+//           setTimeout(() => {
+//             this.getSpecializedFirm();
+//           }, 1000);
+//         },
+//         error: (g2cError) => {
+//           this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
+//         }
+//       });
+//     },
+//     error: (localError) => {
+//       this.errorMessage = 'Local cancellation failed: ' + (localError.error?.error || 'Unknown error');
+//     }
+//   });
+// }
 
-     showCancelledMessage() {
-       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm  Cancelled successfully' });
-     }
+    //  showCancelledMessage() {
+    //    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm  Cancelled successfully' });
+    //  }
      openModal(event: Event) {
       event.stopPropagation(); 
     }

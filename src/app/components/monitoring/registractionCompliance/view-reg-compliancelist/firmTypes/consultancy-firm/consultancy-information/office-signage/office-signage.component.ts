@@ -149,7 +149,7 @@ fetchDataBasedOnBctaNo() {
 }
 
   fetchSuspendDataBasedOnBctaNo() {
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+        this.service.getSuspendedDatabasedOnBctaNo(this.data.appNo).subscribe(
     (res1: any) => {
       if (res1?.complianceEntities?.length) {
         this.formData = {
