@@ -118,7 +118,7 @@ export class PermanentEmployeesComponent {
   // Ensure bctaNo is set (you can uncomment below if needed)
   // this.bctaNo = this.WorkDetail.data.contractorNo;
 
-  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+  this.service.getSuspendedDatabasedOnBctaNo(this.data.appNo).subscribe(
     (res1: any) => {
       this.tableData = res1.hrCompliance;
 

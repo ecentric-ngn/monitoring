@@ -67,7 +67,7 @@ export class CbPermanentEmployeesComponent {
      * Merges the first compliance entity from the API response into formData.
      */
     fetchSuspendDataBasedOnBctaNo() {
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+        this.service.getSuspendedDatabasedOnBctaNo(this.appNo).subscribe(
             (res: any) => {
                 this.tableData = res.hrCompliance;
            const payload = [

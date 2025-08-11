@@ -90,7 +90,7 @@ export class SfPermanentEmployeesComponent {
      * Logs any errors that occur to the console.
      */
     fetchSuspendDataBasedOnBctaNo() {
-        this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+        this.service.getSuspendedDatabasedOnBctaNo(this.formData.firmType.appNo).subscribe(
             (res: any) => {
                 this.tableData = res.hrCompliance;
             },

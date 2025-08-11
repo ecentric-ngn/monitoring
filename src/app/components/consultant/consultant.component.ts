@@ -70,7 +70,7 @@ export class ConsultantComponent {
 
 //fetching list of work classification base on contractorNo
 onActionTypeChange(event: any): void {
-  this.isDowngradeSelected = event.target.value === 'Downgrade';
+  this.isDowngradeSelected = event.target.value === 'Cancel';
   if (this.isDowngradeSelected) {
     this.getWorkClassification(this.selectedconsultantId);
   }
@@ -213,12 +213,13 @@ onActionTypeChange(event: any): void {
   }
   //  Method to handle the "Save" button click event
   Savedata() {
-    if (this.formData.Type === 'Downgrade') {
-      this.saveDowngrade();
-    } else if (this.formData.Type === 'Suspend') {
+    // if (this.formData.Type === 'Downgrade') {
+    //   this.saveDowngrade();
+    // } else
+      if (this.formData.Type === 'Suspend') {
       this.savedSuspend();
     } else if (this.formData.Type === 'Cancel') {
-      this.savedCancelled();
+      this.saveCancelled();
     }
   }
   SearchFilter() {
@@ -245,7 +246,7 @@ onActionTypeChange(event: any): void {
         {
           field: "nameOfFirm",
           value: `%${searchQuery}%`,
-          condition: " like ",
+          condition: "like",
           operator: " OR "
         },
         {
@@ -369,7 +370,7 @@ onActionTypeChange(event: any): void {
     }
   }
   // Method to save the downgrade consultant
-  saveDowngrade() {
+  saveCancelled() {
      if (this.formData.Date) {
       // Parse the selected date
       const selectedDate = new Date(this.formData.Date);
@@ -427,7 +428,7 @@ onActionTypeChange(event: any): void {
   }
   
 showDowngradeMessage() {
-    this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Consultant downgraded successfully' });
+    this.messageService.add({ severity: 'success', summary: 'success', detail: 'Consultant cancelled successfully' });
   } 
   // //save savedSuspend  
  savedSuspend() {

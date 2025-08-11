@@ -270,7 +270,7 @@ export class CertifiedBuilderComponent {
     next: () => {
       const suspendPayload = {
         cdbNos: [this.selectedcertifiedBuilderNo],
-        firmType: 'Certified-builder' // Adjusted firm type
+        firmType: 'certified-builder' // Adjusted firm type
       };
       this.service.suspendedIng2cSystem(suspendPayload).subscribe({
         next: () => {

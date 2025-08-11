@@ -327,8 +327,7 @@ fetchDataBasedOnBctaNo() {
 
 fetchSuspendDataBasedOnBctaNo() {
   this.bctaNo = this.WorkDetail.data.contractorNo;
-
-  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+  this.service.getSuspendedDatabasedOnBctaNo(this.WorkDetail.data.appNo).subscribe(
     (res1: any) => {
       if (res1?.complianceEntities?.length) {
         this.formData = { ...this.formData, ...res1.complianceEntities[0] };

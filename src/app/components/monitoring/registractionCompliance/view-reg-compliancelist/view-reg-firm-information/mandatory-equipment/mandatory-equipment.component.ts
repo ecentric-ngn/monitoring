@@ -145,10 +145,9 @@ export class MandatoryEquipmentComponent {
   );
 }
 
-   fetchSuspendDataBasedOnBctaNo() {
+fetchSuspendDataBasedOnBctaNo() {
   this.bctaNo = this.data.contractorNo;
-
-  this.service.getSuspendedDatabasedOnBctaNo(this.bctaNo).subscribe(
+  this.service.getSuspendedDatabasedOnBctaNo(this.data.appNo).subscribe(
     (res1: any) => {
       this.tableData = res1.vehicles;
       // Prepare payload for next fetch
