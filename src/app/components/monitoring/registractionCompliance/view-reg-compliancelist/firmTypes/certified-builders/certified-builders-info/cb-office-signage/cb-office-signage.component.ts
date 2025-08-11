@@ -74,61 +74,6 @@ export class CbOfficeSignageComponent {
         this.selectedAction.actionDate = `${yyyy}-${mm}-${dd}`;
     }
 
-    // fetchDataBasedOnBctaNo() {
-    //     this.service.getDatabasedOnBctaNos(this.bctaNo,this.data.appNo).subscribe((res: any) => {
-    //         Object.assign(this.formData, res.complianceEntities[0]);
-    //     });
-    // }
-
-// fetchDataBasedOnBctaNo() {
-//   console.log('BCTA No:', this.bctaNo, 'App No:', this.data.appNo);
-
-//   this.service.getDatabasedOnBctaNos(this.bctaNo, this.data.appNo).subscribe(
-//     (res1: any) => {
-//       if (res1?.complianceEntities?.length) {
-//         Object.assign(this.formData, res1.complianceEntities[0]);
-//       }
-
-//       const payload = [
-//         {
-//           field: 'bctaNo',
-//           value: this.bctaNo,
-//           condition: 'LIKE',
-//           operator: 'AND'
-//         },
-//         {
-//           field: 'application_number',
-//           value: this.data.appNo,
-//           condition: 'LIKE',
-//           operator: 'AND'
-//         }
-//       ];
-
-//       this.service.fetchDetails(payload, 1, 10, 'combine_firm_dtls_view').subscribe(
-//         (res2: any) => {
-//           if (res2?.data?.length) {
-//             this.formData = {
-//               ...this.formData,
-//               ...res2.data[0]
-//             };
-
-//             this.formData.signboardReview = this.formData.os_review || '';
-//             this.formData.filingReview = this.formData.fsreview || '';
-//             this.formData.ohsReview = this.formData.ohsreview || '';
-//             this.formData.generalRemarks = this.formData.ohsRemarks || '';
-//           }
-//         },
-//         (error) => {
-//           console.error('Error fetching contractor details:', error);
-//         }
-//       );
-//     },
-//     (error) => {
-//       console.error('Error fetching data:', error);
-//     }
-//   );
-// }
-
 fetchDataBasedOnBctaNo() {
   this.service.getDatabasedOnBctaNos(this.bctaNo, this.data.appNo).subscribe(
     (res1: any) => {
@@ -157,12 +102,8 @@ fetchDataBasedOnBctaNo() {
               ...this.formData,
               ...res2.data[0]
             };
-
             // Map specific fields to user-friendly form keys
-            this.formData.signboardReview = this.formData.os_review || '';
-            this.formData.filingReview = this.formData.fsreview || '';
-            this.formData.ohsReview = this.formData.ohsreview || '';
-            this.formData.generalRemarks = this.formData.ohsRemarks || '';
+            this.formData.reviewLocation = this.formData.locationreview || '';
           }
         },
         (error) => {
@@ -217,7 +158,7 @@ fetchDataBasedOnBctaNo() {
                 Object.assign(this.formData, res.complianceEntities[0]);
             const payload = [
         {
-          field: 'bctaNo',
+          field: 'bctano',
           value: this.bctaNo,
           condition: 'LIKE',
           operator: 'AND'
@@ -504,21 +445,6 @@ fetchDataBasedOnBctaNo() {
         return this.applicationStatus === 'Submitted';
     }
 
-    // isFieldEditable(field: string): boolean {
-    //     switch (field) {
-    //         case 'officeSignboard':
-    //         case 'signboardReview':
-    //             return this.isOfficeSignboardEnabled();
-    //         case 'filingSystem':
-    //         case 'filingReview':
-    //             return this.isFilingSystemEnabled();
-    //         case 'ohs':
-    //         case 'ohsReview':
-    //             return this.isOhsEnabled();
-    //         default:
-    //             return false;
-    //     }
-    // }
     isFieldEditable;
     update() {
         this.isSaving = true;
@@ -533,7 +459,7 @@ fetchDataBasedOnBctaNo() {
                 fsreview: this.formData.filingReview || null,
                 fsremarks: this.formData.filingRemarks || null,
                 fsresubmitDeadline: this.formData.filingResubmitDate || null,
-                applicationNO: this.data.appNo,
+                applicationNumber: this.data.appNo,
             },
         };
 
@@ -598,7 +524,7 @@ fetchDataBasedOnBctaNo() {
                 fsreview: this.formData.filingReview,
                 fsremarks: this.formData.fsRemarks,
                 reviewDate: this.formData.reviewDate,
-                applicationNO: this.data.appNo
+                applicationNumber: this.data.appNo
             },
         };
         this.service.saveOfficeSignageAndDocCB(payload).subscribe(

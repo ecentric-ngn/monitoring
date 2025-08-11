@@ -60,7 +60,7 @@ goBack() {
 }
 
   fetchDataBasedOnBctaNo() {
-    this.service.getDatabasedOnBctaNos(this.bctaNo,this.appNo).subscribe((res: any) => {
+    this.service.getDatabasedOnBctaNos(this.bctaNo, this.appNo).subscribe((res: any) => {
       this.formData = res.complianceEntities[0];
       console.log('this.formData', this.formData);
     })

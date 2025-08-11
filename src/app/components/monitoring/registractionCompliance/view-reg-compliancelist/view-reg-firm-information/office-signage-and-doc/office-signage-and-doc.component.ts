@@ -139,64 +139,6 @@ export class OfficeSignageAndDocComponent implements OnInit {
               this.downgradeList = [];
           }
       }
-//         saveAndForward() {
-//         this.isSaving = true;
-//         const payload = {
-//       registrationReview: {
-//         bctaNo: this.data.contractorNo,
-//         firmName: this.formData.firmName,
-//         contactNo: this.formData.mobileNo,
-//         email: this.formData.emailAddress,
-//         classification: this.formData.classification,
-//         applicationStatus: this.data.status,
-//         officeSignboard: this.formData.officeSignboardPath,
-//         osresubmitDeadline: this.formData.signboardResubmitDate,
-//         filingSystem: this.formData.properFillingPath,
-//         ohsHandbook: this.formData.ohsHandBook,
-//         ohsReview: this.formData.ohsReview,
-//         ohsRemarks: this.formData.generalRemarks,
-//         reviewDate: this.formData.reviewDate,
-//         fsreview: this.formData.filingReview,
-//         fsremarks: this.formData.filingRemarks,
-//         fsresubmitDeadline: this.formData.filingResubmitDate,
-//         oslocation: this.formData.officeLocation,
-//         osreview: this.formData.signboardReview,
-//         osremarks: this.formData.signboardRemarks,
-//       }
-//     };
-
-//   this.service.saveOfficeSignageAndDoc(payload).subscribe(
-//   (response: any) => {
-//     this.isSaving = false;
-//     try {
-//       const parsedResponse = typeof response === 'string' ? JSON.parse(response) : response;
-//       this.id = parsedResponse.registrationReview?.id;
-//       this.activateTab.emit({ id: this.id, tab: 'employee' });
-//     } catch (e) {
-//       console.error('Error parsing response:', e);
-//     }
-//   },
-//   (error) => {
-//     this.isSaving = false;
-
-//     if (error.status === 500) {
-//       this.createNotification(
-//         'error',
-//         'Server Error',
-//         'A server error occurred (500). Please try again later.'
-//       );
-//     } else {
-//       this.createNotification(
-//         'error',
-//         'Error',
-//         'Something went wrong while sending the list.'
-//       );
-//     }
-
-//     console.error('Error saving data:', error);
-//   }
-// );
-//   }
 
    rejectApplication() {
           this.service.rejectApplication('Contractor',this.data.contractorNo).subscribe(

@@ -332,16 +332,30 @@ export class CertifiedBuildersComponent {
         }
     }
 
-    navigate(data: any) {
+    // navigate(data: any) {
+    //     if (
+    //         data.applicationStatus === 'Submitted' ||
+    //         data.applicationStatus === 'Resubmitted OS and PFS' ||
+    //         data.applicationStatus === 'Resubmitted HR and EQ' ||
+    //         data.applicationStatus === 'Rejected' ||
+    //         data.applicationStatus === 'Suspension Resubmission',
+    //         data.applicationStatus === 'Cancellation Request Rejected'
+    //     ) {
+    //         const workId = data.certifiedBuilderNo;
+    //         this.prepareAndNavigate(data, workId);
+    //     }
+    // }
+      navigate(data: any) {
+        // Only proceed if status is "Submitted"
         if (
             data.applicationStatus === 'Submitted' ||
             data.applicationStatus === 'Resubmitted OS and PFS' ||
             data.applicationStatus === 'Resubmitted HR and EQ' ||
             data.applicationStatus === 'Rejected' ||
-            data.applicationStatus === 'Suspension Resubmission',
+            data.applicationStatus === 'Suspension Resubmission' ||
             data.applicationStatus === 'Cancellation Request Rejected'
         ) {
-            const workId = data.certifiedBuilderNo;
+            const workId = data.consultantNo;
             this.prepareAndNavigate(data, workId);
         }
     }
@@ -351,9 +365,7 @@ export class CertifiedBuildersComponent {
             data: data,
             firmType: this.firmType,
         };
-
         console.log('Navigation payload:', workDetail);
-
         this.service.setData(workDetail, 'BctaNo', 'monitoring/cb-info');
     }
 
