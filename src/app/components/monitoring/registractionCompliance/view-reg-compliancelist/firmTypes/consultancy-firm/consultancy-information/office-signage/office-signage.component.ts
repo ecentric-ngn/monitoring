@@ -58,8 +58,10 @@ export class OfficeSignageComponent {
             return;
         }
         this.formData.firmType = WorkDetail.data;
+        debugger
         this.data = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
+        debugger
         this.applicationStatus = WorkDetail.data.applicationStatus;
         if (
             this.applicationStatus === 'Suspension Resubmission' &&
@@ -108,8 +110,8 @@ fetchDataBasedOnBctaNo() {
       }
       const payload = [
         {
-          field: 'bctaNo',
-          value: this.bctaNo,
+          field: 'bctano',
+          value:  this.bctaNo,
           condition: 'LIKE',
           operator: 'AND'
         },
@@ -158,7 +160,7 @@ fetchDataBasedOnBctaNo() {
 
       const payload = [
         {
-          field: 'bctaNo',
+          field: 'bctano',
           value:  this.bctaNo,
           condition: 'LIKE',
           operator: 'AND'
@@ -398,7 +400,8 @@ fetchDataBasedOnBctaNo() {
                 osremarks: this.formData.signboardRemarks,
                 fsremarks: this.formData.filingRemarks,
                 fsresubmitDeadline: this.formData.filingResubmitDate,
-                applicationNO: this.data.appNo
+                applicationNumber: this.data.appNo
+                
             },
         };
 
@@ -487,6 +490,7 @@ fetchDataBasedOnBctaNo() {
                             'success'
                         );
                         this.closeModal();
+                          this.router.navigate(['monitoring/consultancy']);
                     } else {
                         Swal.fire(
                             'Error',
@@ -494,6 +498,7 @@ fetchDataBasedOnBctaNo() {
                             'error'
                         );
                         this.closeModal();
+                          this.router.navigate(['monitoring/consultancy']);
                     }
                 },
                 error: (err) => {
@@ -526,6 +531,7 @@ fetchDataBasedOnBctaNo() {
                         'success'
                     );
                     this.closeModal();
+                      this.router.navigate(['monitoring/consultancy']);
                 },
                 error: (err) => {
                     console.error('Error during suspension:', err);
@@ -544,7 +550,7 @@ fetchDataBasedOnBctaNo() {
                 'Application rejected successfully'
               );
               this.closeModal();
-              this.router.navigate(['monitoring/construction']);
+  this.router.navigate(['monitoring/consultancy']);
             },
             (error) => {
               console.error('Error rejecting application:', error);

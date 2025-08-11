@@ -54,6 +54,7 @@
                     <th>Para #</th>
                     <th>Audit Observation</th>
                     <th>Date</th>
+                    <th>status</th>
                     <th>Action</th>
                   </tr>
                 </thead>
@@ -74,6 +75,7 @@
                       {{ auditObservation }}
                     </div></td>
                     <td>{{data.date | date: 'dd-MM-yyyy'}}</td>
+                    <td>{{ data.status === 1 ? 'Settled' : 'Not Settled' }}</td>
                     <td class="text-center">
                       <button (click)="navigateToEditAuditClearance(data.id)" type="button" class="btn btn-sm btn-primary ml-2">Edit</button>
                       <button (click)="storeId(data.id)" type="button" class="btn btn-sm btn-danger ml-2">Delete</button>

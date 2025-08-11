@@ -390,9 +390,7 @@ export class SfPermanentEmployeesComponent {
         const sfReviewEmployeeDto = (this.tableData || []).map((item: any) => ({
             nationality: item?.countryName || 'string',
             qualification: item?.qualification || 'string',
-            joiningDate: item?.joiningDate
-                ? this.formatDate(item.joiningDate)
-                : '2025-06-26',
+            joiningDate: item?.joiningDate ? this.formatDate(item.joiningDate) : 'string',
         }));
         const sfReviewDto = {
             bctaNo: this.bctaNo || 'string',
@@ -403,13 +401,12 @@ export class SfPermanentEmployeesComponent {
             hrResubmitDeadline: this.tData?.resubmitDate,
             hrRemarks: this.tData?.remarks || 'string',
         };
-
         // Create the request payload
         const payload = {
             sfReviewDto,
             sfReviewEmployeeDto,
+            applicationNumber: this.formData.firmType.appNo,
         };
-
         // Save the record
         this.service.saveOfficeSignageAndDocSF(payload).subscribe({
             next: (res: any) => {
