@@ -70,7 +70,6 @@ export class OnSiteQualityCheckComponent {
             condition: '=',
         },
     ];
-
     this.service
         .fetchDetails(payload, 1, 100, 'oq_confirmation_view')
         .subscribe(

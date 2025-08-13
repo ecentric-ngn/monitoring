@@ -6,12 +6,11 @@
       <thead>
         <tr>
           <th>Is Equipment Registered</th>
-          <th>Vehicle Type*</th>
-          <th>Registration No*</th>
+          <th>Vehicle Type</th>
+          <th>Registration No</th>
           <th>Owner Name</th>
           <th>Owner CID</th>
-          <th>Equipment Type*</th>
-          <th>Remarks</th>
+          <th>Equipment Type</th>
           <th>Download</th>
           <th>Action</th>
         </tr>
@@ -29,7 +28,6 @@
             <td>{{ data.owner || '-' }}</td>
             <td>{{ data.cdbNo || 'N/A' }}</td>
             <td>{{ data.equipmentName }}</td>
-            <td>-</td>
             <td class="text-center bg-white">
               <a *ngIf="data.filePath" (click)="downloadFile(data.filePath)" class="btn" style="cursor: pointer;">
                 <i class="pi pi-download"></i>
@@ -116,7 +114,7 @@
 
         <!-- Save & Next -->
         <button type="submit" class="btn btn-success"
-          *ngIf="((tData.fulfillsRequirement === 'Yes') || applicationStatus === 'Rejected' || applicationStatus === 'Submitted') && applicationStatus !== 'Resubmitted HR and EQ'"
+          *ngIf="((tData.fulfillsRequirement === 'Yes') || applicationStatus === 'Rejected' || applicationStatus === 'Submitted' || applicationStatus === 'Suspension Rejected') && applicationStatus !== 'Resubmitted HR and EQ'"
           (click)="saveAndNext()" [disabled]="isSaving">
           <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
           Save & Next

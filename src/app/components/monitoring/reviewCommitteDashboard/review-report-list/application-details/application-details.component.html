@@ -608,7 +608,6 @@
             <th class="text-center p-1">Designation</th>
             <th class="text-center p-1">Qualification</th>
             <th class="text-center p-1">Status</th>
-            <th class="text-center p-1">uploaded Doc</th>
             <!-- <th class="text-center p-1">Action</th> -->
           </tr>
         </thead>
@@ -624,58 +623,58 @@
               <td class="text-center">{{ item.designation }}</td>
               <td class="text-center">{{ item.qualification }}</td>
               <td class="text-center">{{ item.status }}</td>
-              <td class="text-center"><span></span></td>
             </tr>
           </ng-container>
         </tbody>
       </table>
       <div class="row">
-        <div class="col-md-4 d-flex">
-          <label class="form-label me-2 font-size-12">Upload:</label>
-          <div *ngFor="let item of fileAndRemark">
-            <div *ngIf="item.form_type === '10'" class="">
-              <button class="btn btn-outline-primary btn-sm" (click)="viewFile(item.file_path)">
-                <i class="bi bi-eye me-1"></i> view doc Doc
-              </button>
-            </div>
+        <div *ngIf="fileAndRemark.length > 0" class="mb-3 p-3 d-flex align-items-center">
+          <label class="form-label me-3 mb-0">Documents:</label>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <ng-container *ngIf="fileAndRemark.length > 0; else noFiles">
+              <div *ngFor="let filePath of fileAndRemark" class="file-item">
+                <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath.file_paths)">
+                  <i class="bi bi-eye me-1"></i> View Document
+                </button>
+              </div>
+            </ng-container>
+            <ng-template #noFiles>
+              <span class="text-muted">No files uploaded</span>
+            </ng-template>
           </div>
-
         </div>
         <div class="col-md-4 d-flex">
           <label class="form-label me-2 font-size-12">Remarks:</label>
-          <div *ngFor="let item of fileAndRemark">
-            <div *ngIf="item.form_type === '10'" class="">
-              <span class="font-size-12"> {{ item.remarks }}</span>
+            <div  class="">
+              <span class="font-size-12"> {{ hrRemarks }}</span>
             </div>
-          </div>
         </div>
       </div>
     </form>
-
-    <span class=" font-bold font-size-12">Certified Skilled worker deployed at Site</span>
-    <hr>
-    <form>
-      <table class="table table-bordered border-1 overflow-hidden">
-        <thead>
-          <tr>
-            <th>Skilled Worker Type</th>
-            <th>Certificate</th>
-            <th>Number of Workers</th>
-            <th>Remarks</th>
+  <span class=" font-bold font-size-12">Certified Skilled worker deployed at Site</span>
+  <hr>
+  <form>
+    <table class="table table-bordered border-1 overflow-hidden">
+      <thead>
+        <tr>
+          <th>Skilled Worker Type</th>
+          <th>Certificate</th>
+          <th>Number of Workers</th>
+          <th>Remarks</th>
+        </tr>
+      </thead>
+      <tbody>
+        <ng-container *ngFor="let group of groupedData">
+          <tr *ngFor="let worker of group.workers; let i = index">
+            <td *ngIf="i === 0" [attr.rowspan]="group.workers.length">{{ group.skilled_worker_type }}</td>
+            <td>{{ worker.certificates }}</td>
+            <td>{{ worker.number_of_workers }}</td>
+            <td>{{ worker.remarks }}</td>
           </tr>
-        </thead>
-        <tbody>
-          <ng-container *ngFor="let group of groupedData">
-            <tr *ngFor="let worker of group.workers; let i = index">
-              <td *ngIf="i === 0" [attr.rowspan]="group.workers.length">{{ group.skilled_worker_type }}</td>
-              <td>{{ worker.certificates }}</td>
-              <td>{{ worker.number_of_workers }}</td>
-              <td>{{ worker.remarks }}</td>
-            </tr>
-          </ng-container>
-        </tbody>
-      </table>
-    </form>
+        </ng-container>
+      </tbody>
+    </table>
+  </form>
     <span class=" font-bold font-size-12">List of committed equipments</span>
     <hr>
     <form>
@@ -697,7 +696,7 @@
           </tr>
           <tr *ngFor="let item of committedEquipmentList; let i = index">
             <td class="text-center">{{ i + 1 }}</td>
-            <td class="text-center">{{ item.equipment_name }}</td>
+            <td class="text-center">{{ item.equipmentName }}</td>
             <td class="text-center">{{ item.equipment_type }}</td>
             <td class="text-center">{{ item.equipment_number }}</td>
             <td class="text-center">{{ item.registration_number }}</td>
@@ -709,6 +708,21 @@
         </tbody>
       </table>
       <div class="row">
+         <div *ngIf="eqDocFile.length > 0" class="mb-3 p-3 d-flex align-items-center">
+          <label class="form-label me-3 mb-0">Documents:</label>
+          <div class="d-flex flex-wrap align-items-center gap-2">
+            <ng-container *ngIf="eqDocFile.length > 0; else noFiles">
+              <div *ngFor="let filePath of eqDocFile" class="file-item">
+                <button class="btn btn-outline-primary btn-sm" (click)="viewFile(filePath.file_paths)">
+                  <i class="bi bi-eye me-1"></i> View Document
+                </button>
+              </div>
+            </ng-container>
+            <ng-template #noFiles>
+              <span class="text-muted">No files uploaded</span>
+            </ng-template>
+          </div>
+        </div>
         <div class="col-md-6 -flex">
           <label class="form-label me-2 font-size-12">Remarks:</label>
           <div>

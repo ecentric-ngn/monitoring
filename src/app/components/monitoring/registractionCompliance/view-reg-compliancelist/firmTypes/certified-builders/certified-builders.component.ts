@@ -353,7 +353,8 @@ export class CertifiedBuildersComponent {
             data.applicationStatus === 'Resubmitted HR and EQ' ||
             data.applicationStatus === 'Rejected' ||
             data.applicationStatus === 'Suspension Resubmission' ||
-            data.applicationStatus === 'Cancellation Request Rejected'
+            data.applicationStatus === 'Cancellation Request Rejected' ||
+            data.applicationStatus === 'Suspension Rejected'
         ) {
             const workId = data.consultantNo;
             this.prepareAndNavigate(data, workId);

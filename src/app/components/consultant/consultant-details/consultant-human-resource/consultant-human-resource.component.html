@@ -24,6 +24,7 @@
               <th class="text-center p-1">Joining Date</th>
               <th class="text-center p-1">Course</th>
               <th class="text-center p-1">Employment Type</th>
+              <th class="text-center p-1">Attachment</th>
               <th *ngIf="shouldShowActionButton()" class="text-center p-1">Action</th>
               </tr>
           </thead>
@@ -43,6 +44,11 @@
              <td  class="text-center">{{data.joiningDate | date: 'dd-MM-yyyy'}}</td>
              <td  class="text-center">{{data.course}}</td>
              <td  class="text-center">{{data.employmentType}}</td>
+            <td class="text-center">
+                <a *ngIf="data.attachment" (click)="viewFile(data.attachment)" class="view-link text-blue pointer">
+                  View
+                </a>
+               </td>
              <td *ngIf="shouldShowActionButton()">
               <button (click)="storeHrID(data.hrId)"  type="button" class="btn btn-sm btn-danger align-items-center" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                 Release

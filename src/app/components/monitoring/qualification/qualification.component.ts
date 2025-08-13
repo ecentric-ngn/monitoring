@@ -133,9 +133,8 @@ export class QualificationComponent {
                     // If data is found, populate the form fields
                     const data = response.data[0];
                     this.formData.expiryDate = data.expiryDate?.split('T')[0];
-                    const ownerDetails = data.nameOfFirm || '';
-                    const nameOnly = ownerDetails.split(' ').slice(1).join(' ');
-                    this.formData.nameOfFirm = nameOnly;
+                    const ownerDetails = data.nameOfFirm
+                    this.formData.nameOfFirm = ownerDetails;
                     this.disableField = true;
                     this.isFetching = false; // Stop loading
                 } else if (viewName === 'contractor') {

@@ -5,6 +5,9 @@ import { userManagment_redirection } from './app.const/const';
   providedIn: 'root',
 })
 export class AuthServiceService {
+  getUsername(): string {
+    throw new Error('Method not implemented.');
+  }
   constructor() { }
 
   loggedIn(): boolean {
@@ -32,10 +35,14 @@ export class AuthServiceService {
     }
   }
 
-  getUsername(): string | null {
-    const user = this.getCurrentUser();
-    return user && user.username ? user.username : null;
-  }
+getUserInfo(): { username: string | null; userId: string | null } {
+  const user = this.getCurrentUser();
+  return {
+    username: user?.username ?? null,
+    userId: user?.userId ?? null
+  };
+}
+
 
   private isTokenExpired(token: string): boolean {
     const decoded = this.decodeToken(token);
