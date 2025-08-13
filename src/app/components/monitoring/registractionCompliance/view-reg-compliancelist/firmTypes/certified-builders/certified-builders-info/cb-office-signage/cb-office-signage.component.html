@@ -50,6 +50,7 @@
           applicationStatus === 'Suspension Resubmission' ||
           applicationStatus === 'Cancellation Request Rejected'
           || applicationStatus === 'Rejected'
+          || applicationStatus === 'Suspension Rejected'
         ) && (
           formData.reviewLocation === 'Yes'
         )" (click)="saveAndNext()" [disabled]="isSaving">
@@ -62,6 +63,7 @@
           applicationStatus === 'Suspension Resubmission' 
           || applicationStatus === 'Cancellation Request Rejected'
           || applicationStatus === 'Rejected'
+          || applicationStatus === 'Suspension Rejected'
         ) && (
           formData.reviewLocation === 'No'
         )" (click)="saveAndNext()" [disabled]="isSaving">

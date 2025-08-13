@@ -28,6 +28,8 @@ export class ApplicationDetailsComponent {
     awardedBctaNo: any;
     inspectionType: any;
     contractorsList: any;
+    hrRemarks: any;
+    eqDocFile: any[] = [];
     constructor(
         private service: CommonService,
         private notification: NzNotificationService,
@@ -37,7 +39,7 @@ export class ApplicationDetailsComponent {
     committedEquipment: any[] = [];
     monitoringTeam: any[] = [];
     siteEngineers: any[] = [];
-    fileAndRemark: any;
+    fileAndRemark: any[] = [];
     contractDocFiles: string[] = [];
     onsiteFiles: string[] = [];
     workProgressFiles: string[] = [];
@@ -76,25 +78,43 @@ export class ApplicationDetailsComponent {
         }
         
     }
-    gethumanResourceList() {
-        const payload: any = [
-            {
-                field: 'checklist_id',
-                value:this.checklistId,
-                operator: 'AND',
-                condition: '=',
-            },
-        ];
-        this.service.fetchDetails(payload, 1, 100, 'human_resources_view').subscribe(
-                (response: any) => {
-                    this.humanResources = response.data;
-                },
-                (error) => {
-                    console.error('Error fetching contractor details:', error);
-                }
-            );
-    }
-
+     hrfiles: string[] = [];
+ gethumanResourceList() {
+    const payload: any = [
+        {
+            field: 'checklist_id',
+            value: this.checklistId,
+            operator: 'AND',
+            condition: '=',
+        },
+    ];
+    
+    this.service.fetchDetails(payload, 1, 100, 'human_resources_view').subscribe(
+        (response: any) => {
+            this.humanResources = response.data;
+            this.hrRemarks = response.data[0].remarks;
+            this.humanResources.forEach((hr: any) => {
+                const paths = hr.file_paths ? hr.file_paths.split(',') : [];
+                paths.forEach((path: string) => {
+                    const cleanedPath = path.trim();
+                    // Optional: skip local paths
+                    if (!cleanedPath.startsWith('D:/')) {
+                        const entry = {
+                            file_paths: cleanedPath,
+                        };
+                        this.fileAndRemark.push(entry);
+                        console.log('hr file path:', this.fileAndRemark);
+                    } else {
+                        console.log('Skipping local file path:', this.fileAndRemark);
+                    }
+                });
+            });
+        },
+        (error) => {
+            console.error('Error fetching contractor details:', error);
+        }
+    );
+}
 
     getConsractorPresentList() {
         const payload: any = [
@@ -208,7 +228,21 @@ export class ApplicationDetailsComponent {
         this.service.fetchDetails(payload,this.pageNo,this.pageSize,'committed_equipment_view').subscribe(
                 (response: any) => {
                     this.committedEquipmentList = response.data;
-                    console.log('this.formData', this.humanResources);
+                    this.committedEquipmentList.forEach((eq: any) => {
+                    const paths = eq.file_paths ? eq.file_paths.split(',') : [];
+                    paths.forEach((path: string) => {
+                    const cleanedPath = path.trim();
+                    // Optional: skip local paths
+                    if (!cleanedPath.startsWith('D:/')) {
+                        const entry = {
+                            file_paths: cleanedPath,
+                        };
+                        this.eqDocFile.push(entry);
+                    } else {
+                        console.log('Skipping local file path:', this.fileAndRemark);
+                    }
+                });
+            });
                 },
                 (error) => {
                     console.error('Error fetching contractor details:', error);
@@ -314,7 +348,8 @@ export class ApplicationDetailsComponent {
                 condition: '=',
             },
         ];
-        this.service.fetchDetails(payload, this.pageNo, this.pageSize, 'csw_view')
+               this.service
+            .fetchDetails(payload, this.pageNo, this.pageSize, 'csw_view')
             .subscribe(
                 (response: any) => {
                     const rawData = response.data;

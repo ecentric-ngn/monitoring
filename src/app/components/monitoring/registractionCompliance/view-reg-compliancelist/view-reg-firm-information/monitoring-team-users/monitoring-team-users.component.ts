@@ -21,21 +21,56 @@ applicationStatus : any;
   @Input() id: string = ''; // Input from parent component
 @Input() data: any;
   complianceData: string;
+  designation: any;
+  userId:  any = {};
+  userInfo: any = {};
   constructor(private service: CommonService,
     private router: Router,
     private authService: AuthServiceService) { }
 
   ngOnInit() {
+       this.userInfo = this.authService.getUserInfo() || 'NA';
+        this.userId = this.userInfo.userId;
+        if (this.userId) {
+            this.fetchCrpsUsers();
+        }
     this.data = this.data;
-    this.username = this.authService.getUsername() || 'NA';
     this.id = this.id;
-    //   WorkDetail = this.service.getData('BctaNo');
     this.applicationStatus = this.data.applicationStatus;
     this.service.bctaNo$.subscribe(bctaNo => {
         this.bctaNo = bctaNo;
     });
 
   }
+
+    fetchCrpsUsers(): void {
+        const userData = {
+            viewName: 'crpsUsersList',
+            pageSize: 100,
+            pageNo: 1,
+            condition: [
+                // {
+                //     field: "user_type",
+                //     value: "monitor",
+                // }
+            ],
+        };
+        this.service.getUserDetails(userData).subscribe(
+            (response: any) => {
+                this.teamList = response.data;
+                const matchedUser = this.teamList.find(
+                    (user: any) => user.id === this.userId
+                );
+                if (matchedUser) {
+                    this.designation = matchedUser.designation; // store designation
+                } else {
+                }
+            },
+            (error) => {
+                console.error('Error fetching contractor details:', error);
+            }
+        );
+    }
    reinstate(row: any) {
         const payload = {
             firmNo: this.data.contractorNo,

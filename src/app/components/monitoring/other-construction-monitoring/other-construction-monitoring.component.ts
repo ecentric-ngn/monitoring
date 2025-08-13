@@ -135,7 +135,6 @@ export class OtherConstructionMonitoringComponent {
                     this.newContractorId = idMatch
                         ? parseInt(idMatch[0], 10)
                         : null;
-                    console.log('ownerId', this.newContractorId);
                     const WorkDetail = {
                         data: contractorDetails,
                         workId: this.workType,

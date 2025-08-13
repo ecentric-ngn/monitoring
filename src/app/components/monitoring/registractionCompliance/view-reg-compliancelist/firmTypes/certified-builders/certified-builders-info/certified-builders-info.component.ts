@@ -47,7 +47,7 @@ ngOnInit(): void {
 isTabEnabled(tabId: string): boolean {
   const status = this.applicationStatus;
 
-  if (status === 'Submitted' || status === 'Suspension Resubmission' || status === 'Rejected' || status === 'Cancellation Request Rejected') {
+  if (status === 'Submitted' || status === 'Suspension Resubmission' || status === 'Rejected' || status === 'Cancellation Request Rejected' || status === 'Suspension Rejected') {
     return true; // Enable all tabs
   }
 

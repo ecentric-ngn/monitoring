@@ -63,23 +63,13 @@
             </thead>
             <tbody>
                 <tr *ngFor="let data of tableData" class="table-row">
-
-                    <!-- <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus === 'Submitted'"
-                        [class.text-primary]="data.applicationStatus === 'Submitted'
-        || data.applicationStatus === 'Resubmitted HR and EQ'
-        || data.applicationStatus === 'Resubmitted OS and PFS'
-        || data.applicationStatus === 'Rejected'
-        || data.applicationStatus === 'Suspension Resubmission'
-        || data.applicationStatus === 'Cancellation Request Rejected'" (click)="navigate(data)">
-                        {{ data.certifiedBuilderNo }}
-                    </td> -->
                       <td class="text-bold cursor-pointer" [class.pointer-event]="data.applicationStatus === 'Submitted'"
                         [class.text-primary]="
                             data.applicationStatus === 'Submitted' ||
                             data.applicationStatus === 'Resubmitted HR and EQ' ||
                             data.applicationStatus === 'Resubmitted OS and PFS' ||
                             data.applicationStatus === 'Rejected' ||
-                            data.applicationStatus === 'Suspension Resubmission' || data.applicationStatus === 'Cancellation Request Rejected'" (click)="navigate(data)">
+                            data.applicationStatus === 'Suspension Resubmission' || data.applicationStatus === 'Cancellation Request Rejected' || data.applicationStatus === 'Suspension Rejected'" (click)="navigate(data)">
                         {{ data.certifiedBuilderNo }}
                     </td>
 
