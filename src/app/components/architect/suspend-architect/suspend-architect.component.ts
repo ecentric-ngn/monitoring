@@ -200,36 +200,61 @@ showErrorMessage:boolean=false
             });
           }
         //revoke the suspended architect
-        reInstateSuspendedArchitect() {
-          if (this.formData.Date) {
-            const selectedDate = new Date(this.formData.Date);
-            // Attach the current time to the selected date
-            selectedDate.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds());
-            this.formData.Date = selectedDate.toISOString(); // Format as 'YYYY-MM-DDTHH:MM:SS.000Z'
-          }
-            const suspendRevoke = {
-              revokedDate: this.formData.Date,
-              revokedDetails: this.formData.Details,
-              revokedBy:this.uuid,
-              architectNo: this.selectedarchitectNo,
-              fileId:this.fileId
-            };
-            this.service.saveSuspendReregister(suspendRevoke).subscribe((response: any) => {
-              setTimeout(() => {
-              this.closeButton.nativeElement.click();
-              this.showSuspendMessage();
-              // Show the success message after the modal is closed
-              setTimeout(() => {
-                  this.getSuspendList()
-              }, 1000);
-              },);
-          },
+   reInstateSuspendedArchitect() {
+    if (this.formData.Date) {
+        const selectedDate = new Date(this.formData.Date);
+        // Attach the current time to the selected date
+        const now = new Date();
+        selectedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+        this.formData.Date = selectedDate.toISOString(); // Format as 'YYYY-MM-DDTHH:MM:SS.000Z'
+    }
+
+    const suspendRevoke = {
+        revokedDate: this.formData.Date,
+        revokedDetails: this.formData.Details,
+        revokedBy: this.uuid,
+        architectNo: this.selectedarchitectNo,
+        fileId: this.fileId
+    };
+
+    const reinstatedDetail = {
+        firmType: 'Architect',
+        cdbNos: this.selectedarchitectNo,
+    };
+
+    // Save the suspension/revocation first
+    this.service.saveSuspendReregister(suspendRevoke).subscribe(
+        (response: any) => {
+            // After successful save, call the second endpoint for approval
+            this.service.approveReinstatementIng2cSystem(reinstatedDetail).subscribe(
+                (g2cResponse: any) => {
+                    setTimeout(() => {
+                        this.closeButton.nativeElement.click();
+                        this.showReinstatmessage(); // Show reinstatement success message
+                        setTimeout(() => {
+                            this.getSuspendList(); // Refresh the list
+                        }, 1000);
+                    });
+                },
+                (g2cError: any) => {
+                    console.error('G2C approval failed:', g2cError);
+                    setTimeout(() => {
+                        this.closeButton.nativeElement.click();
+                        this.showReinstatmessage(); // Show reinstatement message even if G2C fails
+                        setTimeout(() => {
+                            this.getSuspendList(); // Refresh the list
+                        }, 1000);
+                    });
+                }
+            );
+        },
         (error: any) => {
             this.errorMessage = error.error.error;
         }
-        );
-        }
-      showSuspendMessage() {
+    );
+}
+
+      showReinstatmessage() {
           this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Architect reinstated successfully' });
       }
       cancel(actionForm: NgForm) {

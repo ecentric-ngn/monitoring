@@ -8,6 +8,7 @@ import { faCoffee } from '@fortawesome/free-solid-svg-icons';
 import { faFilm } from '@fortawesome/free-solid-svg-icons';
 import * as CryptoJS from 'crypto-js';
 import { environment } from '../../environments/environment.prod';
+
 @Component({
   selector: "app-menu",
   templateUrl: "./app.menu.component.html",
@@ -47,6 +48,7 @@ export class AppMenuComponent implements OnInit {
   ngOnInit() {
     this.Crps();
   }
+
   Crps() {
     // Retrieve user details from session storage
     const sessionLocalData: any = JSON.parse(sessionStorage.getItem('sessionDataForCrps'));

@@ -252,95 +252,62 @@ showErrorMessage:boolean=false
       }, (Error) => {
       })
     }
-
-  //save deregister
-  // savedDowngrade(){
-  //    if (this.formData.Date) {
-  //     // Parse the selected date
-  //     const selectedDate = new Date(this.formData.Date);
-  //     // Get the current time in UTC
-  //     const nowUTC = new Date();
-  //     // Calculate Bhutan Time (UTC+6)
-  //     const bhutanOffset = 6; // Bhutan is UTC+6
-  //     const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-  //     // Attach the Bhutan time to the selected date
-  //     selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-  //     // Format the selected date to ISO string with timezone offset
-  //     this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
-  //   }
-  //   const specializedfirm = {
-  //     type:this.formData.Type,
-  //     date: this.formData.Date,
-  //     remarks: this.formData.Details,
-  //     createdBy: this.uuid,
-  //     specializedTradeNo: this.selectedspecializedTradeNo,
-  //     fileId:this.fileId
-  //     };
-  //     this.service.saveDowngradedetails(specializedfirm).subscribe((response: any) => {
-  //       this.unCheckItem.forEach((item)=>{
-  //         this.uncheck(item)
-  //       });
-  //       this.unCheckItem=[];
-  //       this.unCheckedItems = [];
-  //       setTimeout(() => {
-  //         this.closeButton.nativeElement.click();
-  //         this.showDowngradeMessage();
-  //         // Show the success message after the modal is closed
-  //         setTimeout(() => {
-  //           this.getspecializedtrade()
-  //         }, 1000);
-  //       },);
-  //     },
-  //     (error: any) => {
-  //       this.errorMessage = error.error.error;
-  //     }
-  //   );
-  // }
-  // showDowngradeMessage() {
-  //   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm  Downgraded successfully' });
-  // }
   
   // //save savedSuspend
-  savedSuspend() {
-     if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    }
-    const suspendDetail = {
-      type: this.formData.Type,
-      suspendDate: this.formData.Date,
-      suspendDetails: this.formData.Details,
-      suspendBy: this.uuid,
-      specializedTradeNo: this.selectedspecializedTradeNo,
-      fileId:this.fileId
-    };
-    this.service.saveSuspendDetails(suspendDetail).subscribe(
-      (response: any) => {
+savedSuspend() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+
+    // Get current time in UTC
+    const nowUTC = new Date();
+    const bhutanOffset = 6; // Bhutan is UTC+6
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+
+    // Attach Bhutan time to the selected date
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+
+    // Format to ISO string
+    this.formData.Date = selectedDate.toISOString();
+  }
+
+  const suspendDetail = {
+    type: this.formData.Type,
+    suspendDate: this.formData.Date,
+    suspendDetails: this.formData.Details,
+    suspendBy: this.uuid,
+    specializedTradeNo: this.selectedspecializedTradeNo,
+    fileId: this.fileId
+  };
+
+  // Step 1: Save suspension locally
+  this.service.saveSuspendDetails(suspendDetail).subscribe({
+    next: (response: any) => {
+      // Step 2: Call second endpoint in G2C system
+      const suspendPayload = {
+        cdbNos: [this.selectedspecializedTradeNo], // Array format
+        firmType: 'Specialized-Trade'
+      };
+
+      this.service.suspendedIng2cSystem(suspendPayload).subscribe({
+        next: (g2cResponse: any) => {
+          this.closeButton.nativeElement.click();
+          this.showSuspendedMessage();
           setTimeout(() => {
-            this.closeButton.nativeElement.click();
-            this.showSuspendedMessage();
-            // Show the success message after the modal is closed
-            setTimeout(() => {
-              this.getspecializedtrade()
-            }, 500);
-          },);
+            this.getspecializedtrade(); // Refresh list
+          }, 500);
         },
-        (error: any) => {
-          this.show500Message()
-          this.errorMessage = error.error.error;
+        error: (err: any) => {
+          this.errorMessage = 'Suspension in G2C system failed: ' + (err.error?.error || 'Unknown error');
         }
-      );
+      });
+    },
+    error: (error: any) => {
+      this.show500Message();
+      this.errorMessage = 'Local save failed: ' + (error.error?.error || 'Unknown error');
     }
+  });
+}
+
     showSuspendedMessage() {
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Trade Suspended successfully' });
     }
@@ -348,47 +315,55 @@ showErrorMessage:boolean=false
       this.messageService.add({ severity: 'error', summary: 'error', detail: 'Something went wrong.Please try again later' });
     }
   //method to save cancelled
-  savedCancelled() {
-    if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
-    }
-    const cancelledDetail = {
-      type: this.formData.Type,
-      cancelledDate: this.formData.Date,
-      cancelledDetails: this.formData.Details,
-      cancelledBy: this.uuid,
-      specializedTradeNo: this.selectedspecializedTradeNo,
-      fileId:this.fileId
-    };
+ savedCancelled() {
+  if (this.formData.Date) {
+    // Convert the selected date to Bhutan time
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6; // Bhutan is UTC+6
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString(); // Still in UTC format
+  }
 
-    this.service.saveCancelledDetails(cancelledDetail).subscribe(
-      (response: any) => {
+  const cancelledDetail = {
+    type: this.formData.Type,
+    cancelledDate: this.formData.Date,
+    cancelledDetails: this.formData.Details,
+    cancelledBy: this.uuid,
+    specializedTradeNo: this.selectedspecializedTradeNo,
+    fileId: this.fileId
+  };
+
+  // Step 1: Save cancellation locally
+  this.service.saveCancelledDetails(cancelledDetail).subscribe({
+    next: () => {
+      // Step 2: Call G2C cancel API
+      const g2cPayload = {
+        cdbNos: [this.selectedspecializedTradeNo],
+        firmType: 'Specialized-Trade'
+      };
+
+      this.service.cancelledIng2cSystem(g2cPayload).subscribe({
+        next: () => {
+          this.closeButton.nativeElement.click();
+          this.showCancelledMessage();
           setTimeout(() => {
-            this.closeButton.nativeElement.click();
-            this.showCancelledMessage();
-            // Show the success message after the modal is closed
-            setTimeout(() => {
-              this.getspecializedtrade()
-            }, 500);
-          },);
+            this.getspecializedtrade(); // Refresh the list
+          }, 500);
         },
-        (error: any) => {
-          this.show500Message()
-          this.errorMessage = error.error.error;
+        error: (g2cError: any) => {
+          this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
         }
-      );
+      });
+    },
+    error: (error: any) => {
+      this.show500Message();
+      this.errorMessage = 'Local cancellation failed: ' + (error.error?.error || 'Unknown error');
     }
+  });
+}
+
     showCancelledMessage() {
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Trade  Cancelled successfully' });
     }

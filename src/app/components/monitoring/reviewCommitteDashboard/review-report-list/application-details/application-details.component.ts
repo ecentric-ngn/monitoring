@@ -27,7 +27,7 @@ export class ApplicationDetailsComponent {
     dzongkhagName: any;
     awardedBctaNo: any;
     inspectionType: any;
-    contractorsList: any;
+    contractorsList: any = [];
     hrRemarks: any;
     eqDocFile: any[] = [];
     constructor(
@@ -66,6 +66,7 @@ export class ApplicationDetailsComponent {
         this.checklistId = data.checklist_id;
         if(this.checklistId){
             this.getAllData();
+             this.getConsractorPresentList();
             this.gethumanResourceList();
             this.getReinforcementList();
             this.getOnsiteQuantityList();
@@ -74,7 +75,7 @@ export class ApplicationDetailsComponent {
             this.getCommitedEquipmentList();
             this.getSkilledWorkerList();
             this.getclientList();
-            this.getConsractorPresentList();
+           
         }
         
     }
@@ -131,6 +132,7 @@ export class ApplicationDetailsComponent {
         .subscribe({
             next: (response: any) => {
                 this.contractorsList = response.data;
+                
               
             },
             error: (error) => {

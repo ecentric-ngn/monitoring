@@ -235,44 +235,52 @@ uploadFileForEngineer() {
   });
 }
     // //save savedSuspend  
-    savedSuspend() {
-       if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
+  savedSuspend() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6; // Bhutan is UTC+6
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
+  }
+  const suspendDetail = {
+    type: this.formData.Type,
+    suspendDate: this.formData.Date,
+    suspendDetails: this.formData.Details,
+    suspendBy: this.uuid,
+    engineerNo: this.selectedengineerNo,
+    fileId: this.fileId
+  };
+  // First API call
+  this.service.saveSuspendDetails(suspendDetail).subscribe({
+    next: (response: any) => {
+      // Second API call after save
+      const suspendPayload = {
+        cdbNos: [this.selectedengineerNo], // Array format like contractors
+        firmType: 'Engineer'
+      };
+
+      this.service.suspendedIng2cSystem(suspendPayload).subscribe({
+        next: (suspendResponse: any) => {
+          this.closeButton.nativeElement.click();
+          this.showSuspendMessage();
+          setTimeout(() => {
+            this.getengineerList();
+          }, 500); // Adjust delay if needed
+        },
+        error: (err) => {
+          this.errorMessage = 'Suspension failed: ' + (err.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (error: any) => {
+      this.show500Message();
+      this.errorMessage = 'Save failed: ' + (error.error?.error || 'Unknown error');
     }
-       const suspendDetail = {
-        type: this.formData.Type,
-        suspendDate: this.formData.Date,
-        suspendDetails: this.formData.Details,
-        suspendBy: this.uuid,
-        engineerNo: this.selectedengineerNo,
-        fileId:this.fileId
-         };
-         this.service.saveSuspendDetails(suspendDetail)
-         .subscribe({
-          next: (response: any) => {
-            this.closeButton.nativeElement.click();
-            this.showSuspendMessage();
-            setTimeout(() => {
-              this.getengineerList();
-            }, 500); // Adjust the delay (in milliseconds) if needed
-          },
-          error: (error: any) => {
-            this.show500Message()
-            this.errorMessage = error.error.error;
-          }
-        });
-      }
+  });
+}
+
   showSuspendMessage() {
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Engineer suspended successfully' });
     }
@@ -280,45 +288,60 @@ uploadFileForEngineer() {
       this.messageService.add({ severity: 'error', summary: 'error', detail: 'Something went wrong.Please try again later' });
     }
 //save cancelled
-     savedCancelled() {
-       if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
+   savedCancelled() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    // Get current time in UTC
+    const nowUTC = new Date();
+    // Calculate Bhutan Time (UTC+6)
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    // Attach Bhutan time to the selected date
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
+  }
+
+  const cancelledDetails = {
+    type: this.formData.Type,
+    cancelledDate: this.formData.Date,
+    cancelledDetails: this.formData.Details,
+    cancelledBy: this.uuid,
+    engineerNo: this.selectedengineerNo,
+    fileId: this.fileId
+  };
+
+  // Step 1: Save cancellation locally
+  this.service.saveCancelledDetails(cancelledDetails).subscribe({
+    next: (response: any) => {
+      // Step 2: Also cancel in G2C system
+      const g2cPayload = {
+        cdbNos: [this.selectedengineerNo], // Array format
+        firmType: 'Engineer'                // Firm type for engineer
+      };
+      this.service.cancelledIng2cSystem(g2cPayload).subscribe({
+        next: () => {
+          // Both calls successful
+          this.closeButton.nativeElement.click();
+          this.showCancelledMessage();
+          setTimeout(() => {
+            this.getengineerList(); // Refresh engineer list
+          }, 1000);
+        },
+        error: (g2cError: any) => {
+          this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
+          this.showCancelledMessage();
+          console.error('G2C cancellation error', g2cError);
+        }
+      });
+    },
+    error: (localError: any) => {
+      this.errorMessage = 'Local cancellation failed: ' + (localError.error?.error || 'Unknown error');
+      this.show500Message();
+      console.error('Local cancellation error', localError);
     }
-       const cancelledDetail = {
-        type: this.formData.Type,
-        cancelledDate: this.formData.Date,
-        cancelledDetails: this.formData.Details,
-        cancelledBy:this.uuid,
-        engineerNo: this.selectedengineerNo ,
-        fileId:this.fileId
-         };
-         this.service.saveCancelledDetails(cancelledDetail)
-         .subscribe({
-          next: (response: any) => {
-            this.closeButton.nativeElement.click();
-            this.showCancelledMessage();
-            setTimeout(() => {
-              this.getengineerList();
-            }, 500); // Adjust the delay (in milliseconds) if needed
-          },
-          error: (error: any) => {
-            this.show500Message()
-            this.errorMessage = error.error.error;
-          }
-        });
-      
-     }
+  });
+}
+
      showCancelledMessage() {
        this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Engineer cancelled successfully' });
      }

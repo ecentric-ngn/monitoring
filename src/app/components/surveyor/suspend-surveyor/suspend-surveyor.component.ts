@@ -195,44 +195,59 @@ shouldShowActionButton(): boolean {
         // this.loading = false;
     });
   }
-  ReinstateSuspendedSurveyor() {
-     if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    }
-    const suspendRevoke = {
-      revokedDate: this.formData.Date,
-      revokedDetails: this.formData.Details,
-      revokedBy:this.uuid,
-      surveyorNo: this.selectedsurveyorNo,
-      fileId:this.fileId
-    };
-    this.service.saveSuspendReregister(suspendRevoke).subscribe(
-      (response: any) => {
-        setTimeout(() => {
-          this.closeButton.nativeElement.click();
-           this.showReinstateMessage();
-          // Show the success message after the modal is closed
-          setTimeout(() => {
-            this.getSuspendList()
-          }, 1000);
-        },);
-      },
-      (error: any) => {
-        console.error("Error:", error);
-        this.errorMessage = error.error.error;
-      }
-    );
+ ReinstateSuspendedSurveyor() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString();
   }
+
+  const suspendRevoke = {
+    revokedDate: this.formData.Date,
+    revokedDetails: this.formData.Details,
+    revokedBy: this.uuid,
+    surveyorNo: this.selectedsurveyorNo,
+    fileId: this.fileId
+  };
+
+  // Step 1: Save local revocation
+  this.service.saveSuspendReregister(suspendRevoke).subscribe({
+    next: () => {
+      // Step 2: Call G2C approval endpoint
+      const approvePayload = {
+        cdbNos: [this.selectedsurveyorNo], // array format
+        firmType: 'Surveyor'
+      };
+
+      this.service.approveReinstatementIng2cSystem(approvePayload).subscribe({
+        next: () => {
+          this.closeButton.nativeElement.click();
+          this.showReinstateMessage();
+          setTimeout(() => {
+            this.getSuspendList(); // Refresh suspended list
+          }, 1000);
+        },
+        error: (g2cError) => {
+          this.errorMessage = 'G2C reinstatement failed: ' + (g2cError.error?.error || 'Unknown error');
+          console.error('G2C reinstatement error', g2cError);
+          this.closeButton.nativeElement.click();
+          this.showReinstateMessage(); // Still show message even if G2C fails
+          setTimeout(() => {
+            this.getSuspendList();
+          }, 1000);
+        }
+      });
+    },
+    error: (localError) => {
+      this.errorMessage = 'Local reinstatement failed: ' + (localError.error?.error || 'Unknown error');
+      console.error('Local reinstatement error', localError);
+    }
+  });
+}
+
   showReinstateMessage() {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Surveyor reinstated successfully' });
   }

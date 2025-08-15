@@ -58,10 +58,10 @@ export class OfficeSignageComponent {
             return;
         }
         this.formData.firmType = WorkDetail.data;
-        debugger
+        
         this.data = WorkDetail.data;
         this.bctaNo = WorkDetail.data.consultantNo;
-        debugger
+        
         this.applicationStatus = WorkDetail.data.applicationStatus;
         if (
             this.applicationStatus === 'Suspension Resubmission' &&

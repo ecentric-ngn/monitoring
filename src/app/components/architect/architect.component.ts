@@ -262,44 +262,63 @@ export class ArchitectComponent implements OnInit {
         };
     }
     // //save savedSuspend
-    savedSuspend() {
-         if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
-    }
+        savedSuspend() {
+        if (this.formData.Date) {
+            // Parse the selected date
+            const selectedDate = new Date(this.formData.Date);
+
+            // Get the current time in UTC
+            const nowUTC = new Date();
+
+            // Calculate Bhutan Time (UTC+6)
+            const bhutanOffset = 6; // Bhutan is UTC+6
+            const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+
+            // Attach the Bhutan time to the selected date
+            selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+
+            // Format to ISO string
+            this.formData.Date = selectedDate.toISOString(); // UTC format
+        }
+
         const suspendDetail = {
             type: this.formData.Type,
             suspendDate: this.formData.Date,
             suspendDetails: this.formData.Details,
             suspendBy: this.uuid,
             architectNo: this.selectedarchitectNo,
-            fileId:this.fileId
+            fileId: this.fileId
         };
-        this.service.saveSuspendDetails(suspendDetail)
-        .subscribe({
+
+        // First API call
+        this.service.saveSuspendDetails(suspendDetail).subscribe({
             next: (response: any) => {
-              this.closeButton.nativeElement.click();
-              this.showSuspendMessage();
-              setTimeout(() => {
-                this.getArchitectList();
-              }, 500); // Adjust the delay (in milliseconds) if needed
+            // Second API call after save
+            const suspendPayload = {
+                cdbNos: [this.selectedarchitectNo], // Array format like contractors
+                firmType: 'Architect'
+            };
+
+            this.service.suspendedIng2cSystem(suspendPayload).subscribe({
+                next: (suspendResponse: any) => {
+                this.closeButton.nativeElement.click();
+                this.showSuspendMessage();
+                setTimeout(() => {
+                    this.getArchitectList();
+                }, 500);
+                },
+                error: (err) => {
+                this.errorMessage = 'Suspension failed: ' + (err.error?.error || 'Unknown error');
+                }
+            });
             },
             error: (error: any) => {
-              this.show500Message()
-              this.errorMessage = error.error.error;
+            this.show500Message();
+            this.errorMessage = 'Save failed: ' + (error.error?.error || 'Unknown error');
             }
-          });
-        }
+        });
+}
+
    
             showSuspendMessage() {
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Architect suspended successfully' });
@@ -309,39 +328,61 @@ export class ArchitectComponent implements OnInit {
             }
 
             //save cancelled
-            savedCancelled() {
+           savedCancelled() {
             if (this.formData.Date) {
-             const selectedDate = new Date(this.formData.Date);
-            // Attach the current time to the selected date
-            selectedDate.setHours(new Date().getHours(), new Date().getMinutes(), new Date().getSeconds());
-            this.formData.Date = selectedDate.toISOString(); // Format as 'YYYY-MM-DDTHH:MM:SS.000Z'
+                const selectedDate = new Date(this.formData.Date);
+                // Attach Bhutan time to the selected date
+                const nowUTC = new Date();
+                const bhutanOffset = 6;
+                const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+                selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+                this.formData.Date = selectedDate.toISOString();
             }
+
             const cancelledDetails = {
                 type: this.formData.Type,
                 cancelledDate: this.formData.Date,
                 cancelledDetails: this.formData.Details,
                 cancelledBy: this.uuid,
                 architectNo: this.selectedarchitectNo,
-                fileId:this.fileId
+                fileId: this.fileId
             };
-            this.service.saveCancelledDetails(cancelledDetails)
-            .subscribe({
+
+            // Step 1: Save cancellation locally
+            this.service.saveCancelledDetails(cancelledDetails).subscribe({
                 next: (response: any) => {
-                  this.closeButton.nativeElement.click();
-                  this.showCancelledMessage();
-                  setTimeout(() => {
-                    this.getArchitectList();
-                  }, 500); // Adjust the delay (in milliseconds) if needed
+                // Step 2: Also cancel in G2C system
+                this.service.cancelledIng2cSystem({
+                    cdbNos: [this.selectedarchitectNo], // ensure it's an array
+                    firmType: 'Architect'               // firm type for architect
+                }).subscribe({
+                    next: () => {
+                    // Both calls successful
+                    this.closeButton.nativeElement.click();
+                    this.showCancelledMessage();
+                    setTimeout(() => {
+                        this.getArchitectList(); // refresh list
+                    }, 1000);
+                    },
+                    error: (g2cError: any) => {
+                     this.showCancelledg2cMessage();
+                    }
+                });
                 },
-                error: (error: any) => {
-                  this.show500Message()
-                  this.errorMessage = error.error.error;
+                error: (localError: any) => {
+                this.errorMessage = 'Local cancellation failed: ' + (localError.error?.error || 'Unknown error');
+                this.show500Message();
+                console.error('Local cancellation error', localError);
                 }
-              });
+            });
             }
+
        
             showCancelledMessage() {
                 this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Architect cancelled successfully' });
+            }
+             showCancelledg2cMessage() {
+                this.messageService.add({ severity: 'success', summary: 'Success', detail: 'G2C cancellation failed' });
             }
           
 

@@ -208,7 +208,7 @@ export class SfPermanentEmployeesComponent {
 
     onActionTypeChange() {
         if (this.selectedAction.actionType === 'cancel') {
-            debugger
+            
             const firmId = this.formData.firmType.specializedFirmId; // Use the correct property for firmId
             const firmType = 'specializedfirm';
             if (!firmId) {

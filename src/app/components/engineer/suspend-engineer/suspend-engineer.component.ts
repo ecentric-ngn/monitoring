@@ -194,43 +194,70 @@
     }, error => {
     });
   }
-  ReinstateSuspendedEngineer()  {
-     if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    }
-      const suspendRevoke = {
-      revokedDate: this.formData.Date,
-      revokedDetails: this.formData.Details,
-      revokedBy: this.uuid ,
-      engineerNo: this.selectedengineerNo,
-      fileId:this.fileId
-      };
-      this.service.saveSuspendReregister(suspendRevoke).subscribe((response: any) => {
-           setTimeout(() => {
+ReinstateSuspendedEngineer() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+
+    // Get current time in UTC
+    const nowUTC = new Date();
+    // Calculate Bhutan Time (UTC+6)
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+
+    // Attach Bhutan time to the selected date
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+
+    // Format to ISO string
+    this.formData.Date = selectedDate.toISOString();
+  }
+
+  const suspendRevoke = {
+    revokedDate: this.formData.Date,
+    revokedDetails: this.formData.Details,
+    revokedBy: this.uuid,
+    engineerNo: this.selectedengineerNo,
+    fileId: this.fileId
+  };
+
+  const reinstatedDetail = {
+    firmType: 'Engineer',
+    cdbNos: [this.selectedengineerNo] // must be an array
+  };
+
+  // Step 1: Save revocation locally
+  this.service.saveSuspendReregister(suspendRevoke).subscribe(
+    (response: any) => {
+      // Step 2: Call G2C approval endpoint
+      this.service.approveReinstatementIng2cSystem(reinstatedDetail).subscribe(
+        (g2cResponse: any) => {
+          setTimeout(() => {
             this.closeButton.nativeElement.click();
-            this.showSuspendMessage();
-            // Show the success message after the modal is closed
+            this.showReinstatmessage(); // Show success message
             setTimeout(() => {
-              this.getSuspendedList()
+              this.getSuspendedList(); // Refresh suspended list
             }, 1000);
-          },);
+          });
         },
-        (error: any) => {
-          this.errorMessage = error.error.error;
+        (g2cError: any) => {
+          console.error('G2C approval failed:', g2cError);
+          setTimeout(() => {
+            this.closeButton.nativeElement.click();
+            this.showReinstatmessage(); // Still show message even if G2C fails
+            setTimeout(() => {
+              this.getSuspendedList(); // Refresh suspended list
+            }, 1000);
+          });
         }
       );
+    },
+    (error: any) => {
+      this.errorMessage = 'Local reinstatement failed: ' + (error.error?.error || 'Unknown error');
+      console.error('Local reinstatement error:', error);
     }
-  showSuspendMessage() {
+  );
+}
+
+  showReinstatmessage() {
       this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Engineer reinstated successfully' });
     }
     openModal(event: Event) {

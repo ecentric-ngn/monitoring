@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs'; // Import Observable
-import { api_url, fileUpload_api } from '../app.const/const';
+import { api_url, fileUpload_api, g2c_url } from '../app.const/const';
 
 @Injectable({
   providedIn: 'root'
@@ -33,6 +33,18 @@ saveDeregisterdetails(architectDetail:any){
 saveSuspendDetails(suspendDetail:any){
   return this.http.post<any>(`${api_url}/architectSuspend`,suspendDetail);
 }
+
+  /**
+   * Suspends a contractor from the G2C system.
+   *
+   * @param suspendDetail The details of the contractor to be suspended.
+   * @returns A promise that resolves to a string if the suspension is successful.
+   */
+  suspendedIng2cSystem(suspendDetail: any) {
+    return this.http.post(`${g2c_url}/compliance/suspend`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
 //save cancelled
 saveCancelledDetails(cancelledDetails:any){
   return this.http.post<any>(`${api_url}/architectCancel`,cancelledDetails);
@@ -45,9 +57,26 @@ saveReregisterdetails(reRegisterDetail:any){
 saveCancelledReregister(reRegisterDetail:any){
   return this.http.post<any>(`${api_url}/architectCancelledReregister`,reRegisterDetail);
 }
+  /**
+   * Cancels a contractor in the G2C system.
+   *
+   * @param suspendDetail The details of the contractor to be cancelled.
+   * @returns A promise that resolves to a string if the cancellation is successful.
+   */
+  cancelledIng2cSystem(suspendDetail: any) {
+    // Post the suspend detail to the G2C compliance cancel endpoint
+    return this.http.post(`${g2c_url}/compliance/cancel`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
  // revokesuspend enginner
  saveSuspendReregister(suspendRevoke:any){
   return this.http.post<any>(`${api_url}/architectSuspendedReregister`,suspendRevoke);
+}
+  approveReinstatementIng2cSystem(payload: any) {
+  return this.http.post(`${g2c_url}/compliance/approved`, payload, {
+    responseType: 'text' as 'text'
+  });
 }
   // method to download the file
   downloadFile(filePath:any) {

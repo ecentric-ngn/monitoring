@@ -4,8 +4,8 @@
   </div>
 
   <!-- Tabs -->
-  <span class="text-warning ml-3">Note:<i>Filter base on license status</i></span>
-  <div class="col-md-4">
+  <span class="text-warning">Note:<i>Filter base on license status</i></span>
+  <div class="col-md-4 p-1">
     <select class="form-select" (change)="onTabChange($event)" [value]="activeTab">
       <option disabled>--select--</option>
       <option value="active">Active</option>
@@ -33,7 +33,7 @@
       <input
         type="text"
         placeholder="BCTA No"
-        class="form-control form-control-sm col-md-4"
+        class="form-control form-control-sm col-md-2"
         id="search"
         [(ngModel)]="searchQuery"
         (input)="Searchfilter(searchQuery)"
@@ -84,7 +84,7 @@
         </tr>
 
         <tr *ngIf="tableData.length === 0 && !isLoading">
-          <td colspan="8" class="text-center text-muted">
+          <td colspan="8" class="text-center">
             No actions found
           </td>
         </tr>

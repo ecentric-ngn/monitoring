@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { api_url, fileUpload_api } from '../app.const/const';
+import { api_url, fileUpload_api, g2c_url } from '../app.const/const';
 
 @Injectable({
   providedIn: 'root'
@@ -24,22 +24,43 @@ updateGeneralInformation(specializedTrade: any) {
   });
 }
 
-  //save deregisater
-  saveDowngradedetails(specializedtrade:any){
-    return this.http.post<any>(`${api_url}/specializedTradeAdverseCommentRecord`,specializedtrade);
-  }
+
   //save suspend
     saveSuspendDetails(suspendDetail:any){
       return this.http.post<any>(`${api_url}/specializedTradeSuspend`,suspendDetail);
   }
+    suspendedIng2cSystem(suspendDetail: any) {
+      return this.http.post(`${g2c_url}/compliance/suspend`, suspendDetail, {
+        responseType: 'text' as const  // ✅ required to avoid TS error
+      });
+    }
   //save cancelled
     saveCancelledDetails(cancelledDetail:any){
       return this.http.post<any>(`${api_url}/specializedTradeCancel`,cancelledDetail);
     }
-    //reregister deregister certified builder
+      /**
+   * Cancels a contractor in the G2C system.
+   *
+   * @param suspendDetail The details of the contractor to be cancelled.
+   * @returns A promise that resolves to a string if the cancellation is successful.
+   */
+  cancelledIng2cSystem(suspendDetail: any) {
+    // Post the suspend detail to the G2C compliance cancel endpoint
+    return this.http.post(`${g2c_url}/compliance/cancel`, suspendDetail, {
+      responseType: 'text' as const  // ✅ required to avoid TS error
+    });
+  }
+    //rer
+    // egister deregister certified builder
     saveReregisterdetails(reRegisterDetail:any){
       return this.http.post<any>(`${api_url}/specializedTradeDeregisteredReregister`,reRegisterDetail);
     }
+
+    approveReinstatementIng2cSystem(payload: any) {
+    return this.http.post(`${g2c_url}/compliance/approved`, payload, {
+      responseType: 'text' as 'text'
+    });
+  }
     // reregister cancelled certified builder
     saveCancelledReregister(reRegisterDetail:any){
       return this.http.post<any>(`${api_url}/specializedTradeCancelledReregister`,reRegisterDetail);
