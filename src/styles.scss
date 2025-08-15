@@ -33,10 +33,42 @@ $gutter: 1rem; //for primeflex grid system
     background-color: #344a75;
     transition: background-color 0.6s ease;
   }
-  
-  .save-next-btn:hover {
-    background-color: #2c3e5b;
-  }
+  /* Add this to your component's CSS or global styles */
+
+.iq-sidebar.sidebar-default {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Make the menu scrollable */
+.data-scrollbar {
+  flex: 1;
+  overflow-y: auto; /* Enable vertical scroll */
+  overflow-x: hidden; /* Hide horizontal scroll */
+  height: calc(100vh - 120px); /* Adjust based on your header & logo height */
+}
+
+/* Style the scrollbar (optional) */
+// .data-scrollbar::-webkit-scrollbar {
+//   width: 5px;
+// }
+
+// .data-scrollbar::-webkit-scrollbar-thumb {
+//   background: #888;
+//   border-radius: 5px;
+// }
+
+// .data-scrollbar::-webkit-scrollbar-thumb:hover {
+//   background: #555;
+// }
+
+// .iq-sidebar-menu {
+//   padding-bottom: 20px; /* Prevents last item from being cut off */
+// }
+//   .save-next-btn:hover {
+//     background-color: #2c3e5b;
+//   }
   
 
 .mandatory{

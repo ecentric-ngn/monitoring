@@ -236,89 +236,120 @@ export class SurveyorComponent {
       });
     }
       // //save savedSuspend  
-      savedSuspend(){
-         if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
+    savedSuspend() {
+  if (this.formData.Date) {
+    const selectedDate = new Date(this.formData.Date);
+
+    // Get current time in UTC
+    const nowUTC = new Date();
+    // Calculate Bhutan Time (UTC+6)
+    const bhutanOffset = 6;
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+
+    // Attach Bhutan time to the selected date
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+
+    // Format to ISO string
+    this.formData.Date = selectedDate.toISOString();
+  }
+
+  const suspendDetail = {
+    type: this.formData.Type,
+    suspendDate: this.formData.Date,
+    suspendDetails: this.formData.Details,
+    suspendBy: this.uuid,
+    surveyorNo: this.selectedsurveyorNo,
+    fileId: this.fileId
+  };
+
+  // Step 1: Save suspension locally
+  this.service.saveSuspendDetails(suspendDetail).subscribe({
+    next: (response: any) => {
+      // Step 2: Call G2C suspension API
+      const suspendPayload = {
+        cdbNos: [this.selectedsurveyorNo], // must be an array
+        firmType: 'Surveyor'
+      };
+
+      this.service.suspendedIng2cSystem(suspendPayload).subscribe({
+        next: (g2cResponse: any) => {
+          this.closeButton.nativeElement.click();
+          this.showSuspendedMessage();
+          setTimeout(() => {
+            this.getSurveyorList(); // Refresh list
+          }, 500);
+        },
+        error: (g2cError: any) => {
+          this.errorMessage = 'G2C suspension failed: ' + (g2cError.error?.error || 'Unknown error');
+        }
+      });
+    },
+    error: (error: any) => {
+      this.show500Message();
+      this.errorMessage = 'Local save failed: ' + (error.error?.error || 'Unknown error');
     }
-         const suspendDetail = {
-          type: this.formData.Type,
-          suspendDate: this.formData.Date,
-          suspendDetails: this.formData.Details,
-          suspendBy: this.uuid,
-          surveyorNo: this.selectedsurveyorNo,
-          fileId:this.fileId
-           };
-           this.service.saveSuspendDetails(suspendDetail).subscribe((response: any) => {
-             setTimeout(() => {
-               this.closeButton.nativeElement.click();
-                this.showSuspendedMessage();
-               // Show the success message after the modal is closed
-               setTimeout(() => {
-                 this.getSurveyorList()
-               }, 1000);
-             },);
-           },
-           (error: any) => {
-             console.error("Error:", error);
-             this.errorMessage = error.error.error;
-           }
-         );
-       }
+  });
+}
+
        showSuspendedMessage() {
          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Surveyor suspended successfully' });
        }
-  
+  show500Message() {
+    this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Internal server error' });
+  }
   //save cancelled
-       savedCancelled(){
-         if (this.formData.Date) {
-      // Parse the selected date
-      const selectedDate = new Date(this.formData.Date);
-      // Get the current time in UTC
-      const nowUTC = new Date();
-      // Calculate Bhutan Time (UTC+6)
-      const bhutanOffset = 6; // Bhutan is UTC+6
-      const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
-      // Attach the Bhutan time to the selected date
-      selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
-      // Format the selected date to ISO string with timezone offset
-      this.formData.Date = selectedDate.toISOString(); // Note: This will still be in UTC format
-    
+savedCancelled() {
+  if (this.formData.Date) {
+    // Convert the selected date to Bhutan time
+    const selectedDate = new Date(this.formData.Date);
+    const nowUTC = new Date();
+    const bhutanOffset = 6; // Bhutan is UTC+6
+    const bhutanTime = new Date(nowUTC.getTime() + bhutanOffset * 60 * 60 * 1000);
+    selectedDate.setHours(bhutanTime.getHours(), bhutanTime.getMinutes(), bhutanTime.getSeconds());
+    this.formData.Date = selectedDate.toISOString(); // Still in UTC format
+  }
+
+  const cancelledDetail = {
+    type: this.formData.Type,
+    cancelledDate: this.formData.Date,
+    cancelledDetails: this.formData.Details,
+    cancelledBy: this.uuid,
+    surveyorNo: this.selectedsurveyorNo,
+    fileId: this.fileId
+  };
+
+  // Step 1: Save cancellation locally
+  this.service.saveCancelledDetails(cancelledDetail).subscribe({
+    next: () => {
+      // Step 2: Call G2C cancel API after local cancellation succeeds
+      const g2cPayload = {
+        cdbNos: [this.selectedsurveyorNo], // Ensure it's an array
+        firmType: 'Surveyor'
+      };
+
+      this.service.cancelledIng2cSystem(g2cPayload).subscribe({
+        next: () => {
+          this.closeButton.nativeElement.click();
+          this.showCancelMessage();
+          setTimeout(() => {
+            this.getSurveyorList(); // Refresh surveyor list
+          }, 500);
+        },
+        error: (g2cError: any) => {
+          this.errorMessage = 'G2C cancellation failed: ' + (g2cError.error?.error || 'Unknown error');
+          console.error('G2C cancellation error', g2cError);
+          this.showCancelMessage(); // Still show local cancellation message
+        }
+      });
+    },
+    error: (localError: any) => {
+      this.errorMessage = 'Local cancellation failed: ' + (localError.error?.error || 'Unknown error');
+      console.error('Local cancellation error', localError);
+      this.show500Message();
     }
-         const cancelledDetail = {
-          type: this.formData.Type,
-          cancelledDate: this.formData.Date,
-          cancelledDetails: this.formData.Details,
-          cancelledBy: this.uuid,
-          surveyorNo: this.selectedsurveyorNo,
-          fileId:this.fileId
-           };
-           this.service.saveCancelledDetails(cancelledDetail).subscribe((response: any) => {
-             setTimeout(() => {
-               this.closeButton.nativeElement.click();
-                this.showCancelMessage();
-               // Show the success message after the modal is closed
-               setTimeout(() => {
-                 this.getSurveyorList()
-               }, 1000);
-             },);
-           },
-           (error: any) => {
-             console.error("Error:", error);
-             this.errorMessage = error.error.error;
-           }
-         );
-       }
+  });
+}
+
        showCancelMessage() {
          this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Surveyor cancelled successfully' });
        }

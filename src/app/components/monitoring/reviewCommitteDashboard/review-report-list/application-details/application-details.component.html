@@ -444,7 +444,7 @@
             <td class="text-center bg-white">{{ item.remarks }}</td>
             <td class="text-center bg-white">
               <a *ngIf="item.file_path">
-                <i class="pi pi-download"></i>
+                <i class="pi pi-download link-info"></i>
               </a>
             </td>
           </tr>
@@ -476,7 +476,7 @@
             <td class="text-center bg-white">{{ item.remarks }}</td>
             <td class="text-center bg-white">
               <a *ngIf="item.file_path">
-                <i class="pi pi-download"></i>
+                <i class="pi pi-download link-info"></i>
               </a>
             </td>
           </tr>
@@ -683,10 +683,7 @@
           <tr>
             <th class="text-center p-1">#</th>
             <th class="text-center p-1">Equipment</th>
-            <th class="text-center p-1">Equipment Type</th>
-            <th class="text-center p-1">Equipment No.</th>
             <th class="text-center p-1">Registration No.</th>
-            <th class="text-center p-1">Vehicle Type</th>
             <th class="text-center p-1">Status</th>
           </tr>
         </thead>
@@ -697,10 +694,7 @@
           <tr *ngFor="let item of committedEquipmentList; let i = index">
             <td class="text-center">{{ i + 1 }}</td>
             <td class="text-center">{{ item.equipmentName }}</td>
-            <td class="text-center">{{ item.equipment_type }}</td>
-            <td class="text-center">{{ item.equipment_number }}</td>
             <td class="text-center">{{ item.registration_number }}</td>
-            <td class="text-center">{{ item.vehicle_type }}</td>
             <td class="text-center">{{ item.status }}</td>
 
 

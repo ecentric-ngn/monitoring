@@ -51,14 +51,15 @@ getAuditById(){
 
 editAuditClearance(tableData: any): void{
 const payload={
-  agency:tableData.agency,
-  ain:tableData.AIN,
-  auditedPeriod:tableData.auditPeriod,
-  paroNo:tableData.paraNo,
-  auditObservation:tableData.auditObservation,
+  agency:tableData[0].agency,
+  ain:tableData[0].AIN,
+  auditedPeriod:tableData[0].auditPeriod,
+  paroNo:tableData[0].paraNo,
+  auditObservation:tableData[0].auditObservation,
   id:this.paramData,
   editedBy:this.uuid
 }
+
 this.service.updateAuditMemo(payload).subscribe((response:any)=>{
   this.showUpdateMessage()
   setTimeout(() => {

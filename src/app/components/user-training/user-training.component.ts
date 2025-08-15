@@ -161,13 +161,21 @@ export class UserTrainingComponent {
         );
     }
     //method to delete the participant
-    deleteParticipant(id: any) {
-        this.service.deleteParticipantData(id).subscribe((response: any) => {
-            this.closeButton.nativeElement.click();
-            this.showDeleteMessage();
-            this.GetUserTraingData();
-        });
-    }
+deleteParticipant(id: any) {
+  const confirmed = confirm('Are you sure you want to delete this participant?');
+  
+  if (confirmed) {
+    this.service.deleteParticipantData(id).subscribe((response: any) => {
+      this.closeButton.nativeElement.click();
+      this.showDeleteMessage();
+      this.GetUserTraingData();
+    });
+  } else {
+    // Optional: show a message when deletion is canceled
+    console.log('Deletion canceled by the user.');
+  }
+}
+
     showDeleteMessage() {
         this.messageService.add({
             severity: 'success',

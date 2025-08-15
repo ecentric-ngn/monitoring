@@ -449,7 +449,7 @@ saveSiteEngineerData(payload: any, tableId: any, workId: any) {
     return this.http.get(`${g2c_url}/compliance/full/${bctaNo}`);
   }
    getDatabasedOnBctaNos(bctaNo: any,appNo: any) {
-    debugger
+    
     return this.http.get(`${g2c_url}/compliance/full/${bctaNo}/${appNo}`);
   }
 
