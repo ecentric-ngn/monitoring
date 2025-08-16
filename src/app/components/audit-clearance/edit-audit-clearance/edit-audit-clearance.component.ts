@@ -49,34 +49,45 @@ getAuditById(){
   })
 }
 
-editAuditClearance(tableData: any): void{
-const payload={
-  agency:tableData[0].agency,
-  ain:tableData[0].AIN,
-  auditedPeriod:tableData[0].auditPeriod,
-  paroNo:tableData[0].paraNo,
-  auditObservation:tableData[0].auditObservation,
-  id:this.paramData,
-  editedBy:this.uuid
+editAuditClearance(tableData: any): void {
+  const payload = {
+    agency: tableData[0].agency,
+    ain: tableData[0].AIN,
+    auditedPeriod: tableData[0].auditPeriod,
+    paroNo: tableData[0].paraNo,
+    auditObservation: tableData[0].auditObservation,
+    id: this.paramData,
+    editedBy: this.uuid
+  };
+
+  this.service.updateAuditMemo(payload).subscribe(
+    (response: any) => {
+      this.showUpdateMessage();
+      setTimeout(() => {
+        this.getAuditById();
+      }, 1000);
+    },
+    (error) => {
+      if (error.status === 500) {
+       this.showerrorMessage();
+      } else {
+        console.error(error);
+      }
+    }
+  );
 }
 
-this.service.updateAuditMemo(payload).subscribe((response:any)=>{
-  this.showUpdateMessage()
-  setTimeout(() => {
-   this.getAuditById()
-  }, 1000);
-
-
-  }, error => {
-    console.error(error);
-  });
-}
 back(){
   this.router.navigate(['/audit-clearance'])
 }
 
 showUpdateMessage() {
   this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Audit Detail updated successfully' });
+
+}
+showerrorMessage() {
+  this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Something went wrong' });
+
 }
 }
 
