@@ -164,6 +164,7 @@ dropDetails(actionForm) {
   }
  this.SaveDropDetails();
 }
+isLoading = false;
 SaveDropDetails(){
   const payload={
     dropped:1,

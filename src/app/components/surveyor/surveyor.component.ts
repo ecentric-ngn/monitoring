@@ -270,7 +270,6 @@ export class SurveyorComponent {
         cdbNos: [this.selectedsurveyorNo], // must be an array
         firmType: 'Surveyor'
       };
-
       this.service.suspendedIng2cSystem(suspendPayload).subscribe({
         next: (g2cResponse: any) => {
           this.closeButton.nativeElement.click();

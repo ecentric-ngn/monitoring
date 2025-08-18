@@ -221,7 +221,7 @@ ReinstateSuspendedEngineer() {
 
   const reinstatedDetail = {
     firmType: 'Engineer',
-    cdbNos: [this.selectedengineerNo] // must be an array
+    cdbNos: this.selectedengineerNo // must be an array
   };
 
   // Step 1: Save revocation locally
