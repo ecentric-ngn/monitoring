@@ -166,7 +166,7 @@ dropDetails(actionForm) {
 }
 SaveDropDetails(){
   const payload={
-    droped:1,
+    dropped:1,
     id:this.id,
     remarks:this.formData.remarks,
     dropedDate:this.formData.Date,
