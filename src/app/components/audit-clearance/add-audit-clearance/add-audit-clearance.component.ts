@@ -119,7 +119,9 @@ export class AddAuditClearanceComponent {
   }
 
   // This will be triggered when the Save button is clicked
+  isLoading = false;
   saveAuditDetails() {
+    this.isLoading = true;
     if (this.uploadedData.length > 0) {
       const headers = this.uploadedData[0];
       const data = this.uploadedData.slice(1);
@@ -135,13 +137,10 @@ export class AddAuditClearanceComponent {
             rowData[this.headerMapping[key]] = value;
           }
         });
-  
         return Object.values(rowData).some(value => value !== '') ? rowData : null;
       }).filter(row => row !== null);
-  
       // Assuming only the first row is required
       const firstRow = transformedData[0];
-  
       // Create the payload with only the necessary fields
       const payload = {
         agency: firstRow.agency, 
@@ -153,11 +152,11 @@ export class AddAuditClearanceComponent {
         type: firstRow.type,
         createdBy: this.uuid
       };
-  
       // Call the service with the payload
       this.service.createAuditMemo(payload).subscribe(
         (response) => {
           this.showUpdateMessage();
+            this.isLoading = false;
           setTimeout(() => {
             this.router.navigate(['/audit-clearance']);
           }, 1000);
@@ -166,9 +165,11 @@ export class AddAuditClearanceComponent {
           if (error.status === 500) {
             console.error('Something went wrong. Please try again later.');
             this.showErrorMessage();
+              this.isLoading = false;
           } else {
             console.error(error);
             this.showErrorMessage();
+              this.isLoading = false;
           }
         }
       );
