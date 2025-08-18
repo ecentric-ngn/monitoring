@@ -127,7 +127,6 @@ export class CommentsAdverseRecordComponent {
         this.hideAdverseOption = hasComment || hasMonitoring;
         this.hideReadOption = !hasRead;
       }
-  
       return hasRead || hasAdverse || hasComment || hasMonitoring;
     }
   

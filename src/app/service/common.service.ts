@@ -77,7 +77,7 @@ export class CommonService {
   }
   //save audit memo
   createAuditMemo(payload) {
-    return this.http.post<any>(`${api_url}/createAuditMemo`, payload)
+    return this.http.post<any>(`${api_url}/createAuditMemo`, payload, { responseType: 'text' as 'json' });
   }
   
   
