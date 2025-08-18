@@ -225,7 +225,7 @@ ReinstateSuspendedSpecializedTrade() {
 
   const reinstatedDetail = {
     firmType: 'Specialized-Trade',
-    cdbNos: [this.selectedspecializedTradeNo] // Must be an array
+    cdbNos: this.selectedspecializedTradeNo
   };
 
   // Step 1: Save revocation locally

@@ -219,7 +219,7 @@ reInstateSuspendedCertifiedVuilder() {
   };
 
   const reinstatedDetail = {
-    firmType: 'Certified-builder',
+    firmType: 'CertifiedBuilder',
     cdbNos: this.selectedcertifiedBuilderNo
   };
 

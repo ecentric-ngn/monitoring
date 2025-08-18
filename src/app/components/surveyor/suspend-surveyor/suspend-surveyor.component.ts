@@ -218,7 +218,7 @@ shouldShowActionButton(): boolean {
     next: () => {
       // Step 2: Call G2C approval endpoint
       const approvePayload = {
-        cdbNos: [this.selectedsurveyorNo], // array format
+        cdbNos: this.selectedsurveyorNo, // array format
         firmType: 'Surveyor'
       };
 
