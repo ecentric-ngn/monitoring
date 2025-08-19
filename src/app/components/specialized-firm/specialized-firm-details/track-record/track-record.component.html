@@ -26,11 +26,11 @@
             </thead>
             <tbody>
                 <tr *ngIf="TableData?.length === 0">
-                    <td colspan="14" class="text-center">No data found</td>
+                    <td colspan="15" class="text-center">No data found</td>
                 </tr>
                 <tr *ngFor="let data of TableData; let i = index">
                     <td>{{ i + 1 }}</td>
-                     <td>{{ data.startDate | date: 'dd-MM-yyyy' }} - {{data.completionDate | date: 'dd-MM-yyyy'}}</td>
+                     <td  class="text-nowrap">{{ data.startDate | date: 'dd-MM-yyyy' }} - {{data.completionDate | date: 'dd-MM-yyyy'}}</td>
                     <td>{{ data.agencyName }} / {{ data.departmentName}}</td>
                     <td>{{ data.referenceNo }}</td>
                     <td>{{ data.workName }}</td>
