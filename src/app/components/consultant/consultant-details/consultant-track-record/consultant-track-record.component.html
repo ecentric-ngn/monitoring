@@ -37,8 +37,8 @@
               </tr>
               <tr *ngFor="let data of TableData; let i = index">
                   <td>{{ i + 1 }}</td>
-                <td>{{ data.startDate | date: 'dd-MM-yyyy' }} - {{data.completionDate | date: 'dd-MM-yyyy'}}</td>
-                  <td>{{ data.agencyName }} / {{ data.departmentName}}</td>
+                  <td class="text-nowrap">{{ data.startDate | date: 'dd-MM-yyyy' }} - {{data.completionDate | date: 'dd-MM-yyyy'}}</td>
+                  <td >{{ data.agencyName }} / {{ data.departmentName}}</td>
                   <td>{{ data.referenceNo }}</td>
                   <td>{{ data.workName }}</td>
                   <td>{{ data.workCategory }}</td>

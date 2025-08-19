@@ -12,14 +12,14 @@ import { MessageService } from 'primeng/api';
 export class AddAuditClearanceComponent {
   tableData: any;
   selectedFile: any;
-  auditClearanceExcelSheet: any[] = ['Type (1 for Contractor, 2 for Consultant)', 'CDB No', 'Audited Agency', 'Audited period', 'AIN', 'Para No.', 'Observation in brief'];
+  auditClearanceExcelSheet: any[] = ['Type (1 for Contractor, 2 for Consultant)', 'BCTA No', 'Audited Agency', 'Audited period', 'AIN', 'Para No.', 'Observation in brief'];
   table: any;
   uploadedData: unknown[] = [];
   fileId: string;
   // Define the header mapping object
   headerMapping = {
     "Type (1 for Contractor, 2 for Consultant)": "type",
-    "CDB No": "cdbNo",
+    "BCTA No": "cdbNo",
     "Audited Agency": "agency",
     "Audited period": "auditedPeriod",
     "AIN": "ain",
