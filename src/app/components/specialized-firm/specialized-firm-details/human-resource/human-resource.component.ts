@@ -155,40 +155,31 @@ onUpload() {
   });
 }
 
-viewFile(attachment: string): void {
-  this.service.downloadFile(attachment).subscribe(
-    (response: HttpResponse<Blob>) => {
-      const binaryData = [response.body];
-      // Create a Blob from the response
-      const blob = new Blob(binaryData, { type: response.body.type });
-      // Generate a URL for the Blob
-      const blobUrl = window.URL.createObjectURL(blob);
-      // Open a new window
-      const newWindow = window.open('', '_blank', 'width=800,height=600');
-      if (newWindow) {
-        // Write HTML content to the new window
-        newWindow.document.write(`
-          <html>
-            <head>
-            </head>
-            <body>
-              <h1>File</h1>
-              <iframe src="${blobUrl}" width="100%" height="100%" style="border: none;"></iframe>
-            </body>
-          </html>
-        `);
-
-        // Optionally revoke the object URL after a timeout to free up resources
-        setTimeout(() => {
-          window.URL.revokeObjectURL(blobUrl);
-        }, 100);
-      } else {
-        console.error('Failed to open the new window');
-      }
-    },
-    (error) => {
-      console.error('Download failed', error);
+    viewFile(filePath: string): void {
+      this.service.downloadhrandeqFile(filePath).subscribe(
+        (response: HttpResponse<Blob>) => {
+          const filename: string = this.extractFileName(filePath);
+          const binaryData = [response.body];
+          const blob = new Blob(binaryData, { type: response.body.type });
+          const downloadLink = document.createElement('a');
+          downloadLink.href = window.URL.createObjectURL(blob);
+          downloadLink.setAttribute('download', filename);
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          window.URL.revokeObjectURL(downloadLink.href);
+        },
+        (error) => {
+          this.showErrorMessage();
+          console.error('Download failed', error);
+        }
+      );
     }
-  );
-}
+    showErrorMessage() {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'The requested file was not found' });
+    }
+    // Extract filename from the file path
+    extractFileName(filePath: string): string {
+      return filePath.split('/').pop() || filePath.split('\\').pop() || 'downloaded-file';
+    }
 }

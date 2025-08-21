@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs'; // Import Observable
-import { api_url, fileUpload_api, g2c_url, web_service_url } from '../app.const/const';
+import { api_url, fileUpload_api, fileUploadfromg2c, g2c_url, web_service_url } from '../app.const/const';
 
 @Injectable({
   providedIn: 'root'
@@ -101,4 +101,10 @@ saveCancelledReregister(reRegisterDetail:any){
       responseType: 'blob' 
     });
   }
+    downloadhrandeqFile(filePath:any) {
+      return this.http.get(`${fileUploadfromg2c}/public_access/compliance/download?path=${filePath}`, { 
+        observe: 'response', 
+        responseType: 'blob' 
+      });
+    }
 }

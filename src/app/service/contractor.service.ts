@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { api_url, g2c_url, web_service_url } from '../app.const/const';
+import { api_url, fileUploadfromg2c, g2c_url, web_service_url } from '../app.const/const';
 import { fileUpload_api } from '../app.const/const';
 
 @Injectable({
@@ -126,5 +126,11 @@ downloadFile(filePath:any) {
     responseType: 'blob' 
   });
 }
-
+downloadhrandeqFile(filePath:any) {
+  return this.http.get(`${fileUploadfromg2c}/public_access/compliance/download?path=${filePath}`, { 
+    observe: 'response', 
+    responseType: 'blob' 
+  });
+}
+// 
 }

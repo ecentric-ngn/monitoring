@@ -3,6 +3,7 @@ import { ConsultantService } from '../../../../service/consultant.service';
 import { Input } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { MessageService } from 'primeng/api';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-consultant-human-resource',
@@ -155,6 +156,46 @@ resetModalData() {
     Remarks: '',
   };
 }
-  }
 
+viewFile(attachment: string): void {
+  this.service.downloadhrandeqFile(attachment).subscribe(
+    (response: HttpResponse<Blob>) => {
+      const binaryData = [response.body];
+      // Create a Blob from the response
+      const blob = new Blob(binaryData, { type: response.body.type });
+      // Generate a URL for the Blob
+      const blobUrl = window.URL.createObjectURL(blob);
+      // Open a new window
+      const newWindow = window.open('', '_blank', 'width=800,height=600');
+      if (newWindow) {
+        // Write HTML content to the new window
+        newWindow.document.write(`
+          <html>
+            <head>
+            </head>
+            <body>
+              <h1>File</h1>
+              <iframe src="${blobUrl}" width="100%" height="100%" style="border: none;"></iframe>
+            </body>
+          </html>
+        `);
+
+        // Optionally revoke the object URL after a timeout to free up resources
+        setTimeout(() => {
+          window.URL.revokeObjectURL(blobUrl);
+        }, 100);
+      } else {
+        console.error('Failed to open the new window');
+      }
+    },
+    (error) => {
+      this.showErrorMessage()
+      console.error('Download failed', error);
+    }
+  );
+}
+  showErrorMessage() {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'The requested file was not found' });
+    }
+  }
 

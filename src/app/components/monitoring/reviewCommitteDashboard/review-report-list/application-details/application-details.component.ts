@@ -132,8 +132,6 @@ export class ApplicationDetailsComponent {
         .subscribe({
             next: (response: any) => {
                 this.contractorsList = response.data;
-                
-              
             },
             error: (error) => {
                 console.error('Error fetching contractor details:', error);
@@ -152,6 +150,7 @@ export class ApplicationDetailsComponent {
         this.service.fetchDetails(payload, 1, 100, 'work_with_contractor_view').subscribe(
                 (response: any) => {
                     this.formData = response.data[0];
+                    
                     
                 },
                 (error) => {

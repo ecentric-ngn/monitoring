@@ -30,10 +30,11 @@
                     <td >{{data.equipmentName}}</td>
                     <td class="text-center">{{data.registrationNo}}</td>
                     <td class="text-center">{{data.quantity}}</td>
-                    <td>
-                      <button *ngIf="data.filePath" (click)="viewFile(data.filePath)" class="view-button">
-                      </button>
-                     </td>
+                   <td class="text-center">
+                <a *ngIf="data.attachment" (click)="viewFile(data.attachment)" class="view-link text-blue pointer">
+                  View
+                </a>
+               </td>
                     <td *ngIf="shouldShowActionButton()" class="text-center">
                         <button  (click)="storeEquipementID(data.contractorEquipmentId)"  type="button" class="btn btn-sm btn-danger align-items-center text-center" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
                             Release

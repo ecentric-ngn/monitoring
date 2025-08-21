@@ -159,7 +159,7 @@ shouldShowActionButton(): boolean {
     };
   }
       viewFile(filePath: string): void {
-        this.service.downloadFile(filePath).subscribe(
+        this.service.downloadhrandeqFile(filePath).subscribe(
           (response: HttpResponse<Blob>) => {
             const filename: string = this.extractFileName(filePath);
             const binaryData = [response.body];

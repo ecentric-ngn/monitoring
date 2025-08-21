@@ -141,31 +141,33 @@ resetModalData() {
   };
 }
 
-viewFile(filePath: string): void {
-  this.service.downloadFile(filePath).subscribe(
-    (response: HttpResponse<Blob>) => {
-      const filename: string = this.extractFileName(filePath);
-      const binaryData = [response.body];
-      const blob = new Blob(binaryData, { type: response.body.type });
-      const downloadLink = document.createElement('a');
-      downloadLink.href = window.URL.createObjectURL(blob);
-      downloadLink.setAttribute('download', filename);
-      document.body.appendChild(downloadLink);
-      downloadLink.click();
-      document.body.removeChild(downloadLink);
-      window.URL.revokeObjectURL(downloadLink.href);
-    },
-    (error) => {
-      this.showErrorMessage('Something went wrong.Please try again later.Download failed')
+    viewFile(filePath: string): void {
+      this.service.downloadhrandeqFile(filePath).subscribe(
+        (response: HttpResponse<Blob>) => {
+          const filename: string = this.extractFileName(filePath);
+          const binaryData = [response.body];
+          const blob = new Blob(binaryData, { type: response.body.type });
+          const downloadLink = document.createElement('a');
+          downloadLink.href = window.URL.createObjectURL(blob);
+          downloadLink.setAttribute('download', filename);
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          window.URL.revokeObjectURL(downloadLink.href);
+        },
+        (error) => {
+          this.showErrorMessage();
+          console.error('Download failed', error);
+        }
+      );
     }
-  );
-}
-extractFileName(filePath: string): string {
-  return filePath.split('/').pop() || filePath.split('\\').pop() || 'downloaded-file';
-}
-showErrorMessage(message: string) {
-  this.messageService.add({ severity: 'error', summary: 'error', detail: message });
-}
+    showErrorMessage() {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'The requested file was not found' });
+    }
+    // Extract filename from the file path
+    extractFileName(filePath: string): string {
+      return filePath.split('/').pop() || filePath.split('\\').pop() || 'downloaded-file';
+    }
 
 }
 

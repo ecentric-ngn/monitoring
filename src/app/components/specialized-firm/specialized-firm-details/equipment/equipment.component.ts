@@ -3,6 +3,7 @@ import { Input } from '@angular/core';
 import { NgForm } from '@angular/forms';
 import { SpecializedFirmService } from '../.././../../service/specialized-firm.service';
 import { MessageService } from 'primeng/api';
+import { HttpResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-equipment',
@@ -102,6 +103,33 @@ shouldShowActionButton(): boolean {
       }
     );
   }
+    viewFile(filePath: string): void {
+      this.service.downloadhrandeqFile(filePath).subscribe(
+        (response: HttpResponse<Blob>) => {
+          const filename: string = this.extractFileName(filePath);
+          const binaryData = [response.body];
+          const blob = new Blob(binaryData, { type: response.body.type });
+          const downloadLink = document.createElement('a');
+          downloadLink.href = window.URL.createObjectURL(blob);
+          downloadLink.setAttribute('download', filename);
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          window.URL.revokeObjectURL(downloadLink.href);
+        },
+        (error) => {
+          this.showErrorMessage();
+          console.error('Download failed', error);
+        }
+      );
+    }
+    showErrorMessage() {
+      this.messageService.add({ severity: 'error', summary: 'Error', detail: 'The requested file was not found' });
+    }
+    // Extract filename from the file path
+    extractFileName(filePath: string): string {
+      return filePath.split('/').pop() || filePath.split('\\').pop() || 'downloaded-file';
+    }
   showReleasedMessage() {
     this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Specialized Firm Released successfully' });
   }

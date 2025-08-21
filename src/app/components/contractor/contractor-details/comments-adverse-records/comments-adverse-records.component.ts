@@ -305,6 +305,7 @@ extractFileName(filePath: string): string {
       
     }
     closeModal() {
+      
       this.closeButton.nativeElement.click();
     }
    
