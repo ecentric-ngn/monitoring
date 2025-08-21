@@ -4,10 +4,7 @@
 <div class="container m-5">
   <!-- Company Information (Form Format) -->
   <div class="card mb-4">
-    <div class="card-header">
       <h4>Company Information</h4>
-    </div>
-    <div class="card-body">
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
@@ -46,14 +43,10 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
   <div class="card mb-4">
-    <div class="card-header">
       <h4>Office Signage and Documents</h4>
-    </div>
-    <div class="card-body">
-           <div class="row">
+       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
             <label><strong>Location:</strong></label>
@@ -114,13 +107,9 @@
         </div>
       </div>
     </div>
-  </div>
   <!-- HR Details (Table Format) -->
   <div class="card mb-4">
-    <div class="card-header">
       <h4>HR Details</h4>
-    </div>
-    <div class="card-body">
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
           <thead class="">
@@ -145,7 +134,7 @@
               <td>{{ hr.joiningDate || 'N/A' }}</td>
             </tr>
             <tr *ngIf="!hrCompliance || hrCompliance.length === 0">
-              <td colspan="6" class="text-center">No HR records found</td>
+              <td colspan="7" class="text-center">No HR records found</td>
             </tr>
           </tbody>
         </table>
@@ -168,15 +157,11 @@
         </div>
       </div>
       </div>
-    </div>
   </div>
 
   <!-- Vehicle/Equipment Details (Table Format) -->
   <div class="card mb-4">
-    <div class="card-header">
       <h4>Vehicle/Equipment Details</h4>
-    </div>
-    <div class="card-body">
       <div class="table-responsive">
         <table class="table table-bordered table-striped">
           <thead class="">
@@ -220,15 +205,11 @@
         </div>
       </div>
       </div>
-    </div>
   </div>
 
     <!-- Review Information -->
   <div class="card mb-4">
-    <div class="card-header">
       <h4>Review Information</h4>
-    </div>
-    <div class="card-body">
       <div class="row">
         <div class="col-md-6">
           <div class="form-group">
@@ -237,7 +218,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </div>
 
