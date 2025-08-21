@@ -23,13 +23,15 @@ export class ConsultantCommentsAdverseRecordsComponent {
   hideMonitoringOption: boolean;
   hideReadOption: boolean;
   @ViewChild('showSuccessModal') addAgencyBtn: ElementRef;
-  @ViewChild('closeButton') closeButton: ElementRef;
+@ViewChild('closeButton', { static: false }) closeButton!: ElementRef;
+
   showSuccessModal: boolean = true;
   loading: boolean = false;
   errorMessage: any;
   Tabledata: any = [];
   Privileges: any;
   today: string;
+
 
   constructor(
     private service: ConsultantService,

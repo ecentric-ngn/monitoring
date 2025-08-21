@@ -8,6 +8,7 @@ export const api_url_Monitoring_siteEngineer = "http://172.30.4.159:8080/api";
 //export const api_url_Monitoring_siteEngineer = "http://172.16.217.13:8080/api";
 export const fileUpload_api = "http://103.252.84.86/api";
 export const fileUpload_api_url_Monitoring= "http://172.30.4.159:8080/api";
+export const fileUploadfromg2c= "http://172.30.4.159:8180";
 export const otp_api_url= "http://172.30.4.159:8080/api";
 export const userTrainingView = "http://103.252.84.86/api/crps";
 export const web_service_url = "http://103.252.84.86/api/dataHubApi";

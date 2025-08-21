@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { api_url, fileUpload_api, g2c_url, web_service_url } from '../app.const/const';
+import { api_url, fileUpload_api, fileUploadfromg2c, g2c_url, web_service_url } from '../app.const/const';
 
 @Injectable({
   providedIn: 'root'
@@ -116,6 +116,12 @@ getClassificationOfspecializedFirm(types: any) {
   // method to download the file
   downloadFile(filePath:any) {
     return this.http.get(`${fileUpload_api}/file/download?filePath=${filePath}`, { 
+      observe: 'response', 
+      responseType: 'blob' 
+    });
+  }
+  downloadhrandeqFile(filePath:any) {
+    return this.http.get(`${fileUploadfromg2c}/public_access/compliance/download?path=${filePath}`, { 
       observe: 'response', 
       responseType: 'blob' 
     });

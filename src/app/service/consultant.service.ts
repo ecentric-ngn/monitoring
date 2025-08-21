@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { api_url, fileUpload_api, g2c_url, web_service_url } from '../app.const/const';
+import { api_url, fileUpload_api, fileUploadfromg2c, g2c_url, web_service_url } from '../app.const/const';
 
 export interface ConsultantData {
   workCategory: string;
@@ -118,6 +118,12 @@ saveRecord(records:any){
       responseType: 'blob' 
     });
   }
+    downloadhrandeqFile(filePath:any) {
+      return this.http.get(`${fileUploadfromg2c}/public_access/compliance/download?path=${filePath}`, { 
+        observe: 'response', 
+        responseType: 'blob' 
+      });
+    }
   }
 
 
