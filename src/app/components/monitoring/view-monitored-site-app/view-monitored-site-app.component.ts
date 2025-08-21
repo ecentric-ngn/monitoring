@@ -305,7 +305,9 @@ export class ViewMonitoredSiteAppComponent {
 );
     }
 
-
+closeModal() {
+   this.formData = {};
+}
     // resetForm() {
     //     this.formData.contractorNo = '';
     //     this.formData.nameOfFirm = '';

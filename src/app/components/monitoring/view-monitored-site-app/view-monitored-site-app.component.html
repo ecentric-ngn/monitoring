@@ -113,12 +113,12 @@
     </table>
     <div class="justify-content-end d-flex"
       *ngIf="tableData && tableData?.length > 0 && selectedChecklistIds.length > 0">
-        <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to forward the application?'"
-                (nzOnConfirm)="forwardApplication()">
-                <button *ngIf="selectedChecklistIds.length > 0"  class="btn btn-success pi pi-angle-right h-100  pointer-event">
-                    Forward to Review
-                </button>
-            </a>
+      <a nz-popconfirm [nzPopconfirmTitle]="'Do you want to forward the application?'"
+        (nzOnConfirm)="forwardApplication()">
+        <button *ngIf="selectedChecklistIds.length > 0" class="btn btn-success pi pi-angle-right h-100  pointer-event">
+          Forward to Review
+        </button>
+      </a>
       <!-- <button *ngIf="selectedChecklistIds.length > 0" (click)="forwardApplication()" class="btn btn-success  pointer-event">
         <span class="text-white">Forward to Review</span>
         <i class="pi pi-forward text-white ms-2"></i>
@@ -156,8 +156,8 @@
   <div class="modal-dialog modal-lg">
     <div class="modal-content">
       <div class="modal-header" style="background-color: #495f8a">
-        <h5 class="modal-title text-white" id="exampleModalLabel">Record of Monitoring observations actions  taken by the
-           ВСТА
+        <h5 class="modal-title text-white" id="exampleModalLabel">Record of Monitoring observations actions taken by the
+          ВСТА
         </h5>
         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
       </div>
@@ -325,6 +325,7 @@
                   </div>
                 </div>
               </div>
+
               <div class="justify-content-end d-flex">
                 <button class="btn text-white save-next-btn" type="button" (click)="goToClientTab()">Next</button>
               </div>
@@ -359,11 +360,16 @@
                 </table>
               </div>
             </div>
-            <div class="justify-content-end d-flex">
+            <div class="d-flex justify-content-between">
               <button class="btn mr-1 text-white btn-warning" type="button" (click)="goToPreviousTab()">Prev</button>
-              <button class="btn text-white save-next-btn" (click)="generateChecklistDetails(form)"
-                type="submit">Send</button>
+              <div>
+                <button class="btn btn-danger mr-1" (click)="closeModal()" type="button" data-bs-dismiss="modal">Cancel</button>
+                <button class="btn text-white save-next-btn" (click)="generateChecklistDetails(form)" type="submit">
+                  Send
+                </button>
+              </div>
             </div>
+
           </div>
         </div>
       </div>
@@ -469,4 +475,3 @@
     </div>
   </div>
 </div>
-
